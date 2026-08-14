@@ -1,0 +1,50 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+ERROR: Unable to locate a modulefile for 'ipopt/3.14.2'
+Initializing simulation...
+Traceback (most recent call last):
+  File "/users/ylu28/GitHub/RTS-GMLC/trial_0826/./base_pcm_test.py", line 42, in <module>
+    Prescient().simulate(**prescient_options)
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/prescient.py", line 75, in simulate
+    return self._simulate(self.config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/prescient.py", line 82, in _simulate
+    return super().simulate(options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/simulator.py", line 85, in simulate
+    engine.initialize(options)
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/engine/egret/engine.py", line 80, in initialize
+    self._data_provider = options.data_provider.get_data_provider(options)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/data/data_provider_factory.py", line 26, in get_data_provider
+    return GmlcDataProvider(options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/data/providers/gmlc_data_provider.py", line 45, in __init__
+    self._cache = parser.parse_to_cache(options.data_path, self._start_time, self._end_time, honor_lookahead=False)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/egret/parsers/rts_gmlc/parser.py", line 143, in parse_to_cache
+    timeseries_df = _read_timeseries_data(model_data, rts_gmlc_dir,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/egret/parsers/rts_gmlc/parser.py", line 818, in _read_timeseries_data
+    data = _read_timeseries_file(fname, minutes_per_period[sim], 
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/egret/parsers/rts_gmlc/parser.py", line 229, in _read_timeseries_file
+    headers = pd.read_csv(file_name, nrows=0).columns.tolist()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/pandas/io/parsers/readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/pandas/io/common.py", line 930, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/users/ylu28/GitHub/RTS-GMLC/RTS_Data/timeseries_data_files/HYDRO/DAY_AHEAD_hydro.csv'
+Loading CRC_default/1.1

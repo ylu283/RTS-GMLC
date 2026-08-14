@@ -1,0 +1,28 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+ERROR: Unable to locate a modulefile for 'ipopt/3.14.2'
+Initializing simulation...
+Traceback (most recent call last):
+  File "/users/ylu28/GitHub/RTS-GMLC/trial_0826/./base_pcm_test.py", line 42, in <module>
+    Prescient().simulate(**prescient_options)
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/prescient.py", line 75, in simulate
+    return self._simulate(self.config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/prescient.py", line 82, in _simulate
+    return super().simulate(options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/simulator/simulator.py", line 85, in simulate
+    engine.initialize(options)
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/engine/egret/engine.py", line 80, in initialize
+    self._data_provider = options.data_provider.get_data_provider(options)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/data/data_provider_factory.py", line 26, in get_data_provider
+    return GmlcDataProvider(options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/prescient/data/providers/gmlc_data_provider.py", line 45, in __init__
+    self._cache = parser.parse_to_cache(options.data_path, self._start_time, self._end_time, honor_lookahead=False)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/users/ylu28/.conda/envs/PCM0826/lib/python3.12/site-packages/egret/parsers/rts_gmlc/parser.py", line 125, in parse_to_cache
+    raise ValueError(f'RTS-GMLC directory "{rts_gmlc_dir}" does not exist')
+ValueError: RTS-GMLC directory "/users/ylu28/GitHub/RTS-GMLC/trial_0826/RTS-GMLC" does not exist
+Loading CRC_default/1.1

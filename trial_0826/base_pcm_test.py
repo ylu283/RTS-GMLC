@@ -6,14 +6,14 @@ this_file_path = os.path.dirname(os.path.realpath(__file__))
 shortfall = 500
 output_path = "base_case_pcm_test"
 prescient_options = {
-        "data_path":"./RTS-GMLC",
+        "data_path":"../RTS_Data/SourceData",
         "reserve_factor": 0.1,
         "simulate_out_of_sample":True,
         "output_directory":output_path,
         "monitor_all_contingencies":False,
         "input_format":"rts-gmlc",
         "start_date":"01-01-2020",
-        "num_days":3,
+        "num_days":366,
         "sced_horizon":1,
         "ruc_mipgap":0.01,
 	    "deterministic_ruc_solver": "gurobi",

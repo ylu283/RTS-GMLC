@@ -12,7 +12,7 @@ def submit_job(job_name):
     with open(file_name, "w") as f:
         f.write(
             "#!/bin/bash\n"
-            + "#$ -M xchen24@nd.edu\n"
+            + "#$ -M ylu28@nd.edu\n"
             + "#$ -m ae\n"
             + "#$ -q long\n"
             + f"#$ -N {job_name}\n"
