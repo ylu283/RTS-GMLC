@@ -37,7 +37,7 @@ parser.add_argument(
 options = parser.parse_args()
 
 this_file_path = os.path.dirname(os.path.realpath(__file__))
-data_path = os.path.join(this_file_path, "..", "RTS-GMLC", "RTS_Data", "SourceData")
+data_path = os.path.join(this_file_path, "..","..", "RTS-GMLC", "RTS_Data", "SourceData")
 
 # default some options
 output_path = None
