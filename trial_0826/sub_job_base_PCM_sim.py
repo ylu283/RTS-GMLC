@@ -17,9 +17,10 @@ def submit_job(job_name):
             + "#$ -q long\n"
             + f"#$ -N {job_name}\n"
             + f"conda activate PCM0826\n"
+            # FIXME: points at the 'regen' env, not PCM0826 — reason unknown;
+            # resolve during pilot batch (doc 14 §5.2)
             + "export LD_LIBRARY_PATH=~/.conda/envs/regen/lib:$LD_LIBRARY_PATH \n"
             + "module load gurobi\n"
-            + "module load ipopt/3.14.2 \n"
             + f"python ./base_pcm_test.py"
         )
 
