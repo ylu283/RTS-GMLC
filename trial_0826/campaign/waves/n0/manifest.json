@@ -1,0 +1,139 @@
+{
+  "git_sha": "856c9d524df6931ea3a01b5624f6f2e887d4779e",
+  "dirty": false,
+  "tiers": {
+    "nuclear": {
+      "members": [
+        "121_NUCLEAR_1"
+      ],
+      "type": "thermal",
+      "omega": [
+        0.05,
+        0.5
+      ],
+      "bid": [
+        15,
+        40
+      ]
+    },
+    "wind_303": {
+      "members": [
+        "303_WIND_1"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.05,
+        1.0
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "303_WIND_1": 847.0
+      }
+    },
+    "wind_317": {
+      "members": [
+        "317_WIND_1"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.05,
+        1.0
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "317_WIND_1": 799.1
+      }
+    },
+    "wind_122": {
+      "members": [
+        "122_WIND_1"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.05,
+        1.0
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "122_WIND_1": 713.5
+      }
+    },
+    "pv_319": {
+      "members": [
+        "319_PV_1"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.02,
+        0.8
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "319_PV_1": 188.2
+      }
+    },
+    "pv_324": {
+      "members": [
+        "324_PV_1",
+        "324_PV_2",
+        "324_PV_3"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.02,
+        0.8
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "324_PV_1": 49.7,
+        "324_PV_2": 51.6,
+        "324_PV_3": 51.0
+      }
+    },
+    "tail": {
+      "members": [
+        "310_PV_2",
+        "320_PV_1",
+        "309_WIND_1"
+      ],
+      "type": "renewable",
+      "omega": [
+        0.02,
+        1.0
+      ],
+      "bid": [
+        10,
+        40
+      ],
+      "gen_pmax": {
+        "310_PV_2": 51.6,
+        "320_PV_1": 51.6,
+        "309_WIND_1": 148.3
+      }
+    }
+  },
+  "sobol": {
+    "seed": 20260821,
+    "skip": 0,
+    "n": 128
+  },
+  "scipy_version": "1.16.3",
+  "generated_at": "2026-08-22T14:23:12+00:00",
+  "environment_yml_sha256": "121cfdd73e6aa166cd844c8053317732b37728bb0fee3a4cc21c8962252beab7",
+  "n_rows": 130
+}

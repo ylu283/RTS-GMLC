@@ -1,0 +1,56 @@
+{
+  "121_NUCLEAR_1": {
+    "PEM_bid": 37.12,
+    "PEM_fraction": 0.0828
+  },
+  "122_WIND_1": {
+    "PEM_bid": 30.17,
+    "PEM_fraction": 0.6608,
+    "gen_pmax": 713.5
+  },
+  "303_WIND_1": {
+    "PEM_bid": 25.99,
+    "PEM_fraction": 0.1592,
+    "gen_pmax": 847.0
+  },
+  "309_WIND_1": {
+    "PEM_bid": 23.18,
+    "PEM_fraction": 0.7168,
+    "gen_pmax": 148.3
+  },
+  "310_PV_2": {
+    "PEM_bid": 23.18,
+    "PEM_fraction": 0.7168,
+    "gen_pmax": 51.6
+  },
+  "317_WIND_1": {
+    "PEM_bid": 27.07,
+    "PEM_fraction": 0.7408,
+    "gen_pmax": 799.1
+  },
+  "319_PV_1": {
+    "PEM_bid": 34.89,
+    "PEM_fraction": 0.2352,
+    "gen_pmax": 188.2
+  },
+  "320_PV_1": {
+    "PEM_bid": 23.18,
+    "PEM_fraction": 0.7168,
+    "gen_pmax": 51.6
+  },
+  "324_PV_1": {
+    "PEM_bid": 12.47,
+    "PEM_fraction": 0.3354,
+    "gen_pmax": 49.7
+  },
+  "324_PV_2": {
+    "PEM_bid": 12.47,
+    "PEM_fraction": 0.3354,
+    "gen_pmax": 51.6
+  },
+  "324_PV_3": {
+    "PEM_bid": 12.47,
+    "PEM_fraction": 0.3354,
+    "gen_pmax": 51.0
+  }
+}

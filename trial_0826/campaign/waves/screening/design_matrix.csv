@@ -1,0 +1,13 @@
+index,nuclear_omega,nuclear_bid,wind_303_omega,wind_303_bid,wind_317_omega,wind_317_bid,wind_122_omega,wind_122_bid,pv_319_omega,pv_319_bid,pv_324_omega,pv_324_bid,tail_omega,tail_bid,oat_site,anchor,start_date,num_days,provisional
+1,,,,,,,,,,,,,,,121_NUCLEAR_1,False,01-01-2020,366,False
+2,,,,,,,,,,,,,,,303_WIND_1,False,01-01-2020,366,False
+3,,,,,,,,,,,,,,,317_WIND_1,False,01-01-2020,366,False
+4,,,,,,,,,,,,,,,122_WIND_1,False,01-01-2020,366,False
+5,,,,,,,,,,,,,,,319_PV_1,False,01-01-2020,366,False
+6,,,,,,,,,,,,,,,324_PV_1,False,01-01-2020,366,False
+7,,,,,,,,,,,,,,,324_PV_2,False,01-01-2020,366,False
+8,,,,,,,,,,,,,,,324_PV_3,False,01-01-2020,366,False
+9,,,,,,,,,,,,,,,310_PV_2,False,01-01-2020,366,False
+10,,,,,,,,,,,,,,,320_PV_1,False,01-01-2020,366,False
+11,,,,,,,,,,,,,,,309_WIND_1,False,01-01-2020,366,False
+12,,,,,,,,,,,,,,,__ALL__,False,01-01-2020,366,False
