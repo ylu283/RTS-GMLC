@@ -1,5 +1,7 @@
 .DS_Store
-.pyc
+*.pyc
+__pycache__/
+.pytest_cache/
 .Rapp.history
 .Rhistory
 *.qgs~
