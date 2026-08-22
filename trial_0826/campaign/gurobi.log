@@ -1,0 +1,7 @@
+
+Gurobi 11.0.2 (linux64, gurobi_cl) logging started Sat Aug 22 10:56:19 2026
+
+Set parameter GURO_PAR_SPECIAL
+Set parameter TokenServer to value "linux4-lic.virtual.crc.nd.edu"
+Set parameter LogFile to value "gurobi.log"
+Using license file /afs/crc.nd.edu/x86_64_linux/g/gurobi/license/gurobi.lic

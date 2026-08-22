@@ -14,11 +14,11 @@
 set -euo pipefail
 
 # Pinned solver module. TODO(Kay): pin the exact CRC version once
-# (`module avail gurobi`), e.g. GUROBI_MODULE="gurobi/11.0.3".
+# (`module avail gurobi`), e.g. GUROBI_MODULE="gurobi/11.0.2".
 # Deliberate (doc 14 §5.1 deviation, see README): the prescient options and
 # this module pin live here in the version-controlled script, not in
 # manifest.json.
-GUROBI_MODULE="gurobi"
+GUROBI_MODULE="gurobi/11.0.2"
 
 WAVE_DIR="$PWD"
 TRIAL_DIR="$(cd "$PWD/../../.." && pwd)"
