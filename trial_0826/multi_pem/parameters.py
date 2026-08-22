@@ -10,8 +10,9 @@ def _update_thermal_generator(gen, gen_PEM_data, n_time_keys):
         gen["p_cost"] = { "data_type" : "cost_curve", "cost_curve_type" : "piecewise" }
     gen["p_cost"]["values"] = [[gen["p_min"], 0.], [gen["p_max"], PEM_capacity*gen_PEM_data["PEM_indifference_point"]]]
 
-    gen["ramp_up_60min"] = PEM_capacity*60
-    gen["ramp_down_60min"] = PEM_capacity*60
+    # Egret ramp units are MW/h; the flexible band is exactly the PEM capacity.
+    gen["ramp_up_60min"] = PEM_capacity
+    gen["ramp_down_60min"] = PEM_capacity
     gen["fixed_commitment"] = {"data_type" : "time_series", "values" : [1]*n_time_keys}
 
 
