@@ -1,6 +1,29 @@
 import copy
 
 
+def _get_bid(gen_PEM_data):
+    """Return the PEM bid price ($/MWh).
+
+    "PEM_bid" is the preferred key; "PEM_indifference_point" is accepted as a
+    deprecated alias (under the frozen /10 convention B is a bid, not the
+    theoretical indifference point). Raises if both are present with
+    different values.
+    """
+    has_bid = "PEM_bid" in gen_PEM_data
+    has_legacy = "PEM_indifference_point" in gen_PEM_data
+    if has_bid and has_legacy and gen_PEM_data["PEM_bid"] != gen_PEM_data["PEM_indifference_point"]:
+        raise ValueError(
+            "Conflicting bid values: PEM_bid="
+            f"{gen_PEM_data['PEM_bid']} vs deprecated PEM_indifference_point="
+            f"{gen_PEM_data['PEM_indifference_point']}; provide only 'PEM_bid'"
+        )
+    if has_bid:
+        return gen_PEM_data["PEM_bid"]
+    if has_legacy:
+        return gen_PEM_data["PEM_indifference_point"]
+    raise KeyError("PEM data must contain 'PEM_bid' (or the deprecated alias 'PEM_indifference_point')")
+
+
 def _update_thermal_generator(gen, gen_PEM_data, n_time_keys):
     PEM_capacity = gen_PEM_data["PEM_fraction"] * gen["p_max"]
     gen["p_min"] = gen["p_max"] - PEM_capacity
@@ -12,7 +35,7 @@ def _update_thermal_generator(gen, gen_PEM_data, n_time_keys):
         assert isinstance(gen["p_cost"], dict) and gen["p_cost"].get("cost_curve_type") == "piecewise", (
             f"Cannot overwrite p_cost: expected a piecewise cost-curve dict, got {gen['p_cost']!r}"
         )
-    gen["p_cost"]["values"] = [[gen["p_min"], 0.], [gen["p_max"], PEM_capacity*gen_PEM_data["PEM_indifference_point"]]]
+    gen["p_cost"]["values"] = [[gen["p_min"], 0.], [gen["p_max"], PEM_capacity*_get_bid(gen_PEM_data)]]
 
     # Egret ramp units are MW/h; the flexible band is exactly the PEM capacity.
     gen["ramp_up_60min"] = PEM_capacity
@@ -43,7 +66,7 @@ def _update_renewable_generator(generators, gen_name, gen_PEM_data):
     pem = copy.deepcopy(gen)
     pem["p_min"] = 0.0
     pem["p_max"]["values"] = [min(PEM_power_capacity, val) for val in gen["p_max"]["values"]]
-    pem["p_cost"] = gen_PEM_data["PEM_indifference_point"]
+    pem["p_cost"] = _get_bid(gen_PEM_data)
 
     generators[pem_name] = pem
 
@@ -69,8 +92,23 @@ def update_function_multi(model_data, PEM_data):
 
     Args:
         model_data : the Prescient model data instance
-        PEM_data (dict) : mapping of generator_name -> {"PEM_indifference_point": ..., "PEM_fraction": ...,
-            "gen_pmax": ...}. "gen_pmax" (installed capacity) is only required for renewable generators.
+        PEM_data (dict) : mapping of generator_name -> dict with keys:
+            "PEM_bid" : PEM bid price in $/MWh (preferred; "PEM_indifference_point"
+                is a deprecated alias),
+            "PEM_fraction" : PEM power as a ratio of installed capacity,
+            "gen_pmax" : installed capacity in MW — required for renewable generators only.
+
+    Mechanics:
+        Thermal: p_min is raised to p_max - PEM_capacity, the band is priced at the
+            bid with forced commitment (the unit diverts to H2 when LMP < bid).
+        Renewable: the unit is split into the parent (availability minus PEM_capacity,
+            floored at 0) and a "<name>_PEM" unit (p_max = min(PEM_capacity,
+            availability), scalar p_cost = bid) — priced withholding.
+
+    Warning:
+        Prescient reports gen_PEM's withheld (H2) energy as *Curtailment* of the
+        "<name>_PEM" unit — post-processing must exclude "*_PEM" units from
+        curtailment sums (that column is the H2 production time series).
     """
     generators = model_data.data["elements"]["generator"]
     n_time_keys = len(model_data.data["system"]["time_keys"])

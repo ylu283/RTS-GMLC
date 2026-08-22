@@ -29,8 +29,8 @@ if __name__ == "__main__":
     index = "7_days"
     output_directory = f"multi_pem_test_{index}"
     retrofit_gen_dict = {
-        "121_NUCLEAR_1": {"PEM_indifference_point": 25, "PEM_fraction": 0.5},
-        "303_WIND_1": {"PEM_indifference_point": 20, "PEM_fraction": 0.2, "gen_pmax": 847},
-        "319_PV_1": {"PEM_indifference_point": 30, "PEM_fraction": 0.3, "gen_pmax": 188.2},
+        "121_NUCLEAR_1": {"PEM_bid": 25, "PEM_fraction": 0.5},
+        "303_WIND_1": {"PEM_bid": 20, "PEM_fraction": 0.2, "gen_pmax": 847},
+        "319_PV_1": {"PEM_bid": 30, "PEM_fraction": 0.3, "gen_pmax": 188.2},
     }
     submit_job(index, output_directory, retrofit_gen_dict)

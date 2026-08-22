@@ -30,7 +30,7 @@ parser.add_argument(
     "--retrofit_gen_dict",
     dest="retrofit_gen_dict",
     help="Set the retrofit generator dictionary as a JSON string, "
-         "e.g. '{\"121_NUCLEAR_1\": {\"PEM_indifference_point\": 25, \"PEM_fraction\": 0.5}}'.",
+         "e.g. '{\"121_NUCLEAR_1\": {\"PEM_bid\": 25, \"PEM_fraction\": 0.5}}'.",
     action="store",
     default={},
 )
@@ -79,12 +79,13 @@ index = options.index
 prescient_options["output_directory"] = options.output_directory
 
 # Dictionary of generator name -> PEM data for that generator.
-# PEM_indifference_point : PEM bid price in $/MW
-# PEM_fraction : PEM power as a ratio of the NPP capacity
+# PEM_bid : PEM bid price in $/MWh ("PEM_indifference_point" is a deprecated alias)
+# PEM_fraction : PEM power as a ratio of the installed capacity
+# gen_pmax : installed capacity in MW (required for renewable generators only)
 if options.retrofit_gen_dict == {}:
     PEM_data = {
-        "121_NUCLEAR_1": {"PEM_indifference_point": 25, "PEM_fraction": 0.5},
-        "303_WIND_1": {"PEM_indifference_point": 20, "PEM_fraction": 0.2, "gen_pmax": 847},
+        "121_NUCLEAR_1": {"PEM_bid": 25, "PEM_fraction": 0.5},
+        "303_WIND_1": {"PEM_bid": 20, "PEM_fraction": 0.2, "gen_pmax": 847},
     }
 elif isinstance(options.retrofit_gen_dict, dict):
     PEM_data = options.retrofit_gen_dict
