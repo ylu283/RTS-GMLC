@@ -5,3 +5,7 @@ __pycache__/
 .Rapp.history
 .Rhistory
 *.qgs~
+
+# Campaign run outputs stay out of git (150 MB/full-year run; sync objectives
+# CSVs instead). Pilot runs committed before this rule remain tracked.
+trial_0826/campaign/waves/*/runs/
