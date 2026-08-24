@@ -47,7 +47,7 @@ def test_to_design_matrix_physical_bounds(tiers):
         assert df[f"{name}_omega"].between(omega_lo, omega_hi).all()
         assert df[f"{name}_bid"].between(bid_lo, bid_hi).all()
     # d columns complete
-    assert len(dt.tier_columns(tiers)) == 2 * len(TIERS) == 14
+    assert len(dt.tier_columns(tiers)) == 2 * len(TIERS) == 12
     assert all(col in df.columns for col in dt.matrix_columns(tiers))
 
 
@@ -68,13 +68,13 @@ def test_index_is_one_based(tiers):
 
 
 def test_cluster_expansion(tiers):
-    row = dt.make_row(tiers, {"pv_324": (0.1234567, 20.123456)}, index=1)
+    row = dt.make_row(tiers, {"pv": (0.1234567, 20.123456)}, index=1)
     out = dt.expand_to_retrofit_dict(row, tiers)
-    assert set(out) == {"324_PV_1", "324_PV_2", "324_PV_3"}
+    assert set(out) == {"319_PV_1", "324_PV_1", "324_PV_2", "324_PV_3"}
     for member, entry in out.items():
         assert entry["PEM_fraction"] == 0.1235  # rounded to 4 decimals
         assert entry["PEM_bid"] == 20.12        # rounded to 2 decimals
-        assert entry["gen_pmax"] == tiers["pv_324"]["gen_pmax"][member]
+        assert entry["gen_pmax"] == tiers["pv"]["gen_pmax"][member]
         assert set(entry) == {"PEM_fraction", "PEM_bid", "gen_pmax"}
     # NaN tiers skipped; only PEM_bid key; JSON round-trips
     text = json.dumps(out)

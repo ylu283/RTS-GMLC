@@ -5,7 +5,11 @@ that only sites with learnable individual signal get independent (omega, B)
 dimensions. A cluster shares one (omega, B) pair; each member still gets its
 own physical PEM (omega x own nameplate).
 
-d = 2 * len(TIERS) = 14.
+d = 2 * len(TIERS) = 12 (d12 branch, 2026-08-24): pv_319 + pv_324 merged
+into one `pv` tier per the screening verdict — both were sub-threshold
+(4.2% / 3.9% effect share vs 5%), and the B-axis endpoints agree (319's
+share is 4.4% in the low-B limit = base ranking, 4.2% at B = 40). See
+waves/screening/screening_review.md.
 """
 
 import copy
@@ -33,9 +37,9 @@ TIERS = {
                  "omega": (0.05, 0.5), "bid": (10, 40)},
     "wind_122": {"members": ["122_WIND_1"], "type": "renewable",
                  "omega": (0.05, 0.5), "bid": (10, 40)},
-    "pv_319":   {"members": ["319_PV_1"], "type": "renewable",
-                 "omega": (0.02, 0.3), "bid": (10, 40)},
-    "pv_324":   {"members": ["324_PV_1", "324_PV_2", "324_PV_3"],
+    # merged pv tier (screening verdict): shared "PV policy" — near-identical
+    # per-MW effect (1,269-1,590 MWh/MW) and CF (0.41-0.42) across all four
+    "pv":       {"members": ["319_PV_1", "324_PV_1", "324_PV_2", "324_PV_3"],
                  "type": "renewable", "omega": (0.02, 0.3), "bid": (10, 40)},
     # tail mixes PV + wind: omega = union of member-type ranges
     # (doc 14: prefer generous bounds over truncation)

@@ -27,9 +27,9 @@ BASE_CASE_SOURCE_DIR = "trial_0826/base_case_pcm_test"
 
 HOLD_MD = """# HOLD — do not submit this wave
 
-1. **This wave is a DRAFT generated from provisional tiers/bounds — submit
-   nothing.** Pending decisions: O-M2 bid handling and the final tier
-   assignment from the screening batch's noise criterion.
+1. **This wave is a DRAFT — submit nothing yet.** Tier structure is FINAL
+   (d = 12, screening verdict 2026-08-24); still pending: the PI decisions
+   (O-M2 bid handling, O-15 constraint, f5) from doc 16.
 
 2. **After the PI + screening decisions land, regenerate** by editing
    `campaign/tiers.py` and rerunning `python make_batches.py n0` — same
@@ -166,7 +166,29 @@ def build_n0(waves_root=WAVES_ROOT):
     return wave_dir
 
 
-BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0}
+def build_control_b0(waves_root=WAVES_ROOT):
+    """f4 artifact control (screening_review.md): ONE run — 317_WIND_1 OAT at
+    B ~= 0. gen_PEM at cost ~0 is economically identical to the unsplit base
+    case, so any residual delta_shed isolates the pure split/DA-commitment
+    artifact behind the suspicious wind shed reductions. Same omega as the
+    screening 317 OAT so the pair differs only in B."""
+    tiers, provisional = build_tiers()
+    stats = load_tm1_stats()
+    pmax = load_gen_pmax()
+    site = "317_WIND_1"
+    omega = (stats[site]["omega_oat_reference"]
+             if stats is not None and site in stats else 0.5)
+    dicts = {1: dt.single_site_entry(site, omega, 0.01, pmax[site])}
+    rows = [dt.make_row(tiers, {}, index=1, num_days=FULL_YEAR,
+                        oat_site=site, provisional=provisional)]
+    wave_dir = os.path.join(waves_root, "control_b0")
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers,
+                  sobol=None, retrofit_dicts=dicts)
+    return wave_dir
+
+
+BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
+            "control_b0": build_control_b0}
 
 
 def main(argv=None):
