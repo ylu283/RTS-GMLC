@@ -1,2 +1,2 @@
-index,nuclear_omega,nuclear_bid,wind_303_omega,wind_303_bid,wind_317_omega,wind_317_bid,wind_122_omega,wind_122_bid,pv_319_omega,pv_319_bid,pv_324_omega,pv_324_bid,tail_omega,tail_bid,oat_site,anchor,start_date,num_days,provisional,source_dir
-0,,,,,,,,,,,,,,,,True,01-01-2020,366,False,trial_0826/base_case_pcm_test
+index,nuclear_omega,nuclear_bid,wind_303_omega,wind_303_bid,wind_317_omega,wind_317_bid,wind_122_omega,wind_122_bid,pv_omega,pv_bid,tail_omega,tail_bid,oat_site,anchor,start_date,num_days,provisional,source_dir
+0,,,,,,,,,,,,,,True,01-01-2020,366,False,trial_0826/base_case_pcm_test

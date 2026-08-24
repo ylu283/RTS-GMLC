@@ -1,8 +1,8 @@
 # HOLD — do not submit this wave
 
-1. **This wave is a DRAFT generated from provisional tiers/bounds — submit
-   nothing.** Pending decisions: O-M2 bid handling and the final tier
-   assignment from the screening batch's noise criterion.
+1. **This wave is a DRAFT — submit nothing yet.** Tier structure is FINAL
+   (d = 12, screening verdict 2026-08-24); still pending: the PI decisions
+   (O-M2 bid handling, O-15 constraint, f5) from doc 16.
 
 2. **After the PI + screening decisions land, regenerate** by editing
    `campaign/tiers.py` and rerunning `python make_batches.py n0` — same

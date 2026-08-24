@@ -1,6 +1,6 @@
 {
   "git_sha": "bf6c69eb476f9029ba5e3c8fd0d1ae4a4af7f32e",
-  "dirty": false,
+  "dirty": true,
   "tiers": {
     "nuclear": {
       "members": [
@@ -112,13 +112,9 @@
       }
     }
   },
-  "sobol": {
-    "seed": 20260821,
-    "skip": 0,
-    "n": 128
-  },
+  "sobol": null,
   "scipy_version": "1.16.3",
-  "generated_at": "2026-08-24T17:16:29+00:00",
+  "generated_at": "2026-08-24T17:16:30+00:00",
   "environment_yml_sha256": "121cfdd73e6aa166cd844c8053317732b37728bb0fee3a4cc21c8962252beab7",
-  "n_rows": 130
+  "n_rows": 1
 }
