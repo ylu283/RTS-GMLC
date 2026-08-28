@@ -45,6 +45,52 @@ def load_pmax_lookup():
     return dict(zip(g["GEN UID"], g["PMax MW"]))
 
 
+# g4 source (math-log §3): "Total reserve shortfall" in
+# overall_simulation_output.csv — the annual total in MWh. Verified on the
+# base case against reserves_detail.csv's per-hour "Shortfall" sum
+# (203,681.35 MWh, agree to 1e-5); the overall column is used because it is
+# one pre-aggregated number per run.
+RESERVE_SHORTFALL_COL = "Total reserve shortfall"
+
+
+def reserve_shortfall_mwh(ov: pd.DataFrame, where: str):
+    if RESERVE_SHORTFALL_COL not in ov.columns:
+        print(f"    WARNING: {where}: column {RESERVE_SHORTFALL_COL!r} absent from "
+              f"{SENTINEL} — g4 emitted as NaN, NOT zero. Investigate before use.")
+        return float("nan")
+    return ov[RESERVE_SHORTFALL_COL].sum()
+
+
+def _unit_state_bool(s: pd.Series):
+    """Coerce thermal_detail 'Unit State' to bool. Real Prescient output
+    parses as bool dtype (True/False strings); guard the numeric-0/1 and
+    unparsed-string cases so a dtype drift can never silently miscount
+    (bare astype(bool) would map ANY non-empty string, incl. 'False', to True)."""
+    if s.dtype == bool:
+        return s
+    if s.dtype == object:
+        mapped = s.map({"True": True, "False": False, True: True, False: False})
+        assert not mapped.isna().any(), \
+            f"unrecognized Unit State values: {sorted(s[mapped.isna()].unique())}"
+        return mapped.astype(bool)
+    return s.astype(float) > 0.5
+
+
+def fleet_thermal_starts(run_dir: Path):
+    """g5 (math-log §3): fleet startup count S = sum_g sum_t
+    1[u_t = 1 and u_{t-1} = 0], per generator sorted by time; the first hour
+    compares against itself (no start)."""
+    td = pd.read_csv(run_dir / "thermal_detail.csv",
+                     usecols=["Generator", "Date", "Hour", "Minute", "Unit State"])
+    # ISO dates sort lexicographically; stable sort keeps file order within ties
+    td = td.sort_values(["Generator", "Date", "Hour", "Minute"], kind="stable")
+    starts = 0
+    for _, grp in td.groupby("Generator", sort=False):
+        u = _unit_state_bool(grp["Unit State"]).to_numpy()
+        starts += int((u[1:] & ~u[:-1]).sum())
+    return starts
+
+
 def base_aggregates(base_dir: Path):
     ov = pd.read_csv(base_dir / SENTINEL)
     rd = pd.read_csv(base_dir / "renewables_detail.csv",
@@ -53,6 +99,8 @@ def base_aggregates(base_dir: Path):
         "curtailment_mwh": rd["Curtailment"].sum(),
         "load_shed_mwh": ov["Total load shedding"].sum(),
         "total_cost_usd": ov["Total costs"].sum(),
+        "reserve_shortfall_mwh": reserve_shortfall_mwh(ov, str(base_dir)),
+        "thermal_starts": fleet_thermal_starts(base_dir),
     }
 
 
@@ -68,6 +116,8 @@ def summarize_run(run_dir: Path, retrofit: dict, pmax_lookup: dict):
         "true_curtailment_mwh": rd.loc[~is_pem, "Curtailment"].sum(),
         "load_shed_mwh": ov["Total load shedding"].sum(),
         "total_cost_raw_usd": ov["Total costs"].sum(),
+        "reserve_shortfall_mwh": reserve_shortfall_mwh(ov, run_dir.name),
+        "thermal_starts": fleet_thermal_starts(run_dir),
     }
 
     ren_groups = rd.groupby("Generator").sum(numeric_only=True)
@@ -159,6 +209,9 @@ def main():
             "anchor": drow.get("anchor", False),
             "num_days": int(drow["num_days"]),
             "start_date": drow["start_date"],
+            # v3 derived-bid scenario, passed through from the design matrix
+            # (math-log §1.3); NaN for pre-v3 waves whose matrices lack it
+            "rho_h2": float(drow["rho_h2"]) if "rho_h2" in dm.columns else float("nan"),
             **row,
             "delta_curtailment_mwh":
                 row["true_curtailment_mwh"] - base["curtailment_mwh"] if full_year else float("nan"),
@@ -166,10 +219,21 @@ def main():
                 row["load_shed_mwh"] - base["load_shed_mwh"] if full_year else float("nan"),
             "delta_cost_less_synthetic_usd_APPROX":
                 row["total_cost_less_synthetic_usd"] - base["total_cost_usd"] if full_year else float("nan"),
+            "delta_reserve_shortfall_mwh":
+                row["reserve_shortfall_mwh"] - base["reserve_shortfall_mwh"] if full_year else float("nan"),
+            "delta_thermal_starts":
+                row["thermal_starts"] - base["thermal_starts"] if full_year else float("nan"),
         }
         obj_rows.append(row)
         for s in site_rows:
             site_rows_all.append({"index": i, **s})
+
+    if not obj_rows:
+        # never overwrite a previous summary with an empty table: a wave whose
+        # runs/ is absent (e.g. not yet synced from CRC) must be a no-op
+        print(f"{wave.name}: NO completed runs found — objectives.csv untouched")
+        print(f"MISSING (not summarized): indices {missing}")
+        return 1
 
     obj = pd.DataFrame(obj_rows)
     site = pd.DataFrame(site_rows_all)

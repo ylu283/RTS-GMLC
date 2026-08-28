@@ -41,3 +41,24 @@ def n0_wave(waves_root):
     wave_dir = make_batches.build_n0(waves_root)
     submit_array.generate_script(wave_dir)
     return wave_dir
+
+
+@pytest.fixture(scope="session")
+def contour_a_wave(waves_root):
+    wave_dir = make_batches.build_contour_303x317("A", waves_root)
+    submit_array.generate_script(wave_dir)
+    return wave_dir
+
+
+@pytest.fixture(scope="session")
+def contour_b_wave(waves_root):
+    wave_dir = make_batches.build_contour_303x317("B", waves_root)
+    submit_array.generate_script(wave_dir)
+    return wave_dir
+
+
+@pytest.fixture(scope="session")
+def sweep_b_wave(waves_root):
+    wave_dir = make_batches.build_sweep("B", waves_root)
+    submit_array.generate_script(wave_dir)
+    return wave_dir

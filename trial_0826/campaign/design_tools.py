@@ -19,9 +19,10 @@ import pandas as pd
 import scipy
 from scipy.stats import qmc
 
-from tiers import ENVIRONMENT_YML, REPO_DIR, TIERS
+from tiers import ENVIRONMENT_YML, REPO_DIR, TIERS, derived_bid
 
-META_COLUMNS = ["oat_site", "anchor", "start_date", "num_days", "provisional"]
+META_COLUMNS = ["oat_site", "anchor", "start_date", "num_days", "provisional",
+                "rho_h2"]
 
 
 def tier_columns(tiers):
@@ -54,10 +55,18 @@ def generate_sobol(n, seed, skip=0, d=None):
 
 
 def make_row(tiers, tier_values, index, num_days=366, start_date="01-01-2020",
-             anchor=False, provisional=False, oat_site=None, external=False):
+             anchor=False, provisional=False, oat_site=None, external=False,
+             rho_h2=None):
     """One design-matrix row. `tier_values` maps tier -> (omega, bid) for the
     tiers present in the design; absent tiers become NaN. `external` is only
-    for external-anchor rows (index outside 1..N, separate CSV)."""
+    for external-anchor rows (index outside 1..N, separate CSV).
+
+    v3 derived-bid mode (math-log §1-2): with `rho_h2` set, `tier_values`
+    maps tier -> omega ONLY — every active tier's bid is forced to
+    `derived_bid(rho_h2)` and the scenario is recorded in the `rho_h2`
+    column. Caller-supplied bids are an error in this mode. With
+    rho_h2=None (old waves), behavior is exactly as before and the
+    `rho_h2` column is NaN."""
     if not external:
         assert index >= 1, "index maps 1:1 to $SGE_TASK_ID, which is 1-based"
     row = {"index": int(index)}
@@ -66,7 +75,16 @@ def make_row(tiers, tier_values, index, num_days=366, start_date="01-01-2020",
     assert not unknown, f"unknown tiers in design row: {sorted(unknown)}"
     for tier_name in tiers:
         if tier_name in tier_values:
-            omega, bid = tier_values[tier_name]
+            if rho_h2 is not None:
+                omega = tier_values[tier_name]
+                assert np.isscalar(omega), (
+                    f"tier {tier_name}, index {index}: with rho_h2 set, bids are "
+                    "DERIVED (B = 20*rho_h2, math-log §1.2) — pass omega only, "
+                    "never an (omega, bid) pair"
+                )
+                bid = derived_bid(rho_h2)
+            else:
+                omega, bid = tier_values[tier_name]
             assert omega > 0, (
                 f"omega=0 is forbidden (tier {tier_name}, index {index}): encode an "
                 "absent tier as NaN — omega=0 would create a degenerate zero-capacity PEM unit"
@@ -81,6 +99,7 @@ def make_row(tiers, tier_values, index, num_days=366, start_date="01-01-2020",
     row["start_date"] = str(start_date)
     row["num_days"] = int(num_days)
     row["provisional"] = bool(provisional)
+    row["rho_h2"] = float(rho_h2) if rho_h2 is not None else float("nan")
     return row
 
 
@@ -89,15 +108,19 @@ def rows_to_matrix(rows, tiers):
 
 
 def to_design_matrix(unit_points, tiers, start_index=1, num_days=366,
-                     start_date="01-01-2020", anchor=False, provisional=False):
+                     start_date="01-01-2020", anchor=False, provisional=False,
+                     rho_h2=None):
     """Affine-map unit hypercube points to physical tier ranges.
 
     The scalar kwargs apply to every row of this call; multi-horizon waves
     are built from multiple calls concatenated with continued `start_index`.
-    Column order per point: (omega, bid) per tier, in tier order.
+    Column order per point (rho_h2=None): (omega, bid) per tier, in tier
+    order. v3 derived-bid mode (rho_h2 set, math-log §2): points are omega
+    ONLY — one column per tier, in tier order (d = len(tiers)) — and every
+    tier's bid is filled with derived_bid(rho_h2).
     """
     unit_points = np.asarray(unit_points, dtype=float)
-    d = 2 * len(tiers)
+    d = len(tiers) if rho_h2 is not None else 2 * len(tiers)
     assert unit_points.ndim == 2 and unit_points.shape[1] == d, (
         f"expected unit points of shape (n, {d}), got {unit_points.shape}"
     )
@@ -107,15 +130,29 @@ def to_design_matrix(unit_points, tiers, start_index=1, num_days=366,
         tier_values = {}
         for j, (tier_name, tier) in enumerate(tiers.items()):
             omega_lo, omega_hi = tier["omega"]
-            bid_lo, bid_hi = tier["bid"]
-            tier_values[tier_name] = (
-                omega_lo + point[2 * j] * (omega_hi - omega_lo),
-                bid_lo + point[2 * j + 1] * (bid_hi - bid_lo),
-            )
+            if rho_h2 is not None:
+                tier_values[tier_name] = omega_lo + point[j] * (omega_hi - omega_lo)
+            else:
+                bid_lo, bid_hi = tier["bid"]
+                tier_values[tier_name] = (
+                    omega_lo + point[2 * j] * (omega_hi - omega_lo),
+                    bid_lo + point[2 * j + 1] * (bid_hi - bid_lo),
+                )
         rows.append(make_row(tiers, tier_values, index=start_index + i,
                              num_days=num_days, start_date=start_date,
-                             anchor=anchor, provisional=provisional))
+                             anchor=anchor, provisional=provisional,
+                             rho_h2=rho_h2))
     return rows_to_matrix(rows, tiers)
+
+
+def omega_grid(levels, lo, hi):
+    """Evenly spaced omega levels over [lo, hi] INCLUDING both endpoints
+    (contour grid axes and OAT sweep levels — shared so the §4.3 interaction
+    index gets its f(omega, 0) margins from the sweeps at zero extra cost)."""
+    assert levels >= 2, "a grid needs both endpoints: levels >= 2"
+    assert lo > 0, "omega=0 is forbidden (absent tiers are NaN, never omega=0)"
+    assert hi > lo, f"empty omega range: [{lo}, {hi}]"
+    return np.linspace(lo, hi, levels)
 
 
 def _is_oat_row(row):

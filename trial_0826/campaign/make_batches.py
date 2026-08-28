@@ -8,12 +8,14 @@ SGE array script. Commit the campaign code BEFORE generating waves so the
 manifest git SHA describes the generator. No job is ever submitted here.
 """
 
+import functools
 import os
 import sys
 
 import design_tools as dt
 import submit_array
-from tiers import SOBOL_SEED, build_tiers, load_gen_pmax, load_tm1_stats
+from tiers import (RHO_SCENARIOS, SOBOL_SEED, build_tiers, load_gen_pmax,
+                   load_tm1_stats)
 
 WAVES_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waves")
 
@@ -166,12 +168,16 @@ def build_n0(waves_root=WAVES_ROOT):
     return wave_dir
 
 
-def build_control_b0(waves_root=WAVES_ROOT):
-    """f4 artifact control (screening_review.md): ONE run — 317_WIND_1 OAT at
-    B ~= 0. gen_PEM at cost ~0 is economically identical to the unsplit base
-    case, so any residual delta_shed isolates the pure split/DA-commitment
-    artifact behind the suspicious wind shed reductions. Same omega as the
-    screening 317 OAT so the pair differs only in B."""
+def build_placebo(waves_root=WAVES_ROOT):
+    """Placebo wave (screening_review.md; living report §7.2): ONE run —
+    317_WIND_1 split into gen + gen_PEM at B = 0.01, an economically inert
+    retrofit. At near-zero bid the PEM twin clears whenever the unsplit unit
+    would have, so market outcomes should match the base case. A placebo must
+    produce no effect — any residual delta IS the measurement: the pure
+    split/DA-commitment artifact suspected of inflating wind-site f4 gains
+    (screening saw 317 cut shedding by 22 GWh at B = 40 vs nuclear's 3.5 GWh).
+    Same omega as the screening 317 OAT so the A/B pair differs only in B.
+    Verdict rendered by analyze_placebo.py after summarize_wave.py runs."""
     tiers, provisional = build_tiers()
     stats = load_tm1_stats()
     pmax = load_gen_pmax()
@@ -181,14 +187,71 @@ def build_control_b0(waves_root=WAVES_ROOT):
     dicts = {1: dt.single_site_entry(site, omega, 0.01, pmax[site])}
     rows = [dt.make_row(tiers, {}, index=1, num_days=FULL_YEAR,
                         oat_site=site, provisional=provisional)]
-    wave_dir = os.path.join(waves_root, "control_b0")
+    wave_dir = os.path.join(waves_root, "placebo")
     dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers,
                   sobol=None, retrofit_dicts=dicts)
     return wave_dir
 
 
+GRID_LEVELS = 9  # math-log §4.2: 9x9 direct contour grid / 9-level OAT sweeps
+CONTOUR_PAIR = ("wind_303", "wind_317")  # phase-1 headline pair (two biggest)
+
+
+def build_contour_303x317(scenario, waves_root=WAVES_ROOT):
+    """Phase-1 contour wave (math-log §4.2): 9x9 grid over (omega_303,
+    omega_317), all other tiers absent, bids derived from the batch's rho
+    scenario (B = 20*rho_h2, math-log §1). 81 full-year rows, indices 1-81
+    ROW-MAJOR with omega_303 as the OUTER axis:
+    index = 9*i303 + i317 + 1 (i303, i317 = 0..8 into each tier's
+    omega_grid). See README for the reconstruction recipe."""
+    tiers, provisional = build_tiers()
+    rho = RHO_SCENARIOS[scenario]
+    t303, t317 = CONTOUR_PAIR
+    grid_303 = dt.omega_grid(GRID_LEVELS, *tiers[t303]["omega"])
+    grid_317 = dt.omega_grid(GRID_LEVELS, *tiers[t317]["omega"])
+    rows = []
+    for i, w303 in enumerate(grid_303):          # outer: omega_303
+        for j, w317 in enumerate(grid_317):      # inner: omega_317
+            rows.append(dt.make_row(
+                tiers, {t303: w303, t317: w317},
+                index=GRID_LEVELS * i + j + 1, num_days=FULL_YEAR,
+                provisional=provisional, rho_h2=rho))
+    wave_dir = os.path.join(waves_root, f"contour_303x317_{scenario}")
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers, sobol=None)
+    return wave_dir
+
+
+def build_sweep(scenario, waves_root=WAVES_ROOT):
+    """Per-tier OAT omega sweeps (math-log §4.1): for each of the 6 tiers,
+    that tier alone at its 9 omega_grid levels (others absent), bids derived
+    from the rho scenario. 54 full-year rows, indices 1-54 in tier order.
+    The 303/317 sweep levels equal the contour grid axes (same omega_grid),
+    so the §4.3 interaction index gets its f(omega, 0) margins at zero extra
+    cost; f(0, 0) is the base case (external)."""
+    tiers, provisional = build_tiers()
+    rho = RHO_SCENARIOS[scenario]
+    rows = []
+    index = 1
+    for tier_name, tier in tiers.items():
+        for w in dt.omega_grid(GRID_LEVELS, *tier["omega"]):
+            rows.append(dt.make_row(tiers, {tier_name: w}, index=index,
+                                    num_days=FULL_YEAR,
+                                    provisional=provisional, rho_h2=rho))
+            index += 1
+    wave_dir = os.path.join(waves_root, f"sweep_{scenario}")
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers, sobol=None)
+    return wave_dir
+
+
 BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
-            "control_b0": build_control_b0}
+            "placebo": build_placebo,
+            # v3 derived-bid waves (math-log §4); contour_A first — rho = 1.0
+            # is the current-market headline
+            "contour_303x317_A": functools.partial(build_contour_303x317, "A"),
+            "contour_303x317_B": functools.partial(build_contour_303x317, "B"),
+            "contour_303x317_C": functools.partial(build_contour_303x317, "C"),
+            "sweep_B": functools.partial(build_sweep, "B"),
+            "sweep_C": functools.partial(build_sweep, "C")}
 
 
 def main(argv=None):

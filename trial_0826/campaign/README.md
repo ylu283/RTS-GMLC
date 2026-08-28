@@ -8,9 +8,9 @@ tested locally; **nothing submits jobs** — submission is done by Kay on CRC.
 
 | File | Role |
 |---|---|
-| `tiers.py` | Single source of truth: tier config (doc 14 §2.1), `SOBOL_SEED` (permanent — never re-seed), nameplates read from `RTS_Data/SourceData/gen.csv` at build time, ω upper bounds widened from 15a's `tm1_per_site_stats.csv` when present |
-| `design_tools.py` | Sobol generation (continuation via `skip`), design-matrix construction, retrofit-dict expansion, wave writing (`manifest.json` provenance) |
-| `make_batches.py` | The three batch definitions → `waves/{pilot,screening,n0}/` |
+| `tiers.py` | Single source of truth: tier config (doc 14 §2.1), `SOBOL_SEED` (permanent — never re-seed), the derived-bid scheme (`derived_bid`, `RHO_SCENARIOS` — math-log §1), nameplates read from `RTS_Data/SourceData/gen.csv` at build time, ω upper bounds widened from 15a's `tm1_per_site_stats.csv` when present |
+| `design_tools.py` | Sobol generation (continuation via `skip`), design-matrix construction (incl. v3 ω-only rows with derived bids + `rho_h2` column, and `omega_grid`), retrofit-dict expansion, wave writing (`manifest.json` provenance) |
+| `make_batches.py` | All batch definitions → `waves/<wave>/` (see the wave inventory below) |
 | `submit_array.py` | Generates one SGE array script per wave (never submits) |
 | `get_row.py` | Used *by the array script* on CRC: maps `$SGE_TASK_ID` → design-matrix row, prints only scalar shell assignments |
 | `resubmit_missing.py` | Lists incomplete indices, cleans partial run dirs, prints `qsub -t a-b` commands (one per contiguous range — SGE `-t` takes no comma lists) |
@@ -19,6 +19,50 @@ tested locally; **nothing submits jobs** — submission is done by Kay on CRC.
 Each wave dir is self-contained: `design_matrix.csv` (row `index` ==
 `$SGE_TASK_ID`, both 1-based), one `retrofit_gen_dict_<index>.json` per row,
 `manifest.json`, `<wave>_array.sh`.
+
+## Wave inventory
+
+| Wave | Rows | Design | Status |
+|---|---|---|---|
+| `pilot` | 12 | mid-box reference: 3 full-year repeats + 9 seven-day copies | DONE (noise floor) |
+| `screening` | 12 | 11 single-site OAT + 1 all-in, B = 40 | DONE (tier verdict → d = 12 → v3 d = 6) |
+| `n0` | 130 | free-B d = 12 Sobol | **SUPERSEDED — never submit** (see its `HOLD.md`) |
+| `placebo` | 1 | 317 OAT at B = 0.01 (f4 split-artifact control) | pending submission |
+| `contour_303x317_A` | 81 | 9×9 (ω_303, ω_317) grid, ρ = 1.0 (B = 20) | ready |
+| `contour_303x317_B` | 81 | same grid, ρ = 1.5 (B = 30) | ready |
+| `contour_303x317_C` | 81 | same grid, ρ = 2.0 (B = 40) | ready |
+| `sweep_B` | 54 | per-tier OAT ω sweeps (6 tiers × 9 levels), ρ = 1.5 | ready |
+| `sweep_C` | 54 | same sweeps, ρ = 2.0 | ready |
+
+**Submission order suggestion:** `placebo` (1 job) and `contour_303x317_A`
+first — ρ = 1.0 is the current-market headline; then `contour_303x317_B` and
+`_C`; sweeps after. Each contour/sweep wave is ~81/54 full-year jobs ≈ 10 h
+wall as one batch. After each batch: `summarize_wave.py` → commit CSVs →
+push. Per math-log §4.2, run the 81-point LOOCV resolution gate on batch A
+before firing B and C blind.
+
+**Screening g4/g5 backfill (Kay, on CRC):** the new objective columns
+(`reserve_shortfall_mwh`, `thermal_starts`, deltas) were backfilled into
+`waves/pilot/objectives.csv` locally, but `waves/screening/runs/` exists
+only on CRC (run outputs are untracked) — run
+`python summarize_wave.py waves/screening` there once and commit the
+refreshed CSVs. Old columns are regression-guarded byte-identical by
+`tests/test_derived_bid.py`.
+
+**Contour grid ordering (reconstruct the 9×9 from `index`):** row-major with
+ω_303 as the OUTER axis — `index = 9*i303 + i317 + 1`, where `i303`/`i317`
+index each tier's `omega_grid(9, lo, hi)` (evenly spaced, endpoints
+included). So index 1 = (ω_303 lo, ω_317 lo), index 9 = (lo, hi), index 10 =
+(2nd ω_303 level, lo), index 81 = (hi, hi). The sweep waves use the same
+`omega_grid` levels, so the 303/317 sweeps are the contour axes' f(ω, 0)
+margins for the math-log §4.3 interaction index (f(0,0) = the base case,
+external).
+
+**v3 derived-bid waves** (math-log §1–2): the design space is ω-only
+(d = 6); every `<tier>_bid` column is FILLED with `derived_bid(rho_h2)` =
+20·ρ_H2, never sampled, and the `rho_h2` column records the batch's price
+scenario (A/B/C = 1.0/1.5/2.0 $/kg). Each ρ scenario needs its own PCM runs
+(B enters the simulation).
 
 ## How Kay runs it on CRC (in order)
 
@@ -44,10 +88,9 @@ Each wave dir is self-contained: `design_matrix.csv` (row `index` ==
 6. **Screening:** `cd ../screening && qsub screening_array.sh` (12
    concurrent full-year jobs — this is also the sustained license-concurrency
    demonstration).
-7. **n0 — HOLD:** `waves/n0/` is a **draft**; see its `HOLD.md`. After PI +
-   screening tier decisions, edit `tiers.py`, rerun
-   `python make_batches.py n0` (same `SOBOL_SEED`, `skip=0` — nothing was
-   submitted, so a full redraw is safe), commit, then release.
+7. **n0 — SUPERSEDED:** `waves/n0/` is the d12-era free-B draft, replaced
+   by the derived-bid ω-only scheme; see its `HOLD.md`. Never submit it.
+   Submit the v3 waves per the inventory table above instead.
 
 ## Notes and deliberate deviations
 

@@ -20,6 +20,23 @@ import os
 # campaign state. Import it — no literal seeds at any call site.
 SOBOL_SEED = 20260821
 
+# Derived-bid scheme (math-log §1, PI-approved 2026-08-27): psi kg H2 per MWh
+# diverted. The exact conversion number behind "20" (psi, and any
+# site-specific m_VOM) is a recorded future-study item — do not silently
+# change it.
+PSI_KG_PER_MWH = 20.0
+
+# Price scenarios (math-log §1.3). PI cap: rho_H2 <= 2.0 $/kg.
+RHO_SCENARIOS = {"A": 1.0, "B": 1.5, "C": 2.0}   # $/kg
+
+
+def derived_bid(rho_h2):
+    """Truthful opportunity-cost offer B* = psi*rho_H2 - m_VOM (math-log
+    §1.2; m_VOM = 0 in the current model), in $/MWh. Uniform across all
+    sites INCLUDING nuclear (Kay 2026-08-27): psi and m_VOM are
+    site-independent."""
+    return round(PSI_KG_PER_MWH * rho_h2, 2)
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 TRIAL_DIR = os.path.dirname(THIS_DIR)
 REPO_DIR = os.path.dirname(TRIAL_DIR)
