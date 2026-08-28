@@ -54,7 +54,7 @@ and any attribution reading.
   floor — unaffected. Small-site shed and cost deltas are below floor —
   report as "0 within noise", never as findings.
 
-### f4 (unserved energy): contaminated for renewable sites — control run needed  ⚠
+### f4 (unserved energy): contaminated for renewable sites — placebo run needed  ⚠
 
 Wind OAT shed reductions (317: −22.0k, 122: −21.4k = half of base shedding)
 are physically inverted vs nuclear's −3.5k (whose band actually adds zero
@@ -64,7 +64,7 @@ RUC treat forecast output as withheld → commits more thermal → the extra
 iron serves load when wind underperforms in RT. "Withholding makes DA
 conservative," not "the PEM firms supply."
 
-**Action: add ONE control run to the next CRC batch** — 317 OAT with B ≈ 0
+**Action: add ONE placebo run (`waves/placebo`) to the next CRC batch** — 317 OAT with B ≈ 0
 (gen_PEM at cost ~0 is economically identical to the unsplit base; any
 residual Δshed isolates the pure split/commitment artifact). Until it runs:
 wind f4 gains and the all-in −93% shed carry an explicit caveat; f4 drives
@@ -95,6 +95,8 @@ structure diagnostic.
 
 1. [Kay approves] Edit `tiers.py`: merge to 6 tiers → redraw n₀ = 128 at
    seed 20260821 (held anyway pending PI decisions — free).
-2. Add the B≈0 317 control run to the next submission batch (~10 h, 1 job).
+2. Add the B≈0 317 placebo run (`waves/placebo`) to the next submission batch (~10 h, 1 job).
 3. Living report updated: §3.3 (d=12), §4.3 (kernel closed), §4.5/§5
    (two-regime noise), §7.2 (results + verdict), f4 caveat.
+
+(2026-08-27: the B≈0 control wave was renamed to "placebo".)
