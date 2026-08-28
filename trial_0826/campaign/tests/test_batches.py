@@ -140,3 +140,58 @@ def test_manifests_record_provenance(pilot_wave, screening_wave, n0_wave):
         assert manifest["scipy_version"]
         assert len(manifest["environment_yml_sha256"]) == 64
         assert set(manifest["tiers"]) == set(TIERS)
+
+
+# ---- placebo wave (prompt 17 Task 4) ----
+
+def test_placebo_builder_registered():
+    assert "placebo" in make_batches.BUILDERS
+    assert "control_b0" not in make_batches.BUILDERS
+
+
+def test_placebo_wave(placebo_wave, screening_wave):
+    df, manifest = load_wave(placebo_wave)
+    assert len(df) == 1
+    row = df.iloc[0]
+    assert row["oat_site"] == "317_WIND_1"
+    assert int(row["num_days"]) == 366
+    d = load_json(placebo_wave, 1)
+    assert set(d) == {"317_WIND_1"}
+    assert d["317_WIND_1"]["PEM_bid"] == 0.01
+    # A/B coupling: same omega as the screening 317 OAT — locate the screening
+    # reference BY CONTENT, not index (content-lookup survives regeneration
+    # reorder; index happens to be 3 today).
+    ref = None
+    for i in range(1, 13):
+        try:
+            cand = load_json(screening_wave, i)
+        except FileNotFoundError:
+            continue
+        if set(cand) == {"317_WIND_1"}:
+            ref = cand
+            break
+    assert ref is not None, "screening 317 OAT dict not found by content"
+    assert d["317_WIND_1"]["PEM_fraction"] == ref["317_WIND_1"]["PEM_fraction"]
+
+
+def test_analyze_placebo_verdict_bands():
+    import analyze_placebo as ap
+    assert ap.verdict_for(-500.0) == "SPLIT-NEUTRAL"
+    assert ap.verdict_for(-5_000.0) == "INCONCLUSIVE"
+    assert "permuted-dict repeat" in ap.VERDICTS["INCONCLUSIVE"]
+    assert ap.verdict_for(-12_000.0) == "ARTIFACT CONFIRMED"
+
+
+def test_analyze_placebo_integrity_gates():
+    import analyze_placebo as ap
+    ok = {"pem_withheld_mwh_total": 400_000.0, "delta_curtailment_mwh": -350_000.0}
+    assert ap.integrity_violations(ok) == []
+    bad_h2 = {"pem_withheld_mwh_total": 960_000.0, "delta_curtailment_mwh": -350_000.0}
+    assert ap.integrity_violations(bad_h2)
+    bad_curt = {"pem_withheld_mwh_total": 400_000.0, "delta_curtailment_mwh": +9_000.0}
+    assert ap.integrity_violations(bad_curt)
+
+
+def test_analyze_placebo_missing_objectives(tmp_path):
+    import analyze_placebo as ap
+    assert ap.main([str(tmp_path)]) == 0

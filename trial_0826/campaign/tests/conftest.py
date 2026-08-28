@@ -62,3 +62,10 @@ def sweep_b_wave(waves_root):
     wave_dir = make_batches.build_sweep("B", waves_root)
     submit_array.generate_script(wave_dir)
     return wave_dir
+
+
+@pytest.fixture(scope="session")
+def placebo_wave(waves_root):
+    wave_dir = make_batches.build_placebo(waves_root)
+    submit_array.generate_script(wave_dir)
+    return wave_dir
