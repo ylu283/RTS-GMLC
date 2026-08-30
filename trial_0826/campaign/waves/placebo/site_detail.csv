@@ -1,0 +1,2 @@
+index,site,kind,pem_capacity_mw,pem_bid,h2_mwh,h2_kg,pem_grid_sales_mwh,site_market_revenue_usd,uplift_usd
+1,317_WIND_1,renewable,399.55,0.01,560011.371453,11200227.42906,1040179.928548,-3851493.7875769995,0.0
