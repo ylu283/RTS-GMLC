@@ -27,6 +27,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+plt.rcParams.update({"font.weight": "bold", "axes.labelweight": "bold", "axes.titleweight": "bold"})
 import numpy as np
 import pandas as pd
 from matplotlib.patches import Rectangle
