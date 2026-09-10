@@ -126,8 +126,8 @@ deliberate phased decision (math-log §4.2), not an omission:
    plants (nuclear, 303, 317, 122) give 6 pairs. Direct 9×9 grids for all
    of them at three price scenarios would be 81 × 6 × 3 = 1,458 full-year
    runs ≈ 14,000 core-h — six times what was actually spent (243 runs,
-   ~2,400 core-h). The originally floated 25×25 resolution (~7,500 runs
-   per scenario) was never feasible.
+   ~2,400 core-h). The originally floated 25×25 resolution (625 × 6
+   pairs ≈ 3,750 runs per scenario; ~7,500 for two) was never feasible.
 2. **303×317 is the highest-information pair.** These are the two largest
    curtailers (317 alone carries ~25% of system base curtailment; 303 is
    next), and screening had already shown strong wind-to-wind cross-site
