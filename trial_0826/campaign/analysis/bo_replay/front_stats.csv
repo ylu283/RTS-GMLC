@@ -1,0 +1,4 @@
+scenario,front_M4,front_cost_shed,corner_11_weakly_dominates,cost_shed_front_cells_within_floors_of_best
+A,15,4,54/81 (incl. itself),1
+B,71,23,1/81 (incl. itself),0
+C,73,24,1/81 (incl. itself),0
