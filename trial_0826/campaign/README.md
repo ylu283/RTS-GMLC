@@ -116,6 +116,46 @@ scenario (A/B/C = 1.0/1.5/2.0 $/kg). Each ρ scenario needs its own PCM runs
   the git SHA + a dirty flag (`git status --porcelain -uno`, tracked
   modifications only) so the SHA describes the generator.
 
+## Why only the 303×317 pair has contour grids (design rationale)
+
+A recurring question: the campaign selected 11 generators (6 tiers), so why
+do 2-D contour grids exist only for the wind pair 303×317? This is a
+deliberate phased decision (math-log §4.2), not an omission:
+
+1. **Budget arithmetic rules out all pairs.** The four independent large
+   plants (nuclear, 303, 317, 122) give 6 pairs. Direct 9×9 grids for all
+   of them at three price scenarios would be 81 × 6 × 3 = 1,458 full-year
+   runs ≈ 14,000 core-h — six times what was actually spent (243 runs,
+   ~2,400 core-h). The originally floated 25×25 resolution (~7,500 runs
+   per scenario) was never feasible.
+2. **303×317 is the highest-information pair.** These are the two largest
+   curtailers (317 alone carries ~25% of system base curtailment; 303 is
+   next), and screening had already shown strong wind-to-wind cross-site
+   substitution (+54.6% aggregate interaction gap). If 2-D structure is
+   worth resolving by direct enumeration anywhere, it is here. Phase 1 =
+   this headline pair; **phase 2 (the remaining 5 pairs) is explicitly
+   PENDING** in math-log §4.2, gated on what phase 1 revealed.
+3. **Every plant IS covered — in the sweeps.** `sweep_B`/`sweep_C` give
+   all 6 tiers (nuclear, PV, and tail included) a 9-level one-at-a-time
+   size curve. The only increment a pair grid adds is the 2-D interaction
+   structure, and the interaction index I_ij = pair surface − the two OAT
+   curves — so "full OAT coverage + one pair grid" is the cheapest design
+   that actually tests the additivity assumption.
+4. **The paper's thesis makes full enumeration self-defeating.** The
+   thesis is that BO *replaces* enumeration; the grids exist only as
+   ground truth for validating the BO machinery (Stage 1). The joint
+   space of all 6 tiers is covered by Stage-2 continuous BO (d = 6), not
+   by grids. Enumerating all 6 pairs would undercut the paper's own
+   argument.
+
+Post-hoc status of phase 2: probably unnecessary. LOOCV showed the
+surfaces are very smooth (GP lengthscales exceed the domain), the
+within-scenario structure is quasi-1-D, and Stage-1 replay found the grids
+almost too easy. If reviewers or the PI want interaction maps for the
+other pairs, the right instrument is phase-2 option (b) from math-log
+§4.2: GP-render them from Stage-2 BO data + the sweeps, validated with a
+handful of direct runs per pair (tens of runs, not thousands).
+
 ## Tests
 
 `pytest trial_0826/campaign/tests/ -q` — hermetic (waves are rebuilt in a
