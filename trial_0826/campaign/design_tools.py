@@ -19,7 +19,22 @@ import pandas as pd
 import scipy
 from scipy.stats import qmc
 
-from tiers import ENVIRONMENT_YML, REPO_DIR, TIERS, derived_bid
+
+def omega_grid(levels, lo, hi):
+    """Evenly spaced omega levels over [lo, hi] INCLUDING both endpoints
+    (contour grid axes and OAT sweep levels — shared so the §4.3 interaction
+    index gets its f(omega, 0) margins from the sweeps at zero extra cost).
+
+    Defined ABOVE the tiers import: tiers.py imports omega_grid back (for
+    STAGE2_LATTICE), so this definition must exist even when design_tools is
+    only partially initialized during that circular import."""
+    assert levels >= 2, "a grid needs both endpoints: levels >= 2"
+    assert lo > 0, "omega=0 is forbidden (absent tiers are NaN, never omega=0)"
+    assert hi > lo, f"empty omega range: [{lo}, {hi}]"
+    return np.linspace(lo, hi, levels)
+
+
+from tiers import ENVIRONMENT_YML, REPO_DIR, TIERS, derived_bid  # noqa: E402
 
 META_COLUMNS = ["oat_site", "anchor", "start_date", "num_days", "provisional",
                 "rho_h2"]
@@ -143,16 +158,6 @@ def to_design_matrix(unit_points, tiers, start_index=1, num_days=366,
                              anchor=anchor, provisional=provisional,
                              rho_h2=rho_h2))
     return rows_to_matrix(rows, tiers)
-
-
-def omega_grid(levels, lo, hi):
-    """Evenly spaced omega levels over [lo, hi] INCLUDING both endpoints
-    (contour grid axes and OAT sweep levels — shared so the §4.3 interaction
-    index gets its f(omega, 0) margins from the sweeps at zero extra cost)."""
-    assert levels >= 2, "a grid needs both endpoints: levels >= 2"
-    assert lo > 0, "omega=0 is forbidden (absent tiers are NaN, never omega=0)"
-    assert hi > lo, f"empty omega range: [{lo}, {hi}]"
-    return np.linspace(lo, hi, levels)
 
 
 def _is_oat_row(row):

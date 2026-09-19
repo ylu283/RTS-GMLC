@@ -9,13 +9,17 @@ manifest git SHA describes the generator. No job is ever submitted here.
 """
 
 import functools
+import json
 import os
 import sys
 
+import numpy as np
+import scipy
+
 import design_tools as dt
 import submit_array
-from tiers import (RHO_SCENARIOS, SOBOL_SEED, build_tiers, load_gen_pmax,
-                   load_tm1_stats)
+from tiers import (RHO_SCENARIOS, SOBOL_SEED, STAGE2_LATTICE, build_tiers,
+                   load_gen_pmax, load_tm1_stats, stage2_tiers)
 
 WAVES_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "waves")
 
@@ -243,6 +247,113 @@ def build_sweep(scenario, waves_root=WAVES_ROOT):
     return wave_dir
 
 
+STAGE2_N0_SIZE = 16  # stage2_plan.md §2.1: power of 2, Sobol balance
+
+
+def _snap_to_lattice(omegas):
+    """Snap each omega coordinate to the nearest STAGE2_LATTICE level.
+    np.argmin returns the FIRST index on an exact midpoint tie."""
+    lattice = np.asarray(STAGE2_LATTICE, dtype=float)
+    return np.array([lattice[np.argmin(np.abs(w - lattice))] for w in omegas])
+
+
+def build_stage2_n0(scenario, waves_root=WAVES_ROOT):
+    """Stage-2 batch 0 (prompt 27, PI directive 2026-09): 16 scrambled Sobol
+    points on the d = 6 discrete lattice. A NEW d = 6 engine (seed
+    SOBOL_SEED, skip = 0) — the never-re-seed rule applies to later Stage-2
+    rows, which continue THIS sequence with skip = n_drawn_total (recorded in
+    the manifest). Each point is affine-mapped into the stage-2 box and each
+    coordinate snapped to the nearest lattice level; duplicate post-snap rows
+    are dropped keeping the first occurrence and replaced by continuing the
+    sequence in blocks (with this seed snapping produces zero collisions —
+    the redraw path is correctly-specified dead code; scipy's
+    non-power-of-2 UserWarning on a redraw is expected, not an error)."""
+    tiers, provisional = stage2_tiers()
+    rho = RHO_SCENARIOS[scenario]
+    lo, hi = float(STAGE2_LATTICE[0]), float(STAGE2_LATTICE[-1])
+
+    kept, seen, snap_log = [], set(), []
+    n_drawn_total = 0
+    while len(kept) < STAGE2_N0_SIZE:
+        block = STAGE2_N0_SIZE if n_drawn_total == 0 else STAGE2_N0_SIZE - len(kept)
+        points = dt.generate_sobol(block, SOBOL_SEED, skip=n_drawn_total,
+                                   d=len(tiers))
+        n_drawn_total += block
+        for unit in points:
+            pre = lo + unit * (hi - lo)
+            post = _snap_to_lattice(pre)
+            key = tuple(float(w) for w in post)
+            entry = {"draw": len(snap_log) + 1,
+                     "pre_snap": [float(w) for w in pre],
+                     "post_snap": [float(w) for w in post],
+                     "kept_index": None}
+            if key not in seen and len(kept) < STAGE2_N0_SIZE:
+                seen.add(key)
+                kept.append(post)
+                entry["kept_index"] = len(kept)
+            snap_log.append(entry)
+
+    rows = [dt.make_row(tiers, dict(zip(tiers, omegas)), index=i,
+                        num_days=FULL_YEAR, provisional=provisional, rho_h2=rho)
+            for i, omegas in enumerate(kept, start=1)]
+    wave_dir = os.path.join(waves_root, f"stage2_{scenario}_n0")
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers,
+                  sobol={"seed": SOBOL_SEED, "skip": 0, "n": STAGE2_N0_SIZE,
+                         "n_drawn_total": n_drawn_total,
+                         "lattice": [float(w) for w in STAGE2_LATTICE],
+                         "scipy_version": scipy.__version__})
+    with open(os.path.join(wave_dir, "snap_map.json"), "w") as f:
+        json.dump({"tier_order": list(tiers), "draws": snap_log}, f, indent=2)
+        f.write("\n")
+    return wave_dir
+
+
+STAGE2_BACKFILL_README = """# stage2_backfill_C — lattice back-fill OAT rows (B = 40)
+
+10 full-year rows riding the stage2_C_n0 submission: nuclear OAT at the 8
+new-lattice levels the old [0.05, 0.5] sweep never ran (only 0.05
+coincides), plus pv OAT at 0.88125 and 1.0 (the old pv box tops out at 0.8,
+so those two levels are EXTRAPOLATION, not interpolation — same gap class
+as nuclear). Coverage status by tier: wind lattice-matched (old box == new);
+tail interpolable (old box [0.02, 1] spans the lattice); pv interpolable
+below 0.8, now measured at 0.88125/1.0; nuclear measured on the full
+lattice; B-scenario back-fills deferred.
+
+Indices 1-8: nuclear at STAGE2_LATTICE[1:]; indices 9-10: pv at
+STAGE2_LATTICE[7:]. Built with stage2_tiers(); bids derived (B = 20*rho,
+scenario C: rho = 2.0 -> B = 40).
+"""
+
+
+def build_stage2_backfill(scenario, waves_root=WAVES_ROOT):
+    """Stage-2 back-fill wave (prompt 27 T2): tier-level OAT rows putting
+    nuclear on the full 9-level lattice and pv on the two levels above its
+    old 0.8 box top. Same stage2_tiers() dict as the n0 wave so manifests
+    match rows with nuclear omega > 0.5."""
+    tiers, provisional = stage2_tiers()
+    rho = RHO_SCENARIOS[scenario]
+    rows = []
+    # nuclear: the 8 levels the old [0.05, 0.5] sweep never ran
+    for w in STAGE2_LATTICE[1:]:
+        rows.append(dt.make_row(tiers, {"nuclear": float(w)},
+                                index=len(rows) + 1, num_days=FULL_YEAR,
+                                provisional=provisional, rho_h2=rho))
+    # pv: extrapolation levels above the old 0.8 box top
+    for w in STAGE2_LATTICE[7:]:
+        rows.append(dt.make_row(tiers, {"pv": float(w)},
+                                index=len(rows) + 1, num_days=FULL_YEAR,
+                                provisional=provisional, rho_h2=rho))
+    wave_dir = os.path.join(waves_root, f"stage2_backfill_{scenario}")
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers, sobol=None)
+    with open(os.path.join(wave_dir, "README.md"), "w") as f:
+        f.write(STAGE2_BACKFILL_README)
+    return wave_dir
+
+
+# License budget (prompt 27 T3): total concurrent Stage-2 tasks <= 12
+# (prompt 26's ERCOT job shares the Gurobi pool).
+WAVE_MAX_CONCURRENT = {"stage2_C_n0": 12, "stage2_backfill_C": 12}
+
 BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
             "placebo": build_placebo,
             # v3 derived-bid waves (math-log §4); contour_A first — rho = 1.0
@@ -251,7 +362,10 @@ BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
             "contour_303x317_B": functools.partial(build_contour_303x317, "B"),
             "contour_303x317_C": functools.partial(build_contour_303x317, "C"),
             "sweep_B": functools.partial(build_sweep, "B"),
-            "sweep_C": functools.partial(build_sweep, "C")}
+            "sweep_C": functools.partial(build_sweep, "C"),
+            # Stage-2 scenario C on the discrete lattice (prompt 27)
+            "stage2_C_n0": functools.partial(build_stage2_n0, "C"),
+            "stage2_backfill_C": functools.partial(build_stage2_backfill, "C")}
 
 
 def main(argv=None):
@@ -262,7 +376,8 @@ def main(argv=None):
         if name not in BUILDERS:
             raise SystemExit(f"unknown wave {name!r}; choose from {list(BUILDERS)} or 'all'")
         wave_dir = BUILDERS[name]()
-        script = submit_array.generate_script(wave_dir)
+        script = submit_array.generate_script(
+            wave_dir, max_concurrent=WAVE_MAX_CONCURRENT.get(name, 20))
         print(f"built wave {name}: {wave_dir} (SGE script: {os.path.basename(script)})")
 
 

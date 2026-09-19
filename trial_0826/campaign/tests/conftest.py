@@ -69,3 +69,17 @@ def placebo_wave(waves_root):
     wave_dir = make_batches.build_placebo(waves_root)
     submit_array.generate_script(wave_dir)
     return wave_dir
+
+
+@pytest.fixture(scope="session")
+def stage2_n0_wave(waves_root):
+    wave_dir = make_batches.build_stage2_n0("C", waves_root)
+    submit_array.generate_script(wave_dir, max_concurrent=12)
+    return wave_dir
+
+
+@pytest.fixture(scope="session")
+def stage2_backfill_wave(waves_root):
+    wave_dir = make_batches.build_stage2_backfill("C", waves_root)
+    submit_array.generate_script(wave_dir, max_concurrent=12)
+    return wave_dir

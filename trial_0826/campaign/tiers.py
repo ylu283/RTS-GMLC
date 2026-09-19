@@ -16,6 +16,8 @@ import copy
 import csv
 import os
 
+import numpy as np
+
 # Arbitrary but PERMANENT: the never-re-seed rule (doc 14 §5.1) makes this
 # campaign state. Import it — no literal seeds at any call site.
 SOBOL_SEED = 20260821
@@ -118,4 +120,33 @@ def build_tiers(stats_csv=TM1_STATS_CSV, gen_csv=GEN_CSV):
             if recs:
                 lo, _ = tier["omega"]
                 tier["omega"] = (lo, max(recs))
+    return tiers, provisional
+
+
+# --- Stage 2 (PI directive 2026-09 + Kay 09-19) -------------------------------
+# This import sits BELOW everything design_tools needs from tiers (TIERS,
+# derived_bid, ENVIRONMENT_YML, REPO_DIR); design_tools defines omega_grid
+# above ITS tiers import — together the circular import is safe from either
+# entry point.
+from design_tools import omega_grid  # noqa: E402
+
+# All six tiers share one 9-level discrete omega lattice: nuclear's 0.5 cap
+# is lifted and the pv/tail 0.02 floors are gone (Kay 09-19: no feasibility
+# check). Bids stay derived (B = 20*rho_H2), never searched.
+# np.round(..., 10) makes every level the float of its short decimal string
+# (linspace computes 0.05 + 3*0.11875 one ulp below the exact 0.40625 =
+# 13/32, and pandas' fast CSV parser is itself 1-ulp lossy on the long
+# repr) — so design_matrix.csv round-trips every omega bit-exactly.
+STAGE2_LATTICE = np.round(omega_grid(9, 0.05, 1.0), 10)
+
+
+def stage2_tiers():
+    """Stage-2 tier config: build_tiers() output with every tier's omega box
+    set to the full lattice span. Returns (tiers, provisional). Deepcopy —
+    TIERS/build_tiers themselves are never mutated; use this dict for every
+    Stage-2 wave so manifests match rows with nuclear omega > 0.5."""
+    tiers, provisional = build_tiers()
+    tiers = copy.deepcopy(tiers)
+    for tier in tiers.values():
+        tier["omega"] = (float(STAGE2_LATTICE[0]), float(STAGE2_LATTICE[-1]))
     return tiers, provisional

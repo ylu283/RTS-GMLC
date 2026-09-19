@@ -54,6 +54,38 @@ def test_thermal_patch():
     assert gen["fixed_commitment"]["values"] == [1] * N_HOURS
 
 
+def test_thermal_patch_full_fraction():
+    # omega = 1.0 (stage-2 lattice top): the entire unit becomes the PEM band.
+    # This regime has never run in Prescient — the patch must produce p_min = 0
+    # with the cost curve spanning [0, p_max] (prompt 27 T1.4).
+    generators = {"121_NUCLEAR_1": thermal_gen()}
+    md = FakeModelData(generators)
+    update_function_multi(md, {"121_NUCLEAR_1": {"PEM_bid": 40.0, "PEM_fraction": 1.0}})
+
+    gen = generators["121_NUCLEAR_1"]
+    assert gen["p_min"] == 0.0
+    assert gen["p_cost"]["values"] == [[0.0, 0.0], [400.0, 400.0 * 40.0]]
+    assert gen["ramp_up_60min"] == 400.0
+    assert gen["ramp_down_60min"] == 400.0
+    assert gen["fixed_commitment"]["values"] == [1] * N_HOURS
+
+
+def test_thermal_patch_omega_above_half():
+    # omega = 0.7625 (a stage-2 lattice level above the old 0.5 cap):
+    # p_min = p_max - PEM_cap stays positive but below half load.
+    generators = {"121_NUCLEAR_1": thermal_gen()}
+    md = FakeModelData(generators)
+    update_function_multi(md, {"121_NUCLEAR_1": {"PEM_bid": 40.0, "PEM_fraction": 0.7625}})
+
+    gen = generators["121_NUCLEAR_1"]
+    pem_cap = 0.7625 * 400.0
+    assert gen["p_min"] == 400.0 - pem_cap == 95.0
+    assert gen["p_cost"]["values"] == [[95.0, 0.0], [400.0, pem_cap * 40.0]]
+    assert gen["ramp_up_60min"] == pem_cap
+    assert gen["ramp_down_60min"] == pem_cap
+    assert gen["fixed_commitment"]["values"] == [1] * N_HOURS
+
+
 def test_renewable_patch():
     generators = {"303_WIND_1": renewable_gen()}
     md = FakeModelData(generators)
