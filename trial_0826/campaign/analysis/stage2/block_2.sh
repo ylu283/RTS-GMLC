@@ -28,7 +28,8 @@ if [[ "${SKIP_SMOKE_CHECK:-0}" != "1" ]] && \
 fi
 
 cd "$CAMPAIGN_DIR/waves/stage2_C_n0"
-J1=$(qsub -terse -t 1-16 -tc 12 stage2_C_n0_array.sh | cut -d. -f1)
+# no -tc cap: Kay 09-19 — license is not a constraint, let all tasks run
+J1=$(qsub -terse -t 1-16 stage2_C_n0_array.sh | cut -d. -f1)
 [[ "$J1" =~ ^[0-9]+$ ]] || { echo "BAD JID: $J1"; exit 1; }
 echo "stage2_C_n0 array submitted: J1=$J1"
 
