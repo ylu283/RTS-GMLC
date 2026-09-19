@@ -62,9 +62,15 @@ HEAD_SHA=$(git -C "$PRESCIENT_DIR" rev-parse HEAD)
 echo "HEAD hash equality OK: $HEAD_SHA"
 
 echo "--- (ii) record the single-file patch diff into the branch ---"
+# the CRC clone may lack the upstream 2.2.3 TAG — but HEAD~2 IS the
+# 2.2.3 commit (the patch is exactly 2 commits); assert that by hash
+# and diff against it, no tag needed.
+V223_SHA="97e5dcfe4cd97302baf8bba1f53f1f24ea532340"
+BASE_SHA=$(git -C "$PRESCIENT_DIR" rev-parse HEAD~2)
+[[ "$BASE_SHA" == "$V223_SHA" ]] || { echo "ABORT: HEAD~2 $BASE_SHA != 2.2.3 tag commit $V223_SHA"; exit 1; }
 mkdir -p "$ERCOT_DIR/env"
-git -C "$PRESCIENT_DIR" diff 2.2.3..h2patch-2.2.3 > "$ERCOT_DIR/env/h2patch_2.2.3.diff"
-DIFF_FILES=$(git -C "$PRESCIENT_DIR" diff --name-only 2.2.3..h2patch-2.2.3)
+git -C "$PRESCIENT_DIR" diff HEAD~2..HEAD > "$ERCOT_DIR/env/h2patch_2.2.3.diff"
+DIFF_FILES=$(git -C "$PRESCIENT_DIR" diff --name-only HEAD~2..HEAD)
 echo "patched files: $DIFF_FILES"
 [[ "$DIFF_FILES" == "prescient/engine/egret/reporting.py" ]] || \
     { echo "ABORT: patch touches more than reporting.py"; exit 1; }
