@@ -44,15 +44,17 @@ conda activate PCM_ERCOT
 export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 
 echo "--- (i) prescient version + editable path, HEAD equality BY HASH ---"
-# NOTE: prescient is packaged with find_namespace_packages, so under an
-# editable install prescient.__file__ is legitimately None — locate the
-# package via __path__ (always set for packages), never __file__.
-python -c "import prescient, importlib.metadata as im; \
-print('gridx-prescient', im.version('gridx-prescient'), 'from', list(prescient.__path__)[0])"
+# NOTE: under a PEP 660 editable install the top-level package's
+# __file__ is None and __path__ is a finder hook token — neither is a
+# filesystem path. The reliable location probe is a SUBMODULE's
+# __file__ (always a real source path); we probe the patched module
+# itself, which doubles as an import check of the patch site.
+python -c "import importlib.metadata as im, prescient.engine.egret.reporting as m; \
+print('gridx-prescient', im.version('gridx-prescient'), 'from', m.__file__)"
 PVER=$(python -c "import importlib.metadata as im; print(im.version('gridx-prescient'))")
-PPATH=$(python -c "import prescient; print(list(prescient.__path__)[0])")
+PMOD=$(python -c "import prescient.engine.egret.reporting as m; print(m.__file__)")
 [[ "$PVER" == 2.2.3* ]] || { echo "ABORT: prescient version '$PVER' != 2.2.3"; exit 1; }
-[[ "$PPATH" == "$PRESCIENT_DIR"/* ]] || { echo "ABORT: prescient not imported from the editable dir ($PPATH)"; exit 1; }
+[[ "$PMOD" == "$PRESCIENT_DIR"/* ]] || { echo "ABORT: prescient not imported from the editable dir ($PMOD)"; exit 1; }
 HEAD_SHA=$(git -C "$PRESCIENT_DIR" rev-parse HEAD)
 [[ "$HEAD_SHA" == "$H2PATCH_SHA" ]] || { echo "ABORT: $PRESCIENT_DIR HEAD $HEAD_SHA != h2patch-2.2.3 $H2PATCH_SHA"; exit 1; }
 echo "HEAD hash equality OK: $HEAD_SHA"
