@@ -1,0 +1,11 @@
+index,nuclear_omega,nuclear_bid,wind_303_omega,wind_303_bid,wind_317_omega,wind_317_bid,wind_122_omega,wind_122_bid,pv_omega,pv_bid,tail_omega,tail_bid,oat_site,anchor,start_date,num_days,provisional,rho_h2
+1,0.16875,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+2,0.2875,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+3,0.40625,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+4,0.525,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+5,0.64375,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+6,0.7625,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+7,0.88125,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+8,1.0,40.0,,,,,,,,,,,,False,01-01-2020,366,False,2.0
+9,,,,,,,,,0.88125,40.0,,,,False,01-01-2020,366,False,2.0
+10,,,,,,,,,1.0,40.0,,,,False,01-01-2020,366,False,2.0

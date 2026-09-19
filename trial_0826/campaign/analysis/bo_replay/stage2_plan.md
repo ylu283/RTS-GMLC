@@ -153,3 +153,60 @@ commit + submit.
 4. Stage-1 evidence that bears on Stage 2: 4-D non-domination inflates fronts
    (71–73/81 on the pair grids), so track the cost–shed 2-D front alongside
    M = 4 HV in Stage 2 as well.
+
+## AMENDMENTS (2026-09-19, prompt 27 — post PI-directive; this append is the update of record)
+
+Supersedes the corresponding sections above. Source: `pi-directive-2026-09.md`
+§1 + Kay 09-19.
+
+1. **Scope: ONE scenario — C (ρ = 2.0, B = 40).** Scenario A/B launches and
+   the D2 multi-scenario budget are deferred until the one-scenario science +
+   workflow-pain report is in (directive D2-modified).
+2. **Design space is DISCRETE:** all six tiers on the same 9-level lattice
+   `tiers.STAGE2_LATTICE = np.round(omega_grid(9, 0.05, 1.0), 10)`
+   (= {0.05, 0.16875, 0.2875, 0.40625, 0.525, 0.64375, 0.7625, 0.88125, 1.0}).
+   Nuclear's 0.5 cap and the pv/tail 0.02 floors are GONE; no feasibility
+   check (Kay 09-19). §1's bounds table is stale for Stage 2 — the box is
+   [0.05, 1.0]^6 via `tiers.stage2_tiers()` (a deepcopy; `build_tiers()`
+   itself is unchanged and still governs the v3 sweep/contour waves). The
+   rounding makes every level the float of its short decimal so
+   design_matrix.csv round-trips ω bit-exactly.
+3. **Objective vector is OPEN** (M = 4 in §1 superseded; directive D1): the
+   n₀ batch is objective-agnostic — the design depends only on the lattice;
+   `summarize_wave.py` extracts every current candidate, and NPV/congestion
+   are post-hoc extractions from the retained raw runs (hourly bus LMPs in
+   `bus_detail.csv`, hourly line flows in `line_detail.csv` — verified not
+   suppressed by the driver's prescient options). BO rounds start only after
+   the location analysis fixes M; §2.2's q-ParEGO recipe and §2.1's
+   "continuous, no snapping" acquisition remain pending the discrete-BO
+   decision (directive open question 3).
+4. **Batch 0 construction (implemented as `build_stage2_n0("C")`):** 16
+   scrambled Sobol points, NEW d = 6 engine (seed 20260821, skip = 0,
+   `d=6` passed explicitly), each coordinate affine-mapped to [0.05, 1.0]
+   then snapped to the nearest lattice level (`np.argmin(|ω − lattice|)`,
+   first index wins midpoint ties), deduped keeping first occurrences with
+   block redraws at `skip = <points consumed>` until 16 distinct rows. With
+   this seed snapping produces zero collisions (n_drawn_total = 16) — the
+   redraw path is correctly-specified dead code. Manifest `sobol` dict:
+   {seed, skip, n, n_drawn_total, lattice, scipy_version}; `snap_map.json`
+   sidecar records pre/post-snap coordinates per draw.
+   **Continuation rule (supersedes §2.1's "skip = 16"): later Stage-2 rows
+   continue the same d = 6 sequence with `skip = n_drawn_total`** (from the
+   manifest; currently 16).
+5. **Back-fill wave `stage2_backfill_C`** (10 rows, B = 40, same
+   `stage2_tiers()` dict): nuclear OAT at the 8 new-lattice levels the old
+   [0.05, 0.5] sweep never ran (only 0.05 coincides), plus pv OAT at
+   0.88125 and 1.0 (the old pv box tops out at 0.8 — those two levels are
+   extrapolation, same gap class as nuclear). Wind is lattice-matched, tail
+   interpolable; B-scenario back-fills deferred. See the wave README.
+6. **Submission automation (supersedes §2.1's manual loop):** SGE dependency
+   chain per the directive's row-rejection workaround — `qsub -terse` both
+   arrays (backfill holds on n0), ONE `collect_stage2.sh` collector holding
+   on both: self-contained integrity gate (sentinel count vs design matrix;
+   never `resubmit_missing.py`), FAILED_<wave>.md markers committed+pushed
+   on any gap, else `summarize_wave.py` both waves and a bot-identity
+   commit/push (`git -c user.name=stage2-bot ...`, never persistent config)
+   with one rebase retry. License budget: total concurrent Stage-2 tasks
+   ≤ 12 (`-tc 12`; prompt 26's ERCOT job shares the Gurobi pool).
+7. **Cost note:** n₀ + back-fill = 26 full-year runs ≈ 260 core-h; §3's
+   table otherwise unchanged.
