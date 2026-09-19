@@ -4,9 +4,9 @@
 #   bash block_2.sh 2>&1 | tee block_2.log
 # Submits both Stage-2 arrays plus ONE chained collector (SGE dependency
 # chain per the PI directive: hold_jid + bot commit/push completes the
-# automation). License budget: total concurrent Stage-2 tasks <= 12
-# (#$ -tc 12 in the n0 array; the backfill array holds until n0 finishes;
-# prompt 26's ERCOT job shares the Gurobi pool — the 12-cap leaves it room).
+# automation). No concurrency cap (Kay 09-19: Gurobi licenses are not a
+# constraint) — all 16 n0 tasks may run at once; the backfill array still
+# holds until n0 finishes so its manifests see completed n0 state.
 
 set -euo pipefail
 

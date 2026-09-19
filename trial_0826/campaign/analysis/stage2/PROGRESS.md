@@ -31,9 +31,10 @@ main clone and paste the log).
 
 ## JIDs
 
-Pending — assigned when Kay runs the blocks. J1 (n0 array, 16 tasks,
--tc 12), J2 (backfill array, 10 tasks, holds on J1), collector (holds on
-J1,J2). Recorded in `block_2.log`.
+Pending — assigned when Kay runs the blocks. J1 (n0 array, 16 tasks, no
+-tc cap — Kay 09-19: licenses not a constraint), J2 (backfill array, 10
+tasks, holds on J1), collector (holds on J1,J2; emails ylu28@nd.edu on
+finish/abort). Recorded in `block_2.log`.
 
 ## T4 (next session) needs
 
