@@ -49,10 +49,12 @@ echo "--- (i) prescient version + editable path, HEAD equality BY HASH ---"
 # filesystem path. The reliable location probe is a SUBMODULE's
 # __file__ (always a real source path); we probe the patched module
 # itself, which doubles as an import check of the patch site.
-python -c "import importlib.metadata as im, prescient.engine.egret.reporting as m; \
+python -c "import prescient.simulator, importlib.metadata as im, prescient.engine.egret.reporting as m; \
 print('gridx-prescient', im.version('gridx-prescient'), 'from', m.__file__)"
 PVER=$(python -c "import importlib.metadata as im; print(im.version('gridx-prescient'))")
-PMOD=$(python -c "import prescient.engine.egret.reporting as m; print(m.__file__)")
+# import simulator FIRST: egret<->simulator have an order-sensitive
+# circular import; the egret-side entry alone fails
+PMOD=$(python -c "import prescient.simulator, prescient.engine.egret.reporting as m; print(m.__file__)")
 [[ "$PVER" == 2.2.3* ]] || { echo "ABORT: prescient version '$PVER' != 2.2.3"; exit 1; }
 [[ "$PMOD" == "$PRESCIENT_DIR"/* ]] || { echo "ABORT: prescient not imported from the editable dir ($PMOD)"; exit 1; }
 HEAD_SHA=$(git -C "$PRESCIENT_DIR" rev-parse HEAD)
