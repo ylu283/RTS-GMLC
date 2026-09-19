@@ -11,3 +11,5 @@ __pycache__/
 trial_0826/campaign/waves/*/runs/
 trial_0826/ercot/**/runs/
 trial_0826/ercot/**/*.o*
+trial_0826/ercot/smoke/
+trial_0826/ercot/**/*.log
