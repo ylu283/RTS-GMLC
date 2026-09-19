@@ -37,7 +37,10 @@ J2=$(qsub -terse -t 1-10 -hold_jid "$J1" stage2_backfill_C_array.sh | cut -d. -f
 [[ "$J2" =~ ^[0-9]+$ ]] || { echo "BAD JID: $J2"; exit 1; }
 echo "stage2_backfill_C array submitted (holds on J1): J2=$J2"
 
-qsub -hold_jid "$J1,$J2" -cwd collect_stage2.sh   # ONE collector, both waves
+# -M/-m ea on the COLLECTOR only (not the arrays: -m e on an array job
+# emails once PER TASK = 26 emails). One email when everything incl. the
+# summarize+push is done ('e'), plus one if the collector itself aborts ('a').
+qsub -hold_jid "$J1,$J2" -cwd -M ylu28@nd.edu -m ea collect_stage2.sh   # ONE collector, both waves
 echo "collector submitted (holds on J1,J2); it summarizes both waves and bot-pushes objectives to d6."
 echo "JIDs: J1=$J1 J2=$J2"
 
