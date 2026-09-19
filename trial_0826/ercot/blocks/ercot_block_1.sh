@@ -43,12 +43,15 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
 
 echo "--- (i) prescient version + editable path, HEAD equality BY HASH ---"
+# NOTE: prescient is packaged with find_namespace_packages, so under an
+# editable install prescient.__file__ is legitimately None — locate the
+# package via __path__ (always set for packages), never __file__.
 python -c "import prescient, importlib.metadata as im; \
-print('gridx-prescient', im.version('gridx-prescient'), 'from', prescient.__file__)"
+print('gridx-prescient', im.version('gridx-prescient'), 'from', list(prescient.__path__)[0])"
 PVER=$(python -c "import importlib.metadata as im; print(im.version('gridx-prescient'))")
-PFILE=$(python -c "import prescient; print(prescient.__file__)")
+PPATH=$(python -c "import prescient; print(list(prescient.__path__)[0])")
 [[ "$PVER" == 2.2.3* ]] || { echo "ABORT: prescient version '$PVER' != 2.2.3"; exit 1; }
-[[ "$PFILE" == "$PRESCIENT_DIR"/* ]] || { echo "ABORT: prescient not imported from the editable dir ($PFILE)"; exit 1; }
+[[ "$PPATH" == "$PRESCIENT_DIR"/* ]] || { echo "ABORT: prescient not imported from the editable dir ($PPATH)"; exit 1; }
 HEAD_SHA=$(git -C "$PRESCIENT_DIR" rev-parse HEAD)
 [[ "$HEAD_SHA" == "$H2PATCH_SHA" ]] || { echo "ABORT: $PRESCIENT_DIR HEAD $HEAD_SHA != h2patch-2.2.3 $H2PATCH_SHA"; exit 1; }
 echo "HEAD hash equality OK: $HEAD_SHA"
