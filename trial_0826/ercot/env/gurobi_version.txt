@@ -1,0 +1,2 @@
+Gurobi Optimizer version 11.0.2 build v11.0.2rc0 (linux64 - "Red Hat Enterprise Linux 9.8 (Plow)")
+Copyright (c) 2024, Gurobi Optimization, LLC
