@@ -21,6 +21,7 @@ REPO_DIR="$(cd "$ERCOT_DIR/../.." && pwd)"
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 
 BOT=(-c user.name="ercot-bot" -c user.email="ercot-bot@noreply.github.com")
 

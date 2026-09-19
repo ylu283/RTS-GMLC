@@ -25,6 +25,7 @@ ERCOT_DIR="$(cd "$PWD/../.." && pwd)"
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 module load "$GUROBI_MODULE"
 
 python "$ERCOT_DIR/run_ercot_pcm.py" \

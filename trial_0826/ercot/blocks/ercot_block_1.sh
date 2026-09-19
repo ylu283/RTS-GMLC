@@ -41,6 +41,7 @@ ERCOT_DIR="$ERCOT_WT/trial_0826/ercot"
 # --- 2. H2-patch verification (settled-facts checklist) --------------------
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 
 echo "--- (i) prescient version + editable path, HEAD equality BY HASH ---"
 # NOTE: prescient is packaged with find_namespace_packages, so under an

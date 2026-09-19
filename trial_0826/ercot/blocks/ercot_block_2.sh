@@ -37,6 +37,7 @@ for name in smoke_3d probe_jul probe_sep eoy_3d; do
 set -euo pipefail
 source "\$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 module load gurobi
 python "$ERCOT_DIR/run_ercot_pcm.py" \\
     --index "${name}" \\
@@ -90,6 +91,7 @@ done
 echo "--- RUC quality + gap-vs-time + LMP/reserves checks ---"
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 python - "$SMOKE_DIR" "$ERCOT_DIR" <<'EOF'
 import re, sys
 from pathlib import Path

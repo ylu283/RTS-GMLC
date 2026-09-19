@@ -26,6 +26,7 @@ mkdir -p "$WAVE_DIR/runs"
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 module load "$GUROBI_MODULE"
 
 eval "$(python "$TRIAL_DIR/campaign/get_row.py" "$SGE_TASK_ID" "$WAVE_DIR/design_matrix.csv")"

@@ -20,6 +20,7 @@ git -C "$REPO_DIR" pull --rebase --autostash origin ercot/tx123
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 
 if [[ -f "$ERCOT_DIR/extracts/base_2019/gen_summary.csv" ]]; then
     echo "--- confirming drafted slate vs base-case top curtailers (hydro excluded) ---"

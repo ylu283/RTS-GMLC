@@ -27,6 +27,7 @@ fi
 # --- smoke extract -> committed, so local anatomy drafting can start -------
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM_ERCOT
+export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 JOBLOG=$(ls -t "$ERCOT_DIR"/smoke/ercot_smoke_3d.o* 2>/dev/null | head -1 || true)
 python "$ERCOT_DIR/extract_ercot.py" \
     "$ERCOT_DIR/smoke/run_index_smoke_3d" \
