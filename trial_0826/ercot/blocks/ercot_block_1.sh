@@ -1,7 +1,8 @@
 #!/bin/bash
 # ERCOT paste-block #1 — CRC ercot worktree + H2-patch VERIFICATION + env
 # record (prompt 26; the archaeology is done — this block verifies and
-# documents). Run ON CRC from anywhere (self-contained; ~5-10 min, no qsub):
+# documents). Run ON CRC from INSIDE the main RTS-GMLC clone (any subdir;
+# ~5-10 min, no qsub):
 #   bash ercot_block_1.sh 2>&1 | tee ercot_block_1.log
 # Prereq: T1 has pushed ercot/tx123 to origin (done). Kay pre-work DONE
 # (09-19): PCM_ERCOT env (clone of PCM0826) carries editable
@@ -9,8 +10,18 @@
 
 set -euo pipefail
 
-MAIN_CLONE="$GROUP/ylu28/RTS-GMLC"
-ERCOT_WT="$GROUP/ylu28/RTS-GMLC-ercot"
+# main clone: derive from the repo this runs inside (CRC has no $GROUP
+# env var — that assumption broke on first run); $GROUP layout is the
+# fallback only.
+if TOP=$(git rev-parse --show-toplevel 2>/dev/null) \
+   && [[ "$(basename "$TOP")" == "RTS-GMLC" ]]; then
+    MAIN_CLONE="$TOP"
+else
+    MAIN_CLONE="${GROUP:?run from inside the CRC RTS-GMLC clone, or export GROUP}/ylu28/RTS-GMLC"
+fi
+ERCOT_WT="$(dirname "$MAIN_CLONE")/RTS-GMLC-ercot"
+echo "main clone: $MAIN_CLONE"
+echo "ercot worktree target: $ERCOT_WT"
 PRESCIENT_DIR="/users/ylu28/GitHub/Prescient"
 H2PATCH_SHA="a4c0849aff17bc98314b3f8319582c310c89773e"
 
