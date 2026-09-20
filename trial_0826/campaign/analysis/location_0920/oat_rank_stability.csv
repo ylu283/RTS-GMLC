@@ -1,0 +1,13 @@
+scenario,objective,tau_T50_vs_T200,tau_BvsC_at_T200
+B,load_shed_mwh,0.067,0.733
+B,true_curtailment_mwh,0.867,1.0
+B,total_cost_raw_usd,0.6,1.0
+B,total_cost_less_synthetic_usd,0.2,0.867
+B,reserve_shortfall_mwh,0.733,0.867
+B,thermal_starts,0.333,0.867
+C,load_shed_mwh,0.6,0.733
+C,true_curtailment_mwh,1.0,1.0
+C,total_cost_raw_usd,0.6,1.0
+C,total_cost_less_synthetic_usd,0.333,0.867
+C,reserve_shortfall_mwh,0.467,0.867
+C,thermal_starts,0.6,0.867

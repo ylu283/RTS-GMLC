@@ -1,0 +1,389 @@
+{
+  "window": {
+    "B": [
+      42.35,
+      200.0
+    ],
+    "C": [
+      42.35,
+      200.0
+    ]
+  },
+  "backfill_landed": false,
+  "mc": {
+    "seed": 20260920,
+    "n": 10000,
+    "q6": 4.039753491759554,
+    "q2": 2.791712006416367
+  },
+  "spread": [
+    {
+      "scenario": "B",
+      "objective": "load_shed_mwh",
+      "L_median": 6381.815434736465,
+      "L_max": 10487.01937210634,
+      "T_at_max": 173.0,
+      "floor_L": 12119.260475278663,
+      "ratio_median": 0.5265845591613729,
+      "ratio_max": 0.8653184238013671
+    },
+    {
+      "scenario": "B",
+      "objective": "true_curtailment_mwh",
+      "L_median": 149996.6025849539,
+      "L_max": 234907.7651187121,
+      "T_at_max": 200.0,
+      "floor_L": 20198.76745879777,
+      "ratio_median": 7.426027498505677,
+      "ratio_max": 11.629806897766711
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_raw_usd",
+      "L_median": 17856230.210210234,
+      "L_max": 25828223.2989372,
+      "T_at_max": 43.0,
+      "floor_L": 2019876.745879777,
+      "ratio_median": 8.840257330866383,
+      "ratio_max": 12.78702938267031
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_less_synthetic_usd",
+      "L_median": 17629591.016335666,
+      "L_max": 25754274.95991528,
+      "T_at_max": 43.0,
+      "floor_L": 2019876.745879777,
+      "ratio_median": 8.728052863768639,
+      "ratio_max": 12.750419060197535
+    },
+    {
+      "scenario": "B",
+      "objective": "reserve_shortfall_mwh",
+      "L_median": 26927.75407088772,
+      "L_max": 40266.35403524642,
+      "T_at_max": 200.0,
+      "floor_L": NaN,
+      "ratio_median": NaN,
+      "ratio_max": NaN
+    },
+    {
+      "scenario": "B",
+      "objective": "thermal_starts",
+      "L_median": 291.9825993175159,
+      "L_max": 352.4954259203714,
+      "T_at_max": 200.0,
+      "floor_L": NaN,
+      "ratio_median": NaN,
+      "ratio_max": NaN
+    },
+    {
+      "scenario": "C",
+      "objective": "load_shed_mwh",
+      "L_median": 7354.672160113598,
+      "L_max": 8639.843265113639,
+      "T_at_max": 155.0,
+      "floor_L": 12119.260475278663,
+      "ratio_median": 0.6068581639214656,
+      "ratio_max": 0.7129018542622734
+    },
+    {
+      "scenario": "C",
+      "objective": "true_curtailment_mwh",
+      "L_median": 152506.31303976092,
+      "L_max": 243851.7369856937,
+      "T_at_max": 200.0,
+      "floor_L": 20198.76745879777,
+      "ratio_median": 7.550278171717617,
+      "ratio_max": 12.0726048004222
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_raw_usd",
+      "L_median": 17831637.075308174,
+      "L_max": 26317829.8900643,
+      "T_at_max": 43.0,
+      "floor_L": 2019876.745879777,
+      "ratio_median": 8.828081768692986,
+      "ratio_max": 13.029423673374342
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_less_synthetic_usd",
+      "L_median": 17128797.981305838,
+      "L_max": 25873758.016932786,
+      "T_at_max": 43.0,
+      "floor_L": 2019876.745879777,
+      "ratio_median": 8.480120391625789,
+      "ratio_max": 12.809572697795092
+    },
+    {
+      "scenario": "C",
+      "objective": "reserve_shortfall_mwh",
+      "L_median": 27179.788750256732,
+      "L_max": 39209.9330168101,
+      "T_at_max": 200.0,
+      "floor_L": NaN,
+      "ratio_median": NaN,
+      "ratio_max": NaN
+    },
+    {
+      "scenario": "C",
+      "objective": "thermal_starts",
+      "L_median": 444.62011239664025,
+      "L_max": 541.8888679942729,
+      "T_at_max": 173.0,
+      "floor_L": NaN,
+      "ratio_median": NaN,
+      "ratio_max": NaN
+    }
+  ],
+  "ancova": [
+    {
+      "scenario": "B",
+      "objective": "load_shed_mwh",
+      "m0_total_R2adj": 0.7722,
+      "m1_+intercepts_R2adj": 0.9135,
+      "m2_+tierxT_R2adj": 0.9678,
+      "d_intercepts_dR2adj": 0.1413,
+      "F_intercepts": 13.66,
+      "p_intercepts": 2.3403238235393955e-13,
+      "d_tierxT_dR2adj": 0.0543,
+      "F_tierxT": 4.73,
+      "p_tierxT": 0.0002525206626620801
+    },
+    {
+      "scenario": "B",
+      "objective": "true_curtailment_mwh",
+      "m0_total_R2adj": 0.9033,
+      "m1_+intercepts_R2adj": 0.9735,
+      "m2_+tierxT_R2adj": 0.9873,
+      "d_intercepts_dR2adj": 0.0702,
+      "F_intercepts": 1665.45,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.0138,
+      "F_tierxT": 313.69,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_raw_usd",
+      "m0_total_R2adj": 0.609,
+      "m1_+intercepts_R2adj": 0.9281,
+      "m2_+tierxT_R2adj": 0.9975,
+      "d_intercepts_dR2adj": 0.3191,
+      "F_intercepts": 1662.37,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.0694,
+      "F_tierxT": 318.67,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_less_synthetic_usd",
+      "m0_total_R2adj": 0.5238,
+      "m1_+intercepts_R2adj": 0.9202,
+      "m2_+tierxT_R2adj": 0.9982,
+      "d_intercepts_dR2adj": 0.3964,
+      "F_intercepts": 1685.77,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.078,
+      "F_tierxT": 292.48,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "B",
+      "objective": "reserve_shortfall_mwh",
+      "m0_total_R2adj": 0.8031,
+      "m1_+intercepts_R2adj": 0.9456,
+      "m2_+tierxT_R2adj": 0.9838,
+      "d_intercepts_dR2adj": 0.1425,
+      "F_intercepts": NaN,
+      "p_intercepts": NaN,
+      "d_tierxT_dR2adj": 0.0382,
+      "F_tierxT": NaN,
+      "p_tierxT": NaN
+    },
+    {
+      "scenario": "B",
+      "objective": "thermal_starts",
+      "m0_total_R2adj": 0.8555,
+      "m1_+intercepts_R2adj": 0.9498,
+      "m2_+tierxT_R2adj": 0.9673,
+      "d_intercepts_dR2adj": 0.0943,
+      "F_intercepts": NaN,
+      "p_intercepts": NaN,
+      "d_tierxT_dR2adj": 0.0175,
+      "F_tierxT": NaN,
+      "p_tierxT": NaN
+    },
+    {
+      "scenario": "C",
+      "objective": "load_shed_mwh",
+      "m0_total_R2adj": 0.7625,
+      "m1_+intercepts_R2adj": 0.923,
+      "m2_+tierxT_R2adj": 0.9666,
+      "d_intercepts_dR2adj": 0.1605,
+      "F_intercepts": 21.67,
+      "p_intercepts": 9.252427396772476e-22,
+      "d_tierxT_dR2adj": 0.0436,
+      "F_tierxT": 5.48,
+      "p_tierxT": 4.73924222790906e-05
+    },
+    {
+      "scenario": "C",
+      "objective": "true_curtailment_mwh",
+      "m0_total_R2adj": 0.891,
+      "m1_+intercepts_R2adj": 0.9699,
+      "m2_+tierxT_R2adj": 0.9847,
+      "d_intercepts_dR2adj": 0.0789,
+      "F_intercepts": 1804.66,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.0148,
+      "F_tierxT": 327.37,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_raw_usd",
+      "m0_total_R2adj": 0.6328,
+      "m1_+intercepts_R2adj": 0.9295,
+      "m2_+tierxT_R2adj": 0.9976,
+      "d_intercepts_dR2adj": 0.2967,
+      "F_intercepts": 1668.27,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.0681,
+      "F_tierxT": 337.1,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_less_synthetic_usd",
+      "m0_total_R2adj": 0.5532,
+      "m1_+intercepts_R2adj": 0.9207,
+      "m2_+tierxT_R2adj": 0.998,
+      "d_intercepts_dR2adj": 0.3675,
+      "F_intercepts": 1676.01,
+      "p_intercepts": 0.0,
+      "d_tierxT_dR2adj": 0.0773,
+      "F_tierxT": 310.7,
+      "p_tierxT": 0.0
+    },
+    {
+      "scenario": "C",
+      "objective": "reserve_shortfall_mwh",
+      "m0_total_R2adj": 0.7904,
+      "m1_+intercepts_R2adj": 0.9326,
+      "m2_+tierxT_R2adj": 0.97,
+      "d_intercepts_dR2adj": 0.1422,
+      "F_intercepts": NaN,
+      "p_intercepts": NaN,
+      "d_tierxT_dR2adj": 0.0374,
+      "F_tierxT": NaN,
+      "p_tierxT": NaN
+    },
+    {
+      "scenario": "C",
+      "objective": "thermal_starts",
+      "m0_total_R2adj": 0.8201,
+      "m1_+intercepts_R2adj": 0.9592,
+      "m2_+tierxT_R2adj": 0.9805,
+      "d_intercepts_dR2adj": 0.1391,
+      "F_intercepts": NaN,
+      "p_intercepts": NaN,
+      "d_tierxT_dR2adj": 0.0213,
+      "F_tierxT": NaN,
+      "p_tierxT": NaN
+    }
+  ],
+  "stability": [
+    {
+      "scenario": "B",
+      "objective": "load_shed_mwh",
+      "tau_T50_vs_T200": 0.067,
+      "tau_BvsC_at_T200": 0.733
+    },
+    {
+      "scenario": "B",
+      "objective": "true_curtailment_mwh",
+      "tau_T50_vs_T200": 0.867,
+      "tau_BvsC_at_T200": 1.0
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_raw_usd",
+      "tau_T50_vs_T200": 0.6,
+      "tau_BvsC_at_T200": 1.0
+    },
+    {
+      "scenario": "B",
+      "objective": "total_cost_less_synthetic_usd",
+      "tau_T50_vs_T200": 0.2,
+      "tau_BvsC_at_T200": 0.867
+    },
+    {
+      "scenario": "B",
+      "objective": "reserve_shortfall_mwh",
+      "tau_T50_vs_T200": 0.733,
+      "tau_BvsC_at_T200": 0.867
+    },
+    {
+      "scenario": "B",
+      "objective": "thermal_starts",
+      "tau_T50_vs_T200": 0.333,
+      "tau_BvsC_at_T200": 0.867
+    },
+    {
+      "scenario": "C",
+      "objective": "load_shed_mwh",
+      "tau_T50_vs_T200": 0.6,
+      "tau_BvsC_at_T200": 0.733
+    },
+    {
+      "scenario": "C",
+      "objective": "true_curtailment_mwh",
+      "tau_T50_vs_T200": 1.0,
+      "tau_BvsC_at_T200": 1.0
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_raw_usd",
+      "tau_T50_vs_T200": 0.6,
+      "tau_BvsC_at_T200": 1.0
+    },
+    {
+      "scenario": "C",
+      "objective": "total_cost_less_synthetic_usd",
+      "tau_T50_vs_T200": 0.333,
+      "tau_BvsC_at_T200": 0.867
+    },
+    {
+      "scenario": "C",
+      "objective": "reserve_shortfall_mwh",
+      "tau_T50_vs_T200": 0.467,
+      "tau_BvsC_at_T200": 0.867
+    },
+    {
+      "scenario": "C",
+      "objective": "thermal_starts",
+      "tau_T50_vs_T200": 0.6,
+      "tau_BvsC_at_T200": 0.867
+    }
+  ],
+  "floorless_resolvable": {
+    "reserve_shortfall_mwh": 9,
+    "thermal_starts": 6
+  },
+  "contour_lattice_equiv": {
+    "wind_303_omega": {
+      "allclose_1e-9": true,
+      "exact_equal": false,
+      "max_abs_dev": 1.1102230246251565e-16
+    },
+    "wind_317_omega": {
+      "allclose_1e-9": true,
+      "exact_equal": false,
+      "max_abs_dev": 1.1102230246251565e-16
+    }
+  }
+}
