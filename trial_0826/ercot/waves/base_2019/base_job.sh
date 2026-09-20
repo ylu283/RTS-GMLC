@@ -28,6 +28,8 @@ conda activate PCM_ERCOT
 export PYTHONNOUSERSITE=1  # ~/.local vanilla prescient shadows the patched editable install
 module load "$GUROBI_MODULE"
 
+mkdir -p "$WAVE_DIR/runs"   # prescient uses os.mkdir: parent must exist (base died in 1 s without this)
+
 python "$ERCOT_DIR/run_ercot_pcm.py" \
     --index base \
     --num_days 365 \

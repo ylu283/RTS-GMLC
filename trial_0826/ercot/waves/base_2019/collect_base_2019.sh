@@ -62,6 +62,10 @@ OUT_DIR="$ERCOT_DIR/extracts/base_2019"
 python "$ERCOT_DIR/extract_ercot.py" "$RUN_DIR" "$OUT_DIR" --full \
     ${JOBLOG:+--joblog "$JOBLOG"}
 
+# clear any stale FAILED marker from a prior failed attempt
+if [[ -f "$WAVE_DIR/FAILED_base_2019.md" ]]; then
+    git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_base_2019.md" || rm -f "$WAVE_DIR/FAILED_base_2019.md"
+fi
 git -C "$REPO_DIR" add -- "$OUT_DIR"
 git -C "$REPO_DIR" "${BOT[@]}" commit -m "ercot-bot: base_2019 extract"
 push_with_one_retry
