@@ -76,8 +76,27 @@ echo "patched files: $DIFF_FILES"
     { echo "ABORT: patch touches more than reporting.py"; exit 1; }
 
 echo "--- (iii) egret import + model-level metadata verify under PCM_ERCOT ---"
+# egret is ALSO patched (editable ercotpatch-0.6.2 from Kay's fork):
+# 0.6.2 + one 2-line commit in parsers/rts_gmlc/parser.py raising the
+# fuel-curve rounding precision — coarse 0.1 MW / 0.01 quantization made
+# near-flat heat-rate segments non-convex and egret's UC-model convexity
+# check killed every run (gen 14). Same class of fix as Kay's original
+# Egret ERCOT branch (0.5.5 era); date/bus-id fixes from that branch are
+# NOT needed on 0.6.2 (upstream fixed dates; metadata verify proved
+# parsing). Verify by hash, record the diff.
+EGRET_DIR="/users/ylu28/GitHub/Egret"
+EGRETPATCH_SHA="e4a244da7a74a3258ac769c3ae8c7a15fbe639e2"
+V062_SHA="ede56b8a8be333520ea04813d282a472f6342f45"
 python -c "import egret, importlib.metadata as im; \
 print('gridx-egret', im.version('gridx-egret'))"
+EMOD=$(python -c "import egret.parsers.rts_gmlc.parser as m; print(m.__file__)")
+[[ "$EMOD" == "$EGRET_DIR"/* ]] || { echo "ABORT: egret parser not from the editable dir ($EMOD)"; exit 1; }
+EHEAD=$(git -C "$EGRET_DIR" rev-parse HEAD)
+[[ "$EHEAD" == "$EGRETPATCH_SHA" ]] || { echo "ABORT: $EGRET_DIR HEAD $EHEAD != ercotpatch-0.6.2 $EGRETPATCH_SHA"; exit 1; }
+EBASE=$(git -C "$EGRET_DIR" rev-parse HEAD~1)
+[[ "$EBASE" == "$V062_SHA" ]] || { echo "ABORT: egret HEAD~1 $EBASE != 0.6.2 tag commit $V062_SHA"; exit 1; }
+git -C "$EGRET_DIR" diff HEAD~1..HEAD > "$ERCOT_DIR/env/egretpatch_0.6.2.diff"
+echo "egret patch verified: 0.6.2 + parser precision fix ($EGRETPATCH_SHA)"
 python "$ERCOT_DIR/verify_metadata.py"
 
 echo "--- env exports (solver-provenance companion record) ---"
