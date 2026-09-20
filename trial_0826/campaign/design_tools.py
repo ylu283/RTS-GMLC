@@ -215,7 +215,7 @@ def _sha256_of(path):
 
 
 def write_wave(design_df, wave_dir, tiers, sobol=None, retrofit_dicts=None,
-               external_anchors=None):
+               external_anchors=None, manifest_extra=None):
     """Write a self-contained wave directory: design_matrix.csv, one
     retrofit_gen_dict_<index>.json per row, manifest.json, and (optionally)
     external_anchors.csv.
@@ -224,6 +224,10 @@ def write_wave(design_df, wave_dir, tiers, sobol=None, retrofit_dicts=None,
     manifest) for fixed-design waves that draw no Sobol points.
     `retrofit_dicts` maps index -> dict for rows whose dict is not tier
     expansion (OAT rows); required for every OAT row.
+    `manifest_extra` is merged into the manifest for wave-specific fields
+    (e.g. pair identity + lattice for pair-grid waves — the manifest is the
+    authority on pair identity, never the directory name); it may not
+    shadow a fixed manifest key.
     """
     indices = [int(i) for i in design_df["index"]]
     assert len(set(indices)) == len(indices), "duplicate indices in design matrix"
@@ -259,6 +263,10 @@ def write_wave(design_df, wave_dir, tiers, sobol=None, retrofit_dicts=None,
         "environment_yml_sha256": _sha256_of(ENVIRONMENT_YML),
         "n_rows": len(indices),
     }
+    if manifest_extra:
+        clash = set(manifest_extra) & set(manifest)
+        assert not clash, f"manifest_extra may not shadow fixed keys: {sorted(clash)}"
+        manifest.update(manifest_extra)
     with open(os.path.join(wave_dir, "manifest.json"), "w") as f:
         json.dump(manifest, f, indent=2)
         f.write("\n")
