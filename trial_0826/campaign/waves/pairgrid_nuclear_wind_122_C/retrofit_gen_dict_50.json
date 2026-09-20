@@ -1,0 +1,11 @@
+{
+  "121_NUCLEAR_1": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.6438
+  },
+  "122_WIND_1": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.525,
+    "gen_pmax": 713.5
+  }
+}

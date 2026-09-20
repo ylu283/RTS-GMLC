@@ -1,0 +1,27 @@
+{
+  "303_WIND_1": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.6438,
+    "gen_pmax": 847.0
+  },
+  "319_PV_1": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.1688,
+    "gen_pmax": 188.2
+  },
+  "324_PV_1": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.1688,
+    "gen_pmax": 49.7
+  },
+  "324_PV_2": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.1688,
+    "gen_pmax": 51.6
+  },
+  "324_PV_3": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.1688,
+    "gen_pmax": 51.0
+  }
+}
