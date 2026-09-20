@@ -21,7 +21,7 @@ executing==2.2.1
 fastjsonschema==2.22.1
 fonttools==4.63.0
 fqdn==1.5.1
-gridx-egret==0.6.2
+-e git+ssh://git@github.com/ylu283/Egret.git@e4a244da7a74a3258ac769c3ae8c7a15fbe639e2#egg=gridx_egret
 -e git+ssh://git@github.com/ylu283/Prescient.git@a4c0849aff17bc98314b3f8319582c310c89773e#egg=gridx_prescient
 gurobipy==13.0.2
 h11==0.16.0

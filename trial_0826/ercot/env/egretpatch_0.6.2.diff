@@ -1,0 +1,22 @@
+diff --git a/egret/parsers/rts_gmlc/parser.py b/egret/parsers/rts_gmlc/parser.py
+index 0e2b537..eb49563 100644
+--- a/egret/parsers/rts_gmlc/parser.py
++++ b/egret/parsers/rts_gmlc/parser.py
+@@ -564,7 +564,7 @@ def _read_generators(base_dir:str, elements:dict, bus_id_to_name:dict) -> None:
+                     yield (i, val)
+                 except:
+                     return
+-        x = {i: round(val*pmax, 1)
++        x = {i: round(val*pmax, 4)
+              for i,val in valid_output_pcts()
+             }
+         fuel_field_count = len(x)
+@@ -577,7 +577,7 @@ def _read_generators(base_dir:str, elements:dict, bus_id_to_name:dict) -> None:
+             for i in range(1,fuel_field_count):
+                 f[i] = (((x[i]-x[i-1])*(float(row[f'HR_incr_{i}'])*1000. / 1000000.))) + f[i-1]
+ 
+-            F_COEFF = [ (x[i], round(f[i],2)) for i in range(fuel_field_count) if (((i == 0) or (x[i-1],f[i-1]) != (x[i], f[i])) and (x[i], f[i]) != (0.,0.)) ]
++            F_COEFF = [ (x[i], round(f[i],6)) for i in range(fuel_field_count) if (((i == 0) or (x[i-1],f[i-1]) != (x[i], f[i])) and (x[i], f[i]) != (0.,0.)) ]
+             if F_COEFF == []:
+                 F_COEFF = [(pmax, 0.0)]
+             gen_dict["p_fuel"] = {"data_type": "fuel_curve", "values": F_COEFF }
