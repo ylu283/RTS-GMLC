@@ -16,8 +16,11 @@ set -euo pipefail
 if TOP=$(git rev-parse --show-toplevel 2>/dev/null) \
    && [[ "$(basename "$TOP")" == "RTS-GMLC" ]]; then
     MAIN_CLONE="$TOP"
+elif [[ -n "${TOP:-}" && "$(basename "$TOP")" == "RTS-GMLC-ercot" ]]; then
+    # run from inside the ercot worktree — main clone is its sibling
+    MAIN_CLONE="$(dirname "$TOP")/RTS-GMLC"
 else
-    MAIN_CLONE="${GROUP:?run from inside the CRC RTS-GMLC clone, or export GROUP}/ylu28/RTS-GMLC"
+    MAIN_CLONE="${GROUP:?run from inside the CRC RTS-GMLC clone (or its ercot worktree), or export GROUP}/ylu28/RTS-GMLC"
 fi
 ERCOT_WT="$(dirname "$MAIN_CLONE")/RTS-GMLC-ercot"
 echo "main clone: $MAIN_CLONE"
