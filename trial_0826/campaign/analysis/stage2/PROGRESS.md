@@ -9,6 +9,10 @@ this directory: `stage2_quicklook.ipynb` (executed) + `figs/` +
 `t4_summary.json`, `WORKFLOW_PAIN.md` (three metrics; PENDING-KAY items
 need block logs + qacct), `TOPUP_RECOMMENDATION.md` (**GO** on 16 → 32,
 `skip = n_drawn_total = 16`, new wave dir — decision is Kay/PI's).
+**KAY DECIDED (09-21): GO, but submission DEFERRED — build the n0b
+wave whenever convenient, submit only AFTER the 3 priority pairgrid
+waves (nuclear_wind_317 / pv_tail / nuclear_pv) have completed on CRC
+(queue-priority: pair grids are the critical path gating M).**
 T4 headlines: n₀ escapes the wind-pair hull on every objective (shed down
 to 22 MWh, cost up to $648M); nuclear trend breaks past ω = 0.5
 (curtailment 29× floor above the ≤ 0.5 extrapolation at ω = 1.0); pv
