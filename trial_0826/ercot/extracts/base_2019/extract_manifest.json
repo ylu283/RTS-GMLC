@@ -1,0 +1,31 @@
+{
+ "mode": "full",
+ "hourly_summary.csv": 8760,
+ "reserves.csv": 8760,
+ "daily_summary.csv": 365,
+ "overall.csv": 1,
+ "gen_summary": 292,
+ "renewables_hourly": 26280,
+ "committed_hourly": 8760,
+ "line_summary": 255,
+ "bus_lmps": 1077480,
+ "renewables": 1436640,
+ "thermal": 1121280,
+ "line_flows": 2233800,
+ "ruc_quality": 365,
+ "md5": {
+  "bus_lmps.csv.gz": "97ec8ef93b0551bf402227a6a02a8983",
+  "committed_hourly.csv": "baac929cb8ec587a80b3ea90abb8676a",
+  "daily_summary.csv": "4cb92b78e78ced08331f08b02890d968",
+  "gen_summary.csv": "4526a1c78228510e745651f227ef01f1",
+  "hourly_summary.csv": "34d155ece7361e66cbeab5eb12814f10",
+  "line_flows.csv.gz": "30cb8fc535565c0222ab080dd8f08b75",
+  "line_summary.csv": "a4e1e98f92df6d36ac9c334c578df1f0",
+  "overall.csv": "919a88b22dc8ebd9acaf9194e9221ccb",
+  "renewables.csv.gz": "80ee71354efc56b7b3c844ad0f2d8268",
+  "renewables_hourly.csv": "fc304c0ad8289c5e4065942bdc92f66b",
+  "reserves.csv": "a410cbe8dd84b383ab413109d414768e",
+  "ruc_quality.csv": "4bc4836f29b98704a9378d561bf05524",
+  "thermal.csv.gz": "ef4f2b77ba1deae44e3521d48c518465"
+ }
+}
