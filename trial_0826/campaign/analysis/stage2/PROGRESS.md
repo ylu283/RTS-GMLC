@@ -1,10 +1,24 @@
 # Stage-2 scenario C — session bridge (prompt 27)
 
-**State (2026-09-19, end of T1–T3 session):** waves built + pushed; smoke
-and submission NOT yet run — they are Kay's two CRC paste-blocks in this
-directory (`block_1.sh` = smoke, `block_2.sh` = submission; run each as
-`bash block_N.sh 2>&1 | tee block_N.log` from this directory on the CRC d6
-main clone and paste the log).
+**State (2026-09-20, end of T4 session): COMPLETE through T4.** Smoke
+passed 09-19 (JID 1458448); both arrays + single chained collector ran;
+results landed on d6 as `fc98902` (stage2-bot, first-pass push success,
+zero human touches post-submission — end-to-end 39.6 h). T4 delivered in
+this directory: `stage2_quicklook.ipynb` (executed) + `figs/` +
+`n0_gp_loo.csv`/`nuclear_break_test.csv`/`pv_topup_test.csv`/
+`t4_summary.json`, `WORKFLOW_PAIN.md` (three metrics; PENDING-KAY items
+need block logs + qacct), `TOPUP_RECOMMENDATION.md` (**GO** on 16 → 32,
+`skip = n_drawn_total = 16`, new wave dir — decision is Kay/PI's).
+T4 headlines: n₀ escapes the wind-pair hull on every objective (shed down
+to 22 MWh, cost up to $648M); nuclear trend breaks past ω = 0.5
+(curtailment 29× floor above the ≤ 0.5 extrapolation at ω = 1.0); pv
+breaks past 0.8 (20× floor); GP LOO: curtailment/cost model-limited
+(7–17× floor), shed already noise-limited (0.5×). Remaining for a later
+session: fill the PENDING-KAY pain-log cells; build n0b if Kay approves
+the top-up; BO round 1 waits on M from the location analysis (prompt 28).
+
+---
+Historical bridge below (T1–T3 session, 2026-09-19):
 
 ## Done this session (T1–T3)
 

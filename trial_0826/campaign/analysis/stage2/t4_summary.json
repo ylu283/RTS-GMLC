@@ -1,0 +1,187 @@
+{
+  "collector_commit": "fc98902",
+  "n0_rows": 16,
+  "backfill_rows": 10,
+  "ranges": [
+    {
+      "objective": "load_shed_mwh",
+      "hull_min": 2920.238785,
+      "hull_max": 40102.474285,
+      "n0_min": 22.425956,
+      "n0_max": 13729.311075,
+      "n0_below_hull_min": true,
+      "n0_above_hull_max": false
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "hull_min": 470809.12429300015,
+      "hull_max": 1494291.658006,
+      "n0_min": 76268.870635,
+      "n0_max": 616342.393128,
+      "n0_below_hull_min": true,
+      "n0_above_hull_max": false
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "hull_min": 528327810.653031,
+      "hull_max": 578550575.006141,
+      "n0_min": 546956561.997831,
+      "n0_max": 647870883.57485,
+      "n0_below_hull_min": false,
+      "n0_above_hull_max": true
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "hull_min": 526484930.811311,
+      "hull_max": 572048842.716301,
+      "n0_min": 539251294.138745,
+      "n0_max": 641212849.1997169,
+      "n0_below_hull_min": false,
+      "n0_above_hull_max": true
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "hull_min": 43220.852724,
+      "hull_max": 190437.386529,
+      "n0_min": 7721.60624,
+      "n0_max": 59038.134983,
+      "n0_below_hull_min": true,
+      "n0_above_hull_max": false
+    },
+    {
+      "objective": "thermal_starts",
+      "hull_min": 2938.0,
+      "hull_max": 5000.0,
+      "n0_min": 2024.0,
+      "n0_max": 3135.0,
+      "n0_below_hull_min": true,
+      "n0_above_hull_max": false
+    }
+  ],
+  "nuclear_break": [
+    {
+      "objective": "load_shed_mwh",
+      "max_abs_resid_above_0p5": 4060.4705351777666,
+      "signed_resid_at_1p0": -4060.4705351777666,
+      "max_resid_over_floor": 1.3534901783925888
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "max_abs_resid_above_0p5": 147264.47071206756,
+      "signed_resid_at_1p0": 147264.47071206756,
+      "max_resid_over_floor": 29.452894142413513
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "max_abs_resid_above_0p5": 2676335.0677444935,
+      "signed_resid_at_1p0": 2676335.0677444935,
+      "max_resid_over_floor": 5.352670135488987
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "max_abs_resid_above_0p5": 1845368.4280358553,
+      "signed_resid_at_1p0": 1845368.4280358553,
+      "max_resid_over_floor": 3.6907368560717106
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "max_abs_resid_above_0p5": 15356.950753599987,
+      "signed_resid_at_1p0": -15356.950753599987,
+      "max_resid_over_floor": NaN
+    },
+    {
+      "objective": "thermal_starts",
+      "max_abs_resid_above_0p5": 193.9407407407407,
+      "signed_resid_at_1p0": -169.85925925925858,
+      "max_resid_over_floor": NaN
+    }
+  ],
+  "pv_topup": [
+    {
+      "objective": "load_shed_mwh",
+      "resid_0p88125": 3526.4516911083556,
+      "resid_1p0": 1622.2126260068617,
+      "max_resid_over_floor": 1.1754838970361186
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "resid_0p88125": 59149.11693113111,
+      "resid_1p0": 100792.8991300296,
+      "max_resid_over_floor": 20.15857982600592
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "resid_0p88125": -1867725.9927111268,
+      "resid_1p0": -3373202.84299165,
+      "max_resid_over_floor": 6.746405685983301
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "resid_0p88125": -1656802.6560522318,
+      "resid_1p0": -2988548.1584050655,
+      "max_resid_over_floor": 5.977096316810131
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "resid_0p88125": 7265.224164875108,
+      "resid_1p0": 3274.4816801539564,
+      "max_resid_over_floor": NaN
+    },
+    {
+      "objective": "thermal_starts",
+      "resid_0p88125": 10.755555555556384,
+      "resid_1p0": 24.76410256410327,
+      "max_resid_over_floor": NaN
+    }
+  ],
+  "gp_loo": [
+    {
+      "objective": "load_shed_mwh",
+      "loo_rmse": 1497.1572775825289,
+      "y_range": 13706.885119,
+      "rmse_over_range": 0.10922665978335386,
+      "loo_R2": 0.875576867568307,
+      "rmse_over_floor": 0.499052425860843
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "loo_rmse": 85361.69195337445,
+      "y_range": 540073.5224929999,
+      "rmse_over_range": 0.15805568760220207,
+      "loo_R2": 0.6752847740148953,
+      "rmse_over_floor": 17.07233839067489
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "loo_rmse": 3619112.549902891,
+      "y_range": 100914321.57701898,
+      "rmse_over_range": 0.03586322033727138,
+      "loo_R2": 0.9835442531369272,
+      "rmse_over_floor": 7.238225099805781
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "loo_rmse": 3557638.7439246657,
+      "y_range": 101961555.06097198,
+      "rmse_over_range": 0.03489196238520719,
+      "loo_R2": 0.9846441713979602,
+      "rmse_over_floor": 7.1152774878493315
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "loo_rmse": 7011.10853198872,
+      "y_range": 51316.528743,
+      "rmse_over_range": 0.1366247621132225,
+      "loo_R2": 0.8309278818960928,
+      "rmse_over_floor": NaN
+    },
+    {
+      "objective": "thermal_starts",
+      "loo_rmse": 179.34616643669375,
+      "y_range": 1111.0,
+      "rmse_over_range": 0.1614276925622806,
+      "loo_R2": 0.6833041824268282,
+      "rmse_over_floor": NaN
+    }
+  ]
+}
