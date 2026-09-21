@@ -35,7 +35,7 @@ decision.**
 | `price_threshold` | 500 | 5000 | **500** | Comparability; pricing-instance-only (caps scarcity LMPs, never dispatch). |
 | `day_ahead_pricing` | aCHP | LMP | **aCHP** | **CRITICAL**: with DA ≡ RT, deviations ≈ 0 and ~100% of settled revenue rides on the DA price — an LMP/aCHP mismatch would make every revenue-derived number non-comparable with RTS. Physical dispatch/curtailment/shed/H2 are pricing-invariant; the K_syn quantity×B identity survives regardless. Revenue extraction reads the **DA price series (aCHP)** from `bus_lmps.csv.gz` (`LMP DA`). Note: aCHP is the Prescient 2.2.x DEFAULT — GTEP's LMP was the override; our pick is stock. |
 | `ruc_horizon` | 36 | 48 (script) / 36 (actual 365-d run) | **36** | Campaign value AND GTEP's actual full-year choice. |
-| `reserve_factor` | 0.1 | 0.1 | **0.1** | Works standalone without `reserves.csv` (prior run shows the system reserve product in reserves_detail). **Shortfall was identically 0 for all 8,760 h in the TL=3600 run (re-verified from `reserves_detail.csv` 2026-09-19) → likely degenerate g4 — RE-VERIFY on the actual TL=120 base before "degenerate" is asserted**; cruder truncated commitment can produce shortfall hours. |
+| `reserve_factor` | 0.1 | 0.1 | **0.1** | Works standalone without `reserves.csv` (prior run shows the system reserve product in reserves_detail). **g4 verdict (re-verified on the actual TL=120 base, 2026-09-21): NOT degenerate** — 7 hours with RT reserve shortfall > 0, 280.9 MWh total (max requirement 7,467 MW). The TL=3600 run's identically-zero shortfall did not carry over; cruder truncated commitment does produce shortfall hours, exactly as anticipated. |
 | `sced_frequency_minutes` | 60 | 60 | **60** | Load-bearing: REAL_TIME CSVs are hourly and the provider serves only multiples of the native frequency. |
 | `ruc_mipgap` | 0.01 (default) | 0.01 (explicit) | **0.01** | Defines which days count as "converged before 120 s". |
 | `compute_market_settlements` | True | True | **True** | Revenue extraction depends on it. |
@@ -156,7 +156,8 @@ comparison carries this footer.
    standalone (prior logs: "Did not find reserves.csv; assuming no
    reserves", with the system reserve product present in
    reserves_detail). Degenerate-g4 note: shortfall identically 0 in the
-   TL=3600 run — verdict PENDING re-verification on the TL=120 base.
+   TL=3600 run, but **the TL=120 base (2026-09-21) shows 7 shortfall
+   hours totaling 280.9 MWh — g4 is live, NOT degenerate.**
 
 ## Pre-ranking deviation (reported to Kay)
 
@@ -170,6 +171,17 @@ computed from the vendored 2019 profiles
 confirms the slate against the actual base-case curtailment ranking
 before submission (falls back to proxy-submit if the base slips —
 Sep-30 protection).
+
+**Closure (2026-09-21):** the base extract landed and the proxy was
+confirmed WEAK — overlap 3/9 with the actual top-12 (275, 274, 30 only).
+Curtailment is congestion-driven, not size-driven. Resolved by the
+two-arm design (decision 8 below): `screening_topup` adds the missing
+top curtailers (generator `make_screening_topup.py`, deterministic from
+the committed base extract; ranking provenance
+`waves/screening_topup/curtailment_ranking_base2019.csv`); v1 is
+retained as the availability/contrast arm and noise-ruler carrier.
+Submission: `blocks/ercot_block_4b.sh` (supersedes block #4; handles
+both the proxy-submitted and never-submitted v1 histories).
 
 ## PI flags (carried)
 
@@ -192,7 +204,15 @@ record-keeping convention:
 3. `day_ahead_pricing = aCHP` locked (revenue comparability; stock
    default).
 4. Profile year = 2019 (2020 available, flagged only).
-5. Degenerate-g4 verdict: DEFERRED to the TL=120 base re-verification.
+5. Degenerate-g4 verdict (RESOLVED 2026-09-21 on the TL=120 base): NOT
+   degenerate — 7 shortfall hours, 280.9 MWh.
 6. Screening noise model = 2 replicate rows; |Δ| ≫ replicate spread gate.
 7. Screening seed = availability proxy (GTEP results carry zero
    curtailment — unusable as ranking seed).
+8. Screening design (2026-09-21, post-base): TWO-ARM — v1
+   `screening_ercot` (availability/contrast arm + __ALL__ + replicates)
+   plus `screening_topup` (7-row curtailment arm: actual top curtailers
+   missing from v1); both arms together cover the actual top-10 exactly.
+   Ground truth: only 3/9 proxy sites were in the actual top-12 —
+   curtailment concentrates at congestion-trapped sites (bus 120 hosts
+   5 of the top-8; site 163 curtails 2.5× its delivered energy).
