@@ -15,6 +15,7 @@ collector `.o` log, `qacct`) are marked PENDING-KAY — fill in from
 | 2 | 09-19 | Kay | submit | block_1.sh — 3-day nuclear ω=1.0 smoke (JID 1458448, SMOKE PASS) |
 | 3 | 09-19/20 | Kay | submit | block_2.sh — J1 (n₀ ×16) + J2 (backfill ×10, holds J1) + single collector (holds J1,J2) |
 | 4 | 09-20 22:01 EDT | **bot** | — | collector: gate PASS both waves → summarize → commit `fc98902` → push. **Zero human touches.** |
+| 5 | 09-22 | Kay | data-wrangling (pain-log evidence) | pulled n0 task-log mtimes on bastion (screenshot) — fills the J1 row of (ii) below |
 
 Failure-recovery touches: **0** (no FAILED markers ever appeared; no
 resubmissions in git history). Git/race touches: **0 observed** (see iii).
@@ -33,7 +34,8 @@ wave-generated → CSVs-on-d6: **2026-09-19T10:23:08Z → 2026-09-21T02:01:46Z
 | generation → smoke submitted | human-gated (block_1 handoff) | PENDING-KAY (block_1.log) |
 | smoke run + verdict | ~1–2 h by design | SMOKE PASS 09-19, JID 1458448 |
 | smoke pass → block_2 submitted | human-gated dead time | PENDING-KAY (block_2.log timestamp) |
-| queue + run (J1 16 tasks ∥, then J2 10 tasks) | expected ~2 × ~10 h at ~9.7 h/run with no `-tc` | PENDING-KAY (`qacct -j`: qsub_time/start_time/end_time per task) |
+| queue + run, J1 = **1458464** (n₀, 16 tasks ∥) | tasks finished 09-19 21:07:15 → 09-20 00:51:34 EDT (completion spread 3.7 h; all 16 logs ~3.3 MB) | Kay 09-22: `.o1458464.*` mtimes on bastion (screenshot) |
+| queue + run, J2 (backfill, 10 tasks, held on J1) + collector | J1-complete 00:51 → bot commit 22:01 EDT 09-20 ≈ **21.2 h** for the backfill segment incl. queue | mtimes + `fc98902` commit time; per-task queue-vs-run split still PENDING-KAY (`qacct -j 1458464,<J2>`: qsub/start/end per task) |
 | collector + push | minutes | fc98902 single commit at 22:01:46 EDT |
 | results-on-d6 → noticed locally | **~40 min** (bot push → this session's pull at ~22:40 EDT) | pull log |
 | time-to-notice of FAILED marker | n/a — none occurred | — |

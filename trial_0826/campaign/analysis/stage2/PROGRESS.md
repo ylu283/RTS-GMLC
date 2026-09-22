@@ -1,5 +1,27 @@
 # Stage-2 scenario C — session bridge (prompt 27)
 
+**State (2026-09-22, n0b session): T4 complete; n0b BUILT, awaiting
+Kay's submit.** The 09-21 deferral condition cleared — all 3 priority
+pairgrids landed 09-21 (`8579cc5` nuclear_wind_317, `5bfd4a6`
+nuclear_pv, `738b201` pv_tail) — so `waves/stage2_C_n0b/` was built and
+pushed (code `40d337d`, wave `c774b3d`): rows 17–32 of the SAME Sobol
+sequence (skip = 16 from the n0 manifest, zero snap collisions again →
+n_drawn_total = 32 for the NEXT continuation), no overlap with n0, 32
+distinct across both waves, manifest dirty=false, snap_map draws
+numbered globally 17–32. Tests: campaign 74 passed + 1 skipped (4 new
+n0b tests). **Kay's action: on CRC d6 main clone,
+`cd trial_0826/campaign/waves/stage2_C_n0b && bash submit_this.sh`**
+(d6 guard + pull, 16-task array with no `-tc`, chained collector with
+email + 5-retry push; stage2-bot pushes objectives.csv/site_detail.csv).
+WORKFLOW_PAIN.md (ii) partially filled from Kay's 09-22 bastion
+screenshot: J1 = 1458464, n₀ tasks finished 09-19 21:07 → 09-20 00:51
+EDT; queue-vs-run split still needs `qacct`. Analysis of the 32-point
+n₀ (GP refresh, LOO re-check) belongs to the session after the n0b
+collector lands; BO round 1 still waits on M (prompt 28).
+
+---
+Historical bridge below (T4 session, 2026-09-20):
+
 **State (2026-09-20, end of T4 session): COMPLETE through T4.** Smoke
 passed 09-19 (JID 1458448); both arrays + single chained collector ran;
 results landed on d6 as `fc98902` (stage2-bot, first-pass push success,
