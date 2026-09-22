@@ -30,15 +30,30 @@ including error paths.
   range-and-replication, starts 6/15. `stage2_backfill_C` had NOT landed
   → C nuclear/pv curves truncated (old level set); fold in on re-run when
   it lands.
-- [ ] **Priority submission — PENDING KAY.** This session has no CRC
-  access. Kay runs, from the CRC main d6 clone:
-  `cd trial_0826/campaign/analysis/location_0920 && bash block_1.sh 2>&1 | tee block_1.log`
-  → submits pairgrid_nuclear_wind_317_C, pairgrid_pv_tail_C,
-  pairgrid_nuclear_pv_C (243 tasks, no `-tc`) via each wave's own
-  submit_this.sh + 3 chained collectors (`-M/-m ea`). qstat evidence
-  arrives in Kay's pasted block_1.log — check at next re-invocation.
+- [x] **Priority submission + returns (09-21/22).** All 3 priority pair
+  grids ran and collected clean: pairgrid-bot pushes `8579cc5`
+  (nuclear_wind_317), `5bfd4a6` (nuclear_pv), `738b201` (pv_tail) —
+  81/81 each, no FAILED markers, collectors first-pass.
+- [x] **T2 (2026-09-22)** — `pair_apparatus.ipynb` executed on the 3 new
+  pairs + `contour_303x317_C` (pinned estimators; wind-pair ω rounded to
+  10 decimals before the join). Outputs: `pair_verdict_stats.csv`,
+  `pair_gp_gate.csv`, `pair_isototal_reads.csv`,
+  `pair_edge_consistency.csv`, `pool26_total_vs_allocation.csv`,
+  `pooled_kendall_tau.csv`, `drop_one_pareto.csv`, `t2_summary.json`,
+  `figs/pair_*_8c.png`. **LOCATION.md v1** shipped (v0 in appendix with
+  deltas) + **draft M = {shed, curtailment, cost_less_synthetic}** +
+  plain summary. Headlines: curtailment/cost location-sensitive in all
+  4 pairs (gates 1.9–30.5× floor); shed verdict CHANGED to tilt-only
+  (317 ≈ 1.8× nuclear per MW, replicated; magnitude sub-floor); GP gate
+  fails for curtailment everywhere (along-line reads suppressed); cost
+  vs reliability τ flips to −0.6 pooled (19b prior reverses — MOBO
+  necessity); 13/32 edge flags, characterized benign. OAT preliminary
+  re-executed with backfill folded (window [42.4, 251.5]).
 - [ ] Remaining 11 waves: Kay staggers per `SUBMIT_QUEUE.md` (fire-and-
-  forget; ~790 core-h each; total campaign 1,134 runs ≈ 11k core-h).
+  forget; ~790 core-h each). **Kay 09-21: n0b top-up build is GO but
+  submits only AFTER these 3 priority pairs — that condition is now MET;
+  n0b build/submission is queued work for a stage2 session (skip =
+  n_drawn_total = 16, new wave dir).**
 
 ## Re-invocation routing
 

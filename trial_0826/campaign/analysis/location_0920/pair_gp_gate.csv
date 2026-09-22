@@ -1,0 +1,17 @@
+pair,objective,loocv_rmse,floor,gate_pass
+nuclear|wind_317,load_shed_mwh,1357.8796072111309,3000.0,True
+nuclear|wind_317,true_curtailment_mwh,6369.457600229889,5000.0,False
+nuclear|wind_317,total_cost_raw_usd,262943.8120356247,500000.0,True
+nuclear|wind_317,total_cost_less_synthetic_usd,339859.971713076,500000.0,True
+pv|tail,load_shed_mwh,1173.9594170252583,3000.0,True
+pv|tail,true_curtailment_mwh,6331.764716684815,5000.0,False
+pv|tail,total_cost_raw_usd,242431.57648343412,500000.0,True
+pv|tail,total_cost_less_synthetic_usd,237237.39178383315,500000.0,True
+nuclear|pv,load_shed_mwh,1690.915196398359,3000.0,True
+nuclear|pv,true_curtailment_mwh,5169.574269414971,5000.0,False
+nuclear|pv,total_cost_raw_usd,212954.5691219774,500000.0,True
+nuclear|pv,total_cost_less_synthetic_usd,204238.54613749613,500000.0,True
+wind_303|wind_317,load_shed_mwh,1174.8478316790402,3000.0,True
+wind_303|wind_317,true_curtailment_mwh,6126.010923119824,5000.0,False
+wind_303|wind_317,total_cost_raw_usd,298924.5371805541,500000.0,True
+wind_303|wind_317,total_cost_less_synthetic_usd,437635.28203201,500000.0,True

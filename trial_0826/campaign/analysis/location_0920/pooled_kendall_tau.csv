@@ -1,0 +1,7 @@
+,load_shed_mwh,true_curtailment_mwh,total_cost_raw_usd,total_cost_less_synthetic_usd,reserve_shortfall_mwh,thermal_starts
+load_shed_mwh,1.0,0.748,-0.59,-0.561,0.861,0.839
+true_curtailment_mwh,0.748,1.0,-0.662,-0.631,0.806,0.847
+total_cost_raw_usd,-0.59,-0.662,1.0,0.959,-0.645,-0.66
+total_cost_less_synthetic_usd,-0.561,-0.631,0.959,1.0,-0.615,-0.627
+reserve_shortfall_mwh,0.861,0.806,-0.645,-0.615,1.0,0.911
+thermal_starts,0.839,0.847,-0.66,-0.627,0.911,1.0

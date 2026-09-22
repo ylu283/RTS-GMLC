@@ -1,0 +1,7 @@
+dropped,front_overlap,hv_change_pct,redundant_for_MOBO
+load_shed_mwh,0.938,0.05,False
+true_curtailment_mwh,0.815,0.24,False
+total_cost_raw_usd,0.901,0.01,False
+total_cost_less_synthetic_usd,0.988,0.0,True
+reserve_shortfall_mwh,0.988,0.0,True
+thermal_starts,0.988,0.01,True
