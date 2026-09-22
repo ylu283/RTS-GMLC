@@ -83,3 +83,11 @@ def stage2_backfill_wave(waves_root):
     wave_dir = make_batches.build_stage2_backfill("C", waves_root)
     submit_array.generate_script(wave_dir, max_concurrent=12)
     return wave_dir
+
+
+@pytest.fixture(scope="session")
+def stage2_n0b_wave(waves_root, stage2_n0_wave):
+    # continuation builder: reads the n0 manifest/matrix from the same root
+    wave_dir = make_batches.build_stage2_n0b("C", waves_root)
+    submit_array.generate_script(wave_dir, max_concurrent=None)
+    return wave_dir

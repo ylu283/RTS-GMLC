@@ -131,3 +131,76 @@ def test_stage2_arrays_use_tc_12(stage2_n0_wave, stage2_backfill_wave):
         name = os.path.basename(os.path.normpath(wave))
         script = open(os.path.join(wave, f"{name}_array.sh")).read()
         assert "#$ -tc 12" in script
+
+
+# --- n0b top-up: continuation of the n0 sequence (Kay GO 09-21) --------------
+
+def test_stage2_n0b_continues_the_sequence(stage2_n0_wave, stage2_n0b_wave):
+    import design_tools as dt
+    from tiers import SOBOL_SEED
+    _, n0_manifest = load_wave(stage2_n0_wave)
+    df, manifest = load_wave(stage2_n0b_wave)
+    sobol = manifest["sobol"]
+    assert sobol["seed"] == SOBOL_SEED
+    assert sobol["skip"] == n0_manifest["sobol"]["n_drawn_total"]
+    assert sobol["n"] == 16
+    assert sobol["n_drawn_total"] >= sobol["skip"] + 16
+    assert sobol["continues_wave"] == "stage2_C_n0"
+    assert sobol["lattice"] == LATTICE
+    # the first redrawn block really is draws skip+1..skip+16 of the SAME
+    # engine: pre_snap of the first 16 snap_map draws must match an
+    # independent generate_sobol call with skip = n_drawn_total(n0)
+    snap = json.load(open(os.path.join(stage2_n0b_wave, "snap_map.json")))
+    pts = dt.generate_sobol(16, SOBOL_SEED, skip=sobol["skip"], d=len(TIERS))
+    lo, hi = LATTICE[0], LATTICE[-1]
+    expect = lo + pts * (hi - lo)
+    got = np.array([d["pre_snap"] for d in snap["draws"][:16]])
+    assert np.allclose(got, expect, rtol=0, atol=0)
+    assert [d["draw"] for d in snap["draws"][:16]] == list(
+        range(sobol["skip"] + 1, sobol["skip"] + 17))
+
+
+def test_stage2_n0b_no_overlap_and_lattice(stage2_n0_wave, stage2_n0b_wave):
+    df0, _ = load_wave(stage2_n0_wave)
+    df, _ = load_wave(stage2_n0b_wave)
+    assert list(df["index"]) == list(range(1, 17))
+    assert (df["num_days"] == 366).all()
+    om = df[omega_cols(df)]
+    assert om.notna().all().all()
+    for col in om.columns:
+        assert om[col].isin(LATTICE).all(), f"{col} has off-lattice values"
+    combined = pd.concat([df0[omega_cols(df0)], om])
+    assert len(combined.drop_duplicates()) == 32  # 32 distinct across BOTH waves
+    assert (df[bid_cols(df)] == 40.0).all().all()
+    assert (df["rho_h2"] == 2.0).all()
+
+
+def test_stage2_n0b_snap_map_matches_matrix(stage2_n0b_wave):
+    df, manifest = load_wave(stage2_n0b_wave)
+    snap = json.load(open(os.path.join(stage2_n0b_wave, "snap_map.json")))
+    assert snap["tier_order"] == list(TIERS)
+    draws = snap["draws"]
+    assert len(draws) == manifest["sobol"]["n_drawn_total"] - manifest["sobol"]["skip"]
+    kept = [d for d in draws if d["kept_index"] is not None]
+    assert [d["kept_index"] for d in kept] == list(range(1, 17))
+    for d in draws:
+        for pre, post in zip(d["pre_snap"], d["post_snap"]):
+            nearest = LATTICE[int(np.argmin([abs(pre - lv) for lv in LATTICE]))]
+            assert post == nearest
+    om = df[omega_cols(df)].to_numpy()
+    assert np.array_equal(om, np.array([d["post_snap"] for d in kept]))
+
+
+def test_stage2_n0b_support_scripts(stage2_n0b_wave):
+    array = open(os.path.join(stage2_n0b_wave, "stage2_C_n0b_array.sh")).read()
+    assert "#$ -tc" not in array  # no concurrency cap (Kay 09-19)
+    submit = open(os.path.join(stage2_n0b_wave, "submit_this.sh")).read()
+    assert "-t 1-16" in submit
+    assert 'BRANCH" == "d6"' in submit.replace("$", "")
+    collector = open(os.path.join(stage2_n0b_wave, "collect_stage2_C_n0b.sh")).read()
+    assert 'user.name="stage2-bot"' in collector
+    assert "push_with_retries" in collector
+    # the collector never INVOKES resubmit_missing.py (Kay-run recovery only)
+    for line in collector.splitlines():
+        if "resubmit_missing.py" in line:
+            assert line.lstrip().startswith(("#", "echo")), line

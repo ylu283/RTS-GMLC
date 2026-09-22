@@ -12,6 +12,7 @@ SGE array script. Commit the campaign code BEFORE generating waves so the
 manifest git SHA describes the generator. No job is ever submitted here.
 """
 
+import csv
 import functools
 import json
 import os
@@ -354,6 +355,113 @@ def build_stage2_backfill(scenario, waves_root=WAVES_ROOT):
     return wave_dir
 
 
+STAGE2_N0B_SIZE = 16  # top-up 16 -> 32 (T4 GO recommendation, Kay 09-21)
+
+STAGE2_N0B_README = """# stage2_C_n0b — n0 top-up 16 -> 32 (prompt 27; Kay GO 09-21)
+
+16 more full-year rows CONTINUING the stage2_C_n0 scrambled-Sobol
+sequence (TOPUP_RECOMMENDATION.md mechanics, doc 14 SS5.1): same d = 6
+engine and seed, skip = n_drawn_total read from the n0 manifest (never
+re-seed), global draws 17+, snapped to STAGE2_LATTICE, deduped against
+ALL kept post-snap rows (the n0 16 and this wave's own) with block
+redraws on collision. Wave-local indices 1-16 (SGE contract); the
+manifest's sobol dict records skip, the cumulative n_drawn_total for the
+NEXT continuation, and continues_wave = stage2_C_n0. snap_map.json draws
+are numbered by GLOBAL sequence position.
+
+Submission was DEFERRED behind the 3 priority pairgrid waves (Kay
+09-21); those completed 09-21, so this wave is clear to submit ON CRC
+from inside this directory: `bash submit_this.sh` (d6 guard + pull,
+array without -tc, chained collector with email).
+"""
+
+
+def _write_stage2_n0b_support(wave_dir, wave_name):
+    """Single-wave submit + collector, rendered from the pairgrid templates
+    (same automation pattern incl. the 5-retry push loop) with the stage-2
+    bot identity and task count."""
+    subs = {"@WAVE@": wave_name, "@N@": str(STAGE2_N0B_SIZE)}
+
+    def render(template):
+        for key, val in subs.items():
+            template = template.replace(key, val)
+        return (template
+                .replace("pairgrid-bot", "stage2-bot")
+                .replace("(prompt 28 T1)", "(prompt 27 n0b top-up)")
+                .replace("(prompt 28 T1;", "(prompt 27 n0b top-up;"))
+
+    with open(os.path.join(wave_dir, "README.md"), "w") as f:
+        f.write(STAGE2_N0B_README)
+    for fname, template in (("submit_this.sh", PAIRGRID_SUBMIT),
+                            (f"collect_{wave_name}.sh", PAIRGRID_COLLECTOR)):
+        path = os.path.join(wave_dir, fname)
+        with open(path, "w") as f:
+            f.write(render(template))
+        os.chmod(path, 0o755)
+
+
+def build_stage2_n0b(scenario, waves_root=WAVES_ROOT):
+    """Stage-2 n0 top-up (prompt 27 T4 GO, Kay 09-21): rows 17-32 of the
+    SAME d = 6 sequence as stage2_C_n0 — skip = n_drawn_total from the n0
+    manifest (never re-seed), snap to the lattice, dedupe against all kept
+    post-snap rows across BOTH waves, block redraws on collision
+    (TOPUP_RECOMMENDATION.md mechanics)."""
+    tiers, provisional = stage2_tiers()
+    rho = RHO_SCENARIOS[scenario]
+    lo, hi = float(STAGE2_LATTICE[0]), float(STAGE2_LATTICE[-1])
+
+    n0_dir = os.path.join(waves_root, f"stage2_{scenario}_n0")
+    with open(os.path.join(n0_dir, "manifest.json")) as f:
+        n0_sobol = json.load(f)["sobol"]
+    assert n0_sobol["seed"] == SOBOL_SEED, "n0 manifest seed mismatch"
+    start_skip = int(n0_sobol["n_drawn_total"])
+    with open(os.path.join(n0_dir, "design_matrix.csv"), newline="") as f:
+        # decimal-clean lattice values round-trip exactly through float()
+        seen = {tuple(float(row[f"{t}_omega"]) for t in tiers)
+                for row in csv.DictReader(f)}
+    assert len(seen) == n0_sobol["n"], "n0 design matrix has duplicate rows?"
+
+    kept, snap_log = [], []
+    n_drawn_total = start_skip
+    while len(kept) < STAGE2_N0B_SIZE:
+        block = (STAGE2_N0B_SIZE if n_drawn_total == start_skip
+                 else STAGE2_N0B_SIZE - len(kept))
+        points = dt.generate_sobol(block, SOBOL_SEED, skip=n_drawn_total,
+                                   d=len(tiers))
+        n_drawn_total += block
+        for offset, unit in enumerate(points):
+            pre = lo + unit * (hi - lo)
+            post = _snap_to_lattice(pre)
+            key = tuple(float(w) for w in post)
+            entry = {"draw": n_drawn_total - block + offset + 1,  # GLOBAL
+                     "pre_snap": [float(w) for w in pre],
+                     "post_snap": [float(w) for w in post],
+                     "kept_index": None}
+            if key not in seen and len(kept) < STAGE2_N0B_SIZE:
+                seen.add(key)
+                kept.append(post)
+                entry["kept_index"] = len(kept)
+            snap_log.append(entry)
+
+    rows = [dt.make_row(tiers, dict(zip(tiers, omegas)), index=i,
+                        num_days=FULL_YEAR, provisional=provisional, rho_h2=rho)
+            for i, omegas in enumerate(kept, start=1)]
+    wave_name = f"stage2_{scenario}_n0b"
+    wave_dir = os.path.join(waves_root, wave_name)
+    dt.write_wave(dt.rows_to_matrix(rows, tiers), wave_dir, tiers,
+                  sobol={"seed": SOBOL_SEED, "skip": start_skip,
+                         "n": STAGE2_N0B_SIZE,
+                         "n_drawn_total": n_drawn_total,
+                         "continues_wave": f"stage2_{scenario}_n0",
+                         "lattice": [float(w) for w in STAGE2_LATTICE],
+                         "scipy_version": scipy.__version__})
+    with open(os.path.join(wave_dir, "snap_map.json"), "w") as f:
+        json.dump({"tier_order": list(tiers), "draws": snap_log}, f, indent=2)
+        f.write("\n")
+    _write_stage2_n0b_support(wave_dir, wave_name)
+    return wave_dir
+
+
 # --- pair-grid waves (prompt 28 T1; Kay scope ruling 09-20) -------------------
 # ALL 15 tier pairs get full 9x9 grids at scenario C; wind_303 x wind_317 is
 # NOT built here — it already exists as contour_303x317_C (equivalence up to
@@ -408,9 +516,9 @@ BRANCH="$(git -C "$REPO_DIR" branch --show-current)"
 [[ "$BRANCH" == "d6" ]] || { echo "ABORT: repo on '$BRANCH', expected d6"; exit 1; }
 git -C "$REPO_DIR" pull --rebase --autostash origin d6
 
-J=$(qsub -terse -t 1-81 @WAVE@_array.sh | cut -d. -f1)
+J=$(qsub -terse -t 1-@N@ @WAVE@_array.sh | cut -d. -f1)
 [[ "$J" =~ ^[0-9]+$ ]] || { echo "BAD JID: $J"; exit 1; }
-echo "@WAVE@ array submitted: J=$J (81 tasks, no -tc)"
+echo "@WAVE@ array submitted: J=$J (@N@ tasks, no -tc)"
 qsub -hold_jid "$J" -cwd -M ylu28@nd.edu -m ea collect_@WAVE@.sh
 echo "collector submitted (holds on $J only — never on other waves)"
 qstat -u ylu28
@@ -512,7 +620,7 @@ echo "collect_@WAVE@ done: objectives pushed"
 
 def _write_pairgrid_support(wave_dir, wave_name, scenario, tier_a, tier_b):
     subs = {"@WAVE@": wave_name, "@SCENARIO@": scenario,
-            "@TIER_A@": tier_a, "@TIER_B@": tier_b}
+            "@TIER_A@": tier_a, "@TIER_B@": tier_b, "@N@": "81"}
 
     def render(template):
         for key, val in subs.items():
@@ -566,6 +674,7 @@ WAVE_MAX_CONCURRENT = {"stage2_C_n0": 12, "stage2_backfill_C": 12}
 WAVE_MAX_CONCURRENT.update({
     pairgrid_wave_name(a, b): None for a, b in PAIRGRID_PAIRS
 })
+WAVE_MAX_CONCURRENT["stage2_C_n0b"] = None  # top-up: no -tc (Kay 09-19 ruling)
 
 BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
             "placebo": build_placebo,
@@ -578,7 +687,10 @@ BUILDERS = {"pilot": build_pilot, "screening": build_screening, "n0": build_n0,
             "sweep_C": functools.partial(build_sweep, "C"),
             # Stage-2 scenario C on the discrete lattice (prompt 27)
             "stage2_C_n0": functools.partial(build_stage2_n0, "C"),
-            "stage2_backfill_C": functools.partial(build_stage2_backfill, "C")}
+            "stage2_backfill_C": functools.partial(build_stage2_backfill, "C"),
+            # n0 top-up 16 -> 32 (prompt 27 T4 GO; Kay 09-21, deferred behind
+            # the priority pairgrids — those completed 09-21)
+            "stage2_C_n0b": functools.partial(build_stage2_n0b, "C")}
 
 # 14 pair-grid waves (prompt 28). Invoke builders PER-WAVE BY NAME only —
 # `make_batches.py all` (the default argv!) would regenerate legacy builders
