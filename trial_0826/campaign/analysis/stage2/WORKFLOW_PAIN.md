@@ -16,6 +16,8 @@ collector `.o` log, `qacct`) are marked PENDING-KAY — fill in from
 | 3 | 09-19/20 | Kay | submit | block_2.sh — J1 (n₀ ×16) + J2 (backfill ×10, holds J1) + single collector (holds J1,J2) |
 | 4 | 09-20 22:01 EDT | **bot** | — | collector: gate PASS both waves → summarize → commit `fc98902` → push. **Zero human touches.** |
 | 5 | 09-22 | Kay | data-wrangling (pain-log evidence) | pulled n0 task-log mtimes on bastion (screenshot) — fills the J1 row of (ii) below |
+| 6 | 09-22 | Kay | submit | `submit_this.sh` for stage2_C_n0b (16-task array, no `-tc`, + collector) |
+| 7 | 09-22 21:01:52 EDT | **bot** | — | n0b collector: gate PASS → commit `127c8a4` → push. **Zero human touches; AuthorDate == CommitDate ⇒ first push succeeded, no rebase.** Second consecutive clean unattended pass; wave-pushed → results-on-d6 = 11:42 → 21:01 EDT = **9.3 h** (queue + 16 ∥ runs + collector), the pattern's best turnaround yet. |
 
 Failure-recovery touches: **0** (no FAILED markers ever appeared; no
 resubmissions in git history). Git/race touches: **0 observed** (see iii).

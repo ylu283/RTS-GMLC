@@ -1,0 +1,164 @@
+{
+  "collector_commit": "127c8a4",
+  "n_points": 32,
+  "gp_loo_32": [
+    {
+      "objective": "load_shed_mwh",
+      "loo_rmse_32": 1206.8472026868121,
+      "y_range_32": 13729.311075,
+      "rmse_over_range_32": 0.08790296877200098,
+      "loo_R2_32": 0.8937306593695588,
+      "loo_rmse_16": 1497.1572775825289,
+      "loo_R2_16": 0.875576867568307,
+      "rmse_ratio_32_over_16": 0.8060924665413358,
+      "rmse_over_floor_32": 0.402282400895604,
+      "rmse_over_floor_16": 0.499052425860843
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "loo_rmse_32": 33116.151064946556,
+      "y_range_32": 540073.5224929999,
+      "rmse_over_range_32": 0.061317857080052995,
+      "loo_R2_32": 0.9402576401252984,
+      "loo_rmse_16": 85361.69195337445,
+      "loo_R2_16": 0.6752847740148953,
+      "rmse_ratio_32_over_16": 0.3879509684863672,
+      "rmse_over_floor_32": 6.623230212989311,
+      "rmse_over_floor_16": 17.07233839067489
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "loo_rmse_32": 1440541.2603772979,
+      "y_range_32": 101004155.61180997,
+      "rmse_over_range_32": 0.014262197942763276,
+      "loo_R2_32": 0.9971356811232163,
+      "loo_rmse_16": 3619112.549902891,
+      "loo_R2_16": 0.9835442531369272,
+      "rmse_ratio_32_over_16": 0.39803715427859543,
+      "rmse_over_floor_32": 2.8810825207545956,
+      "rmse_over_floor_16": 7.238225099805781
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "loo_rmse_32": 2139606.8810545015,
+      "y_range_32": 102530574.60301995,
+      "rmse_over_range_32": 0.020867988786161366,
+      "loo_R2_32": 0.9939133336801198,
+      "loo_rmse_16": 3557638.7439246657,
+      "loo_R2_16": 0.9846441713979602,
+      "rmse_ratio_32_over_16": 0.6014120699321371,
+      "rmse_over_floor_32": 4.279213762109003,
+      "rmse_over_floor_16": 7.1152774878493315
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "loo_rmse_32": 5246.6234433016425,
+      "y_range_32": 54646.11031900001,
+      "rmse_over_range_32": 0.09601092214384807,
+      "loo_R2_32": 0.8874701267881402,
+      "loo_rmse_16": 7011.10853198872,
+      "loo_R2_16": 0.8309278818960928,
+      "rmse_ratio_32_over_16": 0.7483300849449871,
+      "rmse_over_floor_32": NaN,
+      "rmse_over_floor_16": NaN
+    },
+    {
+      "objective": "thermal_starts",
+      "loo_rmse_32": 83.25526890987913,
+      "y_range_32": 1111.0,
+      "rmse_over_range_32": 0.07493723574246547,
+      "loo_R2_32": 0.9210613097637562,
+      "loo_rmse_16": 179.34616643669375,
+      "loo_R2_16": 0.6833041824268282,
+      "rmse_ratio_32_over_16": 0.4642154921068072,
+      "rmse_over_floor_32": NaN,
+      "rmse_over_floor_16": NaN
+    }
+  ],
+  "ranges_32": [
+    {
+      "objective": "load_shed_mwh",
+      "n0_min": 22.425956,
+      "n0_max": 13729.311075,
+      "n0b_min": 0.0,
+      "n0b_max": 9986.466378,
+      "combined_min": 0.0,
+      "combined_max": 13729.311075,
+      "hull_min": 2920.238785,
+      "hull_max": 40102.474285,
+      "n0b_extends_low": true,
+      "n0b_extends_high": false
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "n0_min": 76268.870635,
+      "n0_max": 616342.393128,
+      "n0b_min": 89901.121618,
+      "n0b_max": 547862.591366,
+      "combined_min": 76268.870635,
+      "combined_max": 616342.393128,
+      "hull_min": 470809.12429300015,
+      "hull_max": 1494291.658006,
+      "n0b_extends_low": false,
+      "n0b_extends_high": false
+    },
+    {
+      "objective": "total_cost_raw_usd",
+      "n0_min": 546956561.997831,
+      "n0_max": 647870883.57485,
+      "n0b_min": 560788064.853791,
+      "n0b_max": 647960717.609641,
+      "combined_min": 546956561.997831,
+      "combined_max": 647960717.609641,
+      "hull_min": 528327810.653031,
+      "hull_max": 578550575.006141,
+      "n0b_extends_low": false,
+      "n0b_extends_high": true
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "n0_min": 539251294.138745,
+      "n0_max": 641212849.1997169,
+      "n0b_min": 553368561.944554,
+      "n0b_max": 641781868.7417649,
+      "combined_min": 539251294.138745,
+      "combined_max": 641781868.7417649,
+      "hull_min": 526484930.811311,
+      "hull_max": 572048842.716301,
+      "n0b_extends_low": false,
+      "n0b_extends_high": true
+    },
+    {
+      "objective": "reserve_shortfall_mwh",
+      "n0_min": 7721.60624,
+      "n0_max": 59038.134983,
+      "n0b_min": 4392.024664,
+      "n0b_max": 57026.365956,
+      "combined_min": 4392.024664,
+      "combined_max": 59038.134983,
+      "hull_min": 43220.852724,
+      "hull_max": 190437.386529,
+      "n0b_extends_low": true,
+      "n0b_extends_high": false
+    },
+    {
+      "objective": "thermal_starts",
+      "n0_min": 2024.0,
+      "n0_max": 3135.0,
+      "n0b_min": 2062.0,
+      "n0b_max": 2944.0,
+      "combined_min": 2024.0,
+      "combined_max": 3135.0,
+      "hull_min": 2938.0,
+      "hull_max": 5000.0,
+      "n0b_extends_low": false,
+      "n0b_extends_high": false
+    }
+  ],
+  "verdict_lines": [
+    "load_shed_mwh [draft-M]: 0.5x -> 0.4x floor; NOISE-LIMITED \u2014 more n0 points buy ~nothing for this objective",
+    "true_curtailment_mwh [draft-M]: 17.1x -> 6.6x floor; still model-limited but improving fast (halved or better)",
+    "total_cost_raw_usd: 7.2x -> 2.9x floor; still model-limited but improving fast (halved or better)",
+    "total_cost_less_synthetic_usd [draft-M]: 7.1x -> 4.3x floor; still model-limited; improvement modest"
+  ]
+}

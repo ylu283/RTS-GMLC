@@ -1,5 +1,27 @@
 # Stage-2 scenario C — session bridge (prompt 27)
 
+**State (2026-09-22 late, refresh session): n0b LANDED + 32-point GP
+refresh DONE.** Kay submitted same day; collector `127c8a4` (second
+consecutive zero-touch pass, 9.3 h wave-pushed → results-on-d6 — best
+turnaround yet; pain log updated). `n0_refresh_32.ipynb` (executed;
+T4's LOO apparatus byte-identical, only n 16 → 32) + `n0_32pt_gp_loo.csv`
+/ `n0_32pt_ranges.csv` / `t4b_summary.json` / `figs/loo_16_vs_32.png`,
+`figs/loo_scatter_32.png`. **Headlines:** curtailment LOO error
+17.1× → 6.6× floor (R² 0.68 → 0.94), cost raw 7.2× → 2.9×, cost_ls
+7.1× → 4.3×, shed stays noise-limited (0.4×); every objective now
+R² ≥ 0.89. n0b found a **zero-shed design point** (combined shed range
+now [0, 13,729] MWh) and nudged the cost maxima up. Worst draft-M
+objective (curtailment) is still model-limited at 6.6× floor but
+halving per doubling so far. **A 32 → 64 extension was NOT
+pre-registered — numbers reported, decision is Kay/PI's; the sequence
+continues with `skip = n_drawn_total = 32` if wanted.** BO round 1
+still waits on the final M (prompt 28). Remaining pain-log pendings:
+`qacct` queue-vs-run split (J1 = 1458464 + the n0b JIDs) and the
+block-log handoff timestamps.
+
+---
+Historical bridge below (n0b-build session, 2026-09-22 morning):
+
 **State (2026-09-22, n0b session): T4 complete; n0b BUILT, awaiting
 Kay's submit.** The 09-21 deferral condition cleared — all 3 priority
 pairgrids landed 09-21 (`8579cc5` nuclear_wind_317, `5bfd4a6`
