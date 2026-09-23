@@ -1,0 +1,23 @@
+{
+ "mode": "slim",
+ "hourly_summary.csv": 8760,
+ "reserves.csv": 8760,
+ "daily_summary.csv": 365,
+ "overall.csv": 1,
+ "gen_summary": 293,
+ "renewables_hourly": 35040,
+ "committed_hourly": 8760,
+ "line_summary": 255,
+ "ruc_quality": 365,
+ "md5": {
+  "committed_hourly.csv": "d762090fd072c365c250b4f95b6bd78c",
+  "daily_summary.csv": "149221a9c448761658cd19fd972e3336",
+  "gen_summary.csv": "4f4efb1a8bb5b9536b01a475c23efb38",
+  "hourly_summary.csv": "db0b1ae203be23ec9118e4bb94b87207",
+  "line_summary.csv": "5c268bd3ef081151d6fa70a39bf63c1e",
+  "overall.csv": "85fb0dba8a48190b41ae0aef60dd1853",
+  "renewables_hourly.csv": "bb584542d27fd3fa5695af73b9447868",
+  "reserves.csv": "977e41fe985358650738d929a91b4d3e",
+  "ruc_quality.csv": "eb230b02761c68160b5fab85d51343d5"
+ }
+}
