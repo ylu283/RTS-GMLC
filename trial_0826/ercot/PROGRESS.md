@@ -47,18 +47,26 @@ owns the main clones on `d6` — never touch.
   from the base extract; both arms together cover the actual top-10
   exactly. v1 = availability/contrast arm + __ALL__ + the 2 replicate
   noise-ruler rows.
-- [ ] **Block #4b (CRC, NEXT KAY ACTION — supersedes block #4):**
-  `bash ercot_block_4b.sh 2>&1 | tee ercot_block_4b.log`. Handles both
-  histories: if v1 was never submitted (or block #4's ranking gate
-  stopped it — it fires at 3/9), submits BOTH arms (12 + 7 tasks); if
-  v1 was proxy-submitted before the base landed, detects it (qstat -j /
-  run dirs) and submits only the top-up. Each arm has its own chained
-  collector (-M/-m ea). **Do not run ercot_block_4.sh anymore.**
-- [ ] Screening analysis when the arm extracts land: retrofit deltas
-  gated by the replicate-spread noise ruler (|Δ| ≫ spread or "within
-  solver noise"); check whether retrofit value tracks curtailment
-  (top-up arm) or size/availability (v1 arm); bus-120 congestion-pocket
-  story vs line_flows.
+- [x] **Block #4b (CRC)** — both arms ran and collected first-pass:
+  `6dc533e` (topup extracts), `33a139b` (v1 extracts incl. replicate
+  rows). No FAILED markers.
+- [x] **SCREENING ANALYSIS (09-22, fourth session)** —
+  `analysis/screening_analysis.ipynb` executed + `SCREENING_ERCOT.md`
+  verdict + `screening_site_effects.csv` + `screening_noise_ruler.json`.
+  Headlines: (1) relief tracks the site's own base curtailment
+  (Spearman +0.89) and nothing else — availability proxy formally dead;
+  (2) bus-120 pocket is the MOST efficient diversion target (0.72
+  relief/H2 vs 0.37; site 275 = 2.17 TWh relief, 397× ruler); (3) big
+  uncongested wind (20/204/205) = zero relief at +$13–16M var cost;
+  (4) **total cost UNREADABLE: fixed cost bimodal ±$79.5M — gen 1
+  (2,430 MW NUC) commitment flips under TL=120** (both replicate pairs
+  landed opposite states); variable gen cost is the cost read-out
+  (ruler $0.29M); (5) joint/Σ = 0.933 (mild sub-additivity);
+  (6) zero load shed everywhere — shed is not an ERCOT objective.
+  Proposed tier structure (pocket_120 cluster / wind_near / pv_26 /
+  drop the availability giants unless an H2-volume objective enters) is
+  in SCREENING_ERCOT.md, awaiting PI. Pain log compiled there
+  (PENDING-KAY: qacct splits, block-log timestamps).
 
 ## Workflow-pain log inputs accumulating (directive requirement)
 
