@@ -49,11 +49,29 @@ including error paths.
   vs reliability τ flips to −0.6 pooled (19b prior reverses — MOBO
   necessity); 13/32 edge flags, characterized benign. OAT preliminary
   re-executed with backfill folded (window [42.4, 251.5]).
-- [ ] Remaining 11 waves: Kay staggers per `SUBMIT_QUEUE.md` (fire-and-
-  forget; ~790 core-h each). **Kay 09-21: n0b top-up build is GO but
-  submits only AFTER these 3 priority pairs — that condition is now MET;
-  n0b build/submission is queued work for a stage2 session (skip =
-  n_drawn_total = 16, new wave dir).**
+- [x] **T3 atlas pass 1 (2026-09-29)** — 9 more pairs landed (12/14
+  pairgrid waves + contour = **13/15 pairs**); `pair_apparatus.ipynb`
+  re-executed over all of them (T2 pairs recomputed, unchanged); atlas
+  heat-tables (`atlas_extra_rmse_over_floor.csv`, `atlas_log2_tilt.csv`,
+  `figs/atlas_heattables.png`) + LOCATION.md v1.1 atlas section.
+  Verdict-relevant changes: shed tilt replicated **10/13** (wind ≫
+  nuclear > pv, up to 17× per-MW); cost = two regimes (nuclear pairs
+  16–33× vs renewable-only 1.6–3.4×); curtailment over-gate 13/13 but GP
+  gate fails 13/13 (no along-line reads anywhere); **thermal_starts
+  drop-one redundancy FLIPPED** (0.988→0.806) — flagged as candidate 4th
+  objective if D3 lands a floor; draft M = {shed, curt, cost_ls} stands.
+  Multiplicity: 299 reads, 29 in the 2–3× band, replication rule is the
+  control. 42-pt supplement extension (n0b) strengthens allocation
+  signal (cost 5×). n0b itself was built/run/analyzed by the stage2
+  session (46f35ea).
+- [ ] **OUTSTANDING pairs: wind_122×wind_303, wind_122×wind_317**
+  (Kay's staggered queue, `SUBMIT_QUEUE.md`). At next re-invocation:
+  pull, re-run `build_pair_t3_nb`-style pass (the notebook auto-detects
+  landed waves), then the **final 15-pair atlas + final verdict table +
+  final M memo revision**. If still outstanding, report and proceed.
+- [ ] g1 ruling still pending (quality_report proposal unanswered) —
+  nuclear cost rows keep the APPROX caveat; verdicts conditional on
+  rejecting option (b).
 
 ## Re-invocation routing
 

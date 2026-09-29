@@ -1,0 +1,371 @@
+{
+  "pairs_available": [
+    "nuclear|pv",
+    "nuclear|tail",
+    "nuclear|wind_122",
+    "nuclear|wind_303",
+    "nuclear|wind_317",
+    "pv|tail",
+    "pv|wind_122",
+    "pv|wind_303",
+    "pv|wind_317",
+    "tail|wind_122",
+    "tail|wind_303",
+    "tail|wind_317",
+    "wind_303|wind_317"
+  ],
+  "outstanding": [
+    "wind_122|wind_303",
+    "wind_122|wind_317"
+  ],
+  "gate_pass_counts": {
+    "load_shed_mwh": 13,
+    "total_cost_less_synthetic_usd": 13,
+    "total_cost_raw_usd": 13,
+    "true_curtailment_mwh": 0
+  },
+  "atlas_gate": {
+    "load_shed_mwh": {
+      "nuclear|pv": 0.558,
+      "nuclear|tail": 0.358,
+      "nuclear|wind_122": 0.743,
+      "nuclear|wind_303": 0.325,
+      "nuclear|wind_317": 0.762,
+      "pv|tail": 0.151,
+      "pv|wind_122": 1.278,
+      "pv|wind_303": 0.638,
+      "pv|wind_317": 1.394,
+      "tail|wind_122": 0.853,
+      "tail|wind_303": 0.249,
+      "tail|wind_317": 0.783,
+      "wind_303|wind_317": 0.933
+    },
+    "total_cost_less_synthetic_usd": {
+      "nuclear|pv": 19.616,
+      "nuclear|tail": 16.538,
+      "nuclear|wind_122": 28.535,
+      "nuclear|wind_303": 31.152,
+      "nuclear|wind_317": 29.248,
+      "pv|tail": 1.928,
+      "pv|wind_122": 2.115,
+      "pv|wind_303": 3.381,
+      "pv|wind_317": 2.148,
+      "tail|wind_122": 1.784,
+      "tail|wind_303": 1.639,
+      "tail|wind_317": 1.807,
+      "wind_303|wind_317": 5.53
+    },
+    "total_cost_raw_usd": {
+      "nuclear|pv": 21.867,
+      "nuclear|tail": 18.186,
+      "nuclear|wind_122": 29.516,
+      "nuclear|wind_303": 32.911,
+      "nuclear|wind_317": 30.543,
+      "pv|tail": 1.965,
+      "pv|wind_122": 2.515,
+      "pv|wind_303": 3.24,
+      "pv|wind_317": 2.644,
+      "tail|wind_122": 2.413,
+      "tail|wind_303": 1.866,
+      "tail|wind_317": 2.387,
+      "wind_303|wind_317": 5.87
+    },
+    "true_curtailment_mwh": {
+      "nuclear|pv": 12.183,
+      "nuclear|tail": 11.592,
+      "nuclear|wind_122": 10.476,
+      "nuclear|wind_303": 12.599,
+      "nuclear|wind_317": 8.623,
+      "pv|tail": 4.155,
+      "pv|wind_122": 5.808,
+      "pv|wind_303": 10.065,
+      "pv|wind_317": 6.602,
+      "tail|wind_122": 4.871,
+      "tail|wind_303": 9.134,
+      "tail|wind_317": 6.266,
+      "wind_303|wind_317": 9.314
+    }
+  },
+  "atlas_tilt": {
+    "load_shed_mwh": {
+      "nuclear|pv": -1.901,
+      "nuclear|tail": -0.783,
+      "nuclear|wind_122": 0.874,
+      "nuclear|wind_303": -0.3,
+      "nuclear|wind_317": 0.845,
+      "pv|tail": 1.594,
+      "pv|wind_122": 2.607,
+      "pv|wind_303": 2.281,
+      "pv|wind_317": 4.114,
+      "tail|wind_122": 1.558,
+      "tail|wind_303": 0.566,
+      "tail|wind_317": 1.409,
+      "wind_303|wind_317": 0.8
+    },
+    "reserve_shortfall_mwh": {
+      "nuclear|pv": -2.117,
+      "nuclear|tail": -0.878,
+      "nuclear|wind_122": 0.266,
+      "nuclear|wind_303": -0.407,
+      "nuclear|wind_317": 0.139,
+      "pv|tail": 0.8,
+      "pv|wind_122": 2.058,
+      "pv|wind_303": 1.567,
+      "pv|wind_317": 1.898,
+      "tail|wind_122": 1.155,
+      "tail|wind_303": 0.485,
+      "tail|wind_317": 1.066,
+      "wind_303|wind_317": 0.685
+    },
+    "thermal_starts": {
+      "nuclear|pv": -1.607,
+      "nuclear|tail": -0.893,
+      "nuclear|wind_122": 0.013,
+      "nuclear|wind_303": -0.635,
+      "nuclear|wind_317": -0.265,
+      "pv|tail": 0.621,
+      "pv|wind_122": 1.208,
+      "pv|wind_303": 0.632,
+      "pv|wind_317": 0.965,
+      "tail|wind_122": 0.959,
+      "tail|wind_303": 0.003,
+      "tail|wind_317": 0.663,
+      "wind_303|wind_317": 0.383
+    },
+    "total_cost_less_synthetic_usd": {
+      "nuclear|pv": -2.278,
+      "nuclear|tail": -2.458,
+      "nuclear|wind_122": -2.279,
+      "nuclear|wind_303": -2.932,
+      "nuclear|wind_317": -2.243,
+      "pv|tail": -0.567,
+      "pv|wind_122": -0.11,
+      "pv|wind_303": -0.883,
+      "pv|wind_317": -0.044,
+      "tail|wind_122": 0.101,
+      "tail|wind_303": -0.39,
+      "tail|wind_317": 0.144,
+      "wind_303|wind_317": 0.55
+    },
+    "total_cost_raw_usd": {
+      "nuclear|pv": -2.354,
+      "nuclear|tail": -2.469,
+      "nuclear|wind_122": -2.254,
+      "nuclear|wind_303": -2.893,
+      "nuclear|wind_317": -2.284,
+      "pv|tail": -0.407,
+      "pv|wind_122": 0.062,
+      "pv|wind_303": -0.645,
+      "pv|wind_317": 0.045,
+      "tail|wind_122": 0.179,
+      "tail|wind_303": -0.275,
+      "tail|wind_317": 0.142,
+      "wind_303|wind_317": 0.478
+    },
+    "true_curtailment_mwh": {
+      "nuclear|pv": -1.056,
+      "nuclear|tail": -1.528,
+      "nuclear|wind_122": -0.902,
+      "nuclear|wind_303": -0.74,
+      "nuclear|wind_317": -0.67,
+      "pv|tail": -0.366,
+      "pv|wind_122": 0.019,
+      "pv|wind_303": 0.221,
+      "pv|wind_317": 0.176,
+      "tail|wind_122": 0.691,
+      "tail|wind_303": 0.424,
+      "tail|wind_317": 0.907,
+      "wind_303|wind_317": 0.0
+    }
+  },
+  "multiplicity": {
+    "n_reads": 299,
+    "over_2x": 138,
+    "band_2_3x": 29
+  },
+  "edge_flags": 43,
+  "supplement": [
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "load_shed_mwh",
+      "loo_rmse_total_only": 3141.065732428415,
+      "loo_rmse_6d": 2935.879354536573,
+      "ratio": 1.069889240364998
+    },
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "true_curtailment_mwh",
+      "loo_rmse_total_only": 98753.67176576958,
+      "loo_rmse_6d": 84988.10539014777,
+      "ratio": 1.1619705053128244
+    },
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "total_cost_raw_usd",
+      "loo_rmse_total_only": 16874474.039319996,
+      "loo_rmse_6d": 6415434.952493754,
+      "ratio": 2.630293061074634
+    },
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "total_cost_less_synthetic_usd",
+      "loo_rmse_total_only": 16939261.65128798,
+      "loo_rmse_6d": 6856739.4420614615,
+      "ratio": 2.4704543310158558
+    },
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "reserve_shortfall_mwh",
+      "loo_rmse_total_only": 13572.74388062365,
+      "loo_rmse_6d": 12973.801826159595,
+      "ratio": 1.046165500482394
+    },
+    {
+      "pool": "26pt (pinned: n0+backfill)",
+      "objective": "thermal_starts",
+      "loo_rmse_total_only": 174.96451722426679,
+      "loo_rmse_6d": 99.08019058972933,
+      "ratio": 1.765887976020947
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "load_shed_mwh",
+      "loo_rmse_total_only": 2214.801142500838,
+      "loo_rmse_6d": 2283.67417269553,
+      "ratio": 0.9698411310080203
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "true_curtailment_mwh",
+      "loo_rmse_total_only": 86246.52727680872,
+      "loo_rmse_6d": 34953.70980295601,
+      "ratio": 2.4674498862353924
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "total_cost_raw_usd",
+      "loo_rmse_total_only": 16587686.271541426,
+      "loo_rmse_6d": 3020400.206422442,
+      "ratio": 5.491883571014901
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "total_cost_less_synthetic_usd",
+      "loo_rmse_total_only": 16712849.278722536,
+      "loo_rmse_6d": 3333845.692154045,
+      "ratio": 5.013084234238845
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "reserve_shortfall_mwh",
+      "loo_rmse_total_only": 10290.023897043811,
+      "loo_rmse_6d": 4644.236658387613,
+      "ratio": 2.215654509866494
+    },
+    {
+      "pool": "42pt (extension: +n0b)",
+      "objective": "thermal_starts",
+      "loo_rmse_total_only": 145.26166176011026,
+      "loo_rmse_6d": 56.09733839147742,
+      "ratio": 2.5894572884438154
+    }
+  ],
+  "drop_one": [
+    {
+      "dropped": "load_shed_mwh",
+      "front_overlap": 0.871,
+      "hv_change_pct": 0.08,
+      "redundant_for_MOBO": false
+    },
+    {
+      "dropped": "true_curtailment_mwh",
+      "front_overlap": 0.606,
+      "hv_change_pct": 4.95,
+      "redundant_for_MOBO": false
+    },
+    {
+      "dropped": "total_cost_raw_usd",
+      "front_overlap": 0.906,
+      "hv_change_pct": 0.01,
+      "redundant_for_MOBO": false
+    },
+    {
+      "dropped": "total_cost_less_synthetic_usd",
+      "front_overlap": 0.988,
+      "hv_change_pct": 0.0,
+      "redundant_for_MOBO": true
+    },
+    {
+      "dropped": "reserve_shortfall_mwh",
+      "front_overlap": 0.959,
+      "hv_change_pct": 0.01,
+      "redundant_for_MOBO": true
+    },
+    {
+      "dropped": "thermal_starts",
+      "front_overlap": 0.806,
+      "hv_change_pct": 0.11,
+      "redundant_for_MOBO": false
+    }
+  ],
+  "kendall_tau_cost_ls": {
+    "load_shed_mwh": -0.544,
+    "true_curtailment_mwh": -0.554,
+    "total_cost_raw_usd": 0.962,
+    "total_cost_less_synthetic_usd": 1.0,
+    "reserve_shortfall_mwh": -0.579,
+    "thermal_starts": -0.624
+  },
+  "tilted_verdicts": [
+    {
+      "pair": "nuclear|pv",
+      "objective": "load_shed_mwh",
+      "log2_tilt": -1.9012107194170447
+    },
+    {
+      "pair": "nuclear|tail",
+      "objective": "load_shed_mwh",
+      "log2_tilt": -0.7827169316192093
+    },
+    {
+      "pair": "nuclear|wind_122",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 0.8738753611515898
+    },
+    {
+      "pair": "nuclear|wind_317",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 0.8446481163193875
+    },
+    {
+      "pair": "pv|wind_122",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 2.606966108609742
+    },
+    {
+      "pair": "pv|wind_303",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 2.2805774040358564
+    },
+    {
+      "pair": "pv|wind_317",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 4.113759440268489
+    },
+    {
+      "pair": "tail|wind_122",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 1.5576831701159568
+    },
+    {
+      "pair": "tail|wind_317",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 1.4089758751601944
+    },
+    {
+      "pair": "wind_303|wind_317",
+      "objective": "load_shed_mwh",
+      "log2_tilt": 0.7998860847559072
+    }
+  ]
+}

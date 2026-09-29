@@ -1,4 +1,11 @@
-# LOCATION.md — v1 (pair-grid evidence; supersedes v0)
+# LOCATION.md — v1.1 (13-pair atlas appended 2026-09-29; v1 core below)
+
+> **T3 status:** 13/15 pairs analyzed under the pinned pipeline
+> (`pair_apparatus.ipynb`, re-executed over all landed waves).
+> **Outstanding: wind_122×wind_303, wind_122×wind_317** — proceeding per
+> the never-block rule; the atlas section near the end carries the
+> updated reads and the two verdict-relevant changes (shed tilt now
+> replicated 10/13; thermal_starts' drop-one redundancy flipped).
 
 **Evidence base:** the 3 priority pair grids — **nuclear×wind_317, pv×tail,
 nuclear×pv** (81/81 rows each, scenario C, collected 09-21/22 by
@@ -99,6 +106,62 @@ total_cost_less_synthetic_usd (with the g1 add-back once ruled)}.**
   integration, economics — one axis each. NPV/congestion join as
   post-hoc extractions if adopted later; the retained raw runs support
   both.
+
+## T3 atlas — 13/15 pairs (2026-09-29)
+
+Heat-tables: `atlas_extra_rmse_over_floor.csv`, `atlas_log2_tilt.csv`,
+`figs/atlas_heattables.png`; per-pair 8c panels (`figs/pair_*_8c.png`)
+remain the evidence. All estimators identical to T2 (the four T2 pairs
+were recomputed, unchanged).
+
+**Location gate (extra-RMSE/floor) across 13 pairs:**
+
+- **Curtailment: over-gate in all 13** (4.2–12.6×) — the most uniformly
+  location-sensitive objective. The GP LOOCV gate now **fails in all 13
+  pairs** (surfaces rougher than the 5 GWh floor everywhere), so no
+  along-line quantitative reads exist for curtailment anywhere in the
+  atlas — raw-81 statistics only.
+- **Cost: two regimes.** Nuclear pairs 16.5–32.9× with log₂ tilt −2.2 to
+  −2.9 (a nuclear MW carries ~5–7.6× the per-MW cost of any partner —
+  uncorrected accounting; invariant under g1 (a)/(c)). Renewable-only
+  pairs: 1.6–3.4× — real but modest, several reads inside the 2–3×
+  multiplicity band. Cost's location signal is dominated by *type*
+  (nuclear vs renewable); *which renewable* matters much less
+  (wind pair 5.5× is the largest renewable-only gate).
+- **Shed: sub-floor to marginal at matched totals in all 13** (0.2–1.4×)
+  — but the **tilt verdict now replicates in 10/13 pairs**, the
+  strongest replication in the atlas. Per-MW shed value ordering:
+  **wind ≫ nuclear > pv/tail** (log₂ tilt: pv|wind_317 +4.11 — a
+  wind_317 MW buys ~17× a pv MW's shed relief; pv|wind_122 +2.61;
+  pv|wind_303 +2.28; nuclear|wind_317 +0.84; nuclear|pv −1.90).
+  Confirms and extends the v1 "tilt-only" verdict.
+- **Reserve/starts (floorless):** tilt point estimates mirror shed's
+  ordering pair-for-pair; still no floor (D3 open).
+
+**Multiplicity accounting (pinned):** 299 floor-ratio reads across the
+atlas; 138 exceed 2×, of which **29 sit in the 2–3× band** — at this
+read count a handful of chance 2× exceedances are expected; the
+≥ 2-independent-evidence replication rule is the control, and every
+verdict above rests on ≥ 4-pair replication. Edge-consistency flags grew
+proportionally (43/104, same benign profile as T2: large partners at
+ω = 0.05 + interpolated pv/tail OAT curves; worst excess 1.6×).
+
+**6-D supplement extension** (n0b landed → 42-point pool, EXPLORATORY):
+total-only vs 6-D LOO ratio grows with data — cost 5.0–5.5× (was 2.5–2.6
+at n = 26), curtailment 2.47× (was 1.16), starts 2.59×, reserve 2.22×,
+shed 0.97× (noise-limited, consistent with its sub-floor gate).
+
+**M machinery refresh (1,053 pooled designs) — one flag for the memo:**
+curtailment is now clearly the most essential objective (front-overlap
+0.606 when dropped, HV −4.95%); reserve stays redundant (0.959,
+−0.01%); the cost pair stays interchangeable (τ = 0.962); **but
+thermal_starts' redundancy verdict FLIPPED** (T2: 0.988 overlap →
+now 0.806, i.e. dropping starts loses ~19% of the 6-objective front).
+The draft **M = {shed, curtailment, cost_ls} stands** — starts remains
+floorless (unusable in noise-gated BO until D3) and its τ with shed is
+high — but if D3 establishes a starts floor, **starts is now the
+strongest candidate fourth objective**, ahead of reserve. Recorded for
+the final memo revision at 15/15.
 
 ## What T3 needs
 
