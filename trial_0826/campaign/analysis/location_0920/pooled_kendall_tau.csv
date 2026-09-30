@@ -1,7 +1,7 @@
 ,load_shed_mwh,true_curtailment_mwh,total_cost_raw_usd,total_cost_less_synthetic_usd,reserve_shortfall_mwh,thermal_starts
-load_shed_mwh,1.0,0.545,-0.566,-0.544,0.89,0.843
-true_curtailment_mwh,0.545,1.0,-0.571,-0.554,0.586,0.623
-total_cost_raw_usd,-0.566,-0.571,1.0,0.962,-0.604,-0.649
-total_cost_less_synthetic_usd,-0.544,-0.554,0.962,1.0,-0.579,-0.624
-reserve_shortfall_mwh,0.89,0.586,-0.604,-0.579,1.0,0.899
-thermal_starts,0.843,0.623,-0.649,-0.624,0.899,1.0
+load_shed_mwh,1.0,0.552,-0.615,-0.595,0.896,0.856
+true_curtailment_mwh,0.552,1.0,-0.588,-0.572,0.59,0.624
+total_cost_raw_usd,-0.615,-0.588,1.0,0.963,-0.65,-0.688
+total_cost_less_synthetic_usd,-0.595,-0.572,0.963,1.0,-0.624,-0.662
+reserve_shortfall_mwh,0.896,0.59,-0.65,-0.624,1.0,0.909
+thermal_starts,0.856,0.624,-0.688,-0.662,0.909,1.0

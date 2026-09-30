@@ -47,6 +47,14 @@ tail|wind_317,load_shed_mwh,1238.637568195556,3000.0,True
 tail|wind_317,true_curtailment_mwh,6218.199704256635,5000.0,False
 tail|wind_317,total_cost_raw_usd,172490.55842018052,500000.0,True
 tail|wind_317,total_cost_less_synthetic_usd,216171.94535731748,500000.0,True
+wind_122|wind_303,load_shed_mwh,1230.6759804101237,3000.0,True
+wind_122|wind_303,true_curtailment_mwh,6690.331816369908,5000.0,False
+wind_122|wind_303,total_cost_raw_usd,247006.58623506228,500000.0,True
+wind_122|wind_303,total_cost_less_synthetic_usd,340663.71657404007,500000.0,True
+wind_122|wind_317,load_shed_mwh,984.6865292566986,3000.0,True
+wind_122|wind_317,true_curtailment_mwh,6549.210940582971,5000.0,False
+wind_122|wind_317,total_cost_raw_usd,336519.9260270766,500000.0,True
+wind_122|wind_317,total_cost_less_synthetic_usd,496129.1399164691,500000.0,True
 wind_303|wind_317,load_shed_mwh,1174.8478316790402,3000.0,True
 wind_303|wind_317,true_curtailment_mwh,6126.010923119824,5000.0,False
 wind_303|wind_317,total_cost_raw_usd,298924.5371805541,500000.0,True

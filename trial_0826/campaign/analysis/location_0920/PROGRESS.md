@@ -64,14 +64,21 @@ including error paths.
   control. 42-pt supplement extension (n0b) strengthens allocation
   signal (cost 5×). n0b itself was built/run/analyzed by the stage2
   session (46f35ea).
-- [ ] **OUTSTANDING pairs: wind_122×wind_303, wind_122×wind_317**
-  (Kay's staggered queue, `SUBMIT_QUEUE.md`). At next re-invocation:
-  pull, re-run `build_pair_t3_nb`-style pass (the notebook auto-detects
-  landed waves), then the **final 15-pair atlas + final verdict table +
-  final M memo revision**. If still outstanding, report and proceed.
-- [ ] g1 ruling still pending (quality_report proposal unanswered) —
-  nuclear cost rows keep the APPROX caveat; verdicts conditional on
-  rejecting option (b).
+- [x] **T3 FINAL (2026-09-30) — 15/15 pairs.** Last two waves landed
+  (`4af50fb`, `24f2752`); `pair_apparatus.ipynb` re-executed over all
+  15; **LOCATION.md v2 FINAL**: final atlas + final verdict table
+  (curtailment sensitive 15/15; cost two-regime; shed tilt-only,
+  replicated 11/15 with ordering wind > nuclear > tail/pv) + final M
+  memo (M = {shed, curt, cost_ls} stands; drop-one at 1,215 designs no
+  longer certifies reserve/starts redundant — their exclusion rests on
+  floorlessness + τ-clustering, both pre-registered as post-D3
+  additions, starts first). Multiplicity: 345 reads, 36 in 2–3× band,
+  no verdict rests on one. **Prompt 28 deliverables complete.**
+- [ ] **External gates for BO round 1** (not this prompt's work):
+  (i) g1 ruling (quality_report proposal pending — nuclear cost
+  verdicts conditional on rejecting option (b)); (ii) M sign-off by
+  Kay/PI; (iii) D3 replicate study → starts/reserve floors (M revision
+  trigger recorded in LOCATION.md v2).
 
 ## Re-invocation routing
 

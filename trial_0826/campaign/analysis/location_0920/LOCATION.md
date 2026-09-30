@@ -1,11 +1,14 @@
-# LOCATION.md — v1.1 (13-pair atlas appended 2026-09-29; v1 core below)
+# LOCATION.md — v2 FINAL (15/15 pairs, 2026-09-30)
 
-> **T3 status:** 13/15 pairs analyzed under the pinned pipeline
-> (`pair_apparatus.ipynb`, re-executed over all landed waves).
-> **Outstanding: wind_122×wind_303, wind_122×wind_317** — proceeding per
-> the never-block rule; the atlas section near the end carries the
-> updated reads and the two verdict-relevant changes (shed tilt now
-> replicated 10/13; thermal_starts' drop-one redundancy flipped).
+> **T3 complete: all 15 tier pairs analyzed under the pinned pipeline**
+> (`pair_apparatus.ipynb`; the last two — wind_122×wind_303,
+> wind_122×wind_317 — landed 09-29/30, `4af50fb`/`24f2752`, no FAILED
+> markers). The **final atlas + final verdict table + final M memo**
+> live in the "Final 15-pair atlas" section below; the v1 core
+> (priority-pair analysis, 09-22) is retained beneath it as the detailed
+> evidence record. Still pending externally: the g1 fuel-accounting
+> ruling (nuclear cost verdicts conditional on rejecting option (b));
+> the D3 replicate study (reserve/starts floors).
 
 **Evidence base:** the 3 priority pair grids — **nuclear×wind_317, pv×tail,
 nuclear×pv** (81/81 rows each, scenario C, collected 09-21/22 by
@@ -107,7 +110,77 @@ total_cost_less_synthetic_usd (with the g1 add-back once ruled)}.**
   post-hoc extractions if adopted later; the retained raw runs support
   both.
 
-## T3 atlas — 13/15 pairs (2026-09-29)
+## Final 15-pair atlas (2026-09-30)
+
+Authoritative artifacts: `atlas_extra_rmse_over_floor.csv`,
+`atlas_log2_tilt.csv`, `figs/atlas_heattables.png`; the 15 per-pair 8c
+panels (`figs/pair_*_8c.png`) remain the evidence. All estimators
+identical to T2; previously-analyzed pairs recomputed unchanged.
+
+### Final verdict table (PI question #1, answered per objective)
+
+| Objective | FINAL verdict | 15-pair evidence |
+|---|---|---|
+| true_curtailment_mwh | **location-sensitive — strongest and most uniform** | extra-RMSE gate over floor in **15/15** pairs (4.2–12.6×); sub-additive interactions wherever the denominator resolves (I_rel up to +0.22); GP LOOCV gate fails in 15/15 → no along-line reads anywhere, raw-81 statistics only |
+| total_cost_less_synthetic_usd (and cost_raw, τ = 0.96) | **location-sensitive — two regimes** | nuclear pairs 16.5–32.9× with nuclear's per-MW cost ~5–7.6× any partner (log₂ tilt −2.2 to −2.9); renewable-only pairs 1.6–5.6× — *which type* dominates, *which renewable* is secondary. Conditional on g1 ≠ (b); invariant under (a)/(c) |
+| load_shed_mwh | **location-sensitive in direction only** | tilt verdict replicates in **11/15 pairs** — per-MW ordering ≈ wind_303 ≈ wind_317 > wind_122 > nuclear > tail > pv (up to 17× wind-vs-pv) — while the absolute matched-total effect stays ≤ 1.4× floor in all 15. The four non-tilted pairs (pv×tail, nuclear×wind_303, tail×wind_303, wind_122×wind_317) are same-value-class pairs, consistent with the ordering |
+| reserve_shortfall_mwh | **location signal, unquantifiable (no floor; pending D3)** | tilt point estimates mirror shed's ordering pair-for-pair; Δloc up to 0.24 |
+| thermal_starts | **not resolvable (no floor; pending D3)** | weakest floorless signal; ordering consistent with shed's |
+| NPV / congestion | *pending extraction* (g1 ruling propagates into NPV) | — |
+
+**Multiplicity control (final):** 345 floor-ratio reads across the atlas;
+169 exceed 2×, of which **36 sit in the 2–3× band**. The ≥ 2-independent-
+evidence replication rule is the control; every table verdict rests on
+≥ 4-pair replication, and no verdict hangs on a 2–3×-band read.
+Edge-consistency flags: 53/120, same benign profile characterized at T2
+(large ω = 0.05 partners + interpolated pv/tail OAT; worst excess 1.6×).
+
+**6-D supplement (EXPLORATORY, 42-point pool):** total-only vs 6-D LOO
+ratio — cost 5.0–5.5×, starts 2.59×, curtailment 2.47×, reserve 2.22×,
+shed 0.97× (noise-limited). Consistent with the table.
+
+### Final M memo revision (RECOMMEND — decision is Kay/PI's)
+
+**M = 3: {load_shed_mwh, true_curtailment_mwh,
+total_cost_less_synthetic_usd (g1-corrected once ruled)} — unchanged
+from the draft, with the supporting argument updated honestly:**
+
+- On the final 1,215-design pool, the pinned drop-one criterion
+  certifies **only cost_ls** as redundant (overlap 0.980 given
+  cost_raw; we keep cost_ls as the principled column and drop cost_raw
+  — the difference is the K_syn accounting artifact). Curtailment is
+  the single most essential objective (overlap 0.590, HV −4.9%).
+- **Reserve (0.916) and starts (0.867) no longer certify as redundant**
+  — the criterion tightens as the front grows (T2: both ≥ 0.95). Their
+  exclusion from round-1 M therefore rests on two stated grounds, not
+  on drop-one: (i) **floorlessness** — D3 has not landed, so neither
+  can be noise-gated inside BO; (ii) τ-clustering with shed
+  (0.86–0.91) — one reliability axis. **Post-D3, both are candidate
+  additions, starts first** (lower overlap, higher τ-distance from
+  shed than from each other). This is the standing revision trigger.
+- MOBO necessity (final): cost is anti-correlated with the entire
+  reliability cluster across the pooled space (τ = −0.57 to −0.66),
+  reversing the 19b within-wind-pair alignment; no objective is
+  f(total) alone (curtailment/cost over-gate in 15/15 pairs; 6-D LOO
+  supplement concurs). A scalarization would silently arbitrate the
+  wind-vs-nuclear-vs-pv site ranking the objectives disagree on.
+
+### Plain-register summary (final, for Kay)
+
+All fifteen tier pairs are in and the answer to the PI's question is
+settled: where the electrolyzers sit matters far above noise for
+curtailment (every pair) and cost (dominated by nuclear-vs-renewable,
+~5–7× per MW), while for load shed only the site *ordering* is resolved
+(wind beats nuclear beats solar, replicated in 11 of 15 pairs) — the
+absolute shed difference at a fixed total stays inside the noise floor.
+Cost and reliability pull in opposite directions across the six-tier
+space, so we recommend locking **M = {shed, curtailment, synthetic-free
+cost}** for BO round 1, with starts (then reserve) as the pre-registered
+additions if the replicate study lands a noise floor for them. The two
+open gates before round 1 are yours and the PI's: the g1 fuel-accounting
+ruling and the M sign-off.
+
+## T3 atlas — 13/15 pairs (2026-09-29, superseded by the final section above)
 
 Heat-tables: `atlas_extra_rmse_over_floor.csv`, `atlas_log2_tilt.csv`,
 `figs/atlas_heattables.png`; per-pair 8c panels (`figs/pair_*_8c.png`)

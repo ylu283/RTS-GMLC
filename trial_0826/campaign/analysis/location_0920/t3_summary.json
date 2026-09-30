@@ -12,16 +12,15 @@
     "tail|wind_122",
     "tail|wind_303",
     "tail|wind_317",
+    "wind_122|wind_303",
+    "wind_122|wind_317",
     "wind_303|wind_317"
   ],
-  "outstanding": [
-    "wind_122|wind_303",
-    "wind_122|wind_317"
-  ],
+  "outstanding": [],
   "gate_pass_counts": {
-    "load_shed_mwh": 13,
-    "total_cost_less_synthetic_usd": 13,
-    "total_cost_raw_usd": 13,
+    "load_shed_mwh": 15,
+    "total_cost_less_synthetic_usd": 15,
+    "total_cost_raw_usd": 15,
     "true_curtailment_mwh": 0
   },
   "atlas_gate": {
@@ -38,6 +37,8 @@
       "tail|wind_122": 0.853,
       "tail|wind_303": 0.249,
       "tail|wind_317": 0.783,
+      "wind_122|wind_303": 1.007,
+      "wind_122|wind_317": 0.316,
       "wind_303|wind_317": 0.933
     },
     "total_cost_less_synthetic_usd": {
@@ -53,6 +54,8 @@
       "tail|wind_122": 1.784,
       "tail|wind_303": 1.639,
       "tail|wind_317": 1.807,
+      "wind_122|wind_303": 4.881,
+      "wind_122|wind_317": 4.165,
       "wind_303|wind_317": 5.53
     },
     "total_cost_raw_usd": {
@@ -68,6 +71,8 @@
       "tail|wind_122": 2.413,
       "tail|wind_303": 1.866,
       "tail|wind_317": 2.387,
+      "wind_122|wind_303": 5.564,
+      "wind_122|wind_317": 5.132,
       "wind_303|wind_317": 5.87
     },
     "true_curtailment_mwh": {
@@ -83,6 +88,8 @@
       "tail|wind_122": 4.871,
       "tail|wind_303": 9.134,
       "tail|wind_317": 6.266,
+      "wind_122|wind_303": 10.93,
+      "wind_122|wind_317": 5.109,
       "wind_303|wind_317": 9.314
     }
   },
@@ -100,6 +107,8 @@
       "tail|wind_122": 1.558,
       "tail|wind_303": 0.566,
       "tail|wind_317": 1.409,
+      "wind_122|wind_303": -0.97,
+      "wind_122|wind_317": -0.132,
       "wind_303|wind_317": 0.8
     },
     "reserve_shortfall_mwh": {
@@ -115,6 +124,8 @@
       "tail|wind_122": 1.155,
       "tail|wind_303": 0.485,
       "tail|wind_317": 1.066,
+      "wind_122|wind_303": -0.897,
+      "wind_122|wind_317": -0.214,
       "wind_303|wind_317": 0.685
     },
     "thermal_starts": {
@@ -130,6 +141,8 @@
       "tail|wind_122": 0.959,
       "tail|wind_303": 0.003,
       "tail|wind_317": 0.663,
+      "wind_122|wind_303": -0.644,
+      "wind_122|wind_317": -0.248,
       "wind_303|wind_317": 0.383
     },
     "total_cost_less_synthetic_usd": {
@@ -145,6 +158,8 @@
       "tail|wind_122": 0.101,
       "tail|wind_303": -0.39,
       "tail|wind_317": 0.144,
+      "wind_122|wind_303": -0.554,
+      "wind_122|wind_317": 0.005,
       "wind_303|wind_317": 0.55
     },
     "total_cost_raw_usd": {
@@ -160,6 +175,8 @@
       "tail|wind_122": 0.179,
       "tail|wind_303": -0.275,
       "tail|wind_317": 0.142,
+      "wind_122|wind_303": -0.544,
+      "wind_122|wind_317": -0.055,
       "wind_303|wind_317": 0.478
     },
     "true_curtailment_mwh": {
@@ -175,15 +192,17 @@
       "tail|wind_122": 0.691,
       "tail|wind_303": 0.424,
       "tail|wind_317": 0.907,
+      "wind_122|wind_303": 0.148,
+      "wind_122|wind_317": 0.278,
       "wind_303|wind_317": 0.0
     }
   },
   "multiplicity": {
-    "n_reads": 299,
-    "over_2x": 138,
-    "band_2_3x": 29
+    "n_reads": 345,
+    "over_2x": 169,
+    "band_2_3x": 36
   },
-  "edge_flags": 43,
+  "edge_flags": 53,
   "supplement": [
     {
       "pool": "26pt (pinned: n0+backfill)",
@@ -273,48 +292,48 @@
   "drop_one": [
     {
       "dropped": "load_shed_mwh",
-      "front_overlap": 0.871,
-      "hv_change_pct": 0.08,
+      "front_overlap": 0.847,
+      "hv_change_pct": 0.05,
       "redundant_for_MOBO": false
     },
     {
       "dropped": "true_curtailment_mwh",
-      "front_overlap": 0.606,
-      "hv_change_pct": 4.95,
+      "front_overlap": 0.59,
+      "hv_change_pct": 4.88,
       "redundant_for_MOBO": false
     },
     {
       "dropped": "total_cost_raw_usd",
-      "front_overlap": 0.906,
+      "front_overlap": 0.892,
       "hv_change_pct": 0.01,
       "redundant_for_MOBO": false
     },
     {
       "dropped": "total_cost_less_synthetic_usd",
-      "front_overlap": 0.988,
+      "front_overlap": 0.98,
       "hv_change_pct": 0.0,
       "redundant_for_MOBO": true
     },
     {
       "dropped": "reserve_shortfall_mwh",
-      "front_overlap": 0.959,
-      "hv_change_pct": 0.01,
-      "redundant_for_MOBO": true
+      "front_overlap": 0.916,
+      "hv_change_pct": 0.04,
+      "redundant_for_MOBO": false
     },
     {
       "dropped": "thermal_starts",
-      "front_overlap": 0.806,
-      "hv_change_pct": 0.11,
+      "front_overlap": 0.867,
+      "hv_change_pct": 0.1,
       "redundant_for_MOBO": false
     }
   ],
   "kendall_tau_cost_ls": {
-    "load_shed_mwh": -0.544,
-    "true_curtailment_mwh": -0.554,
-    "total_cost_raw_usd": 0.962,
+    "load_shed_mwh": -0.595,
+    "true_curtailment_mwh": -0.572,
+    "total_cost_raw_usd": 0.963,
     "total_cost_less_synthetic_usd": 1.0,
-    "reserve_shortfall_mwh": -0.579,
-    "thermal_starts": -0.624
+    "reserve_shortfall_mwh": -0.624,
+    "thermal_starts": -0.662
   },
   "tilted_verdicts": [
     {
@@ -361,6 +380,11 @@
       "pair": "tail|wind_317",
       "objective": "load_shed_mwh",
       "log2_tilt": 1.4089758751601944
+    },
+    {
+      "pair": "wind_122|wind_303",
+      "objective": "load_shed_mwh",
+      "log2_tilt": -0.9696224069871596
     },
     {
       "pair": "wind_303|wind_317",
