@@ -1,5 +1,26 @@
 # Stage-2 scenario C — session bridge (prompt 27)
 
+**State (2026-10-06, strategy session): prompt 27 CLOSED; M DECIDED; BO
+READY TO LAUNCH.** The gates this file was waiting on have cleared:
+LOCATION.md v2 FINAL (all 15 pair grids, `analysis/location_0920/`)
+answered PI question #1, and Kay approved **M = 3 = {load_shed_mwh,
+true_curtailment_mwh, total_cost_less_synthetic_usd}** (reserve/starts
+dropped — drop-one Pareto overlap 0.988, τ 0.86–0.91 vs shed, floorless
+pending D3). The live BO campaign is specified in
+`admin/prompt/bogp/30-stage2-bo-campaign.md` (v4 FINAL, 5 reviews) with
+machinery committed at 7df9213 (`analysis/bo_stage2/`): fully automated
+self-extending qsub chain, q-ParEGO discrete-candidates over the full 9⁶
+lattice, trained on this directory's 42 runs, ≤4 rounds × 8,
+noise-calibrated HV stopping, ~310 core-h. **Kay's action: run
+`bash analysis/bo_stage2/block_1.sh` on the CRC d6 main clone**; watch
+round emails; STOP_BO marker kills the chain; 36 h silence = investigate.
+A 32 → 64 n₀ extension remains unregistered-but-available
+(skip = n_drawn_total = 32). Remaining pain-log pendings (qacct splits,
+block-log timestamps) unchanged below.
+
+---
+Historical bridge below (refresh session, 2026-09-22 late):
+
 **State (2026-09-22 late, refresh session): n0b LANDED + 32-point GP
 refresh DONE.** Kay submitted same day; collector `127c8a4` (second
 consecutive zero-touch pass, 9.3 h wave-pushed → results-on-d6 — best
