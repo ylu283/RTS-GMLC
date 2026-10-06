@@ -41,7 +41,28 @@ from gpytorch.constraints import GreaterThan  # noqa: E402
 
 from bogp.gp_model import GPRegressionModel, train_gp  # noqa: E402
 from bogp.mobo.pareto import hypervolume_exact  # noqa: E402
+import bogp.mobo.qparego as _qparego  # noqa: E402
 from bogp.mobo.qparego import propose_qparego_batch  # noqa: E402
+from bogp.acquisition import expected_improvement as _ei_pointwise  # noqa: E402
+
+
+def _ei_chunked(x, model, f_best, xi=0.01, chunk=20_000):
+    """EVALUATION-CONTEXT adaptation, not a library change: the library's
+    `expected_improvement` is pointwise per candidate, so evaluating it in
+    chunks is mathematically identical — it only bounds the memory of
+    gpytorch's exact-GP posterior, which OOMs when handed all 531,441
+    lattice candidates at once (audited locally: >39 GB at 50k). Values
+    match the one-shot call bit-for-bit per point."""
+    out = [
+        _ei_pointwise(x[i:i + chunk], model, f_best, xi=xi)
+        for i in range(0, len(x), chunk)
+    ]
+    return np.concatenate(out)
+
+
+# redirect the name INSIDE the pinned module (import-site patch; the library
+# file at SHA 60e6328 is untouched — acquire_job.sh still asserts that SHA)
+_qparego.expected_improvement = _ei_chunked
 
 from tiers import TIERS, STAGE2_LATTICE  # noqa: E402
 import make_batches  # noqa: E402
@@ -374,8 +395,13 @@ def propose_round(root: str, k: int) -> str:
     gps = fit_prediction_gps(X, Y)
     _step(root, f"propose r{k}: acquisition (q-ParEGO, candidates mode)")
     seed = led["acq_seed_base"] + k
-    batch = propose_qparego_batch(X, Y, q=8, candidates=lattice_candidates(),
-                                  seed=seed)
+    # fast_pred_var: LOVE variance cache — numerically EXACT here (train
+    # n <= 64 < max_root_decomposition_size 100; verified 2.4e-7 max dev,
+    # float32 noise) and required to keep the 9^6-candidate EI in memory.
+    with gpytorch.settings.fast_pred_var():
+        batch = propose_qparego_batch(X, Y, q=8,
+                                      candidates=lattice_candidates(),
+                                      seed=seed)
     designs = np.asarray(batch["x_batch"], float)
     assert designs.shape == (8, 6), designs.shape
     assert_on_lattice(designs)
@@ -422,11 +448,17 @@ def ingest_gate(root: str, k: int) -> tuple[bool, str]:
     merged = dm.merge(ob, on="index", suffixes=("", "_ob"))
     if len(merged) != 8:
         return False, "index set mismatch vs design_matrix"
-    for t in SORTED_TIERS:
-        col = f"{t}_omega"
-        if col + "_ob" in merged and not np.allclose(
-                merged[col], merged[col + "_ob"], atol=1e-12):
-            return False, f"design column {col} mismatch (wrong-wave/stale runs?)"
+    # design columns must match what round k actually PROPOSED (the round
+    # record) — closes the wrong-wave/stale-runs class even though
+    # objectives.csv itself carries no omega columns
+    if not round_section_exists(root, k):
+        return False, f"no round-{k} record — wave of unknown provenance"
+    with open(records_path(root)) as f:
+        proposed = np.asarray(json.load(f)[str(k)]["designs"], float)
+    dm_x = dm.sort_values("index")[
+        [f"{t}_omega" for t in SORTED_TIERS]].to_numpy(float)
+    if not np.allclose(dm_x, proposed, atol=1e-12):
+        return False, "design_matrix != proposed designs (wrong-wave/stale runs?)"
     return True, "ok"
 
 

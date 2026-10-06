@@ -1,0 +1,33 @@
+{
+  "ref_point": [
+    15102.2421825,
+    670349.7453773,
+    652034926.2020669
+  ],
+  "threshold": 5.262996664950399e+16,
+  "mc_seed": 20261006,
+  "acq_seed_base": 20261006,
+  "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
+  "m_cols": [
+    "load_shed_mwh",
+    "true_curtailment_mwh",
+    "total_cost_less_synthetic_usd"
+  ],
+  "floors": [
+    3000.0,
+    5000.0,
+    500000.0
+  ],
+  "hard_cap": 4,
+  "entries": [
+    {
+      "round": 0,
+      "n": 32,
+      "hv": 6.606271516247082e+17,
+      "gain": null,
+      "n_outside_ref": 0,
+      "decision": "start",
+      "at": "2026-10-06T19:50:35+00:00"
+    }
+  ]
+}
