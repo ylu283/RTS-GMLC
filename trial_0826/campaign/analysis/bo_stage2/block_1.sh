@@ -47,6 +47,13 @@ make_scratch() {
     mkdir -p "$scr/trial_0826"
     rsync -a --exclude "runs" --exclude "*.o*" --exclude "smoke*" \
         "$CAMPAIGN/" "$scr/trial_0826/campaign/"
+    # tiers.py resolves repo-level inputs from its own file path; the wave
+    # builder needs them in the scratch tree too (gen.csv + T-M1 stats +
+    # environment.yml), else propose_round dies on FileNotFoundError.
+    mkdir -p "$scr/RTS_Data/SourceData" "$scr/trial_0826/analysis"
+    cp "$REPO_DIR/RTS_Data/SourceData/gen.csv" "$scr/RTS_Data/SourceData/gen.csv"
+    cp "$REPO_DIR/trial_0826/analysis/tm1_per_site_stats.csv" "$scr/trial_0826/analysis/" 2>/dev/null || true
+    cp "$REPO_DIR/trial_0826/environment.yml" "$scr/trial_0826/" 2>/dev/null || true
     git init -q -b d6 "$scr"
     git -C "$scr" -c user.name=dry -c user.email=dry@dry add -A
     git -C "$scr" -c user.name=dry -c user.email=dry@dry commit -q -m seed
@@ -89,8 +96,12 @@ run_dry() {  # $1 = label, extra env via caller
     make_scratch "$scr"
     export SHIM_LOG="$scr/shim.log"; : > "$SHIM_LOG"
     export CAMPAIGN_ROOT="$scr/trial_0826/campaign"
+    # 1>&2: this function's stdout is command-substituted by the caller —
+    # ONLY the scratch path may land there. Without the redirect, the whole
+    # dry-run transcript pollutes $SCR_A and every grep below explodes with
+    # "File name too long".
     ( cd "$CAMPAIGN_ROOT/waves/bo_C_r1" && \
-      PATH="$SHIM:$REAL_PATH" BO_ROUND=1 bash "$CAMPAIGN_ROOT/analysis/bo_stage2/acquire_job.sh" --dry-run ) \
+      PATH="$SHIM:$REAL_PATH" BO_ROUND=1 bash "$CAMPAIGN_ROOT/analysis/bo_stage2/acquire_job.sh" --dry-run ) 1>&2 \
       || true
     echo "$scr"
 }
