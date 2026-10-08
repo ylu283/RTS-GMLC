@@ -1,0 +1,19 @@
+{
+  "patch_mechanism": "multi_pem/parameters.py:27-43 on an egret-0.6.2 ERCOT thermal dict: parser emits p_fuel (fuel_curve) and NO p_cost (verified locally 2026-10-08) -> the patch takes the del-p_fuel branch and installs the flat band p_cost [[p_min,0],[p_max, cap*B]] + forced commitment",
+  "gen1_base_booked_unit_cost_usd": 3184913484.851423,
+  "gen1_base_output_mwh": 3304484.546403,
+  "gen1_base_starts": 25.0,
+  "gen93_base": {
+    "output_mwh": 0.0,
+    "unit_cost": 0.0,
+    "starts": 0.0,
+    "fact": "gen 93 NEVER COMMITS in the base year"
+  },
+  "parser_facts": {
+    "fuel_cost_usd_per_mmbtu": 0.81035,
+    "p_fuel_at_pmin_mmbtu_h": 2623266.49,
+    "marginal_mmbtu_per_mwh": 15.74,
+    "units_note": "p_fuel curve magnitude does not reconcile with the booked $3.18B/yr at face value \u2014 normalization is a recorded open question (PI-meeting material, not blocking); the OBSERVED base Unit Cost is authoritative for the deletion magnitude"
+  },
+  "rule": "T1 nuclear var_cost readings reported raw AND fuel-cost-adjusted, each with the synthetic-cost caveat; adjudication = PI (RTS g1/NXT-D7 never imported silently)"
+}

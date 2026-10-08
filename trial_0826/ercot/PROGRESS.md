@@ -1,3 +1,45 @@
+# ERCOT PROGRESS (prompts 26 → 32)
+
+## Prompt 32 — selection analysis (2026-10-08, T0 + T1 build done locally)
+
+- [x] **T0 (zero new sims):** `analysis/selection/` — executed
+  `selection_t0.ipynb` + `ERCOT_SELECTION.md` **v0** with the decision
+  register (D4/D5/D6). Ruler adjudication RECORDED and re-verified to the
+  MWh (7,921 = clean 5,007 + PEM-twin 2,914; clean list {5,479, 5,007});
+  SCREENING_ERCOT.md's inverted note corrected; `noise_ruler_v2.json`
+  (list schema, v1 frozen, LOW-CONFIDENCE df rules, bimodal flags).
+  T-M1 analogue: all VRE 0.875–0.979 of availability in LMP<$15 hours;
+  **nuclear gen 1 only 0.360** (bus 107 clears high); **gen 93 NEVER
+  COMMITS in base** (0 output/starts — stays out of T1 by design).
+  Tier shares (positive-part, §4.5 rule): bus-120 cluster pools **59.5%**;
+  independents at ≥5% & ≥2× (same set at ≥3×): {275, 274, 270, 110, 140,
+  146, 30}; negative responder: 20 (−3.8×). Pool first-cut (n=16,
+  NON-USE clause): relief↔var_cost −0.37 — the T2 contrast to prioritize.
+  Fuel note pre-registered: gen-1 base booked Unit Cost **$3.1849B/yr**;
+  patch takes the del-p_fuel branch (**verified locally**: egret 0.6.2
+  emits p_fuel, no p_cost; thermal, p_min=729).
+- [x] **T1 build (local):** `waves/selection_t1/` (11 rows; nuclear OAT on
+  lattice {0,2,4,6,8}; replicate_of uses wave:index keys), smoke-gated
+  chain (SMOKE_PASS file — explicit, never bare hold_jid), `-r n`
+  everywhere, Threads=4 frozen, 5-retry push collector (prompt-30 loop),
+  `compute_objectives.py` (thermal-h2 rule + mode-resolved base
+  differencing + ruler-v2 groups), `probe_model_shape.py`,
+  multi_pem ERCOT gen-1 fixture tests (16/16 pass).
+- [ ] **KAY: T1 on CRC** — (i) `python probe_model_shape.py` under
+  PCM_ERCOT (login node ok); (ii)
+  `cd trial_0826/ercot/waves/selection_t1 && bash submit_this.sh`
+  (smoke → 11-task array → collector; ~700–970 core-h; collector emails
+  + bot-pushes extracts/objectives/ruler-v2).
+- [ ] **PI meeting (D4/D5/D6)** with v0 + T1 nuclear evidence on screen.
+- [ ] **T2 [GATED on D5/D6]:** `make_selection_t2.py` (to be written at
+  T2 time with the bracket decisions: ~5 tier sweeps × 5 levels, 2–3
+  pair grids on STAGE2_LATTICE², `__ALL_TIERS__` @ ω=0.525; §2
+  conventions native — never d6's build_pairgrid; ~11–24k core-h).
+- [ ] **T3:** ERCOT_SELECTION.md FINAL + per-stratum redundancy + RTS-vs-
+  ERCOT table (basis-difference header) + artifact page.
+
+---
+
 # ERCOT sprint PROGRESS (prompt 26)
 
 Updated at every block boundary; a re-invoked session resumes from here.

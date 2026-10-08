@@ -1,0 +1,106 @@
+{
+  "ruler_v2": {
+    "true_curt": 5479.082057999447,
+    "h2": 2914.1304620001465,
+    "var_cost": 285620.6372458935,
+    "reserve": 554.1793599999999,
+    "onoffs": 258.0,
+    "total_cost": 79451497.00707817,
+    "fixed_cost": 79504038.18062592
+  },
+  "tm1_sites": 18,
+  "tier_shares_top": [
+    {
+      "site": "275",
+      "share": 0.22912764850392123,
+      "x_ruler": 396.5878960813368
+    },
+    {
+      "site": "274",
+      "share": 0.16533963862636125,
+      "x_ruler": 286.17977729804596
+    },
+    {
+      "site": "270",
+      "share": 0.13932214760699096,
+      "x_ruler": 241.1471411580624
+    },
+    {
+      "site": "110",
+      "share": 0.07239991349616745,
+      "x_ruler": 125.3141188215199
+    },
+    {
+      "site": "30",
+      "share": 0.07113099471468727,
+      "x_ruler": 123.11779797970448
+    },
+    {
+      "site": "146",
+      "share": 0.057838115031462786,
+      "x_ruler": 100.10968341625352
+    },
+    {
+      "site": "140",
+      "share": 0.0556854982910191,
+      "x_ruler": 96.38380506968016
+    },
+    {
+      "site": "163",
+      "share": 0.04488222501883225,
+      "x_ruler": 77.6848508152136
+    }
+  ],
+  "bus120_pooled_share": 0.5954398852445459,
+  "negative_responders": [
+    [
+      "20",
+      -3.77
+    ]
+  ],
+  "pool_correlations": [
+    {
+      "pair": "relief|var_cost",
+      "spearman_raw": -0.368,
+      "spearman_partial_pmax": -0.364,
+      "n": 16,
+      "n_bus120": 5
+    },
+    {
+      "pair": "relief|h2",
+      "spearman_raw": -0.041,
+      "spearman_partial_pmax": 0.24,
+      "n": 16,
+      "n_bus120": 5
+    },
+    {
+      "pair": "relief|starts",
+      "spearman_raw": 0.566,
+      "spearman_partial_pmax": 0.685,
+      "n": 16,
+      "n_bus120": 5
+    },
+    {
+      "pair": "var_cost|h2",
+      "spearman_raw": 0.782,
+      "spearman_partial_pmax": 0.411,
+      "n": 16,
+      "n_bus120": 5
+    },
+    {
+      "pair": "var_cost|starts",
+      "spearman_raw": -0.814,
+      "spearman_partial_pmax": -0.576,
+      "n": 16,
+      "n_bus120": 5
+    },
+    {
+      "pair": "h2|starts",
+      "spearman_raw": -0.755,
+      "spearman_partial_pmax": -0.264,
+      "n": 16,
+      "n_bus120": 5
+    }
+  ],
+  "gen93_never_commits": true
+}

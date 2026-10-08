@@ -10,7 +10,7 @@ TimeLimit 120 s (12.1% days truncated); never compare cost levels to RTS.**
 
 | Objective | Ruler | Note |
 |---|---|---|
-| true curtailment (non-PEM WIND+PV) | **7,921 MWh** | `overall.csv`'s "renewables curtailment" counts the PEM twin's H2 as curtailment — always recompute from gen_summary |
+| true curtailment (non-PEM WIND+PV) | **5,479 MWh** (reading list {5,479 base-pair, 5,007 275-pair}, both clean) | **CORRECTED 2026-10-08 (prompt-32 adjudication):** this row previously carried **7,921** with an inverted note — 7,921 is the PEM-CONTAMINATED `overall.csv` 275-pair reading, decomposing exactly as clean 5,007 + PEM-twin \|Δ\| 2,914 (= the h2 ruler). Always recompute from gen_summary non-PEM rows; the 397× site-275 headline stands. See `analysis/selection/noise_ruler_v2.json`. |
 | variable generation cost | **$0.29M** | the cost read-out |
 | **total cost** | **UNREADABLE (±$79.5M bimodal)** | fixed-cost component flips between two commitment states; per-generator attribution: **gen 1, the 2,430 MW nuclear** (25↔26 starts, ±104 GWh, ±$79.6M). TL=120 toggles it nondeterministically — both replicate pairs landed in opposite states. |
 | reserve shortfall | 554 MWh | small system total (281 MWh base) — near-degenerate |

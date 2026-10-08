@@ -1,0 +1,122 @@
+{
+  "schema": "v2-list (per-pair reading lists; never a bare scalar)",
+  "provenance": "T0 2026-10-08 from the two screening replicate pairs; T1 adds design-group keys (base/wind-pocket/pv/nuclear)",
+  "replicate_definition": "identical inputs rerun under TL=120 (machine-load-dependent incumbents); conditional on CRC env",
+  "adjudication_2026_10_07": {
+    "contaminated_overall_275pair": 7921.146206999198,
+    "clean_275pair": 5007.015690001659,
+    "pem_twin_h2_275pair": 2914.1304620001465,
+    "note": "SCREENING_ERCOT.md's 7,921 was the contaminated column; clean list = {5479, 5007}; 397x site-275 headline stands"
+  },
+  "groups": {
+    "screening_pairs_v1": {
+      "true_curt": {
+        "readings": [
+          5479.0821,
+          5007.0157
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "h2": {
+        "readings": [
+          0.0,
+          2914.1305
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "var_cost": {
+        "readings": [
+          285620.6372,
+          228430.6473
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "reserve": {
+        "readings": [
+          173.7526,
+          554.1794
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "onoffs": {
+        "readings": [
+          46.0,
+          258.0
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "total_cost": {
+        "readings": [
+          79451497.0071,
+          79275607.5333
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      },
+      "fixed_cost": {
+        "readings": [
+          79165876.3698,
+          79504038.1806
+        ],
+        "pairs": [
+          "base_pair",
+          "wind275_pair"
+        ],
+        "df": 2,
+        "low_confidence": true
+      }
+    }
+  },
+  "campaign_floor_T0": {
+    "true_curt": 5479.082057999447,
+    "h2": 2914.1304620001465,
+    "var_cost": 285620.6372458935,
+    "reserve": 554.1793599999999,
+    "onoffs": 258.0,
+    "total_cost": 79451497.00707817,
+    "fixed_cost": 79504038.18062592
+  },
+  "floor_rule": "campaign floor = max over groups; df<3 => LOW-CONFIDENCE, verdicts need >=3x instead of >=2x; bimodal objectives (total_cost, fixed_cost) never get Gaussian treatment",
+  "bimodal": [
+    "total_cost",
+    "fixed_cost"
+  ],
+  "v1_frozen": {
+    "true_curt": 5479.082057999447,
+    "h2": 2914.1304620001465,
+    "var_cost": 285620.6372458935,
+    "reserve": 554.1793599999999,
+    "onoffs": 258.0,
+    "total_cost": 79451497.00707817,
+    "fixed_cost": 79504038.18062592
+  }
+}
