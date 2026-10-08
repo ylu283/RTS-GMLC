@@ -40,3 +40,4 @@ carry the "pending g1 ruling" caveat; re-level when the PI rules.
     - [1.00000, 0.76250, 1.00000, 1.00000, 0.52500, 0.40625]
     - [0.05000, 0.40625, 0.76250, 0.05000, 0.64375, 0.52500]
 <!-- END r1 -->
+SUBMITTED r1: array=1516257 collector=1516258 acq=1516259
