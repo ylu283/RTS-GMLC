@@ -17,6 +17,10 @@ export PYTHONNOUSERSITE=1
 module load gurobi
 
 rm -f "$WAVE_DIR/SMOKE_PASS"
+# Prescient's reporting_manager uses os.mkdir (no parents) on the output
+# dir — the PARENT must exist or the run dies in 1 s (same bug that killed
+# base_2019 on 09-20; the array script already carries mkdir -p).
+mkdir -p "$WAVE_DIR/smoke"
 python "$ERCOT_DIR/run_ercot_pcm.py" \
     --index smoke --num_days 3 --start_date 01-01-2019 \
     --ruc_time_limit 120 --ruc_threads 4 \
