@@ -41,6 +41,12 @@ if [[ -n "$missing" ]]; then
     exit 1
 fi
 echo "GATE PASS: 11/11"
+# clear any stale FAILED marker from an earlier failed attempt (base_2019
+# collector lesson, 09-20) — success must not leave FAILED in the tree
+if [[ -f "$WAVE_DIR/FAILED_selection_t1.md" ]]; then
+    git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_selection_t1.md" 2>/dev/null \
+        || rm -f "$WAVE_DIR/FAILED_selection_t1.md"
+fi
 
 for i in $(seq 1 11); do
     JOBLOG=$(ls -t "$WAVE_DIR"/selection_t1_array.o*."$i" 2>/dev/null | head -1 || true)
