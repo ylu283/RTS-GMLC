@@ -19,8 +19,12 @@ carry the "pending g1 ruling" caveat; re-level when the PI rules.
 - acq_seed: 20261007
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - predictions: waves/bo_C_r1/predictions.csv
+- graded_at: 2026-10-08T19:01:17+00:00
+- cumulative_hv: 6.969242093952338e+17
+- gain: 3.629705777052557e+16
 - threshold: 5.262996664950399e+16
-- decision: proposed
+- n_outside_ref: 2
+- decision: continue -> r2
 - weights (8 x M, Dirichlet(1) draws):
     - [0.0668, 0.5906, 0.3426]
     - [0.5457, 0.0762, 0.3781]
@@ -39,5 +43,34 @@ carry the "pending g1 ruling" caveat; re-level when the PI rules.
     - [0.05000, 0.52500, 0.52500, 0.16875, 0.64375, 0.76250]
     - [1.00000, 0.76250, 1.00000, 1.00000, 0.52500, 0.40625]
     - [0.05000, 0.40625, 0.76250, 0.05000, 0.64375, 0.52500]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": 0.031, "rms_z": 0.325, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.285, "rms_z": 0.554, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.392, "rms_z": 0.91, "cov95": 8}}
 <!-- END r1 -->
 SUBMITTED r1: array=1516257 collector=1516258 acq=1516259
+
+<!-- BEGIN r2 -->
+## Round 2
+- proposed_at: 2026-10-08T19:30:14+00:00
+- acq_seed: 20261008
+- bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
+- predictions: waves/bo_C_r2/predictions.csv
+- threshold: 5.262996664950399e+16
+- decision: proposed
+- weights (8 x M, Dirichlet(1) draws):
+    - [0.0300, 0.4085, 0.5615]
+    - [0.6340, 0.3359, 0.0301]
+    - [0.1662, 0.0765, 0.7572]
+    - [0.5038, 0.3788, 0.1174]
+    - [0.2215, 0.0615, 0.7169]
+    - [0.6439, 0.2271, 0.1290]
+    - [0.3527, 0.5201, 0.1272]
+    - [0.6644, 0.0958, 0.2398]
+- designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
+    - [0.05000, 0.52500, 0.76250, 0.52500, 0.64375, 0.64375]
+    - [1.00000, 0.76250, 0.16875, 0.52500, 0.88125, 1.00000]
+    - [0.05000, 0.05000, 1.00000, 0.05000, 0.05000, 0.05000]
+    - [1.00000, 0.88125, 1.00000, 0.64375, 1.00000, 0.16875]
+    - [0.05000, 0.05000, 1.00000, 0.05000, 0.05000, 0.88125]
+    - [0.05000, 0.28750, 1.00000, 0.52500, 0.52500, 1.00000]
+    - [1.00000, 0.88125, 1.00000, 0.16875, 1.00000, 0.64375]
+    - [0.05000, 0.05000, 1.00000, 0.40625, 0.88125, 0.88125]
+<!-- END r2 -->

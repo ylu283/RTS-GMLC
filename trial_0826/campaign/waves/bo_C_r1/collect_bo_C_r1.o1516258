@@ -1,0 +1,12 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+GATE PASS: bo_C_r1 complete
+bo_C_r1: 8 runs summarized -> objectives.csv, site_detail.csv
+[d6 21f64f7] bo-bot: bo_C_r1 results
+ 2 files changed, 98 insertions(+)
+ create mode 100644 trial_0826/campaign/waves/bo_C_r1/objectives.csv
+ create mode 100644 trial_0826/campaign/waves/bo_C_r1/site_detail.csv
+To github.com:ylu283/RTS-GMLC.git
+   4d019b0..21f64f7  d6 -> d6
+collect_bo_C_r1 done
+Loading CRC_default/1.1
