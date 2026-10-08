@@ -62,6 +62,12 @@ make_scratch() {
        "$scr/trial_0826/campaign/waves/bo_C_r1/objectives.csv"
     git -C "$scr" -c user.name=dry -c user.email=dry@dry add -A
     git -C "$scr" -c user.name=dry -c user.email=dry@dry commit -q -m fixture
+    # The generated submit/collector scripts open with
+    # `git pull --rebase --autostash origin d6`; the shim only intercepts
+    # `push`. Give the scratch repo a local bare origin so pulls succeed.
+    git init -q --bare "${scr}.origin.git"
+    git -C "$scr" remote add origin "${scr}.origin.git"
+    git -C "$scr" push -q origin d6
 }
 
 SHIM="$(mktemp -d)/shim"
