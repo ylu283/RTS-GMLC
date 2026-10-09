@@ -1,0 +1,4 @@
+index,oat_site,unit_type,bus,omega,bid,gen_pmax,start_date,num_days,replicate_of,ruc_time_limit
+1,__BASE_REPLICATE__,,,,,,01-01-2019,365,,360
+2,__BASE_REPLICATE__,,,,,,01-01-2019,365,tl360_probe:1,360
+3,__BASE_REPLICATE__,,,,,,01-01-2019,365,tl360_probe:1,360

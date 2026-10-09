@@ -1,4 +1,34 @@
-# ERCOT PROGRESS (prompts 26 → 32)
+# ERCOT PROGRESS (prompts 26 → 33)
+
+## Prompt 33 — TL=360 probe (2026-10-09, T0 done + T1 built)
+
+- [x] **T0 near-tie analysis (zero sims):**
+  `analysis/tl360_probe/TL360_VERDICT.md` v0 + `t0_neartie_days.csv`.
+  159 divergence days (≥2 GW committed-MW proxy — a SUPERSET of gen-1
+  flips; replicate is slim, said so) carry +$61.5M of the +$79.5M annual
+  gap; **124/159 sit inside the day's accepted 1% RUC tolerance (median
+  ratio 0.24)**; the Sept/Oct tail (ratios to 227×) is downstream path
+  divergence, not out-of-tolerance solves. **PRE-REGISTERED PREDICTION
+  (recorded before any run): TL=360 will NOT pin gen-1** — the flip is a
+  near-tie inside the frozen 1% mipgap; refutation condition stated.
+- [x] **T1 built:** `waves/tl360_probe/` — 3 identical base solves at
+  the frozen config with EXACTLY ONE change (`--ruc_time_limit 360`;
+  threads 4 frozen; `-r n`; mkdir-p lesson applied; collector clears
+  stale FAILED, 5-retry push, email on collector only; slim extracts +
+  `--full` run 1). **TL=360 = NEW solver identity, quarantined** from
+  all TL=120 data/rulers (manifest-stamped; `compute_tl360.py` never
+  touches noise_ruler_v2.json). ~260 core-h, 18–27 h/run.
+- [ ] **KAY:** `cd trial_0826/ercot/waves/tl360_probe && bash
+  submit_this.sh` (may run concurrently with selection_t1 — both small).
+- [ ] **T2 (re-invocation when the collector pushes):** fill the verdict
+  table in TL360_VERDICT.md from `tl360_readings.json` (gen-1 starts by
+  solve, pairwise |Δ| per objective, gap stats, wall time); confirm or
+  refute the pre-registered prediction; argue Route A/B/C from the
+  table (decide = Kay/PI); record the PI's route in pi-agenda §4.
+
+---
+
+# (prompt 32 and earlier below)
 
 ## Prompt 32 — selection analysis (2026-10-08, T0 + T1 build done locally)
 

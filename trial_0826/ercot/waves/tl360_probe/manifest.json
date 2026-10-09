@@ -1,0 +1,11 @@
+{
+  "wave": "tl360_probe",
+  "n_rows": 3,
+  "solver_identity": {
+    "ruc_time_limit": 360,
+    "ruc_threads": 4,
+    "ruc_mipgap": 0.01,
+    "quarantine": "NEVER mix with TL=120 data/rulers/deltas (prompt 33)"
+  },
+  "generated_at": "2026-10-09T15:29:25+00:00"
+}
