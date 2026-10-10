@@ -53,8 +53,12 @@ SUBMITTED r1: array=1516257 collector=1516258 acq=1516259
 - acq_seed: 20261008
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - predictions: waves/bo_C_r2/predictions.csv
+- graded_at: 2026-10-10T13:05:19+00:00
+- cumulative_hv: 7.06104917466881e+17
+- gain: 9180708071647232.0
 - threshold: 5.262996664950399e+16
-- decision: proposed
+- n_outside_ref: 5
+- decision: STOP — stopping rule: HV gain < threshold (5.263e+16) for 2 consecutive rounds (gains 3.62971e+16, 9.18071e+15)
 - weights (8 x M, Dirichlet(1) draws):
     - [0.0300, 0.4085, 0.5615]
     - [0.6340, 0.3359, 0.0301]
@@ -73,5 +77,6 @@ SUBMITTED r1: array=1516257 collector=1516258 acq=1516259
     - [0.05000, 0.28750, 1.00000, 0.52500, 0.52500, 1.00000]
     - [1.00000, 0.88125, 1.00000, 0.16875, 1.00000, 0.64375]
     - [0.05000, 0.05000, 1.00000, 0.40625, 0.88125, 0.88125]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": 0.475, "rms_z": 1.88, "cov95": 7}, "true_curtailment_mwh": {"mean_z": 0.924, "rms_z": 2.485, "cov95": 6}, "total_cost_less_synthetic_usd": {"mean_z": 0.051, "rms_z": 1.01, "cov95": 8}}
 <!-- END r2 -->
 SUBMITTED r2: array=1519934 collector=1519935 acq=1519936
