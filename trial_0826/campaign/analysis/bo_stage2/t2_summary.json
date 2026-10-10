@@ -1,0 +1,101 @@
+{
+  "hv": [
+    6.606271516247082e+17,
+    6.969242093952338e+17,
+    7.06104917466881e+17
+  ],
+  "gains": [
+    3.629705777052557e+16,
+    9180708071647232.0
+  ],
+  "threshold": 5.262996664950399e+16,
+  "gain_pct_of_hv0": [
+    5.4943333287556655,
+    1.389695844179085
+  ],
+  "threshold_pct": 7.966667207072688,
+  "front_size": 26,
+  "front_by_src": {
+    "start": 13,
+    "r2": 7,
+    "r1": 6
+  },
+  "start_front_size": 15,
+  "knocked_off": [
+    "n0b#1",
+    "n0b#9"
+  ],
+  "knees": [
+    {
+      "label": "n0b#8",
+      "src": "start",
+      "load_shed_mwh": 1306.585965,
+      "true_curtailment_mwh": 326405.376772,
+      "total_cost_less_synthetic_usd": 563115218.28938
+    },
+    {
+      "label": "r1#2",
+      "src": "r1",
+      "load_shed_mwh": 835.865532,
+      "true_curtailment_mwh": 283798.848865,
+      "total_cost_less_synthetic_usd": 568228961.8424821
+    },
+    {
+      "label": "r1#6",
+      "src": "r1",
+      "load_shed_mwh": 3653.89007,
+      "true_curtailment_mwh": 270111.51763400005,
+      "total_cost_less_synthetic_usd": 565960566.163322
+    }
+  ],
+  "calibration_pooled": [
+    {
+      "objective": "load_shed_mwh",
+      "mean_z": 0.25324516185965035,
+      "rms_z": 1.3492273337042207,
+      "cov95": "15/16 (94%)",
+      "calibrated": false
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "mean_z": 0.6044786249662013,
+      "rms_z": 1.8003874728392524,
+      "cov95": "14/16 (88%)",
+      "calibrated": false
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "mean_z": 0.221159965785454,
+      "rms_z": 0.9613053552915246,
+      "cov95": "16/16 (100%)",
+      "calibrated": true
+    }
+  ],
+  "p_bo_model_beats_random": [
+    0.68,
+    0.7025
+  ],
+  "realized_pct_in_random_model": [
+    0.3025,
+    0.1075
+  ],
+  "audit": {
+    "hv_match": true,
+    "replay_weights_match": true,
+    "replay_designs_match": 8,
+    "replay_s": 361.8
+  },
+  "alt_ref_report_only": {
+    "ref48": [
+      32099.9304846,
+      1385277.5562642,
+      684323349.0337118
+    ],
+    "gain_pct": [
+      2.5775022630601665,
+      2.0184513125524184
+    ],
+    "n_out_fixed": 5,
+    "n_out_on_front": 5
+  }
+}

@@ -1,0 +1,10 @@
+round,objective,mean_z,rms_z,cov95,calibrated
+r1,load_shed_mwh,0.0313,0.3245,8/8,
+r1,true_curtailment_mwh,0.2853,0.5541,8/8,
+r1,total_cost_less_synthetic_usd,0.3915,0.9102,8/8,
+r2,load_shed_mwh,0.4752,1.8803,7/8,
+r2,true_curtailment_mwh,0.9236,2.4851,6/8,
+r2,total_cost_less_synthetic_usd,0.0508,1.0098,8/8,
+pooled,load_shed_mwh,0.2532,1.3492,15/16 (94%),False
+pooled,true_curtailment_mwh,0.6045,1.8004,14/16 (88%),False
+pooled,total_cost_less_synthetic_usd,0.2212,0.9613,16/16 (100%),True

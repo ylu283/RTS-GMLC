@@ -45,15 +45,33 @@ read-only (STOP_BO excepted).
   BO suite 8/8 under bogp env (fake-round dry run, stop rule fires only
   on 2 consecutive lows, hard cap refuses r5, double-spend guard,
   ingest-gate design mismatch, STOP_BO, real-r1 validity).
-- [ ] **KAY: run block #1** — `cd trial_0826/campaign/analysis/bo_stage2
+- [x] **KAY: run block #1** — `cd trial_0826/campaign/analysis/bo_stage2
   && bash block_1.sh 2>&1 | tee block_1.log` on the CRC d6 clone:
   bo-gp clone detached @ 60e6328, BOGP_CRC env build + export,
   `--check-env`, THREE dry runs on a scratch copy (full round / STOP_BO
   / forced-WEDGED) with qsub+git shims and a zero-real-files assert,
   then the REAL `waves/bo_C_r1/submit_this.sh` → the chain is live.
-- [ ] Rounds 2–4 run unattended (array → collector → acquisition).
+- [x] Rounds 2–4 run unattended (array → collector → acquisition).
   Stop: threshold rule (2 consecutive low gains), hard cap (refuses
   round 5), or STOP_BO.
+
+## State (2026-10-10, T2) — CAMPAIGN CLOSED
+
+- [x] Chain: r1 submitted 10-07 22:57 EDT by block #1; r1 acquisition graded +
+  proposed r2, then WEDGED at qsub (CRC compute nodes are not submit hosts);
+  r2 submitted by hand from the login node 10-09; r2 graded 10-10 →
+  **BO_DONE (stopping rule: gains +5.5 %, +1.4 % of HV₀ < 8.0 % threshold)**.
+- [x] Audit: r2 re-verified locally — ledger HV 0/1/2 exact, calibration
+  z-stats exact, manifest SHA/seed/weights match, **r2 acquisition replayed
+  locally: 8/8 designs identical**.
+- [x] Deliverable: `BO_STAGE2.md` + executed `bo_stage2_report.ipynb` +
+  `figs/fig1–4` + CSVs + `t2_summary.json`. Calibration: cost calibrated;
+  shed (RMS 1.35) and curtailment (RMS 1.80) NOT — r2 corner extrapolation.
+  Front 26 (13 BO); knees n0b#8, r1#2, r1#6 (nuclear 0.05, ~1.7 GW on winds).
+- [ ] Open: g1 ruling (re-level costs); automation fix for any future
+  campaign (pre-submit the held chain from the login node — BO_STAGE2.md
+  pain-log); optional real random batch for a BO-vs-random claim.
+- Lock 30 released.
 
 ## T2 (one re-invocation after BO_DONE / FAILED / WEDGED email)
 
