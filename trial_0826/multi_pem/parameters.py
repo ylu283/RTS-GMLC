@@ -40,6 +40,17 @@ def _update_thermal_generator(gen, gen_PEM_data, n_time_keys):
     # Egret ramp units are MW/h; the flexible band is exactly the PEM capacity.
     gen["ramp_up_60min"] = PEM_capacity
     gen["ramp_down_60min"] = PEM_capacity
+    # The egret rts-gmlc parser pins startup/shutdown capacity to the
+    # ORIGINAL p_min (parser.py:636-637). Once the retrofit raises p_min
+    # above that, egret's UC validation rejects the data at model build
+    # (StartupRampLimit >= p_min) — seen live on ERCOT gen 1: original
+    # p_min 729 MW was the exact death line (omega <= 0.525 died,
+    # >= 0.7625 lived). The limits are inert for this unit
+    # (fixed_commitment == 1 everywhere: it never starts or stops), so
+    # lift them to the new p_min when they fall short.
+    for _k in ("startup_capacity", "shutdown_capacity"):
+        if _k in gen and gen[_k] < gen["p_min"]:
+            gen[_k] = gen["p_min"]
     gen["fixed_commitment"] = {"data_type" : "time_series", "values" : [1]*n_time_keys}
 
 

@@ -60,6 +60,11 @@ def ercot_gen1():
         "min_down_time": 48.0,
         "ramp_up_60min": 7290.0,
         "ramp_down_60min": 7290.0,
+        # parser.py:636-637 pins these to the ORIGINAL p_min; the fixture
+        # initially omitted them, which is exactly why 16/16 tests passed
+        # while selection_t1 tasks 6/7/8/11 died at model build (10-09)
+        "startup_capacity": 729.0,
+        "shutdown_capacity": 729.0,
     }
 
 
@@ -232,6 +237,28 @@ def test_ercot_gen1_full_fraction():
     # untouched fields survive (startup never incurred under u==1, but the
     # dict must not be mangled)
     assert gen["min_up_time"] == 48.0 and gen["fuel_cost"] == 0.81035
+
+
+def test_ercot_gen1_startup_capacity_lifted_with_p_min():
+    """Regression for the selection_t1 6/7/8/11 deaths (2026-10-09): egret
+    validates StartupRampLimit >= p_min at model build, and the parser pins
+    startup/shutdown capacity to the ORIGINAL p_min (729 MW) — so every
+    retrofit that raised p_min above 729 (omega <= 0.525) was rejected.
+    The patch must lift both limits to the new p_min."""
+    for omega, expect_pmin in [(0.05, 2308.5), (0.525, 1154.25)]:
+        generators = {"1": ercot_gen1()}
+        md = FakeModelData(generators)
+        update_function_multi(md, {"1": {"PEM_bid": 40.0, "PEM_fraction": omega}})
+        gen = generators["1"]
+        assert gen["p_min"] == expect_pmin
+        assert gen["startup_capacity"] >= gen["p_min"]
+        assert gen["shutdown_capacity"] >= gen["p_min"]
+    # high-omega side: limits already sufficient, must NOT be lowered
+    generators = {"1": ercot_gen1()}
+    md = FakeModelData(generators)
+    update_function_multi(md, {"1": {"PEM_bid": 40.0, "PEM_fraction": 1.0}})
+    gen = generators["1"]
+    assert gen["startup_capacity"] == 729.0 and gen["shutdown_capacity"] == 729.0
 
 
 def test_ercot_gen1_midlattice():
