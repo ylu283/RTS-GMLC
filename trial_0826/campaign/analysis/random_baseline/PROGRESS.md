@@ -33,3 +33,4 @@ Budget: ~15 core-h/run × 48 ≈ 715 core-h; wall ≈ 1 day if all 48 dispatch
 at once, plan ≈ 2 days with queue holds.
 
 ## Submission log
+SUBMITTED random_C: array=1526985 collector=1526986
