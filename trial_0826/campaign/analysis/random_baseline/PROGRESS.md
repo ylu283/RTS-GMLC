@@ -21,7 +21,10 @@ results → "awaiting collector"; else T1.
   floor). R frozen in the manifest as written in the prompt (no loosening).
 - [x] §5 Sobol-continuation arm: **OFF** (prompt default; no explicit
   choice from Kay at build time) — recorded in the manifest.
-- [ ] Wave built from a clean tree, committed + pushed.
+- [x] Wave built from a clean tree (`make_batches.py random_C`, base env,
+  scipy 1.16.3): manifest git_sha a368668, dirty False, 48 rows, 48 draws /
+  0 rejections, 0 cross-arm overlaps, exclusion sha256 a2bd9df34210…;
+  real-wave test green (11/11).
 - [ ] **Kay:** send the §0.1 expectation statement to the PI, THEN on CRC
   bastion/login node: `cd trial_0826/campaign/waves/random_C && bash submit_this.sh`
 - [ ] Collector lands → T2 (re-invoke the prompt).
