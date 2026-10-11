@@ -1,8 +1,56 @@
 # TL=360 probe — verdict memo (prompt 33)
 
-**Status: v0 (2026-10-09) — T0 analysis + PRE-REGISTERED prediction,
-written BEFORE any TL=360 run. T2 fills the measured column and renders
-the verdict; route decision = Kay/PI.**
+**Status: v1 (2026-10-11) — T2 filled from the 3 TL=360 solves
+(ercot-bot 1a3a89e). The T0 analysis and the prediction below are
+unchanged from v0 (committed 10-09 in 2c11e7e, before any TL=360 run).
+Route decision = Kay/PI.**
+
+## Verdict (10-11)
+
+**The prediction held. TL=360 does not pin gen-1, and more solve time
+does not make ERCOT total cost readable.**
+
+- gen-1 annual starts: 25 / 26 / 25. The flip persists.
+- Total-cost pairwise |Δ|: $71.6M (1–2), $55.7M (1–3), $127.4M (2–3).
+  This is the same size as TL=120 ($79.5M) or larger.
+- **gen-1 is the driver, but starts are the wrong readout.** Per-unit
+  `Unit Cost` decomposition (`gen_summary.csv`, 128 thermal units):
+  - Solves 1 and 3 have EQUAL gen-1 starts (25) and still differ by
+    $55.7M. gen-1 alone carries $55.6M of it (Δ output 47.6k MWh, about
+    20 full-power hours). The other 127 units churn (gross Σ|Δ| ≈
+    $45M) but net to +$0.1M.
+  - Solves 1 and 2 (25 vs 26 starts): gen-1 carries −$77.4M of the
+    −$71.6M net; all other units net to +$5.8M.
+  - So the cost spread is gen-1's committed HOURS (outage length), not
+    only its start count. Pinning the start count is not enough; the
+    fix must pin gen-1's commitment (NXT-D6 option A, u ≡ 1, or E).
+- The 1% mipgap is the binding stop: median gap 0.97% in all three
+  solves (TL=120: 0.98%). More time only trims the tail (P95 1.00–1.25%
+  vs 1.36%).
+- **Cost of the config: RUC solve time doubles or more.** Annual RUC
+  solve time 29.3 / 31.5 / 37.0 h vs 14.0 h for the TL=120 base. The
+  §3 estimate of "+20–30% per run" was too low; plan on ~2× RUC time.
+
+| readout | TL=120 (known) | TL=360 (measured) | verdict |
+|---|---|---|---|
+| gen-1 annual starts across solves | 25 ↔ 26 (flips) | 25 / 26 / 25 | still flips |
+| total-cost pairwise \|Δ\| | $79.5M bimodal | $55.7M / $71.6M / $127.4M | still unreadable |
+| fixed-cost \|Δ\| | $79.5M | $56.1M / $70.0M / $126.1M | same; ≈ all from gen-1 |
+| var-cost \|Δ\| | $0.29M | $0.37M / $1.20M / $1.57M | still the readable cost column; not tighter |
+| true-curt \|Δ\| | {5,479, 5,007} clean | 13,854 / 17,042 / 30,896 MWh | not tighter (df = 2, read with care) |
+| median / P95 gap | 0.98% / 1.36% | 0.97% / 1.00–1.25% | gap story confirmed |
+| annual RUC solve time | 14.0 h | 29.3–37.0 h | ~2× |
+
+TL=360 readings stay quarantined: they are never pooled with TL=120
+rulers. The "not tighter" entries compare scales only.
+
+**Route recommendation: B** (stay at TL=120). Route A's condition
+(flip pinned AND total-cost |Δ| ≪ $79.5M) fails on both parts, and it
+costs ~2× RUC time. Route C buys presentation-grade gaps (P95 ≈ 1.1%
+vs 1.36%) but not reproducibility, so it adds bookkeeping for little.
+Under B, var_cost stays the cost column, and NXT-D6 option A or E is
+the only way to make total cost readable, because the noise is gen-1's
+commitment.
 
 **The PI's question (10-08 meeting, item 1):** at RUC TimeLimit = 360 s,
 does gen-1 (2,430 MW NUC @ bus 107) behave "normally" — does the 25↔26
