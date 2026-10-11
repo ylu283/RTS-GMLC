@@ -44,12 +44,20 @@ the utopia point, after normalizing the front to [0, 1]³:
 
 Each cell is ω (MW). *Costs are g1-pending. The three knees share one
 shape: nuclear at its 0.05 floor, about 1.6–1.7 GW in total, with most of
-it on wind_303/wind_317, and wind_122 kept low. The best single-objective
+it on wind_303/wind_317, and wind_122 kept low.
+
+**Knee robustness (review addition):** the knee identity is sensitive to
+the normalization span — the 5 outside-ref extremes stretch it. On the
+front clipped to the fixed ref box (21 designs) the three smallest utopia
+distances are r2#1, r1#2, r2#6; only **r1#2 is a knee under both
+normalizations**. What IS robust is the recipe: every knee in either set
+has nuclear at 0.05 and 1.6–2.0 GW total, wind-loaded. Quote the recipe,
+not a single design. The best single-objective
 designs sit at the corners of the front:
 
 | Best in | Design |
 |---|---|
-| Shed | n0b#10: zero shed, cost $642M |
+| Shed | FOUR designs tie at exactly zero shed; the cheapest is **r2#6 at $582M** (curt 235 GWh), and r1#5 pairs zero shed with the lowest curtailment (48 GWh) at $668M |
 | Curtailment | r1#5: 48 GWh, cost $668M (nuclear ω = 1.0) |
 | Cost | r2#3: $510M. Every tier is at 0.05 except tail at 1.0, at the price of 29 GWh shed and 1.26 TWh curtailed |
 
@@ -57,7 +65,12 @@ designs sit at the corners of the front:
 
 The realized hypervolume is HV₀ = 6.606e17 at n = 32, 6.969e17 at n = 40
 (**+5.5 %**) and 7.061e17 at n = 48 (**+1.4 %**). The threshold is 8.0 % of
-HV₀. Figure: `figs/fig2_hv_trajectory.png`.
+HV₀ — **pre-declared conservative** (prompt 30: "the threshold is
+shed-floor-dominated and deliberately conservative — an early stop is the
+rule working, not a bug"). Sensitivity, one line: any threshold below
+5.5 %/round means r1 would not have counted as low and round 3 would have
+run. The stop certifies "gains below a deliberately conservative noise
+bar", never "front converged". Figure: `figs/fig2_hv_trajectory.png`.
 
 The **counterfactual is model-based** (labeled as such). The floored
 prediction GPs are fit on the 32 starting points only. In each of 400
@@ -66,7 +79,7 @@ from that posterior. BO's actual 16 picks are scored the same way.
 
 | n | Realized | Random picks (model), p10 / p50 / p90 | BO's picks (model), p50 |
 |---|---|---|---|
-| 40 | 1.055 | 1.018 / 1.096 / 1.220 | 1.158 |
+| 40 | 1.055 | 1.018 / 1.096 / 1.219 | 1.158 |
 | 48 | 1.069 | 1.065 / 1.169 / 1.346 | 1.266 |
 
 All values are HV / HV₀.
@@ -85,17 +98,21 @@ the final front.
 
 | Designs | Exceeds the ref on |
 |---|---|
-| r1#5, r1#7, r2#2: zero or near-zero shed, curtailment ≤ 58 GWh | cost > $652M |
+| r1#5, r1#7, r2#2: zero or near-zero shed, curtailment ≤ 58.4 GWh | cost > $652M |
 | r2#3, r2#5: cheapest designs | curtailment (r2#3 also on shed) |
 
 These points add no hypervolume by construction. The acquisition
 normalizes over the queried min–max, so it chases front extremes the ref box
-cannot credit. This mismatch between the acquisition target and the scored
-metric is the main reason the HV gains look small. The pinned ref and the
-stop decision stand as pre-registered. With a wider box (nadir of all 48
-plus 10 %, report-only, threshold not recomputed), the gains are 2.6 % and
-2.0 % of the corresponding HV₀. That is still small, so **the stop is not
-an artifact of the box**.
+cannot credit — a mechanical contributor: 5 of 16 evaluations earn zero HV
+no matter how good they are. It is NOT the main reason the gains are small:
+with a wider box (nadir of all 48 plus 10 %, report-only, threshold not
+recomputed) the gains are 2.6 % and 2.0 % of the corresponding HV₀ —
+crediting the extremes raises r2's measured gain (1.4 → 2.0 %) but leaves
+both rounds far below any plausible bar. The dominant explanation is the
+dense-front regime itself (26 of 48 points non-dominated; see the Stage-1
+context below): a round of 8 genuinely adds a few percent here. **The stop
+is not an artifact of the box**, and the pinned ref and stop decision stand
+as pre-registered.
 
 **Stage-1 replay context** (`bo_replay/REPLAY.md` §3–4): on the 2-D,
 81-cell scenario-C contour, q-ParEGO went 0.813 → 0.899 → 0.941 over two
@@ -112,24 +129,36 @@ The rule: "calibrated" requires pooled RMS(z) ∈ [0.7, 1.3] **and** pooled
 
 | Objective | r1 RMS(z) | r2 RMS(z) | Pooled RMS(z) | Pooled cov95 | Verdict |
 |---|---|---|---|---|---|
-| load_shed_mwh | 0.33 | 1.88 | **1.35** | 15/16 (94 %) | **not calibrated** (just above the band) |
+| load_shed_mwh | 0.33 | 1.88 | **1.35** | 15/16 (94 %) | **not calibrated** (pooled value is a cancellation — see below) |
 | true_curtailment_mwh | 0.55 | 2.49 | **1.80** | 14/16 (88 %) | **not calibrated** |
 | total_cost_less_synthetic_usd | 0.91 | 1.01 | **0.96** | 16/16 (100 %) | calibrated |
 
 **Verdict: the prediction GPs are calibrated for cost and not for shed or
 curtailment.**
 
+- Pre-registration note: calibration was REPORT-ONLY and never gated
+  continuation — the in-flight "continue" decisions were HV-threshold-only
+  (prompt 30 pins the pooled statistic to T2). No in-flight gate was
+  violated.
+- Read the per-round rows, not the pooled row: for shed and curtailment the
+  GPs were outside the band in BOTH rounds — too wide in r1 (RMS 0.33/0.55,
+  below the 0.7 edge: by the verdict's own band r1 alone would also fail,
+  in the opposite direction), overconfident at corners in r2 (1.88/2.49).
+  The pooled shed RMS of 1.35 is two opposite failures partially
+  cancelling, not a near-pass.
 - Coverage passes for all three objectives. The failure is RMS, and it
   comes from r2.
-- r1 was over-dispersed: RMS(z) < 1, so the prediction bands were wider than
-  needed.
 - The r2 misses are concentrated at the **lattice corners** BO moved into.
   r2#3 (every tier at 0.05 except tail) realized shed of 29.2k against about
   8.5k predicted, and curtailment of 1.26 TWh against 0.77 TWh predicted.
   r2#5 missed the same way.
 - This is extrapolation from a 40-point Sobol-plus-r1 design that has few
   corner points. Treat corner predictions for shed and curtailment as
-  under-dispersed.
+  under-dispersed. Candidate fixes for any restart: corner points in the
+  design, a heteroscedastic noise model, or a trust-region-limited
+  acquisition (log transforms stay pre-registered-forbidden). This failure
+  is also why §2's model-based counterfactual cannot be quoted as
+  evidence — its scoring GPs are these same models.
 
 ## (4) Interior vs edge character, tied to LOCATION v2
 
@@ -170,14 +199,18 @@ LOCATION v2:
   so the order within the wind tiers is not resolved here.
 - **Tail goes to 1.0 in r2** (6 of 8 picks), yet tail correlates with
   neither curtailment (−0.02) nor cost (0.03), and it is the smallest tier
-  (at most 251 MW). Read this as EI pushing a nearly flat direction to its
+  (at most 251.5 MW). Read this as EI pushing a nearly flat direction to its
   bound, **not** as evidence of a tail effect. This is consistent with tail's
-  low per-MW shed value in v2.
+  low per-MW shed value in v2. The asymmetric reading — nuclear-at-bounds
+  as physics, tail-at-bounds as artifact — rests on a stated discriminator:
+  nuclear carries Spearman 0.89 with cost plus v2's independent 5–7.6×
+  per-MW cost tilt; tail correlates with nothing (−0.02 / 0.03).
 - **PV shows no consistent push** (front mean ω 0.50), in line with its
   last place in v2's per-MW ordering.
 - **Curtailment** was location-sensitive in 15/15 pairs in v2. The front's
-  curtailment axis is set by the nuclear switch combined with how heavily
-  the winds are loaded, so curtailment is not a function of total MW alone.
+  curtailment axis is consistent with the nuclear switch combined with how
+  heavily the winds are loaded; curtailment is not a function of total MW
+  alone.
 
 Interior designs on the front come almost entirely from the Sobol starts.
 Two of the three knees are BO designs, and they are interior on every tier
@@ -193,8 +226,22 @@ at its floor and about 1.6–1.7 GW of electrolyzer, mostly on wind_303 and
 wind_317. The GP's predictions were trustworthy for cost but too confident
 for shed and curtailment at the extreme corner designs BO tried in round 2.
 I re-ran round 2's acquisition locally and it reproduced CRC's 8 designs
-exactly. However, the "fully automated" chain needed one manual
+exactly — though the "fully automated" chain needed one manual
 resubmission, because CRC compute nodes are not allowed to submit jobs.
+
+## Claim scope (maps to math-log §5.2)
+
+Of the three pre-registered Stage-2 claims: **(i) "convergence within
+budget" — NOT demonstrated**; say "terminated under its pre-registered
+rule within budget". **(ii) "stability across ≥ 3 init seeds" — not
+demonstrated for the 6-D campaign** (single seed; the replay's
+seed-stability is 2-D and does not transfer). **(iii) "consistency of the
+found designs with the sensitivity/interaction structure" — SUPPORTED**
+(§4). Safe headline: an automated, pre-registered, interpretable MOBO
+campaign on a real PCM — 13 of 16 BO picks landed on the final front and
+two of three full-front knees are BO designs. Never claim: BO beat random
+(no real baseline; the ~70 % model figure must not appear on a slide);
+convergence; surrogate accuracy beyond cost; seed stability.
 
 ## Pain-log delta (the automation experiment's own report)
 
@@ -240,6 +287,11 @@ resubmission, because CRC compute nodes are not allowed to submit jobs.
   batch, say 16 random lattice designs on CRC (about 155 core-h). The
   model-based counterfactual cannot substitute for it, because the models
   are not calibrated for shed and curtailment at the corners.
+  **Risk to state before approving:** one batch is a single draw (n = 1
+  vs n = 1) — Stage-1 showed random within 3–8 evaluations of BO at
+  scenario C, so a single random batch may well match BO's realized
+  trajectory. Either budget ≥ 3 batches (~465 core-h) or pre-commit to
+  reporting one batch as an anecdote, not a test.
 - Post-D3: starts, then reserve, as M additions (LOCATION v2 trigger).
   The calibration gap at the corners argues for a few corner points in any
   restart design.
