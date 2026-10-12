@@ -23,6 +23,11 @@ HERE and in the session's final message only.
 - [x] **Regression** — generalized code reproduces bo_C_r2's 8 designs exactly (same
   order, seed 20261008, weights) from a scratch root without bo_C_r2 (326 s).
 
+- [x] **N1 replay gate (§3.2) — FAILED (high side) → N1 NOT RUN.** Median HV recovery
+  n = 16: 0.9166 ∈ [0.8444, 0.9295]; n = 24: **0.9534 > max 0.9518** (by 0.0016).
+  Applied as pre-registered (two-sided range); `N1/NOT_RUN_N1.md`, `replay_gate.json`.
+  Re-admitting N1 needs a new pre-registration (strategy session / Kay).
+
 ## Code (§3)
 
 - `arms.json`, `acquire_arm.py` (generalized; imports the frozen prompt-30

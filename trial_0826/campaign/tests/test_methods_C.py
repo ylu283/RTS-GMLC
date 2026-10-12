@@ -240,3 +240,11 @@ REAL = [n for n in ("methods_C_S2_n0", "methods_C_S3_n0", "methods_C_Q1", "metho
 def test_real_wave_manifest_clean(name):
     m = json.load(open(os.path.join(make_batches.WAVES_ROOT, name, "manifest.json")))
     assert m["dirty"] is False and m["n_rows"] == (32 if name.endswith("_n0") else 16)
+
+
+def test_not_run_marker_blocks_arm(fake_tree):
+    d = os.path.join(fake_tree, "analysis", "methods_C", "N1")
+    open(os.path.join(d, "NOT_RUN_N1.md"), "w").write("gate failed")
+    lines, table = methods_state.run(fake_tree, execute=False, hold=True, out=lambda *_: None)
+    assert {n: s for n, s, _ in table}["N1"] == "NOT_RUN"
+    assert not any("N1" in l for l in lines)

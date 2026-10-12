@@ -94,6 +94,8 @@ def arm_state(campaign, cfg, arm, waves, acqs):
     adir = os.path.join(campaign, a["dir"])
     wroot = os.path.join(campaign, "waves")
     rwave = lambda k: a["round_waves"].get(str(k)) or a["round_wave_pattern"].format(k=k)
+    if glob.glob(os.path.join(adir, f"NOT_RUN_{arm}.md")):
+        return "NOT_RUN", None, "pre-registered gate failed (NOT_RUN marker) — never submitted"
     if glob.glob(os.path.join(adir, f"DONE_{arm}.md")):
         return "DONE", None, "DONE marker"
     graded = _graded_rounds(adir)
