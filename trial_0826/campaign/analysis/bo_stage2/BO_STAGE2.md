@@ -89,8 +89,7 @@ All values are HV / HV₀.
 - **In reality,** the trajectory sits at the 30th (n = 40) and 11th (n = 48)
   percentile of the model's random-pick distribution. The 32-point model was
   optimistic about both BO and random picks.
-- **We cannot claim that BO beat random sampling in this campaign.** That
-  would need real random evaluations, which were not run.
+- Real random baseline: see `../random_baseline/RANDOM_BASELINE.md` (prompt 34).
 
 **Why the realized gain is small (report-only, §3b):** 5 of the 16 BO
 evaluations fall **outside the fixed HV reference box**, and all 5 are on
@@ -238,10 +237,18 @@ demonstrated for the 6-D campaign** (single seed; the replay's
 seed-stability is 2-D and does not transfer). **(iii) "consistency of the
 found designs with the sensitivity/interaction structure" — SUPPORTED**
 (§4). Safe headline: an automated, pre-registered, interpretable MOBO
-campaign on a real PCM — 13 of 16 BO picks landed on the final front and
-two of three full-front knees are BO designs. Never claim: BO beat random
-(no real baseline; the ~70 % model figure must not appear on a slide);
-convergence; surrogate accuracy beyond cost; seed stability.
+campaign on a real PCM — 13 of 16 BO picks landed on the final front
+(a random 16-design batch puts 6.6 on the front of starts ∪ batch on
+average, p10–p90 5–8, and 5.0 on the front of starts ∪ BO ∪ batch;
+prompt 34 S2 ii) and two of three full-front knees are BO designs.
+**Random baseline (prompt 34, `../random_baseline/RANDOM_BASELINE.md`):**
+§3.2 row "above" at both refs — p̂48 = 0.94 [0.84, 1.00] at R_frozen,
+1.00 [1.00, 1.00] at R_union — **not robust to floor-level output
+perturbation** (47 % of perturbed draws keep the row); one BO
+realization. Never claim: BO beat random
+(single BO seed, not robust to floor perturbation; the ~70 % model figure
+must not appear on a slide); convergence; surrogate accuracy beyond cost;
+seed stability.
 
 ## Pain-log delta (the automation experiment's own report)
 
@@ -276,14 +283,15 @@ convergence; surrogate accuracy beyond cost; seed stability.
   exists. qdel of the remaining held jobs then cleans up. The fallback is a
   login-node cron watcher that runs `submit_this.sh` when the round's
   "proposed" commit lands. Both options keep acquire_next unchanged.
-- **Compute:** 16 runs at about 9.7 core-h each, roughly 155 core-h, against
-  the ≈ 310 core-h budget for 4 rounds.
+- **Compute:** 16 runs at about 15 core-h each (measured: r1 + r2 mean
+  14.9 h, range 11.7–21.6 h, single-slot), roughly 238 core-h, against the
+  ≈ 310 core-h budget for 4 rounds.
 
 ## Open items
 
 - g1 ruling, then re-level the absolute costs. Fronts and knees are
   invariant.
-- If the PI wants a stronger BO-vs-random claim: a matched real random
+- ~~If the PI wants a stronger BO-vs-random claim: a matched real random
   batch, say 16 random lattice designs on CRC (about 155 core-h). The
   model-based counterfactual cannot substitute for it, because the models
   are not calibrated for shed and curtailment at the corners.
@@ -291,7 +299,9 @@ convergence; surrogate accuracy beyond cost; seed stability.
   vs n = 1) — Stage-1 showed random within 3–8 evaluations of BO at
   scenario C, so a single random batch may well match BO's realized
   trajectory. Either budget ≥ 3 batches (~465 core-h) or pre-commit to
-  reporting one batch as an anecdote, not a test.
+  reporting one batch as an anecdote, not a test.~~ **DONE** (prompt 34:
+  one i.i.d. pool of 48, subset-percentile statistic; see
+  `../random_baseline/RANDOM_BASELINE.md`).
 - Post-D3: starts, then reserve, as M additions (LOCATION v2 trigger).
   The calibration gap at the corners argues for a few corner points in any
   restart design.

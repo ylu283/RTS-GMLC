@@ -34,3 +34,18 @@ at once, plan ≈ 2 days with queue holds.
 
 ## Submission log
 SUBMITTED random_C: array=1526985 collector=1526986
+
+## T2 — analysis (2026-10-11, routed (b): objectives.csv 48 rows, collector ce16936)
+
+- [x] Lock 34 taken (no prior lock). No FAILED marker.
+- [x] R_union computed once before any HV → `ref_union.json` (equals BO_STAGE2 REF48 exactly).
+- [x] Gates: bo-gp HEAD == ledger sha 60e6328; BO HV n=32/40/48 rel err 0.0 (gate 1e-9).
+- [x] HV rate logged: 0.454 ms/call (48 points), 12 spawn workers; full T2 ≈ 10 min.
+- [x] Primary (§3.1): row "above" at both refs — p̂48 0.942 [0.836, 1.000] R_frozen; 1.000 [1.000, 1.000] R_union. p̂40 0.962 / 0.959.
+- [x] §3.3 robustness: 0.467 of draws keep "above" → headline carries "not robust to floor-level output perturbation".
+- [x] §3.4 secondaries in order; S2(iii) recipe counter-examples reported (rnd#2, r2#1, rnd#43).
+- [x] `random_baseline.ipynb` executed; `RANDOM_BASELINE.md`; `t2_summary.json`; figs 1–4.
+- [x] BO_STAGE2.md edits (1)–(4) only.
+- [x] Tests: `test_primary_ignores_arm`, `test_percentile_ties_count_half` (base suite 87 pass / 2 skip).
+- [x] Living-report row 2026-10-11c + math-log §5.2 log line (admin repo; `prompt/bogp/` is untracked there — NOT committed).
+- No further random or BO runs in this prompt (red line). Next: second BO seed (new prompt).

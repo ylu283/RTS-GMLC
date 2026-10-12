@@ -1,0 +1,441 @@
+{
+  "headline": "BO's HV is above most random 16-design batches at this budget (estimated percentile 0.94, interval [0.84, 1.00]) at R_frozen; at R_union: percentile 1.00, interval [1.00, 1.00]. Not robust to floor-level output perturbation (\u00a73.3: 47% of 1,000 perturbed draws keep the point row 'above'; threshold 80%).",
+  "mandatory": "BO's total HV gain (6.9 % of HV\u2080) is below the campaign's per-round noise bar (8 %). No HV result in this experiment can show BO ahead by more than that bar.",
+  "rows48": {
+    "R_frozen": "above",
+    "R_union": "above"
+  },
+  "rows40": {
+    "R_frozen": "above",
+    "R_union": "above"
+  },
+  "primary": [
+    {
+      "ref": "R_frozen",
+      "n": 40,
+      "hv0": 6.606271516247082e+17,
+      "bo": 1.0549433332875566,
+      "p10": 1.0024601843967391,
+      "p50": 1.0210823152980726,
+      "p90": 1.04708593070601,
+      "bo_minus_median": 0.033861017989484044,
+      "p_hat": 0.96202,
+      "p_lo": 0.886925,
+      "p_hi": 1.0,
+      "row": "above",
+      "boot_sd": 0.039474179104827506
+    },
+    {
+      "ref": "R_frozen",
+      "n": 48,
+      "hv0": 6.606271516247082e+17,
+      "bo": 1.0688402917293476,
+      "p10": 1.015796792827726,
+      "p50": 1.0420520992407223,
+      "p90": 1.0650572020314961,
+      "bo_minus_median": 0.026788192488625295,
+      "p_hat": 0.94213,
+      "p_lo": 0.836,
+      "p_hi": 1.0,
+      "row": "above",
+      "boot_sd": 0.058039988550998185
+    },
+    {
+      "ref": "R_union",
+      "n": 40,
+      "hv0": 5.206806452379854e+18,
+      "bo": 1.0257750226306017,
+      "p10": 1.0018869464075917,
+      "p50": 1.0102141515669092,
+      "p90": 1.021643172424773,
+      "bo_minus_median": 0.015560871063692527,
+      "p_hat": 0.95921,
+      "p_lo": 0.889475,
+      "p_hi": 1.0,
+      "row": "above",
+      "boot_sd": 0.041378028707878295
+    },
+    {
+      "ref": "R_union",
+      "n": 48,
+      "hv0": 5.206806452379854e+18,
+      "bo": 1.0459595357561258,
+      "p10": 1.008334402057362,
+      "p50": 1.020434926964455,
+      "p90": 1.031073246271628,
+      "bo_minus_median": 0.025524608791670733,
+      "p_hat": 1.0,
+      "p_lo": 1.0,
+      "p_hi": 1.0,
+      "row": "above",
+      "boot_sd": 0.0
+    }
+  ],
+  "provenance": [
+    {
+      "ref": "R_frozen",
+      "BO n=48": 1.0688402917293476,
+      "BO n=40": 1.0549433332875566,
+      "arm1 n=48": 1.0581325555711574,
+      "arm1 rows1-8 n=40": 1.0456245165234825,
+      "arm2 n=48": 1.0376071017535589,
+      "arm2 rows1-8 n=40": 1.0002796336761575,
+      "arm3 n=48": 1.0292723480986505,
+      "arm3 rows1-8 n=40": 1.0069082691514755,
+      "BO rank among 4 (n=48)": 1,
+      "whole 48-pool (n=80)": 1.0884956857411723
+    },
+    {
+      "ref": "R_union",
+      "BO n=48": 1.0459595357561258,
+      "BO n=40": 1.0257750226306017,
+      "arm1 n=48": 1.0237575022462357,
+      "arm1 rows1-8 n=40": 1.018233419647068,
+      "arm2 n=48": 1.020156256914843,
+      "arm2 rows1-8 n=40": 1.0031378239108548,
+      "arm3 n=48": 1.0193086175183117,
+      "arm3 rows1-8 n=40": 1.0018999941118467,
+      "BO rank among 4 (n=48)": 1,
+      "whole 48-pool (n=80)": 1.0446223389384908
+    }
+  ],
+  "ref_frozen": [
+    15102.2421825,
+    670349.7453773,
+    652034926.2020669
+  ],
+  "ref_union": [
+    32099.9304846,
+    1385277.5562642,
+    684323349.0337118
+  ],
+  "ref48": [
+    32099.9304846,
+    1385277.5562642,
+    684323349.0337118
+  ],
+  "robust": {
+    "det_point_row": "above",
+    "frac_match": 0.467,
+    "rows": {
+      "comparable": 531,
+      "above": 467,
+      "matched": 2
+    },
+    "p_pert_p5_p50_p95": [
+      0.3215,
+      0.871,
+      1.0
+    ]
+  },
+  "s1": [
+    {
+      "objective": "load_shed_mwh",
+      "BO best (32\u222aBO)": 0.0,
+      "BO best from": "n0b#10, r1#5, r2#2, r2#6",
+      "starts best": 0.0,
+      "P(subset best <= BO best - floor)": 0.0,
+      "P(subset best >= BO best + floor)": 0.0,
+      "subset best p10/p50/p90": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "subset-only best p50": 0.0,
+      "48-pool best": 0.0,
+      "pool best from": "rnd#9",
+      "BO beats pool by > floor": false,
+      "BO beats pool-only by > floor": false
+    },
+    {
+      "objective": "true_curtailment_mwh",
+      "BO best (32\u222aBO)": 48444.091768,
+      "BO best from": "r1#5",
+      "starts best": 76268.870635,
+      "P(subset best <= BO best - floor)": 0.0,
+      "P(subset best >= BO best + floor)": 1.0,
+      "subset best p10/p50/p90": [
+        61739.2,
+        76268.9,
+        76268.9
+      ],
+      "subset-only best p50": 86289.905077,
+      "48-pool best": 61739.245372000005,
+      "pool best from": "rnd#15",
+      "BO beats pool by > floor": true,
+      "BO beats pool-only by > floor": true
+    },
+    {
+      "objective": "total_cost_less_synthetic_usd",
+      "BO best (32\u222aBO)": 510066070.036815,
+      "BO best from": "r2#3",
+      "starts best": 539251294.138745,
+      "P(subset best <= BO best - floor)": 0.0,
+      "P(subset best >= BO best + floor)": 1.0,
+      "subset best p10/p50/p90": [
+        535998740.4,
+        538002517.8,
+        539251294.1
+      ],
+      "subset-only best p50": 538002517.764899,
+      "48-pool best": 535998740.367131,
+      "pool best from": "rnd#42",
+      "BO beats pool by > floor": true,
+      "BO beats pool-only by > floor": true
+    }
+  ],
+  "s1_count": 2,
+  "s2_front": {
+    "size": 32,
+    "bo": 13,
+    "random": 12,
+    "start": 7
+  },
+  "s2ii": {
+    "E[subset count on front of 32\u222aBO\u222asubset]": 4.98895,
+    "p10/p90": [
+      3.0,
+      7.0
+    ],
+    "E[BO count on the same front]": 13.0,
+    "E[subset count on front of 32\u222asubset] (like-for-like with BO's 13/16)": 6.5892,
+    "p10/p90 (like-for-like)": [
+      5.0,
+      8.0
+    ],
+    "BO count on front of 32\u222aBO": 13
+  },
+  "knees": [
+    {
+      "normalization": "full front",
+      "front size": 32,
+      "knee": "rnd#2",
+      "src": "random",
+      "dist": 0.4030178655204593,
+      "nuclear": 0.05,
+      "pv": 0.7625,
+      "tail": 0.16875,
+      "wind_122": 0.16875,
+      "wind_303": 0.40625,
+      "wind_317": 0.88125,
+      "total_mw": 1490.7756249999998,
+      "wind_share": 0.7031914175548718,
+      "in_R": false,
+      "shed": 4663.406625,
+      "curt": 295333.23502799997,
+      "cost_$M": 559.051003818596
+    },
+    {
+      "normalization": "full front",
+      "front size": 32,
+      "knee": "n0b#8",
+      "src": "start",
+      "dist": 0.4079907217425177,
+      "nuclear": 0.05,
+      "pv": 0.05,
+      "tail": 0.7625,
+      "wind_122": 0.16875,
+      "wind_303": 0.7625,
+      "wind_317": 0.88125,
+      "total_mw": 1699.24125,
+      "wind_share": 0.7944983533091607,
+      "in_R": true,
+      "shed": 1306.585965,
+      "curt": 326405.376772,
+      "cost_$M": 563.11521828938
+    },
+    {
+      "normalization": "full front",
+      "front size": 32,
+      "knee": "r1#2",
+      "src": "bo",
+      "dist": 0.41608425807133,
+      "nuclear": 0.05,
+      "pv": 0.2875,
+      "tail": 0.88125,
+      "wind_122": 0.2875,
+      "wind_303": 0.7625,
+      "wind_317": 0.64375,
+      "total_mw": 1704.9175,
+      "wind_share": 0.6805362282925713,
+      "in_R": true,
+      "shed": 835.865532,
+      "curt": 283798.848865,
+      "cost_$M": 568.2289618424821
+    },
+    {
+      "normalization": "front clipped to R_frozen",
+      "front size": 25,
+      "knee": "r2#1",
+      "src": "bo",
+      "dist": 0.46651115999273224,
+      "nuclear": 0.05,
+      "pv": 0.525,
+      "tail": 0.7625,
+      "wind_122": 0.525,
+      "wind_303": 0.64375,
+      "wind_317": 0.64375,
+      "total_mw": 1824.7956250000002,
+      "wind_share": 0.5807098945669601,
+      "in_R": false,
+      "shed": 785.282303,
+      "curt": 221748.820218,
+      "cost_$M": 580.282818962224
+    },
+    {
+      "normalization": "front clipped to R_frozen",
+      "front size": 25,
+      "knee": "rnd#43",
+      "src": "random",
+      "dist": 0.4723190408134002,
+      "nuclear": 0.05,
+      "pv": 0.88125,
+      "tail": 0.64375,
+      "wind_122": 0.64375,
+      "wind_303": 0.40625,
+      "wind_317": 1.0,
+      "total_mw": 2084.4781249999996,
+      "wind_share": 0.54843163681557,
+      "in_R": false,
+      "shed": 269.141051,
+      "curt": 166489.845959,
+      "cost_$M": 587.740566461934
+    },
+    {
+      "normalization": "front clipped to R_frozen",
+      "front size": 25,
+      "knee": "r1#2",
+      "src": "bo",
+      "dist": 0.47392879715103553,
+      "nuclear": 0.05,
+      "pv": 0.2875,
+      "tail": 0.88125,
+      "wind_122": 0.2875,
+      "wind_303": 0.7625,
+      "wind_317": 0.64375,
+      "total_mw": 1704.9175,
+      "wind_share": 0.6805362282925713,
+      "in_R": true,
+      "shed": 835.865532,
+      "curt": 283798.848865,
+      "cost_$M": 568.2289618424821
+    }
+  ],
+  "all_knees_in_R": false,
+  "coverage": {
+    "BO": {
+      "BO": 1.0,
+      "arm1": 0.0,
+      "arm2": 0.0,
+      "arm3": 0.0
+    },
+    "arm1": {
+      "BO": 0.5625,
+      "arm1": 1.0,
+      "arm2": 0.375,
+      "arm3": 0.3125
+    },
+    "arm2": {
+      "BO": 0.5625,
+      "arm1": 0.625,
+      "arm2": 1.0,
+      "arm3": 0.6875
+    },
+    "arm3": {
+      "BO": 0.375,
+      "arm1": 0.5,
+      "arm2": 0.3125,
+      "arm3": 1.0
+    }
+  },
+  "set_front_counts": {
+    "BO": 13,
+    "arm1": 8,
+    "arm2": 6,
+    "arm3": 7
+  },
+  "bsf": {
+    "BO|32": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "BO|40": [
+      0.0,
+      48444.091768,
+      539.2512941387449
+    ],
+    "BO|48": [
+      0.0,
+      48444.091768,
+      510.06607003681495
+    ],
+    "arm1 (rows in order)|32": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "arm1 (rows in order)|40": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "arm1 (rows in order)|48": [
+      0.0,
+      61739.245372000005,
+      539.2512941387449
+    ],
+    "arm2 (rows in order)|32": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "arm2 (rows in order)|40": [
+      0.0,
+      76268.870635,
+      538.002517764899
+    ],
+    "arm2 (rows in order)|48": [
+      0.0,
+      76268.870635,
+      538.002517764899
+    ],
+    "arm3 (rows in order)|32": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "arm3 (rows in order)|40": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "arm3 (rows in order)|48": [
+      0.0,
+      76268.870635,
+      535.998740367131
+    ],
+    "random subset p50|32": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "random subset p50|40": [
+      0.0,
+      76268.870635,
+      539.2512941387449
+    ],
+    "random subset p50|48": [
+      0.0,
+      76268.870635,
+      538.002517764899
+    ]
+  },
+  "hv_rate_ms": 0.44794487953186035,
+  "nproc": 12,
+  "seeds": {
+    "subsets": "default_rng([20261012, 0, size])",
+    "bootstrap": "default_rng([20261012, 1, size, b])",
+    "perturb": "default_rng([20261006, d])"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ref_union": [
+    32099.9304846,
+    1385277.5562642,
+    684323349.0337118
+  ],
+  "m_cols": [
+    "load_shed_mwh",
+    "true_curtailment_mwh",
+    "total_cost_less_synthetic_usd"
+  ],
+  "formula": "nadir + 0.1*span over the union of 96 evaluated designs (32 starts + 16 BO + 48 random)",
+  "nadir": [
+    29181.754986,
+    1263747.24131,
+    668481778.2158121
+  ],
+  "ideal": [
+    0.0,
+    48444.091768,
+    510066070.036815
+  ],
+  "n_points": 96
+}
