@@ -1,0 +1,58 @@
+{
+  "ref_point": [
+    15102.2421825,
+    670349.7453773,
+    652034926.2020669
+  ],
+  "threshold": 5.262996664950399e+16,
+  "mc_seed": 20261006,
+  "acq_seed_base": 20261006,
+  "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
+  "m_cols": [
+    "load_shed_mwh",
+    "true_curtailment_mwh",
+    "total_cost_less_synthetic_usd"
+  ],
+  "floors": [
+    3000.0,
+    5000.0,
+    500000.0
+  ],
+  "hard_cap": 4,
+  "entries": [
+    {
+      "round": 0,
+      "n": 32,
+      "hv": 6.606271516247082e+17,
+      "gain": null,
+      "n_outside_ref": 0,
+      "decision": "start",
+      "at": "2026-10-06T19:50:35+00:00"
+    },
+    {
+      "round": 1,
+      "n": 40,
+      "hv": 6.969242093952338e+17,
+      "gain": 3.629705777052557e+16,
+      "n_outside_ref": 2,
+      "decision": "graded",
+      "at": "2026-10-08T19:01:17+00:00"
+    },
+    {
+      "round": 2,
+      "n": 48,
+      "hv": 7.06104917466881e+17,
+      "gain": 9180708071647232.0,
+      "n_outside_ref": 5,
+      "decision": "stop",
+      "at": "2026-10-10T13:05:19+00:00"
+    }
+  ],
+  "arm": "P1",
+  "acq": "qparego",
+  "seed_id": 0,
+  "stop_rule": "record_only",
+  "init_at": "2026-10-12T23:13:13+00:00",
+  "source": "copied from analysis/bo_stage2 (prompt 30); r2 'stop' = the LIVE decision (stands)",
+  "live_stop_round": 2
+}
