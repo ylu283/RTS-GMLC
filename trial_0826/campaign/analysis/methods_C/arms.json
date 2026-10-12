@@ -1,0 +1,56 @@
+{
+  "campaign": "methods_C",
+  "prompt": "35",
+  "acq_seed_base": 20261006,
+  "acq_seed_rule": "acq_seed_base + 100*seed_id + k (P1: seed_id 0 -> 20261006 + k, the prompt-30 rule)",
+  "hard_cap": 4,
+  "q": 8,
+  "stop_rule": "record_only",
+  "repo_branch": "d6",
+  "arms": {
+    "P1": {
+      "dir": "analysis/methods_C/P1",
+      "base_waves": ["stage2_C_n0", "stage2_C_n0b"],
+      "round_waves": {"1": "bo_C_r1", "2": "bo_C_r2"},
+      "round_wave_pattern": "methods_C_P1_r{k}",
+      "env": "BOGP_CRC",
+      "local_env": "bogp",
+      "acq": "qparego",
+      "seed_id": 0,
+      "init": "copy_bo_stage2"
+    },
+    "P2": {
+      "dir": "analysis/methods_C/P2",
+      "base_waves": ["methods_C_S2_n0"],
+      "round_waves": {},
+      "round_wave_pattern": "methods_C_P2_r{k}",
+      "env": "BOGP_CRC",
+      "local_env": "bogp",
+      "acq": "qparego",
+      "seed_id": 2,
+      "init": "mc"
+    },
+    "P3": {
+      "dir": "analysis/methods_C/P3",
+      "base_waves": ["methods_C_S3_n0"],
+      "round_waves": {},
+      "round_wave_pattern": "methods_C_P3_r{k}",
+      "env": "BOGP_CRC",
+      "local_env": "bogp",
+      "acq": "qparego",
+      "seed_id": 3,
+      "init": "mc"
+    },
+    "N1": {
+      "dir": "analysis/methods_C/N1",
+      "base_waves": ["stage2_C_n0", "stage2_C_n0b"],
+      "round_waves": {},
+      "round_wave_pattern": "methods_C_N1_r{k}",
+      "env": "BOGP_CRC_botorch",
+      "local_env": "bogp-botorch",
+      "acq": "qnehvi",
+      "seed_id": 4,
+      "init": "copy_P1_ref"
+    }
+  }
+}

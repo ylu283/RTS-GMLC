@@ -11,3 +11,8 @@ __pycache__/
 trial_0826/campaign/waves/*/runs/
 trial_0826/campaign/analysis/bo_stage2/logs/
 trial_0826/campaign/analysis/bo_stage2/last_step.txt
+
+# prompt 35 methods_C: acquisition logs/breadcrumbs and generic array/collector SGE output
+trial_0826/campaign/analysis/methods_C/*/logs/
+trial_0826/campaign/analysis/methods_C/*/last_step.txt
+trial_0826/campaign/waves/methods_C_logs/
