@@ -6,6 +6,21 @@ audit + skeptical referee). The T0 analysis and the prediction below are
 unchanged from v0 (committed 10-09 in 2c11e7e, before any TL=360 run).
 Route decision = Kay/PI.**
 
+## ⚠ 10-12 — E1 CONFIRMED: this whole memo rests on mis-converted cost data
+
+`data/ercot123_2019/gen.csv` HR_avg_0 = Csu·Pmax/fuel_price for ALL 128
+thermal units (relative error ≤ 2.2e-16): a start-up energy in MMBTU,
+which egret reads as a BTU/kWh average heat rate. HR_incr_k = ΔC_k/fp is
+a segment heat, read as a rate. Start Heat = 1 MBTU and Non-Fuel Start
+Cost = $1 on every unit. Result: no-load ≈ $2.1–2.6M/h on nuclear
+(~$97k/h coal), start-ups ≈ free, merit order inverted. gen-1's cycling,
+gen-93 never committing, and the ±$56–133M spread are artifacts of this.
+**Every TL=120/360 reading here is invalid as evidence about the real
+system.** Finding 1 (TimeLimit nondeterminism) is a solver fact and may
+persist, but must be re-tested on corrected data. Fix = Kay, in a new
+versioned data directory (the frozen file stays). Details: living report
+§9.8, math-log §7.
+
 ## Verdict (10-11)
 
 **gen-1 is not pinned at TL=360, and total cost is not readable. The
