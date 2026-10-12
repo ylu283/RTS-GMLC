@@ -1,4 +1,38 @@
-# ERCOT PROGRESS (prompts 26 → 33)
+# ERCOT PROGRESS (prompts 26 → 36)
+
+## Prompt 36 — cost-data fix (2026-10-12, T0 + T1 build done locally; CRC pending)
+
+- [x] **T0** `analysis/cost_fix/t0_verify_sources.py` → `T0_FACTS.md` 30/30 PASS
+  (pkl = 0.7 × xlsx exactly on all 128 thermal; v1 HR_avg_0 = Csu·Pmax/fp;
+  v1 nuclear cost at Pmin $2.13M / $2.64M/h; authors' objective linear;
+  CONOPT; PV Pmax ×0.3 in pkl). `source_coeffs_tx123.csv` frozen.
+  `CONVERSION_INVENTORY.md`: no other ×0.7 anywhere; live GTEP input
+  `idaes-gtep/gtep/data/123_Bus_Coal/gen.csv` carries the v1 bug (B′).
+- [x] **§0.2** Kay 10-12: option (c), B = 40 (prompt text). B position: 44.8 of
+  75.9 GW thermal has C1 < 40 (merit order by C1).
+- [x] **T1** `tools/convert_tx123_costs.py --reading c` → `data/ercot123_2019_v2/`
+  (10 CSVs byte-copied, gen.csv cost cells only; 22 CT units on the 2-point
+  fallback — fork 6-dp fuel rounding fails egret's convexity check on equal
+  slopes; cost identical). `--data_dir` plumbed (run/extract/verify/probe/
+  screening builders/make_metadata; default = v1; non-default refuses v1 wave dirs).
+- [x] **Tests** `tests/` local (patched stock 0.6.2 copy, hash check skipped):
+  6 pass / 1 skip; RTS round trip 73 units; campaign + multi_pem 77 pass /
+  1 skip; verify_metadata v2 PASS. **CRC run pending:**
+  `bash trial_0826/ercot/tests/run_cost_fix_tests.sh` in PCM_ERCOT.
+- [x] Waves built (`tools/make_v2_waves.py`): smoke_v2, base_2019_v2 (A, 3),
+  screening_v2 (B, 12+7 byte copies), selection_t1_v2 (C, rows 3–11),
+  `waves/submit_v2/submit_this.sh` (refuses without SMOKE_PASS).
+  `compute_objectives.py --suffix _v2` → objectives_t1_v2.csv, noise_ruler_v2_v2.json.
+- [x] INVALID_v1_costs.md markers (9 dirs).
+- [x] Authors' SCUC side-by-side (local Gurobi), days 1–3, reading (c):
+  DLR system-mean LMP 4.95 / 5.68 / 5.53 (bus range −68…+79), cost $17.4M /
+  $28.0M / $26.0M; static ratings: day 2 infeasible (no shed slack).
+  `analysis/cost_fix/smoke_gate.py` dry-run on v1 smoke_3d → FAIL (expected).
+- [ ] Kay: CRC tests → `bash waves/smoke_v2/submit_this.sh` → pull →
+  `python analysis/cost_fix/smoke_gate.py --write_pass` → commit SMOKE_PASS →
+  `bash waves/submit_v2/submit_this.sh` (31 tasks, 124 slots).
+- [ ] T3 read-outs `analysis/cost_fix/ERCOT_COST_FIX.md`; wave D after B.
+
 
 ## Prompt 33 — TL=360 probe (2026-10-09, T0 done + T1 built)
 

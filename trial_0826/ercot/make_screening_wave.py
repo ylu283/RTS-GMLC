@@ -109,4 +109,16 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+    _ap = argparse.ArgumentParser()
+    _ap.add_argument("--data_dir", type=Path, default=DATA_DIR,
+                     help="default v1 ercot123_2019")
+    _ap.add_argument("--wave_dir", type=Path, default=WAVE_DIR,
+                     help="required (and must differ) with a non-default --data_dir")
+    _a = _ap.parse_args()
+    if _a.data_dir.resolve() != DATA_DIR.resolve() and _a.wave_dir.resolve() == WAVE_DIR.resolve():
+        raise SystemExit("non-default --data_dir: pass a new --wave_dir "
+                         "(v1 wave dirs are never overwritten — prompt 36)")
+    DATA_DIR, WAVE_DIR = _a.data_dir.resolve(), _a.wave_dir.resolve()
+    print(f"{Path(__file__).name}: data_dir={DATA_DIR} wave_dir={WAVE_DIR}")
     raise SystemExit(main())

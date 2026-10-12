@@ -40,6 +40,7 @@ import sys
 from argparse import ArgumentParser
 
 ERCOT_DIR = os.path.dirname(os.path.realpath(__file__))
+DEFAULT_DATA_DIR = os.path.join(ERCOT_DIR, "data", "ercot123_2019")
 MULTI_PEM_DIR = os.path.join(ERCOT_DIR, "..", "multi_pem")
 sys.path.insert(0, MULTI_PEM_DIR)
 
@@ -50,6 +51,9 @@ from parameters import update_function_multi  # noqa: E402
 def parse_args(argv=None):
     p = ArgumentParser(__doc__)
     p.add_argument("--index", default="0")
+    p.add_argument("--data_dir", default=DEFAULT_DATA_DIR,
+                   help="RTS-GMLC-format data dir (default: v1 ercot123_2019; "
+                   "prompt 36 runs pass data/ercot123_2019_v2)")
     p.add_argument("--output_directory", default="ercot_pcm")
     p.add_argument("--retrofit_gen_dict", default="{}",
                    help="JSON dict of generator name -> PEM data; '{}' = base")
@@ -66,7 +70,10 @@ def parse_args(argv=None):
 
 def build_options(args):
     opts = dict(multi_PEM_PCM.prescient_options)
-    opts["data_path"] = os.path.join(ERCOT_DIR, "data", "ercot123_2019")
+    data_dir = os.path.realpath(args.data_dir)
+    if not os.path.isfile(os.path.join(data_dir, "gen.csv")):
+        raise SystemExit(f"--data_dir {data_dir} has no gen.csv")
+    opts["data_path"] = data_dir
     opts["output_directory"] = args.output_directory
     opts["start_date"] = args.start_date
     opts["num_days"] = args.num_days
@@ -91,6 +98,7 @@ def main():
     if not isinstance(pem_data, dict):
         raise SystemExit("--retrofit_gen_dict must decode to a dict")
     opts = build_options(args)
+    print(f"run_ercot_pcm: data_dir={opts['data_path']}")
     print(f"run_ercot_pcm: index={args.index} start_date={opts['start_date']} "
           f"num_days={opts['num_days']} output={opts['output_directory']} "
           f"ruc_solver_options={opts['deterministic_ruc_solver_options']} "

@@ -17,7 +17,8 @@ from datetime import datetime
 from egret.parsers.rts_gmlc.parser import parse_to_cache
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "data", "ercot123_2019")
+DEFAULT_DATA = os.path.join(HERE, "data", "ercot123_2019")
+DATA = DEFAULT_DATA
 
 
 def main():
@@ -37,7 +38,9 @@ def main():
               "fuel_cost": g.get("fuel_cost"),
               "p_fuel_values": g.get("p_fuel", {}).get("values"),
               "min_up_time": g.get("min_up_time")}
-    out = os.path.join(HERE, "analysis", "selection", "gen1_model_shape.json")
+    suffix = "" if os.path.realpath(DATA) == os.path.realpath(DEFAULT_DATA) \
+        else "_" + os.path.basename(os.path.normpath(DATA))
+    out = os.path.join(HERE, "analysis", "selection", f"gen1_model_shape{suffix}.json")
     with open(out, "w") as f:
         json.dump(record, f, indent=2)
         f.write("\n")
@@ -46,4 +49,10 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+    _ap = argparse.ArgumentParser()
+    _ap.add_argument("--data_dir", default=DEFAULT_DATA,
+                     help="default v1 ercot123_2019 (prompt 36: pass the v2 dir)")
+    DATA = os.path.realpath(_ap.parse_args().data_dir)
+    print(f"probe_model_shape: data_dir={DATA}")
     sys.exit(main())

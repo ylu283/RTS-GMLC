@@ -56,11 +56,11 @@ from pathlib import Path
 import pandas as pd
 
 ERCOT_DIR = Path(__file__).resolve().parent
-GEN_CSV = ERCOT_DIR / "data" / "ercot123_2019" / "gen.csv"
+DEFAULT_DATA_DIR = ERCOT_DIR / "data" / "ercot123_2019"
 
 
-def unit_type_map():
-    gen = pd.read_csv(GEN_CSV, usecols=["GEN UID", "Unit Type", "PMax MW"])
+def unit_type_map(data_dir=DEFAULT_DATA_DIR):
+    gen = pd.read_csv(Path(data_dir) / "gen.csv", usecols=["GEN UID", "Unit Type", "PMax MW"])
     gen["GEN UID"] = gen["GEN UID"].astype(str)
     return gen
 
@@ -156,14 +156,19 @@ def main(argv=None):
     ap.add_argument("--full", action="store_true",
                     help="also write the hourly per-bus/gen/line tables "
                     "(smoke + base collectors only)")
+    ap.add_argument("--data_dir", type=Path, default=DEFAULT_DATA_DIR,
+                    help="data dir the run used (gen.csv unit types, "
+                    "branch.csv ratings); default v1 ercot123_2019")
     args = ap.parse_args(argv)
+    print(f"extract_ercot: data_dir={args.data_dir.resolve()}")
     run, out = args.run_dir, args.out_dir
     if not (run / "overall_simulation_output.csv").is_file():
         raise SystemExit(f"ABORT: {run} has no overall_simulation_output.csv "
                          "(incomplete run — never extract partials)")
     out.mkdir(parents=True, exist_ok=True)
-    gen = unit_type_map()
-    manifest = {"mode": "full" if args.full else "slim"}
+    gen = unit_type_map(args.data_dir)
+    manifest = {"mode": "full" if args.full else "slim",
+                "data_dir": str(args.data_dir.resolve())}
 
     rd = add_unit_type(pd.read_csv(run / "renewables_detail.csv"), gen)
     rd["is_pem"] = rd["Generator"].str.endswith("_PEM")
@@ -220,7 +225,7 @@ def main(argv=None):
     manifest["committed_hourly"] = len(ch)
 
     # per-line annual summary (congestion signal; rating from branch.csv)
-    br = pd.read_csv(GEN_CSV.parent / "branch.csv")
+    br = pd.read_csv(args.data_dir / "branch.csv")
     rating = dict(zip(br["UID"].astype(str), br["Cont Rating"]))
     ld2 = ld.assign(abs_flow=ld["Flow"].abs())
     lname = (ld2["Line"].astype(str)

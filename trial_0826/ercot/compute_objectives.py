@@ -51,6 +51,31 @@ GROUPS = {
 }
 QUALITATIVE_GROUPS = {"nuclear"}  # df=1 -> never a quantitative floor
 
+# Prompt 36: --suffix _v2 reads the cost-fixed waves and writes _v2 files
+# (v1 outputs are never overwritten). Base df = 3 (A rows 1-3 + screening
+# ercot row 11); screening ercot row 12 replicates row 1.
+GROUPS_V2 = {
+    "base": ["base_2019_v2:1", "base_2019_v2:2", "base_2019_v2:3",
+             "screening_v2/ercot:11"],
+    "wind_pocket": ["screening_v2/ercot:1", "screening_v2/ercot:12",
+                    "selection_t1_v2:3"],
+    "pv": ["screening_v2/ercot:8", "selection_t1_v2:4", "selection_t1_v2:5"],
+    "nuclear": ["selection_t1_v2:8", "selection_t1_v2:11"],
+}
+CONFIG = {
+    "": {"sel_wave": "selection_t1", "groups": GROUPS,
+         "scr_wave": "screening_ercot",
+         "xrefs": ["base_2019:base", "screening_ercot:1", "screening_ercot:8",
+                   "screening_ercot:11", "screening_ercot:12"],
+         "obj_csv": "objectives_t1.csv", "ruler": "noise_ruler_v2.json"},
+    "_v2": {"sel_wave": "selection_t1_v2", "groups": GROUPS_V2,
+            "scr_wave": "screening_v2/ercot",
+            "xrefs": ["base_2019_v2:1", "base_2019_v2:2", "base_2019_v2:3",
+                      "screening_v2/ercot:1", "screening_v2/ercot:8",
+                      "screening_v2/ercot:11", "screening_v2/ercot:12"],
+            "obj_csv": "objectives_t1_v2.csv", "ruler": "noise_ruler_v2_v2.json"},
+}
+
 
 def run_dir(key):
     wave, idx = key.split(":")
@@ -74,7 +99,8 @@ def thermal_h2(key, site="1", pmax=NUC_PMAX):
         td = pd.read_csv(full)
     else:  # CRC fallback: raw run dir (collector runs where runs/ exists)
         wave, idx = key.split(":")
-        raw = os.path.join(HERE, "waves", wave, "runs", f"run_index_{idx}",
+        top, _, rest = wave.partition("/")   # screening_v2/ercot -> runs/ercot/
+        raw = os.path.join(HERE, "waves", top, "runs", rest, f"run_index_{idx}",
                            "thermal_detail.csv")
         td = pd.read_csv(raw)
     td["Generator"] = td["Generator"].astype(str)
@@ -102,33 +128,39 @@ def metrics(key, nuclear=False):
             "gen1_unit_cost": float(g1["Unit Cost"].iloc[0]) if len(g1) else np.nan}
 
 
-def main():
-    dm = pd.read_csv(os.path.join(HERE, "waves", "selection_t1",
-                                  "design_matrix.csv"))
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--suffix", default="", choices=sorted(CONFIG),
+                    help="'' = v1 waves/outputs; '_v2' = prompt-36 cost-fixed waves")
+    cfg = CONFIG[ap.parse_args(argv).suffix]
+    GROUPS = cfg["groups"]
+    sel = cfg["sel_wave"]
+    print(f"compute_objectives: selection wave {sel}, outputs {cfg['obj_csv']}, {cfg['ruler']}")
+    dm = pd.read_csv(os.path.join(HERE, "waves", sel, "design_matrix.csv"))
     dm["oat_site"] = dm["oat_site"].astype(str)
     rows = []
     for _, r in dm.iterrows():
-        key = f"selection_t1:{int(r['index'])}"
+        key = f"{sel}:{int(r['index'])}"
         nuc = str(r["oat_site"]) == "1"
         m = metrics(key, nuclear=nuc)
         if nuc:
             assert m["h2"] > 0, f"{key}: thermal h2 == 0 (pinned regression check)"
-        rows.append({"wave": "selection_t1", "index": int(r["index"]),
+        rows.append({"wave": sel, "index": int(r["index"]),
                      "site": r["oat_site"], "omega": r["omega"],
                      "replicate_of": r["replicate_of"], **m})
     # referenced cross-wave originals (self-contained pairing table)
-    scr_dm = pd.read_csv(os.path.join(HERE, "waves", "screening_ercot",
+    scr_dm = pd.read_csv(os.path.join(HERE, "waves", cfg["scr_wave"],
                                       "design_matrix.csv"))
-    for key in ["base_2019:base", "screening_ercot:1", "screening_ercot:8",
-                "screening_ercot:11", "screening_ercot:12"]:
+    for key in cfg["xrefs"]:
         wave, idx = key.split(":")
-        site = "base" if wave == "base_2019" else str(
+        site = "base" if wave.startswith("base_2019") else str(
             scr_dm[scr_dm["index"] == int(idx)]["oat_site"].iloc[0])
         rows.append({"wave": wave, "index": idx, "site": site, "omega": "",
                      "replicate_of": "", **metrics(key)})
     out = pd.DataFrame(rows)
     os.makedirs(SEL, exist_ok=True)
-    out.to_csv(os.path.join(SEL, "objectives_t1.csv"), index=False)
+    out.to_csv(os.path.join(SEL, cfg["obj_csv"]), index=False)
 
     # --- mode-resolved base classification (pinned) --------------------------
     base_keys = GROUPS["base"]
@@ -136,15 +168,19 @@ def main():
     print("base solves by gen-1 starts (mode):", base_modes)
 
     # --- ruler v2 groups ------------------------------------------------------
-    v2_path = os.path.join(SEL, "noise_ruler_v2.json")
-    v2 = json.load(open(v2_path))
+    v2_path = os.path.join(SEL, cfg["ruler"])
+    if cfg["ruler"] == "noise_ruler_v2.json":
+        v2 = json.load(open(v2_path))
+    else:   # v2 costs: v1 floors are invalid (INVALID_v1_costs.md) -> fresh ruler
+        v2 = {"note": "prompt 36: rulers on v2 costs; no v1 floors carried",
+              "v1_frozen": {}, "groups": {}}
     v1 = v2["v1_frozen"]
     key_m = {}
     for grp, keys in GROUPS.items():
         for k in keys:
             if k not in key_m:
                 key_m[k] = metrics(k, nuclear=(grp == "nuclear"
-                                               and k.startswith("selection_t1")))
+                                               and k.startswith(sel + ":")))
     changes = []
     for grp, keys in GROUPS.items():
         df = len(keys) - 1
@@ -185,7 +221,7 @@ def main():
     with open(v2_path, "w") as f:
         json.dump(v2, f, indent=2)
         f.write("\n")
-    print("objectives_t1.csv + noise_ruler_v2.json written")
+    print(f"{cfg['obj_csv']} + {cfg['ruler']} written")
     print("campaign floors T1:", {k: round(v, 1) for k, v in floors.items()})
     return 0
 

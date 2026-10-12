@@ -1,0 +1,47 @@
+{
+  "142": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.4,
+    "gen_pmax": 703.3333333333334
+  },
+  "20": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 780.1999893773013
+  },
+  "204": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 856.9999804088067
+  },
+  "205": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 1057.999956964386
+  },
+  "206": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 1799.800026503209
+  },
+  "274": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 746.3999877635443
+  },
+  "275": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 1038.999987796685
+  },
+  "30": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.4,
+    "gen_pmax": 926.6666666666669
+  },
+  "91": {
+    "PEM_bid": 40.0,
+    "PEM_fraction": 0.5,
+    "gen_pmax": 785.4999846514534
+  }
+}

@@ -102,4 +102,10 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+    _ap = argparse.ArgumentParser()
+    _ap.add_argument("--data_dir", type=Path, default=DATA_DIR,
+                     help="default v1 ercot123_2019 (prompt 36: pass the v2 dir)")
+    DATA_DIR = _ap.parse_args().data_dir.resolve()
+    print(f"verify_metadata: data_dir={DATA_DIR}")
     sys.exit(main())

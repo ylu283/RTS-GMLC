@@ -1,0 +1,152 @@
+{
+ "reading": "c",
+ "ratings": "dlr",
+ "solver": "gurobi_direct MIPGap 0.01 Threads 4; run2 LP (v relaxed)",
+ "scratch": "/var/folders/p0/8_mj7nxn1td_x1r_61m5pqh40000gn/T/authors_scuc_b2anbire",
+ "days": {
+  "1": {
+   "load_mwh": 986649.81,
+   "wind_solar_mwh": 280614.80000000005,
+   "mip_status": "optimal",
+   "mip_objective": 17397413.394877102,
+   "noload_cost": 1203713.999159322,
+   "variable_cost": 16001327.095166076,
+   "startup_cost": 192372.30055168015,
+   "lp_status": "optimal",
+   "lp_objective": 17397413.394491743,
+   "lmp_system_mean_hourly": [
+    5.3567,
+    5.058,
+    4.791,
+    4.993,
+    4.541,
+    5.0393,
+    5.0901,
+    4.4369,
+    4.5329,
+    4.4689,
+    5.3843,
+    4.4797,
+    3.8218,
+    4.2629,
+    4.1625,
+    4.3811,
+    5.1482,
+    5.4792,
+    5.4567,
+    5.5537,
+    5.5403,
+    5.5579,
+    5.7871,
+    5.5403
+   ],
+   "lmp_system_mean_day": 4.952635258726867,
+   "lmp_min_max": [
+    -57.04394021182652,
+    65.15217684838699
+   ],
+   "lmp_load_weighted_day": 0.5938101267453373,
+   "units_committed_mean": 39.999999981065805,
+   "nuclear_on_hours": [
+    24,
+    24
+   ]
+  },
+  "2": {
+   "load_mwh": 1136655.54,
+   "wind_solar_mwh": 130315.78000000001,
+   "mip_status": "optimal",
+   "mip_objective": 27987563.07888079,
+   "noload_cost": 1858857.0,
+   "variable_cost": 25961791.778880924,
+   "startup_cost": 166914.3,
+   "lp_status": "optimal",
+   "lp_objective": 27987563.078880828,
+   "lmp_system_mean_hourly": [
+    4.9698,
+    4.8553,
+    4.9474,
+    4.985,
+    5.1621,
+    5.2144,
+    5.4337,
+    5.4936,
+    5.6989,
+    5.9472,
+    5.7369,
+    5.8987,
+    5.8889,
+    5.8864,
+    5.8864,
+    5.8864,
+    5.7794,
+    6.0164,
+    6.0429,
+    7.1981,
+    5.9982,
+    5.8095,
+    5.9547,
+    5.6331
+   ],
+   "lmp_system_mean_day": 5.680142083865292,
+   "lmp_min_max": [
+    -60.29144394151317,
+    63.928262763626044
+   ],
+   "lmp_load_weighted_day": 0.8105070681838199,
+   "units_committed_mean": 61.916666666666664,
+   "nuclear_on_hours": [
+    24,
+    24
+   ]
+  },
+  "3": {
+   "load_mwh": 1100872.77,
+   "wind_solar_mwh": 140776.38,
+   "mip_status": "optimal",
+   "mip_objective": 26015975.5491748,
+   "noload_cost": 1779673.0,
+   "variable_cost": 24096939.949174926,
+   "startup_cost": 139362.60000000003,
+   "lp_status": "optimal",
+   "lp_objective": 26015975.54917477,
+   "lmp_system_mean_hourly": [
+    5.7032,
+    5.5308,
+    5.5254,
+    5.497,
+    5.5154,
+    5.5957,
+    5.8276,
+    6.0129,
+    6.1379,
+    5.9189,
+    5.6871,
+    5.5588,
+    5.1393,
+    4.4179,
+    4.2562,
+    4.4131,
+    4.682,
+    5.2174,
+    5.8211,
+    6.6391,
+    6.3132,
+    6.1602,
+    5.5444,
+    5.6002
+   ],
+   "lmp_system_mean_day": 5.529786757269238,
+   "lmp_min_max": [
+    -68.2578622023638,
+    79.30979830684245
+   ],
+   "lmp_load_weighted_day": 0.08868641539323874,
+   "units_committed_mean": 58.416666666666664,
+   "nuclear_on_hours": [
+    24,
+    24
+   ]
+  }
+ }
+}

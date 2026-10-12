@@ -1,0 +1,109 @@
+{
+ "reading": "c",
+ "ratings": "static",
+ "solver": "gurobi_direct MIPGap 0.01 Threads 4; run2 LP (v relaxed)",
+ "scratch": "/var/folders/p0/8_mj7nxn1td_x1r_61m5pqh40000gn/T/authors_scuc_sydgzurg",
+ "days": {
+  "1": {
+   "load_mwh": 986649.81,
+   "wind_solar_mwh": 280614.80000000005,
+   "mip_status": "optimal",
+   "mip_objective": 18504955.385174572,
+   "noload_cost": 1342064.0,
+   "variable_cost": 17005081.385174505,
+   "startup_cost": 157810.0,
+   "lp_status": "optimal",
+   "lp_objective": 18504955.3851746,
+   "lmp_system_mean_hourly": [
+    5.952,
+    5.68,
+    5.5785,
+    5.7283,
+    5.1621,
+    4.8303,
+    5.1944,
+    4.8864,
+    5.2708,
+    78.7482,
+    4.3691,
+    28.6005,
+    4.1581,
+    3.6231,
+    3.6231,
+    3.6818,
+    4.238,
+    4.7032,
+    5.5774,
+    6.5832,
+    5.6743,
+    6.552,
+    10.3496,
+    7.3159
+   ],
+   "lmp_system_mean_day": 9.420007918665672,
+   "lmp_min_max": [
+    -867.5773791704993,
+    768.3555468833777
+   ],
+   "lmp_load_weighted_day": 2.7371695187577485,
+   "units_committed_mean": 46.041666666666664,
+   "nuclear_on_hours": [
+    24,
+    24
+   ]
+  },
+  "2": {
+   "load_mwh": 1136655.54,
+   "wind_solar_mwh": 130315.78000000001,
+   "mip_status": "infeasibleOrUnbounded"
+  },
+  "3": {
+   "load_mwh": 1100872.77,
+   "wind_solar_mwh": 140776.38,
+   "mip_status": "optimal",
+   "mip_objective": 26784311.782674078,
+   "noload_cost": 1793672.0,
+   "variable_cost": 24863740.482674208,
+   "startup_cost": 126899.29999999999,
+   "lp_status": "optimal",
+   "lp_objective": 26784311.78267409,
+   "lmp_system_mean_hourly": [
+    5.8389,
+    5.7765,
+    5.7311,
+    5.5572,
+    5.5946,
+    6.2155,
+    6.6495,
+    7.1492,
+    7.0665,
+    7.1434,
+    6.1996,
+    5.6795,
+    4.9898,
+    3.6203,
+    3.3955,
+    3.8066,
+    3.8092,
+    5.1593,
+    6.461,
+    7.0341,
+    6.4737,
+    6.2047,
+    7.0935,
+    5.6412
+   ],
+   "lmp_system_mean_day": 5.762092739555453,
+   "lmp_min_max": [
+    -75.5036802798103,
+    89.75652490283916
+   ],
+   "lmp_load_weighted_day": 1.8780323057363022,
+   "units_committed_mean": 56.833333333333336,
+   "nuclear_on_hours": [
+    24,
+    24
+   ]
+  }
+ }
+}
