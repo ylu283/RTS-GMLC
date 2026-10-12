@@ -40,4 +40,15 @@ HERE and in the session's final message only.
   (bogp; incl. the bo_C_r2 regression), `tests/test_methods_qnehvi.py`
   (bogp-botorch).
 
+## T0 status (2026-10-12, executor)
+
+- Built + pushed: S2, S3 (32 each), Q1–Q3 (16 each) — f82fddd, clean manifests.
+- P1 initialized + r3 proposed locally (seed 20261009) — d1c2c9a.
+- N1 NOT RUN (replay gate failed high) — 2596416.
+- Dry run of submit_ready: 6 items READY = 120 array tasks + 6 collectors.
+- Budget without N1: 224 − 32 = **192 runs ≈ 2.9k core-h** + ≈ 12 acquisition
+  jobs (P1 r3, r4; P2/P3 r0–r4).
+- BLOCKING before the first submit: **G1 on CRC** (fail → STOP) and **G3** pastes.
+  `BOGP_CRC_botorch` is no longer needed for this prompt (only N1 used it).
+
 ## Submission log
