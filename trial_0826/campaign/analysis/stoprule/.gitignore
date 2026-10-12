@@ -1,0 +1,7 @@
+# prompt 37: large / regenerable artifacts (truth sha256 is in PREREG.md and
+# problems/problems.json; raw trajectories stay on CRC / the Mac, summaries
+# under summary/ are committed)
+problems/*.npz
+results/
+logs/
+__pycache__/
