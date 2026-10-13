@@ -1,0 +1,342 @@
+{
+ "v1": {
+  "lmp": {
+   "rt_mean": 14.49001135038393,
+   "rt_median": 10.358672,
+   "da_mean": 27.147305024785926,
+   "da_median": 18.520495,
+   "rt_mean_all_hours": 14.532382937263801,
+   "sys_hourly_mean_p05_p50_p95": [
+    7.773583261788618,
+    11.103242861788617,
+    35.899584767479666
+   ],
+   "rt_bus_min_max": [
+    -48.003324,
+    682.749862
+   ],
+   "shortfall_hours_excluded": 7,
+   "hourly_price_mean": 18.490382985388127
+  },
+  "overall": {
+   "total_cost": 7938734507.295434,
+   "fixed_cost": 6751847487.681085,
+   "variable_cost": 1186887019.61435,
+   "load_shed": 0.0,
+   "reserve_shortfall": 280.924433,
+   "on_offs": 17689.0,
+   "cum_avg_price": 20.682133,
+   "overall_csv_curtailment_NOT_USED": 9444258.120652
+  },
+  "objectives": {
+   "true_curt": 9444258.120688,
+   "h2": 0.0,
+   "var_cost": 1186887019.61435,
+   "reserve": 280.924433,
+   "onoffs": 17689.0,
+   "total_cost": 7938734507.295434,
+   "fixed_cost": 6751847487.681085,
+   "gen1_starts": 25.0,
+   "gen1_unit_cost": 3184913484.851423
+  },
+  "nuclear": {
+   "1": {
+    "on_hours": 1485,
+    "hours": 8760,
+    "starts": 25.0,
+    "mean_dispatch_when_on": 2225.242118789899,
+    "hours_at_pmax": 1041,
+    "pmax": 2430.0
+   },
+   "93": {
+    "on_hours": 0,
+    "hours": 8760,
+    "starts": 0.0,
+    "mean_dispatch_when_on": 0.0,
+    "hours_at_pmax": 0,
+    "pmax": 2708.6
+   }
+  },
+  "cost_by_type": {
+   "COAL": {
+    "cost": 1067369252.986193,
+    "share": 0.13445080598205453
+   },
+   "CT": {
+    "cost": 3686451769.478446,
+    "share": 0.4643626469787018
+   },
+   "NUC": {
+    "cost": 3184913484.851423,
+    "share": 0.4011865470392438
+   }
+  },
+  "ruc": {
+   "n_solves": 365,
+   "status_counts": {
+    "OPTIMAL": 321,
+    "TIME_LIMIT": 44
+   },
+   "gap_pct_p50_p90_max": [
+    0.9777,
+    1.1182600000000005,
+    3.2311
+   ],
+   "solve_s_p50_p90_max": [
+    107.68366885185242,
+    289.3912240505219,
+    605.6825873851776
+   ],
+   "capped_share": 0.4712328767123288,
+   "capped_share_per_run": {
+    "base_2019:base": 0.4712328767123288
+   },
+   "gap_identical_across_reps": true
+  }
+ },
+ "v2": {
+  "lmp": {
+   "rt_mean": 33.823184305549184,
+   "rt_median": 32.823982,
+   "da_mean": 35.87831884562819,
+   "da_median": 34.661026,
+   "rt_mean_all_hours": 34.06703378502338,
+   "sys_hourly_mean_p05_p50_p95": [
+    21.210013602845528,
+    33.53978707317073,
+    46.45876905569105
+   ],
+   "rt_bus_min_max": [
+    -7.595003,
+    446.14725
+   ],
+   "shortfall_hours_excluded": 38,
+   "hourly_price_mean": 20.49261638344749
+  },
+  "overall": {
+   "total_cost": 8091337539.464982,
+   "fixed_cost": 3631221726.705988,
+   "variable_cost": 4460115812.758994,
+   "load_shed": 0.0,
+   "reserve_shortfall": 445.934085,
+   "on_offs": 15957.0,
+   "cum_avg_price": 21.079698,
+   "overall_csv_curtailment_NOT_USED": 5923688.204436
+  },
+  "objectives": {
+   "true_curt": 5923688.204429999,
+   "h2": 0.0,
+   "var_cost": 4460115812.758994,
+   "reserve": 445.934085,
+   "onoffs": 15957.0,
+   "total_cost": 8091337539.464982,
+   "fixed_cost": 3631221726.705988,
+   "gen1_starts": 0.0,
+   "gen1_unit_cost": 371141914.90196896
+  },
+  "nuclear": {
+   "1": {
+    "on_hours": 8760,
+    "hours": 8760,
+    "starts": 0.0,
+    "mean_dispatch_when_on": 2429.3462445408677,
+    "hours_at_pmax": 8712,
+    "pmax": 2430.0
+   },
+   "93": {
+    "on_hours": 8760,
+    "hours": 8760,
+    "starts": 0.0,
+    "mean_dispatch_when_on": 2544.912653200114,
+    "hours_at_pmax": 3534,
+    "pmax": 2708.6
+   }
+  },
+  "cost_by_type": {
+   "COAL": {
+    "cost": 2604662912.15408,
+    "share": 0.32190758319646456
+   },
+   "CT": {
+    "cost": 4726735208.758131,
+    "share": 0.584172293605015
+   },
+   "NUC": {
+    "cost": 759939418.5468049,
+    "share": 0.09392012319852056
+   }
+  },
+  "ruc": {
+   "n_solves": 1460,
+   "status_counts": {
+    "OPTIMAL": 1460
+   },
+   "gap_pct_p50_p90_max": [
+    0.723,
+    0.9996,
+    0.9999
+   ],
+   "solve_s_p50_p90_max": [
+    19.80589985847473,
+    27.73494057655335,
+    53.371785402297974
+   ],
+   "capped_share": 0.0,
+   "capped_share_per_run": {
+    "base_2019_v2:1": 0.0,
+    "base_2019_v2:2": 0.0,
+    "base_2019_v2:3": 0.0,
+    "screening_v2/ercot:11": 0.0
+   },
+   "gap_identical_across_reps": true
+  },
+  "replicates": {
+   "runs": [
+    "base_2019_v2:1",
+    "base_2019_v2:2",
+    "base_2019_v2:3",
+    "screening_v2/ercot:11"
+   ],
+   "df": 3,
+   "values": {
+    "base_2019_v2:1": {
+     "true_curt": 5923688.204429999,
+     "h2": 0.0,
+     "var_cost": 4460115812.758994,
+     "reserve": 445.934085,
+     "onoffs": 15957.0,
+     "total_cost": 8091337539.464982,
+     "fixed_cost": 3631221726.705988,
+     "gen1_starts": 0.0,
+     "gen1_unit_cost": 371141914.90196896
+    },
+    "base_2019_v2:2": {
+     "true_curt": 5923688.204429999,
+     "h2": 0.0,
+     "var_cost": 4460115812.758994,
+     "reserve": 445.934085,
+     "onoffs": 15957.0,
+     "total_cost": 8091337539.464982,
+     "fixed_cost": 3631221726.705988,
+     "gen1_starts": 0.0,
+     "gen1_unit_cost": 371141914.90196896
+    },
+    "base_2019_v2:3": {
+     "true_curt": 5923688.204429999,
+     "h2": 0.0,
+     "var_cost": 4460115812.758994,
+     "reserve": 445.934085,
+     "onoffs": 15957.0,
+     "total_cost": 8091337539.464982,
+     "fixed_cost": 3631221726.705988,
+     "gen1_starts": 0.0,
+     "gen1_unit_cost": 371141914.90196896
+    },
+    "screening_v2/ercot:11": {
+     "true_curt": 5923688.204429999,
+     "h2": 0.0,
+     "var_cost": 4460115812.758994,
+     "reserve": 445.934085,
+     "onoffs": 15957.0,
+     "total_cost": 8091337539.464982,
+     "fixed_cost": 3631221726.705988,
+     "gen1_starts": 0.0,
+     "gen1_unit_cost": 371141914.90196896
+    }
+   },
+   "pairwise": {
+    "true_curt": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "h2": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "var_cost": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "reserve": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "onoffs": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "total_cost": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    },
+    "fixed_cost": {
+     "pairwise_abs_delta": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "median": 0.0,
+     "max": 0.0
+    }
+   },
+   "byte_identical": {
+    "overall.csv": true,
+    "gen_summary.csv": true,
+    "daily_summary.csv": true,
+    "hourly_summary.csv": true,
+    "committed_hourly.csv": true
+   }
+  }
+ }
+}
