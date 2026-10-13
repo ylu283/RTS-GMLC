@@ -50,9 +50,12 @@ HERE and in the session's final message only.
 - Built + pushed: S2, S3 (32 each), Q1–Q3 (16 each) — f82fddd, clean manifests.
 - P1 initialized + r3 proposed locally (seed 20261009) — d1c2c9a.
 - ~~N1 NOT RUN (replay gate failed high) — 2596416.~~ Superseded: N1 gate PASS (amendment 10-12).
-- Dry run of submit_ready: 6 items READY = 120 array tasks + 6 collectors.
-- Budget without N1: 224 − 32 = **192 runs ≈ 2.9k core-h** + ≈ 12 acquisition
-  jobs (P1 r3, r4; P2/P3 r0–r4).
+- N1 initialized (P1's R_frozen + τ₁) + r1 proposed locally (qNEHVI, seed 20261407,
+  678 s) — 6ab5408.
+- Dry run of submit_ready (after the amendment): **7 items READY = 128 array tasks + 7
+  collectors** (S2, S3, Q1–Q3, P1 r3, N1 r1); P2/P3 WAIT_BASE.
+- Budget with N1: **224 runs ≈ 3.4k core-h** + ≈ 15 acquisition jobs (P1 r3–r4; P2/P3
+  r0–r4; N1 r1–r4, ≈ 30–40 min each on CRC).
 - BLOCKING before the first submit: **G1 on CRC** (fail → STOP) and **G3** pastes.
   ~~`BOGP_CRC_botorch` is no longer needed~~ — **needed again** (N1 runs): Kay builds it from
   the ENV_READY.md block and passes `ARM=N1 ... acquire_arm_job.sh --check-env` before N1's
