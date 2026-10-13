@@ -100,9 +100,11 @@ side is then recorded here.
   typing-inspect 0.9.0, the same set as the local env. No version changed.
 - The `torch.jit.script` FutureWarning on import is harmless; local shows it
   too.
-- **Still open (non-blocking until N1 r1 lands):**
-  1. `BOGP_CRC` unchanged vs the committed prompt-30 freeze:
-     `diff analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt /groups/adowling/ylu28/BOGP_CRC_pip_freeze_now.txt`
-     (expect empty).
-  2. `ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env` → expect
-     `CHECK-ENV PASS (N1)`.
+- **`ARM=N1 acquire_arm_job.sh --check-env`: `CHECK-ENV PASS (N1)`.** It
+  printed `BOGP_CRC_botorch: 2.14.1+cpu 1.15.2`, `botorch 0.16.1` and
+  `bo-gp @ 60e6328236e745b3d34dc8cd704bb72888ae5d15 (matches ledger)`.
+- **`BOGP_CRC` is unchanged** against the committed prompt-30 freeze
+  (`analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt`): the diff is empty, so
+  `BOGP_CRC UNCHANGED`.
+
+**G2 CLOSED (local + CRC).** N1's acquisition jobs can run.

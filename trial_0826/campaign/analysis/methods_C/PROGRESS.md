@@ -14,11 +14,12 @@ HERE and in the session's final message only.
   Max closure error 1.0e-6 MW on three run-#42 wind sites = Prescient's 6-decimal CSV
   rounding (≈ 1e-9 relative to site availability); all others ≤ 2.3e-13. Local pilot
   smoke also PASS.
-- [x] **G2 envs (local)** — `bogp-botorch` ready, no pin drift (ENV_READY.md, deb5f42).
+- [x] **G2 envs (local + CRC — all T0 gates G1–G5 closed)** — `bogp-botorch` ready, no pin drift (ENV_READY.md, deb5f42).
   [x] CRC `BOGP_CRC_botorch` BUILT (10-12 evening) at /groups/…/conda_envs: imports
   2.14.1+cpu / 1.15.2 / 0.6.1 / botorch 0.16.1; freeze diff vs BOGP_CRC = additions only
-  (the same 9 packages as local). Open before N1 r1 lands: BOGP_CRC-vs-committed-freeze
-  diff (expect empty) and `ARM=N1 … --check-env` PASS (ENV_READY.md).
+  (the same 9 packages as local). `ARM=N1 … --check-env` → CHECK-ENV PASS (N1)
+  (bo-gp 60e6328 matches ledger); BOGP_CRC vs committed prompt-30 freeze: UNCHANGED.
+  **G2 closed (local + CRC).**
 - [x] **G3 capacity — recorded (10-12).** `qacct` is unavailable on CRC (no accounting file on bastion) → walls from the
   logs / bot-commit timestamps (upper bounds: include queue wait):
   - per run: random_C 48 tasks SUBMITTED→results **≤ 9.4 h** (10-11 11:00→20:22);
