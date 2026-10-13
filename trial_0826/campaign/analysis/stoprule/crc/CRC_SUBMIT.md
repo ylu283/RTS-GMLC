@@ -6,13 +6,24 @@ behind 35's acquisition jobs. That's fine; nothing here depends on them.
 
 ## 0. Gate (paste the outputs to the 37 session before step 2)
 
-1. `BOGP_CRC_botorch` exists (35's ENV_READY commands) — paste
-   `~/BOGP_CRC_botorch_pip_freeze.txt` (diffed by the session vs
-   `analysis/methods_C/env/bogp-botorch_local_pip_freeze.txt`).
+1. `BOGP_CRC_botorch` exists — built at
+   `/groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch` (home quota is full;
+   that dir is in `envs_dirs`, so `conda activate BOGP_CRC_botorch` by name
+   works on bastion and compute nodes). Paste
+   `/groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt` (diffed by the
+   session vs `analysis/methods_C/env/bogp-botorch_local_pip_freeze.txt`).
 2. `git -C /groups/adowling/ylu28/bo-gp rev-parse HEAD` → must start `60e6328`.
 
 If (1) never appears: use `tasks_noM3.csv` (800 rows: M1 + M4) instead of `tasks.csv`
 below (PREREG §3); M3 is then "not run".
+
+**Home quota (10-12):** nothing in these steps writes to `~` on CRC —
+the checkout, `problems/`, `results/`, `logs/` and `summary/` all live under
+`/groups/adowling/ylu28/RTS-GMLC-stoprule`; no pip/conda installs are
+needed. (If any ever are: `python -m pip install --no-cache-dir` and
+`CONDA_PKGS_DIRS=/groups/adowling/ylu28/conda_pkgs`.) `qacct` does not work
+on CRC; per-task wall times come from the runner's own per-round `t_round`
+records and `logs/stoprule37.o*` timestamps.
 
 ## 1. Separate checkout (never the shared /groups/adowling/ylu28/RTS-GMLC clone)
 

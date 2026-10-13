@@ -52,3 +52,7 @@
   τ-floor statement; Amendment 1. Tests 77 pass.
 - 35's qnehvi.py committed on origin/d6 @ 9f18d5d, byte-identical to 37's
   copy (sha256 d30ed5f8…).
+- 10-12 evening (strategy relay): CRC home quota full; BOGP_CRC_botorch at
+  /groups/adowling/ylu28/conda_envs (activates by name); freeze at
+  /groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt; no qacct. CRC_SUBMIT.md
+  gate updated; 37's CRC steps write nothing to ~. Prompt 36 waves A+B+C submitted.
