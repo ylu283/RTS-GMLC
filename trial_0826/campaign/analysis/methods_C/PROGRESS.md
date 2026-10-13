@@ -91,14 +91,16 @@ HERE and in the session's final message only.
   marker removed (committed), array + collector resubmitted once (`relaunch=1`).
   Local dry run: 7 RELAUNCH, P2/P3 WAIT_BASE.
 - 37 unaffected (BOGP_CRC / BOGP_CRC_botorch only, no PCM0826).
-- [x] **Provenance (Kay, bastion, 10-12)** — PCM0826 = Python 3.12.13,
+- [x] **Provenance (Kay, bastion, 10-12; also relayed by the strategy session)** — PCM0826 = Python 3.12.13,
   `site.ENABLE_USER_SITE = True`, user site `/users/ylu28/.local/lib/python3.12/site-packages`.
   - `PYTHONNOUSERSITE=1 python -c "import networkx"` → ModuleNotFoundError (launch-1 failure reproduced).
   - Without it: `networkx 3.6.1` from `/users/ylu28/.local/lib/python3.12/site-packages/networkx/__init__.py`.
   - `prescient.__file__` = None: prescient resolves as a namespace package; a `prescient/` dir exists in ~/.local.
-  - `~/.local/lib/python3.12/site-packages` (top-level): coramin 0.1.1, gtep 0.1.dev0 (editable),
+  - `~/.local/lib/python3.12/site-packages` (top-level, from Kay's `ls … | head -50` paste to the executor): coramin 0.1.1, gtep 0.1.dev0 (editable),
     flexcache 0.3, flexparser 0.4, iniconfig 2.3.0, networkx 3.6.1, pint 0.25.3, pluggy 1.6.0,
     prescient/, seaborn 0.13.2.
+  - **Entry-path import** (trial_0826/multi_pem, flag unset): `python -c "from utils import
+    parameter_sweep_runner"` → IMPORT OK (the exact import chain launch 1 died in).
   - The ~/.local user site is part of the effective frozen Stage-2 software stack (every
     Stage-2 array script ran without PYTHONNOUSERSITE).
   - **Caveat (first attempt void):** the first provenance attempt ran in a shell where the
