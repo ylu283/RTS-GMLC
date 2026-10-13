@@ -35,8 +35,50 @@
   nuclear on 72/72 h; no shed. Amended gate on v1 smoke_3d → FAIL (cost).
   `waves/smoke_v2/SMOKE_PASS` written.
 - [ ] CRC cost-fix tests output (Kay) — not yet seen.
-- [ ] Kay: `bash waves/submit_v2/submit_this.sh` (31 tasks, 124 slots).
-- [ ] T3 read-outs `analysis/cost_fix/ERCOT_COST_FIX.md`; wave D after B.
+- [x] A + B + C submitted (Kay). A + B landed (e3082fa, 2ba803b; 3 + 19/19).
+- [x] Wave-D top-k rule committed unchanged (4fb3b1f), after B landed at
+  02:30 on 10-13 and before any per-site screening_v2 value was read.
+- [x] T3 base read (df61ab4): `analysis/cost_fix/ERCOT_COST_FIX.md`.
+  - RT LMP mean 14.5 → 33.8; fixed cost 6.75 B → 3.63 B; variable cost
+    1.19 B → 4.46 B; true curtailment 9.44 M → 5.92 M MWh.
+  - Nuclear: both units on 8,760 h with 0 starts.
+  - Solver: 0 % of RUCs capped at the time limit; all 1,460 OPTIMAL.
+  - The 4 base runs are byte-identical, so the A ruler is 0 and the rule
+    falls back to the top 6 by rank: sites 163, 140, 146, 270, 110, 274.
+    Smallest chosen gen_pmax 185.4 MW.
+  - Screening row 10 (`__ALL__`) is an outlier and not a single-site row.
+- [ ] Wave D sizes: Kay to confirm 3 absolute MW levels (≤ 185.4) before
+  the build. The wave-D nuclear row needs the T0 fix below.
+- [x] **Wave C T0 fix (10-13).** selection_t1_v2 tasks 6/7 FAILED (02b147d;
+  CRC log o1533432.6) with "Generator 1 has less output at T0 than is
+  feasible to ramp up to"; PowerGeneratedT0[1] = 7.29 p.u. = 729 MW.
+  - Cause: with no initial_status.csv the parser sets a committed unit's T0
+    to the ORIGINAL p_min (729 MW). The thermal patch raised p_min but did
+    not touch T0.
+  - Fix: `multi_pem/parameters.py` lifts `initial_p_output` to the new p_min
+    when `initial_status > 0`. Prescient sets T0 (egret_plugin.py:401-403)
+    before `before_ruc_solve` runs the patch.
+  - Ramp numbers: gen.csv reads 121.5 MW/min, and the parser emits
+    `ramp_up_60min` = 7,290 MW/h. The patch then overwrites it with the PEM
+    capacity ω × 2,430 (121.5 / 698.6 / 1,275.75 / 1,852.9 / 2,430 MW/h),
+    and that is the value egret's validator uses.
+  - Egret requires T0 ≥ p_min − ramp. From T0 = 729 the ramp needed is
+    1,579.5 at ω 0.05, 1,002.4 at 0.2875 and 425.25 at 0.525. The bracket
+    "425–1002 MW/h" is only what the pass/fail pattern implies.
+  - At ω 0.05 the patched ramp (121.5 MW/h) equals the gen.csv number
+    121.5 MW/min only by coincidence (0.05 × 2,430).
+  - Test: `multi_pem/tests/test_t0_build.py` builds the egret UC model
+    (fork replica, no solve) at every ω.
+    - Without the fix: ω 0.05 and 0.2875 reproduce the CRC error, and
+      0.525 builds but fails the T0 ≥ p_min assertion.
+    - With the fix: 6/6 pass. Locally campaign + multi_pem + ercot give
+      89 passed / 2 skipped.
+  - Rerun of ALL nuclear rows 6–11: `waves/selection_t1_v2/rerun_nuc_this.sh`
+    (6 tasks, 24 slots). It moves the old runs to
+    `runs/quarantine_T0_729/` (never deleted). Rows 3–5 keep their first
+    runs. The collector then extracts all 9 rows and runs
+    compute_objectives --suffix _v2. Disclosed in CARRIED_OVER.md and T3.
+- [ ] Kay: `bash waves/selection_t1_v2/rerun_nuc_this.sh` on CRC.
 
 
 ## Prompt 33 — TL=360 probe (2026-10-09, T0 done + T1 built)

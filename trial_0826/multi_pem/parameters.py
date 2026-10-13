@@ -51,6 +51,18 @@ def _update_thermal_generator(gen, gen_PEM_data, n_time_keys):
     for _k in ("startup_capacity", "shutdown_capacity"):
         if _k in gen and gen[_k] < gen["p_min"]:
             gen[_k] = gen["p_min"]
+    # Same family for the T0 state: with no initial_status.csv the parser
+    # defaults a committed unit's initial_p_output to the ORIGINAL p_min
+    # (parser.py set_t0_data). Egret validates PowerGeneratedT0 >=
+    # p_min - ramp_up_60min at model build, and ramp_up_60min is now the PEM
+    # capacity — seen live on v2 ERCOT gen 1 (selection_t1_v2 tasks 6/7,
+    # 2026-10-13): T0 = 729 MW vs p_min 2308.5 (omega 0.05) / 1731.4
+    # (0.2875) died at the first RUC build; omega >= 0.525 passed but
+    # ramped up from 729 on day 1. A committed unit inside its new band is
+    # the only consistent T0, so lift it to the new p_min when it falls short.
+    if gen.get("initial_status", 0) > 0 and "initial_p_output" in gen \
+            and gen["initial_p_output"] < gen["p_min"]:
+        gen["initial_p_output"] = gen["p_min"]
     gen["fixed_commitment"] = {"data_type" : "time_series", "values" : [1]*n_time_keys}
 
 
