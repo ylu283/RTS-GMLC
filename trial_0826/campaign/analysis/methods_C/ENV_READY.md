@@ -36,29 +36,52 @@ Do not modify this env; only prompt 35 owns it.
 
 **Update 2026-10-12:** N1 runs again (replay gate PASS under the one-sided
 amendment), so `BOGP_CRC_botorch` is needed on CRC again. Every N1
-acquisition job activates it (`arms.json` → `env`). It must exist and pass
-`ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env` BEFORE
-N1's first acquisition (after N1 r1 lands).
+acquisition job activates it by name (`arms.json` → `env`). It must exist
+and pass `ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env`
+BEFORE N1's first acquisition (after N1 r1 lands).
 
+**Update 2026-10-12 evening (strategy session relay): the CRC home quota is
+full.**
+- `conda create --clone` into `~/.conda/envs` failed with NoSpaceLeftError.
+  Never write envs, caches, freezes, logs or data to `~` on CRC; use
+  `/groups/adowling/ylu28/...`. Every pip call uses
+  `python -m pip install --no-cache-dir`, and every conda call sets
+  `CONDA_PKGS_DIRS=/groups/adowling/ylu28/conda_pkgs`.
+- **The env lives at `/groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch`**
+  (`conda create -p … --clone BOGP_CRC`). That directory is registered in
+  `~/.condarc` (`conda config --append envs_dirs
+  /groups/adowling/ylu28/conda_envs`), so **`conda activate BOGP_CRC_botorch`
+  by name works** on bastion and on compute nodes. `acquire_arm_job.sh`
+  therefore needs no change. `BOGP_CRC` and `PCM_ERCOT` stay in
+  `~/.conda/envs`, unchanged.
+- **Freeze files:** `/groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt`
+  and `/groups/adowling/ylu28/BOGP_CRC_pip_freeze_now.txt` (not `~/…`).
+- `qacct` does not work on CRC (no accounting file on bastion). G3 uses job
+  logs and commit timestamps instead (PROGRESS.md).
 
 `BOGP_CRC` is py3.11, torch 2.14.1+cpu, gpytorch 1.15.2, linear_operator
-0.6.1. Clone it with the same pins and the same botorch version as local:
+0.6.1. Clone it with the same pins and the same botorch version as local.
+The strategy session is already running the build; this is the reference
+recipe:
 
 ```bash
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda create -y -n BOGP_CRC_botorch --clone BOGP_CRC
-conda activate BOGP_CRC_botorch
-export PYTHONNOUSERSITE=1
-pip install --no-deps botorch==0.16.1 pyro-ppl==1.9.1 pyro-api==0.1.2 opt-einsum==3.4.0 \
-    multipledispatch==1.0.0 pyre-extensions==0.0.32 typing-inspect==0.9.0 mypy-extensions==1.1.0 tqdm
+export CONDA_PKGS_DIRS=/groups/adowling/ylu28/conda_pkgs PYTHONNOUSERSITE=1
+conda create -y -p /groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch --clone BOGP_CRC
+conda activate BOGP_CRC_botorch          # by name, via envs_dirs in ~/.condarc
+python -m pip install --no-cache-dir --no-deps botorch==0.16.1 pyro-ppl==1.9.1 pyro-api==0.1.2 \
+    opt-einsum==3.4.0 multipledispatch==1.0.0 pyre-extensions==0.0.32 typing-inspect==0.9.0 \
+    mypy-extensions==1.1.0 tqdm
 python -c "import torch, gpytorch, linear_operator, botorch; \
 from botorch.acquisition.multi_objective import qNoisyExpectedHypervolumeImprovement; \
 print(torch.__version__, gpytorch.__version__, linear_operator.__version__, botorch.__version__)"
-pip freeze > ~/BOGP_CRC_botorch_pip_freeze.txt; conda activate BOGP_CRC; pip freeze > ~/BOGP_CRC_pip_freeze_now.txt
-diff ~/BOGP_CRC_pip_freeze_now.txt ~/BOGP_CRC_botorch_pip_freeze.txt
+python -m pip freeze > /groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt
+conda activate BOGP_CRC; python -m pip freeze > /groups/adowling/ylu28/BOGP_CRC_pip_freeze_now.txt
+diff /groups/adowling/ylu28/BOGP_CRC_pip_freeze_now.txt /groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt
+cd /groups/adowling/ylu28/RTS-GMLC/trial_0826/campaign && ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env
 ```
 
-Kay pastes the import line and the diff. The diff must show additions
-only, and `BOGP_CRC` must be unchanged against
-`analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt`. The CRC side is then
-recorded here.
+Kay pastes the import line, the diff and the `--check-env` line when the
+build ends. The diff must show additions only, and `BOGP_CRC` must be
+unchanged against `analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt`. The CRC
+side is then recorded here.

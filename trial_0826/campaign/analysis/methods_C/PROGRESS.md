@@ -15,8 +15,13 @@ HERE and in the session's final message only.
   rounding (≈ 1e-9 relative to site availability); all others ≤ 2.3e-13. Local pilot
   smoke also PASS.
 - [x] **G2 envs (local)** — `bogp-botorch` ready, no pin drift (ENV_READY.md, deb5f42).
-  [ ] CRC `BOGP_CRC_botorch` — Kay runs the ENV_READY.md block, pastes import line + diff.
-- [x] **G3 capacity — recorded (10-12).** `qacct` is unavailable on CRC → walls from the
+  [ ] CRC `BOGP_CRC_botorch` — being built by the strategy session at
+  `/groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch` (home quota full; activates by
+  name via envs_dirs). Freezes go to `/groups/adowling/ylu28/BOGP_CRC_*_pip_freeze*.txt`.
+  Kay pastes the import line, the diff and `ARM=N1 … --check-env` when the build ends.
+  Needed before N1's first acquisition. CRC rule: nothing written to `~`
+  (ENV_READY.md CRC section).
+- [x] **G3 capacity — recorded (10-12).** `qacct` is unavailable on CRC (no accounting file on bastion) → walls from the
   logs / bot-commit timestamps (upper bounds: include queue wait):
   - per run: random_C 48 tasks SUBMITTED→results **≤ 9.4 h** (10-11 11:00→20:22);
     bo_C_r1 16.1 h, bo_C_r2 21.6 h (prompt-30 rounds) → plan ≈ 10–22 h per round.
@@ -66,7 +71,9 @@ HERE and in the session's final message only.
   collectors** (S2, S3, Q1–Q3, P1 r3, N1 r1); P2/P3 WAIT_BASE.
 - Budget with N1: **224 runs ≈ 3.4k core-h** + ≈ 15 acquisition jobs (P1 r3–r4; P2/P3
   r0–r4; N1 r1–r4, ≈ 30–40 min each on CRC).
-- BLOCKING before the first submit: **G1 on CRC** (fail → STOP) and **G3** pastes.
+- ~~BLOCKING before the first submit: G1 on CRC and G3~~ — both done (d876321).
+- Prompt 36 waves A+B+C SUBMITTED (SMOKE_PASS 0a2acf2, strategy relay 10-12) → CRC order
+  allows the prompt-35 launch now.
   ~~`BOGP_CRC_botorch` is no longer needed~~ — **needed again** (N1 runs): Kay builds it from
   the ENV_READY.md block and passes `ARM=N1 ... acquire_arm_job.sh --check-env` before N1's
   first acquisition.
