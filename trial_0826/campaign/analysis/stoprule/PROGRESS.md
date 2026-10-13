@@ -56,3 +56,11 @@
   /groups/adowling/ylu28/conda_envs (activates by name); freeze at
   /groups/adowling/ylu28/BOGP_CRC_botorch_pip_freeze.txt; no qacct. CRC_SUBMIT.md
   gate updated; 37's CRC steps write nothing to ~. Prompt 36 waves A+B+C submitted.
+- Gate (Kay pasted 10-12): CRC bo-gp = 60e6328236e7…; BOGP_CRC_botorch freeze
+  vs frozen BOGP_CRC = additions only (botorch 0.16.1, multipledispatch,
+  mypy_extensions, opt_einsum, pyre-extensions, pyro-api, pyro-ppl, tqdm,
+  typing-inspect); botorch/gpytorch/linear_operator equal to local. Base
+  stack differs from the Mac (py3.11, torch 2.14.1, numpy 2.4.6, scipy 1.17.1,
+  pandas 3.0.6; inherited from BOGP_CRC) → added crc/fingerprint.py with the
+  Mac values (starts, 2-D starts, noise, candidate subset) as a CRN check
+  before submission. GATE PASSED pending the fingerprint match.

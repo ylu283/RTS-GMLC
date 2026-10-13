@@ -52,6 +52,22 @@ for k in p.PROBLEMS_6D: p.Problem(k)            # asserts sha256
 import sr_common; print('OK', sr_common.assert_bogp())"
 ```
 
+Cross-platform common-random-numbers check (replay M1/M4 ran on the Mac,
+everything else runs on CRC) — run in BOTH envs; every line must equal:
+
+```bash
+for E in BOGP_CRC BOGP_CRC_botorch; do conda activate $E
+  PYTHONNOUSERSITE=1 BOGP_PATH=/groups/adowling/ylu28/bo-gp python -W ignore crc/fingerprint.py; done
+```
+```
+starts6d 7ca9fcea04416464
+starts2d 96782936140132b0
+noise 522d9782efaafaa4
+cand e475be63d8797f2f
+truth 62fc731920dd3e3c
+```
+A mismatch → STOP and paste it (do not submit).
+
 ## 2. Submit (from analysis/stoprule of the separate checkout)
 
 ```bash
