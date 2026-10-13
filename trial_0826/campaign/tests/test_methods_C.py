@@ -120,8 +120,9 @@ def test_generic_templates(tmp_path):
     arr = open(tmp_path / "methods_array.sh").read()
     col = open(tmp_path / "methods_collect.sh").read()
     for t in (arr, col):
-        assert "#$ -tc" not in t and "#$ -r n" in t and "PYTHONNOUSERSITE=1" in t
+        assert "#$ -tc" not in t and "#$ -r n" in t
         assert ': "${WAVE:?' in t
+    assert "PYTHONNOUSERSITE=1" in col  # collector (pandas only) keeps it
     assert "-M " not in arr.split("set -euo")[1] and "FATAL" in arr and 'mkdir -p "$WAVE_DIR/runs"' in arr
     assert "flock 9" in col and "methods-bot" in col and "pairgrid-bot" not in col
     assert 'git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_${WAVE}.md"' in col
@@ -248,3 +249,78 @@ def test_not_run_marker_blocks_arm(fake_tree):
     lines, table = methods_state.run(fake_tree, execute=False, hold=True, out=lambda *_: None)
     assert {n: s for n, s, _ in table}["N1"] == "NOT_RUN"
     assert not any("N1" in l for l in lines)
+
+
+def _env_lines(text):
+    keys = ("conda activate", "module load", "PYTHONNOUSERSITE", "GUROBI_MODULE=", "profile.d/conda.sh")
+    return [l.strip() for l in text.splitlines()
+            if any(k in l for k in keys) and not l.lstrip().startswith("#")]
+
+
+def test_array_env_matches_frozen_stage2():
+    """Launch-1 lesson (10-12): the PRESCIENT array task must use the frozen
+    Stage-2 env convention exactly — PCM0826, gurobi module, and NO
+    PYTHONNOUSERSITE (networkx for egret lives in ~/.local)."""
+    arr = open(os.path.join(MC, "methods_array.sh")).read()
+    ref = open(os.path.join(make_batches.WAVES_ROOT, "random_C", "random_C_array.sh")).read()
+    assert _env_lines(arr) == _env_lines(ref)
+    code = lambda t: "\n".join(l for l in t.splitlines() if not l.lstrip().startswith("#"))
+    assert "PYTHONNOUSERSITE" not in code(make_batches.METHODS_ARRAY)
+    for w in ("bo_C_r2", "stage2_C_n0b"):
+        other = [f for f in os.listdir(os.path.join(make_batches.WAVES_ROOT, w)) if f.endswith("_array.sh")]
+        for f in other:
+            assert _env_lines(open(os.path.join(make_batches.WAVES_ROOT, w, f)).read()) == _env_lines(ref)
+
+
+# ---- launch-1 relaunch rule (FAILED + 0 completed runs -> resubmit ONCE) -----
+
+def _launch1_tree(root):
+    """All 7 T0 items submitted once, all FAILED at import (no run completed)."""
+    prog = os.path.join(root, "analysis", "methods_C", "PROGRESS.md")
+    items = ["methods_C_S2_n0", "methods_C_S3_n0", "methods_C_Q1", "methods_C_Q2", "methods_C_Q3",
+             "methods_C_P1_r3", "methods_C_N1_r1"]
+    lines = []
+    for i, w in enumerate(items):
+        n = 32 if w.endswith("_n0") else (16 if "_Q" in w else 8)
+        _wave(root, w, n, failed=True)
+        ob = os.path.join(root, "waves", w, "objectives.csv")
+        if os.path.exists(ob):
+            os.remove(ob)  # launch 1: no wave produced objectives
+        os.makedirs(os.path.join(root, "waves", w, "runs"), exist_ok=True)  # mkdir -p ran, nothing inside
+        lines.append(f"SUBMITTED wave={w} array={100 + 2 * i} collector={101 + 2 * i}")
+    open(prog, "w").write("\n".join(lines) + "\n")
+    return items
+
+
+def test_relaunch_failed_once(fake_tree, tmp_path, monkeypatch):
+    shutil.rmtree(os.path.join(fake_tree, "waves", "methods_C_S3_n0"))
+    items = _launch1_tree(fake_tree)
+    # without the flag: reported, nothing submitted
+    lines, table = methods_state.run(fake_tree, execute=False, out=lambda *_: None)
+    assert lines == [] and all("relaunchable" in s for n, s, _ in table if n in
+                               ("methods_C_S2_n0", "methods_C_Q1", "P1", "N1"))
+    # with the flag (fake qsub): 7 relaunches, markers removed, lines tagged
+    shim = tmp_path / "shim"; shim.mkdir()
+    (shim / "qsub").write_text(QSUB_SHIM); (shim / "qsub").chmod(0o755)
+    monkeypatch.setenv("PATH", f"{shim}:{os.environ['PATH']}")
+    monkeypatch.setenv("SHIM_LOG", str(tmp_path / "qsub.log"))
+    lines, table = methods_state.run(fake_tree, execute=True, out=lambda *_: None, relaunch_failed=True)
+    assert len(lines) == 7 and all(l.endswith("relaunch=1") for l in lines)
+    assert not any(os.path.exists(os.path.join(fake_tree, "waves", w, f"FAILED_{w}.md")) for w in items)
+    assert sum(1 for l in open(tmp_path / "qsub.log") if "methods_array.sh" in l) == 7
+    # idempotent: now SUBMITTED, nothing new
+    lines2, table2 = methods_state.run(fake_tree, execute=True, out=lambda *_: None, relaunch_failed=True)
+    assert lines2 == [] and {n: s for n, s, _ in table2}["P1"] == "SUBMITTED"
+    # fails again -> NOT relaunchable a second time
+    _wave(fake_tree, "methods_C_Q1", 16, failed=True)
+    lines3, table3 = methods_state.run(fake_tree, execute=False, out=lambda *_: None, relaunch_failed=True)
+    assert lines3 == [] and {n: s for n, s, _ in table3}["methods_C_Q1"] == "FAILED"
+
+
+def test_relaunch_refused_when_a_run_completed(fake_tree):
+    _launch1_tree(fake_tree)
+    d = os.path.join(fake_tree, "waves", "methods_C_Q2", "runs", "run_index_3")
+    os.makedirs(d); open(os.path.join(d, "overall_simulation_output.csv"), "w").write("x")
+    lines, table = methods_state.run(fake_tree, execute=False, out=lambda *_: None, relaunch_failed=True)
+    assert {n: s for n, s, _ in table}["methods_C_Q2"] == "FAILED"
+    assert not any("methods_C_Q2" in l for l in lines)

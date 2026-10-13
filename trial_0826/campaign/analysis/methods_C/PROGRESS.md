@@ -77,6 +77,25 @@ HERE and in the session's final message only.
   the ENV_READY.md block and passes `ARM=N1 ... acquire_arm_job.sh --check-env` before N1's
   first acquisition.
 
+## Launch 1 (10-12) — FAILED at import → fixed → relaunch pending
+
+- All 7 arrays (1533458–1533471) died at task start: `methods_array.sh` exported
+  PYTHONNOUSERSITE=1 and PCM0826's `networkx` (egret tx_calc ← prescient) lives in
+  ~/.local → ModuleNotFoundError (`methods_C_N1_r1_array.o1533471.1`). No run started; the
+  7 collectors pushed FAILED markers (4290ab7…deead56).
+- Fix: array env lines = random_C / stage2 / bo_C array scripts exactly (no
+  PYTHONNOUSERSITE; collectors + acquisition jobs keep it); test
+  `test_array_env_matches_frozen_stage2`. PCM0826 untouched. PREREG dated NOTE (not an
+  analysis amendment). This is the ONE allowed resubmission per item.
+- `submit_ready.sh --relaunch-failed`: FAILED + 0 completed runs + 1 prior submission →
+  marker removed (committed), array + collector resubmitted once (`relaunch=1`).
+  Local dry run: 7 RELAUNCH, P2/P3 WAIT_BASE.
+- 37 unaffected (BOGP_CRC / BOGP_CRC_botorch only, no PCM0826).
+- [ ] Provenance (Kay, bastion, BEFORE the relaunch):
+  `conda activate PCM0826; PYTHONNOUSERSITE=1 python -c "import networkx"` (expect FAIL);
+  `python -c "import networkx, sys; print(networkx.__version__, networkx.__file__)"` (expect a
+  ~/.local path); `ls ~/.local/lib/python3.12/site-packages | head -50`.
+
 ## Submission log
 SUBMITTED wave=methods_C_S2_n0 array=1533458 collector=1533459
 SUBMITTED wave=methods_C_S3_n0 array=1533461 collector=1533462

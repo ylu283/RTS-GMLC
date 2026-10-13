@@ -131,3 +131,25 @@ is appended; clarification 1 above is left as originally committed.
   checks the implementation. qNEHVI exceeded the q-ParEGO range by 0.0016
   at n = 24."
 - Nothing else in this file changes.
+
+## NOTE 2026-10-12 (execution, not an amendment of the analysis) — launch 1 failed at import
+
+**Launch 1 failed at import:** no run started and no output was produced.
+All 7 T0 items died at task start: S2, S3, Q1–Q3, P1 r3 and N1 r1 (arrays
+1533458–1533471).
+- **Cause:** the generic `methods_array.sh` set `PYTHONNOUSERSITE=1`.
+  PCM0826 resolves `networkx` (needed by egret's tx_calc, which Prescient
+  imports) from `~/.local`, so `multi_PEM_PCM.py` raised ModuleNotFoundError.
+  A smoke test of `import prescient, pyomo, egret` passes with the flag set,
+  because egret's top level does not import networkx.
+- **Fix:** the PRESCIENT array task now uses the **frozen Stage-2 env
+  convention** byte-for-byte. Its env lines equal `random_C_array.sh` and
+  the stage2 / bo_C array scripts that produced every frozen Stage-2 result:
+  PCM0826, gurobi module, no PYTHONNOUSERSITE. A test enforces this.
+  Collectors and acquisition jobs keep PYTHONNOUSERSITE=1. PCM0826 was not
+  modified.
+- **Resubmission:** each item is resubmitted once with the fixed script.
+  That uses the one resubmission allowed per item (§5 "resubmit once").
+  `submit_ready.sh --relaunch-failed` allows it only for FAILED items with
+  zero completed runs and exactly one prior submission.
+- Nothing in §5, §6 or the clarifications changes.

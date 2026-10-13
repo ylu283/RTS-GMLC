@@ -23,7 +23,12 @@ Hold mode (default): together with acquisition k, submit round k+1's array
 (held on the acquisition) and collector (held on that array); the array task
 reads its design at start and fails loudly if the acquisition wrote none.
 
-Usage: methods_state.py [--execute] [--no-hold] [--campaign DIR]
+Relaunch (prompt 35 §5, launch-1 lesson): a FAILED item whose wave has ZERO
+completed runs and exactly one SUBMITTED line is re-launchable once with
+--relaunch-failed (marker removed, array + collector resubmitted, line tagged
+relaunch=1). A second failure stays FAILED (manual).
+
+Usage: methods_state.py [--execute] [--no-hold] [--relaunch-failed] [--campaign DIR]
 Without --execute: DRY RUN (prints the qsub commands it would run).
 """
 
@@ -43,7 +48,8 @@ EMAIL = "ylu28@nd.edu"
 STANDALONE = ["methods_C_S2_n0", "methods_C_S3_n0", "methods_C_Q1", "methods_C_Q2", "methods_C_Q3"]
 BASE_OF = {"P2": "methods_C_S2_n0", "P3": "methods_C_S3_n0"}
 
-RE_WAVE = re.compile(r"^SUBMITTED wave=(\S+) array=(\d+) collector=(\d+)(?: held_on=(\d+))?\s*$")
+RE_WAVE = re.compile(r"^SUBMITTED wave=(\S+) array=(\d+) collector=(\d+)(?: held_on=(\d+))?(?: relaunch=(\d+))?\s*$")
+MAX_RELAUNCH = 1  # prompt 35 §5: a failed item is resubmitted ONCE
 RE_ACQ = re.compile(r"^SUBMITTED acq arm=(\S+) round=(\d+) acq=(\d+)\s*$")
 
 
@@ -52,7 +58,9 @@ def parse_progress(text):
     for line in text.splitlines():
         m = RE_WAVE.match(line.strip())
         if m:
-            waves[m.group(1)] = {"array": m.group(2), "collector": m.group(3), "held_on": m.group(4)}
+            prev = waves.get(m.group(1), {"n_submits": 0})
+            waves[m.group(1)] = {"array": m.group(2), "collector": m.group(3), "held_on": m.group(4),
+                                 "n_submits": prev["n_submits"] + 1}
         m = RE_ACQ.match(line.strip())
         if m:
             acqs[(m.group(1), int(m.group(2)))] = m.group(3)
@@ -78,6 +86,17 @@ def wave_status(waves_root, wave):
     if ob is not None and ob == n:
         return "LANDED", n
     return "PROPOSED", n
+
+
+def completed_runs(waves_root, wave):
+    return len(glob.glob(os.path.join(waves_root, wave, "runs", "run_index_*", "overall_simulation_output.csv")))
+
+
+def relaunchable(waves_root, wave, waves):
+    """A FAILED item is re-launchable exactly once, and only if NO run completed
+    (launch-1 class: the task died before Prescient started)."""
+    return (wave_status(waves_root, wave)[0] == "FAILED" and completed_runs(waves_root, wave) == 0
+            and waves.get(wave, {}).get("n_submits", 0) == MAX_RELAUNCH)
 
 
 def _graded_rounds(arm_dir):
@@ -158,7 +177,17 @@ class Submitter:
             raise RuntimeError(f"BAD JID from qsub: {out!r}")
         return jid
 
-    def wave(self, wave, n, hold=None):
+    def relaunch(self, wave, n):
+        """Remove the stale FAILED marker (staged + committed by submit_ready.sh)
+        and resubmit array + collector once."""
+        for f in glob.glob(os.path.join(self.waves, wave, "FAILED_*")):
+            print(f"  $ rm {f}")
+            if self.execute:
+                os.remove(f)
+        array, coll = self.wave(wave, n, tag=" relaunch=1")
+        return array, coll
+
+    def wave(self, wave, n, hold=None, tag=""):
         logs = os.path.join(self.waves, "methods_C_logs")  # gitignored; exists before any hold
         if self.execute:
             os.makedirs(logs, exist_ok=True)
@@ -170,7 +199,7 @@ class Submitter:
                           "-N", f"collect_{wave}"] + out + ["-M", EMAIL, "-m", "ea",
                           os.path.join(self.mc, "methods_collect.sh")])
         self.lines.append(f"SUBMITTED wave={wave} array={array} collector={coll}"
-                          + (f" held_on={hold}" if hold else ""))
+                          + (f" held_on={hold}" if hold else "") + tag)
         return array, coll
 
     def acq(self, arm, k):
@@ -184,7 +213,7 @@ class Submitter:
         return jid
 
 
-def run(campaign, execute=False, hold=True, out=print):
+def run(campaign, execute=False, hold=True, out=print, relaunch_failed=False):
     cfg = json.load(open(os.path.join(campaign, "analysis", "methods_C", "arms.json")))
     prog = os.path.join(campaign, "analysis", "methods_C", "PROGRESS.md")
     waves, acqs = parse_progress(open(prog).read() if os.path.isfile(prog) else "")
@@ -200,12 +229,26 @@ def run(campaign, execute=False, hold=True, out=print):
             st = "SUBMITTED (now)"
         elif st == "PROPOSED":
             st = "SUBMITTED"
+        elif st == "FAILED" and relaunchable(wroot, w, waves):
+            if relaunch_failed:
+                out(f"[{w}] FAILED, 0 runs completed -> RELAUNCH 1/{MAX_RELAUNCH}")
+                sub.relaunch(w, n)
+                st = "RELAUNCHED (now)"
+            else:
+                st = "FAILED (relaunchable: --relaunch-failed)"
         table.append((w, st, ""))
     for arm in cfg["arms"]:
         st, k, detail = arm_state(campaign, cfg, arm, waves, acqs)
         a = cfg["arms"][arm]
         rwave = lambda kk: a["round_waves"].get(str(kk)) or a["round_wave_pattern"].format(k=kk)
-        if st == "READY_ARRAY":
+        if st == "FAILED" and relaunchable(wroot, rwave(k), waves):
+            if relaunch_failed:
+                out(f"[{arm}] r{k} FAILED, 0 runs completed -> RELAUNCH {rwave(k)}")
+                sub.relaunch(rwave(k), cfg["q"])
+                st = "RELAUNCHED (now)"
+            else:
+                st = "FAILED (relaunchable: --relaunch-failed)"
+        elif st == "READY_ARRAY":
             out(f"[{arm}] r{k} READY_ARRAY -> submitting {rwave(k)}")
             sub.wave(rwave(k), cfg["q"])
             st = "SUBMITTED (now)"
@@ -231,8 +274,10 @@ def main(argv=None):
     ap.add_argument("--campaign", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--execute", action="store_true")
     ap.add_argument("--no-hold", action="store_true")
+    ap.add_argument("--relaunch-failed", action="store_true",
+                    help="resubmit (once) FAILED items with zero completed runs, removing their markers")
     a = ap.parse_args(argv)
-    lines, _ = run(a.campaign, execute=a.execute, hold=not a.no_hold)
+    lines, _ = run(a.campaign, execute=a.execute, hold=not a.no_hold, relaunch_failed=a.relaunch_failed)
     print(f"\n{len(lines)} SUBMITTED line(s)" + ("" if a.execute else " would be") + " appended")
     return 0
 

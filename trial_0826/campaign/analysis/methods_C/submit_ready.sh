@@ -4,6 +4,7 @@
 #   bash trial_0826/campaign/analysis/methods_C/submit_ready.sh            # submit READY items (hold mode)
 #   bash .../submit_ready.sh --dry-run                                    # print only
 #   bash .../submit_ready.sh --no-hold                                    # no held next rounds
+#   bash .../submit_ready.sh --relaunch-failed                            # resubmit ONCE FAILED items with 0 completed runs
 # Idempotent: re-run after any email; it submits only what is READY, keyed on
 # the SUBMITTED lines in PROGRESS.md + the pulled clone (never on qstat names).
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -26,20 +27,25 @@ conda activate BOGP_CRC
 export PYTHONNOUSERSITE=1
 
 ARGS=(--execute)
+RELAUNCH=0
 for a in "$@"; do
     case "$a" in
         --dry-run) ARGS=() ;;
         --no-hold) ARGS+=(--no-hold) ;;
+        --relaunch-failed) RELAUNCH=1 ;;
         *) echo "unknown option $a"; exit 1 ;;
     esac
 done
-python "$MC_DIR/methods_state.py" --campaign "$CAMPAIGN" "${ARGS[@]}"
+[[ "$RELAUNCH" == 1 ]] && ARGS+=(--relaunch-failed)
+python "$MC_DIR/methods_state.py" --campaign "$CAMPAIGN" ${ARGS[@]+"${ARGS[@]}"}
 
 [[ " ${ARGS[*]-} " == *" --execute "* ]] || exit 0
 flock 9
 if ! git -C "$REPO_DIR" diff --quiet -- "$PROGRESS"; then
     BOT=(-c user.name="methods-bot" -c user.email="methods-bot@noreply.github.com")
     git -C "$REPO_DIR" add -- "$PROGRESS"
+    # stage removed FAILED markers of relaunched items (tracked files only; -u never adds runs/logs)
+    git -C "$REPO_DIR" add -u -- "$CAMPAIGN"/waves/methods_C_*
     git -C "$REPO_DIR" "${BOT[@]}" commit -m "methods-bot: SUBMITTED ($(grep -c '^SUBMITTED' "$PROGRESS") lines total)"
     for attempt in 1 2 3 4 5; do
         git -C "$REPO_DIR" push origin d6 && break

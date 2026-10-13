@@ -1413,9 +1413,11 @@ if [[ ! -f "$WAVE_DIR/design_matrix.csv" ]]; then
 fi
 mkdir -p "$WAVE_DIR/runs"
 
+# Env lines are IDENTICAL to random_C / bo_C / stage2 array scripts (the frozen
+# Stage-2 stack): NO PYTHONNOUSERSITE here — PCM0826 resolves networkx (egret
+# tx_calc) from ~/.local. Launch 1 (10-12) set it and every task died at import.
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate PCM0826
-export PYTHONNOUSERSITE=1
 module load "$GUROBI_MODULE"
 
 eval "$(python "$TRIAL_DIR/campaign/get_row.py" "$SGE_TASK_ID" "$WAVE_DIR/design_matrix.csv")"
