@@ -1,6 +1,6 @@
 #!/bin/bash
 # Prompt 36 T1 test run — PCM_ERCOT on the CRC front-end (Kay pastes the output).
-#   cd ~/GitHub/RTS-GMLC-ercot && git pull && bash trial_0826/ercot/tests/run_cost_fix_tests.sh
+#   cd /groups/adowling/ylu28/RTS-GMLC-ercot && git pull && bash trial_0826/ercot/tests/run_cost_fix_tests.sh
 set -u
 export PYTHONNOUSERSITE=1 OMP_NUM_THREADS=4
 REPO=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
