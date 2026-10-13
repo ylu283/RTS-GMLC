@@ -32,7 +32,14 @@ Usage (all prompts): `PYTHONNOUSERSITE=1 OMP_NUM_THREADS=4
 /opt/anaconda3/envs/bogp-botorch/bin/python`, with `torch.set_num_threads(4)`.
 Do not modify this env; only prompt 35 owns it.
 
-## CRC (pending; Kay runs on bastion)
+## CRC (pending; Kay runs on bastion) — REQUIRED for N1
+
+**Update 2026-10-12:** N1 runs again (replay gate PASS under the one-sided
+amendment), so `BOGP_CRC_botorch` is needed on CRC again. Every N1
+acquisition job activates it (`arms.json` → `env`). It must exist and pass
+`ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env` BEFORE
+N1's first acquisition (after N1 r1 lands).
+
 
 `BOGP_CRC` is py3.11, torch 2.14.1+cpu, gpytorch 1.15.2, linear_operator
 0.6.1. Clone it with the same pins and the same botorch version as local:

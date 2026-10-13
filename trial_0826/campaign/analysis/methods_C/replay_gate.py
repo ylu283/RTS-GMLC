@@ -38,6 +38,13 @@ def smoke_range():
     return {16: (min(v16), max(v16)), 24: (min(v24), max(v24))}
 
 
+def amended_pass(g):
+    """AMENDMENT 2026-10-12 (Kay, after the result; PREREG.md): ONE-SIDED gate —
+    N1's median >= the q-ParEGO smoke MIN at both n = 16 and n = 24. The
+    two-sided `PASS` stored in replay_gate.json is kept as the original record."""
+    return all(g["median"][n] >= g["qparego_range"][n][0] for n in ("16", "24"))
+
+
 def run_seed(s, X, Y, ref, hv_all, floors):
     idx = list(np.random.default_rng(s).choice(81, N0, replace=False))
     curve = [hypervolume_exact(Y[idx], ref) / hv_all]

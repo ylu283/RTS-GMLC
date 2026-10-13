@@ -23,7 +23,12 @@ HERE and in the session's final message only.
 - [x] **Regression** — generalized code reproduces bo_C_r2's 8 designs exactly (same
   order, seed 20261008, weights) from a scratch root without bo_C_r2 (326 s).
 
-- [x] **N1 replay gate (§3.2) — FAILED (high side) → N1 NOT RUN.** Median HV recovery
+- [x] **N1 replay gate (§3.2) — PASS under AMENDMENT 10-12 (one-sided: median ≥ q-ParEGO
+  min at n = 16 and 24; Kay, made after the result, disclosed in PREREG.md).** Re-evaluated
+  on the existing replay_gate.json: 0.9166 ≥ 0.8444, 0.9534 ≥ 0.8698. `N1/GATE_PASS_N1.md`
+  replaces NOT_RUN_N1.md (quoted inside as history). **N1 runs again.**
+  Original record:
+- [x] ~~**N1 replay gate (§3.2) — FAILED (high side) → N1 NOT RUN.**~~ Median HV recovery
   n = 16: 0.9166 ∈ [0.8444, 0.9295]; n = 24: **0.9534 > max 0.9518** (by 0.0016).
   Applied as pre-registered (two-sided range); `N1/NOT_RUN_N1.md`, `replay_gate.json`.
   Re-admitting N1 needs a new pre-registration (strategy session / Kay).
@@ -44,11 +49,13 @@ HERE and in the session's final message only.
 
 - Built + pushed: S2, S3 (32 each), Q1–Q3 (16 each) — f82fddd, clean manifests.
 - P1 initialized + r3 proposed locally (seed 20261009) — d1c2c9a.
-- N1 NOT RUN (replay gate failed high) — 2596416.
+- ~~N1 NOT RUN (replay gate failed high) — 2596416.~~ Superseded: N1 gate PASS (amendment 10-12).
 - Dry run of submit_ready: 6 items READY = 120 array tasks + 6 collectors.
 - Budget without N1: 224 − 32 = **192 runs ≈ 2.9k core-h** + ≈ 12 acquisition
   jobs (P1 r3, r4; P2/P3 r0–r4).
 - BLOCKING before the first submit: **G1 on CRC** (fail → STOP) and **G3** pastes.
-  `BOGP_CRC_botorch` is no longer needed for this prompt (only N1 used it).
+  ~~`BOGP_CRC_botorch` is no longer needed~~ — **needed again** (N1 runs): Kay builds it from
+  the ENV_READY.md block and passes `ARM=N1 ... acquire_arm_job.sh --check-env` before N1's
+  first acquisition.
 
 ## Submission log

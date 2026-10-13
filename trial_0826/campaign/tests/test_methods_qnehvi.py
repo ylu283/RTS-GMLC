@@ -59,3 +59,12 @@ def test_replay_gate_record():
     lo, hi = g["qparego_range"]["16"]
     assert g["PASS"] == (lo <= g["median"]["16"] <= hi and
                          g["qparego_range"]["24"][0] <= g["median"]["24"] <= g["qparego_range"]["24"][1])
+
+
+@pytest.mark.skipif(not os.path.isfile(os.path.join(MC, "replay_gate.json")), reason="gate not run yet")
+def test_amended_one_sided_gate():
+    g = json.load(open(os.path.join(MC, "replay_gate.json")))
+    assert g["PASS"] is False          # original two-sided record kept
+    assert rg.amended_pass(g) is True  # AMENDMENT 2026-10-12: >= min at n = 16 and 24
+    assert os.path.isfile(os.path.join(MC, "N1", "GATE_PASS_N1.md"))
+    assert not os.path.exists(os.path.join(MC, "N1", "NOT_RUN_N1.md"))

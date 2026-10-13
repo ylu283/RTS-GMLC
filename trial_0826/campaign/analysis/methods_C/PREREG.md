@@ -107,3 +107,27 @@ found — never a change of rule).
 
 ---
 sha256(verbatim §5 + §6) = `ef3b46701e44d47f954895c07d971e6806c165caa5bf0c53e7a64aa9014ddccb`
+
+## AMENDMENT 2026-10-12 — N1 replay gate made ONE-SIDED (Kay; made AFTER the gate result)
+
+**Disclosure: this amendment was made after the gate result was known.** It
+is appended; clarification 1 above is left as originally committed.
+
+- Original gate (clarification 1, two-sided): N1's median inside the
+  q-ParEGO 10-seed min–max at both n = 16 and n = 24. Result
+  (`replay_gate.json`, sha256 `f841a700…d889441`): n = 16 median 0.9166 in
+  [0.8444, 0.9295]; n = 24 median **0.9534, above the max 0.9518** by
+  0.0016. That failed on the HIGH side, so N1 was "not run" (commit 2596416).
+- **Why it changed:** the gate only checks the implementation. A broken
+  qNEHVI implementation can only score LOW, so the upper bound tested
+  nothing the gate is for; prompt 35 v2 calls it a wording error. Which
+  acquisition does better is answered only by N1 vs P1 on real runs (§5
+  "Acquisition"), never by this gate.
+- **New gate (one-sided):** N1's median ≥ the q-ParEGO smoke MIN at both
+  n = 16 and n = 24. It is re-evaluated on the EXISTING `replay_gate.json`,
+  with no re-run: 0.9166 ≥ 0.8444 and 0.9534 ≥ 0.8698 → **PASS**.
+- **Paper text (prompt 35 §3.2):** "The pre-registered gate was two-sided;
+  after the result we made it one-sided (lower bound only), because it only
+  checks the implementation. qNEHVI exceeded the q-ParEGO range by 0.0016
+  at n = 24."
+- Nothing else in this file changes.
