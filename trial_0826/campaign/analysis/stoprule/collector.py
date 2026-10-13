@@ -1,6 +1,6 @@
 """Prompt 37 collector: results/<cell>/<method>/seed<s>.npz -> per-run
 trajectory summaries (summary/trajectories.json) and per-(run, rule) stop
-metrics (summary/stops.csv). Runs on CRC after the array (merges + commits
+metrics (summary/stops.csv.gz). Runs on CRC after the array (merges + commits
 the summaries, never the raw npz) and locally for the 2-D replay.
 
 Per run, at R_j (run's frozen box) and at R_union (problem box):
@@ -77,7 +77,8 @@ def stops_for(s: dict) -> list[dict]:
         b = s[box]
         traj = {"H_obs": b["H_obs"], "H_true": b["H_true"], "H_star": b["H_star"],
                 "tau": b["tau"], "q": s["q"], "ehvi": s.get("ehvi") if box == "frozen" else None}
-        for r in rules.apply_all(traj):
+        extra = rules.apply_q4(traj) if s["q"] == 4 else []
+        for r in rules.apply_all(traj) + extra:
             rows.append({"cell": s["cell"], "problem": s["problem"], "method": s["method"],
                          "seed": s["seed"], "noise": s["noise"], "q": s["q"], "box": box,
                          "density_at_stop": s["density"][r["stop"]], **r})
@@ -97,7 +98,7 @@ def collect(pattern: str = "*") -> tuple[list[dict], pd.DataFrame]:
     df = pd.DataFrame(rows)
     tag = "" if pattern == "*" else "_" + pattern.replace("*", "").replace(":", "_").strip("_")
     (SUMMARY / f"trajectories{tag}.json").write_text(json.dumps(summ, default=float) + "\n")
-    df.to_csv(SUMMARY / f"stops{tag}.csv", index=False)
+    df.to_csv(SUMMARY / f"stops{tag}.csv.gz", index=False)
     return summ, df
 
 

@@ -47,6 +47,11 @@ def assert_bogp() -> str:
     assert sha.startswith(BOGP_SHA), f"bo-gp SHA {sha} != {BOGP_SHA}"
     return sha
 
+
+# every entry point (runner, collector, problems, analysis, `python -c`) imports
+# this module, so the bogp path/SHA check runs at import (prompt 37 §1)
+BOGP_FULL_SHA = assert_bogp()
+
 # ---- Stage-2 constants (copied from acquire_next.py) ---------------------- #
 M_COLS = ["load_shed_mwh", "true_curtailment_mwh", "total_cost_less_synthetic_usd"]
 FLOORS = np.array([3000.0, 5000.0, 0.5e6])   # pi_0911 §3.5, M order

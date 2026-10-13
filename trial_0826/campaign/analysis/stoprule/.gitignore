@@ -5,3 +5,4 @@ problems/*.npz
 results/
 logs/
 __pycache__/
+quarantine_local6d_M4/

@@ -94,7 +94,7 @@ def future_gain(H_true: np.ndarray, r: int, horizon: int = HORIZON) -> float:
 
 
 def stop_metrics(s: int, fired: bool, K: int, H_true: np.ndarray, H_star: float,
-                 tau: float, q: int) -> dict:
+                 tau: float, q: int, w: int = 1) -> dict:
     R = len(H_true) - 1
     fg = future_gain(H_true, s)
     early = bool(s < K and s < R and fg > tau)
@@ -103,8 +103,12 @@ def stop_metrics(s: int, fired: bool, K: int, H_true: np.ndarray, H_star: float,
     # next HORIZON rounds is <= tau; continuing past it wastes s - r* rounds
     r_star = next(r for r in range(1, R + 1) if future_gain(H_true, r) <= tau)
     wasted = max(0, s - r_star)
+    # net of the rule's own detection delay: a w-round window needs w - 1
+    # rounds after r* before it can fire
+    wasted_net = max(0, wasted - (w - 1))
     return {"stop": s, "fired": fired, "early": early, "cap": cap,
-            "late": wasted > 0, "wasted": wasted, "r_star": r_star,
+            "late": wasted > 0, "wasted": wasted, "late_net": wasted_net > 0,
+            "wasted_net": wasted_net, "r_star": r_star,
             "future_gain_tau": fg / tau,
             "regret_star": (H_star - H_true[s]) / H_star,
             "regret_budget_tau": (H_true[R] - H_true[s]) / tau,
@@ -134,7 +138,7 @@ def apply_all(traj: dict) -> list[dict]:
     def add(rule, params, K, sf):
         s, fired = sf
         rows.append({"rule": rule, **params, "K": K,
-                     **stop_metrics(s, fired, K, Ht, Hs, tau, q)})
+                     **stop_metrics(s, fired, K, Ht, Hs, tau, q, int(params.get("w", 1)))})
 
     for K in CAPS:
         for w in WINDOWS:
@@ -167,8 +171,8 @@ def apply_q4(traj: dict) -> list[dict]:
     out = []
     for name, t, w in (("unscaled", tau, 2), ("scaled_q/8", tau * q / 8, 2), ("window16", tau, 16 // q)):
         s, f = s0(gains, t, w, K)
-        out.append({"rule": "S0-q4", "variant": name, "K": K,
-                    **stop_metrics(s, f, K, Ht, Hs, tau, q)})
+        out.append({"rule": "S0-q4", "variant": name, "w": w, "K": K,
+                    **stop_metrics(s, f, K, Ht, Hs, tau, q, w)})
     return out
 
 

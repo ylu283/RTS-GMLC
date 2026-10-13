@@ -241,3 +241,18 @@ def test_m3_replay_round(tmp_path):
     rec = json.loads(str(z["rec"]))
     assert len(z["idx"]) == 9 and len(set(z["idx"].tolist())) == 9
     assert all(np.isnan(r["ehvi256"]) for r in rec["per_round"])   # 2-D: no S-model
+
+
+def test_wasted_net_of_window():
+    Ht = np.array([0.0, 10, 10, 10, 10, 10, 10, 10, 10])
+    m = rules.stop_metrics(2, True, 4, Ht, 20.0, tau=1.0, q=8, w=2)
+    assert m["wasted"] == 1 and m["wasted_net"] == 0 and m["late"] and not m["late_net"]
+    m = rules.stop_metrics(4, False, 4, Ht, 20.0, tau=1.0, q=8, w=2)
+    assert m["wasted"] == 3 and m["wasted_net"] == 2
+
+
+def test_q4_variants():
+    Ho = np.linspace(100, 110, 17)
+    rows = rules.apply_q4({"H_obs": Ho, "H_true": Ho, "H_star": 120.0, "tau": 1.0, "q": 4})
+    assert [r["variant"] for r in rows] == ["unscaled", "scaled_q/8", "window16"]
+    assert all(r["K"] == 8 for r in rows)

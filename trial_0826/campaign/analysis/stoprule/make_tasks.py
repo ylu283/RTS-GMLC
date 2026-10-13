@@ -8,7 +8,8 @@ CRC (one task = one trajectory; SGE_TASK_ID = row `task`, 1-based):
                           x {M1, M3} x noise 1   x q 8 x seeds 0-19   200
   D batch     E-path-1..5 x {M1, M3} x noise 1   x q 4 x seeds 0-1     20
   E replay M3 17 2-D grids x M3                        x seeds 0-19   340
-Local: 2-D grids x {M1, M4} x seeds 0-19; every 6-D CRC cell x M4.
+  + M4 in every 6-D cell (A-D)                                      400
+Local: 2-D grids x {M1, M4} x seeds 0-19 only (no 6-D method runs locally).
 """
 import csv
 import sys
@@ -37,11 +38,10 @@ def main():
     crc, local = [], []
     for block, p, n, q, seeds in cells_6d():
         for s in seeds:
-            for m in ("M1", "M3"):
+            # 6-D work is CRC-only (Kay 10-12): M4 included in the array
+            for m in ("M1", "M3", "M4"):
                 crc.append({"block": block, "problem": p, "method": m, "seed": s, "noise": n,
                             "q": q, "cand_rule": "subset"})
-            local.append({"block": block, "problem": p, "method": "M4", "seed": s, "noise": n,
-                          "q": q, "cand_rule": "subset"})
     for p in problem_names_2d():
         for s in range(20):
             crc.append({"block": "E", "problem": p, "method": "M3", "seed": s, "noise": 1.0,
@@ -49,9 +49,9 @@ def main():
             for m in ("M1", "M4"):
                 local.append({"block": "R", "problem": p, "method": m, "seed": s, "noise": 1.0,
                               "q": 2, "cand_rule": "full"})
-    # fallback if BOGP_CRC_botorch never appears (PREREG §3): M1 rows only
-    m1 = [r for r in crc if r["method"] == "M1"]
-    for name, rows in (("tasks.csv", crc), ("local_tasks.csv", local), ("tasks_M1.csv", m1)):
+    # fallback if BOGP_CRC_botorch never appears (PREREG §3): M1 + M4 rows
+    m1 = [r for r in crc if r["method"] in ("M1", "M4")]
+    for name, rows in (("tasks.csv", crc), ("local_tasks.csv", local), ("tasks_noM3.csv", m1)):
         with open(HERE / name, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=["task", *rows[0].keys()])
             w.writeheader()

@@ -9,7 +9,7 @@ Code: `sr_common.py` (copies of the frozen Stage-2 pieces), `problems.py`
 (builders), `runner.py` (trajectories), `rules.py` (rules + metrics),
 `collector.py`, `make_tasks.py` → `tasks.csv` (CRC) / `local_tasks.csv`,
 `crc/` (array + collector), `m3_qnehvi.py` (M3). Tests:
-`tests/test_stoprule.py` (75 pass in `bogp` and in `bogp-botorch`).
+`tests/test_stoprule.py` (77 pass in `bogp-botorch`; M3 test skips in `bogp`).
 
 ## 1. Frozen inputs
 
@@ -235,3 +235,44 @@ front density at the 48 Stage-2 designs under each problem's truth +
 noise vs the real 26/48. Caveat: the emulator is smoothest where the data
 are densest; the corners where the real GPs failed are where it is least
 reliable.
+
+---
+
+## Amendment 1 (2026-10-12, after PREREG commit `1e2a549`; per Kay's 10-12 instructions)
+
+Made BEFORE any 6-D trajectory was looked at. It supersedes the text above
+where they differ.
+
+1. **Pre-PREREG smoke (disclosure).** Before `1e2a549`, one timing smoke
+   was run locally: R-C, seed 0, M3 then M1, all 15 rounds each (outputs
+   seen: per-round wall times only; the trajectories were not analysed).
+   Its scratch outputs are deleted. **R-C seed 0 is labelled "smoke"**:
+   every replay table is reported with R-C seed 0 included AND excluded.
+   It never enters a 6-D cell or the rule's operating characteristic.
+2. **Post-PREREG local runs already executed** (between `1e2a549` and this
+   amendment): block R (680 replay runs, M1 + M4, as pre-registered) —
+   its M1-vs-M4 table was seen; nothing here changes how it is analysed
+   except item 1. Also 400 local 6-D **M4** runs (PREREG §3 listed M4 as
+   "Mac"): per Kay, 6-D work is CRC-only, so these are **quarantined and
+   unused** (`quarantine_local6d_M4/`, gitignored, never summarized) and
+   6-D M4 moves into the CRC array.
+3. **tasks.csv = 1,540 CRC tasks**: A 750, B 120, C 300, D 30 (M1 + M3 +
+   M4 per seed) + E 340 (replay M3). Fallback without `BOGP_CRC_botorch`:
+   `tasks_noM3.csv` (800 rows, M1 + M4). `local_tasks.csv` = 680 replay rows
+   only. No 6-D method runs locally.
+4. **bogp assertion at import:** `sr_common` runs `assert_bogp()` when
+   imported, so every entry point (runner, collector, problems, analysis,
+   `python -c`) checks path, SHA `60e6328` and `PYTHONNOUSERSITE=1`.
+5. **6-D τ floor:** the MC that sets τ_j perturbs the starts by
+   N(0, noise_sd²) with noise_sd = m·ρ_i·span_i — the problem's actual noise
+   sd — so τ_j scales with the noise multiplier m (the rule knows its floor,
+   as live). 2-D replays: noise-free; τ uses the replay floors.
+6. **Late stops, net of the window:** reported alongside the literal late
+   rate and wasted rounds: wasted_net = max(0, wasted − (w − 1)) (w = the
+   rule's window; 1 for S-rel, S-OCD, S-fix, Oracle), late_net = wasted_net > 0.
+7. **q = 4 (block D):** `rules.apply_q4` (τ unscaled, τ·q/8, 16-evaluation
+   window, cap 32 evaluations) is now wired into the collector for q = 4 runs.
+8. Unchanged: primary cell = E-path-1…5 × M1 × S0 (1·τ_j, w = 2, K = 4),
+   **50 seeds per path**; acceptance as §6; M3 source sha256 `d30ed5f8…`
+   (prompt 35's `qnehvi.py`, since committed on origin/d6 @ 9f18d5d,
+   byte-identical).
