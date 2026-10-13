@@ -28,9 +28,14 @@
   DLR system-mean LMP 4.95 / 5.68 / 5.53 (bus range −68…+79), cost $17.4M /
   $28.0M / $26.0M; static ratings: day 2 infeasible (no shed slack).
   `analysis/cost_fix/smoke_gate.py` dry-run on v1 smoke_3d → FAIL (expected).
-- [ ] Kay: CRC tests → `bash waves/smoke_v2/submit_this.sh` → pull →
-  `python analysis/cost_fix/smoke_gate.py --write_pass` → commit SMOKE_PASS →
-  `bash waves/submit_v2/submit_this.sh` (31 tasks, 124 slots).
+- [x] smoke_v2 landed (1a1c628). Gate amended 10-12 (cost ±15 % vs authors
+  DLR + RUC OPTIMAL/≤1 % + RT mean LMP $10–60 + zero shed; LMP side-by-side
+  report-only) → **PASS** (`analysis/cost_fix/SMOKE_REPORT.md`): cost +6.0 /
+  +5.6 / +3.8 %; RT mean LMP 30.0 / 40.1 / 36.9; RUC OPTIMAL, gap ≤ 1 %, ~9 s;
+  nuclear on 72/72 h; no shed. Amended gate on v1 smoke_3d → FAIL (cost).
+  `waves/smoke_v2/SMOKE_PASS` written.
+- [ ] CRC cost-fix tests output (Kay) — not yet seen.
+- [ ] Kay: `bash waves/submit_v2/submit_this.sh` (31 tasks, 124 slots).
 - [ ] T3 read-outs `analysis/cost_fix/ERCOT_COST_FIX.md`; wave D after B.
 
 
