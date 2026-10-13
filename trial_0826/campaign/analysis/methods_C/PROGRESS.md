@@ -77,3 +77,10 @@ HERE and in the session's final message only.
   first acquisition.
 
 ## Submission log
+SUBMITTED wave=methods_C_S2_n0 array=1533458 collector=1533459
+SUBMITTED wave=methods_C_S3_n0 array=1533461 collector=1533462
+SUBMITTED wave=methods_C_Q1 array=1533463 collector=1533464
+SUBMITTED wave=methods_C_Q2 array=1533465 collector=1533466
+SUBMITTED wave=methods_C_Q3 array=1533467 collector=1533468
+SUBMITTED wave=methods_C_P1_r3 array=1533469 collector=1533470
+SUBMITTED wave=methods_C_N1_r1 array=1533471 collector=1533472
