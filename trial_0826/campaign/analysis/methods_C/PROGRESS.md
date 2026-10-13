@@ -6,16 +6,26 @@ HERE and in the session's final message only.
 
 ## T0 gates
 
-- [ ] **G1 curtailment closure** — `g1_closure.py` written; local smoke PASS on
-  `waves/pilot` run 1 (10 renewable PEM sites × 8,784 h, closure / split max
-  error ≤ 1.4e-14 MW, non-retrofit renewables unchanged, PEM curtailment
-  excluded, objectives.csv match 0.0). Stage-2 runs are CRC-only → **Kay runs
-  on CRC** (random_C low-MW #42 827 MW, high-MW #39 2,590 MW, wind-heavy #2
-  share 0.70):
-  `python analysis/methods_C/g1_closure.py --base ../base_case_pcm_test --wave waves/random_C --index 42 --index 39 --index 2`
+- [x] **G1 curtailment closure — PASS on CRC (Kay, 10-12)** on random_C #42 (827 MW), #39
+  (2,590 MW), #2 (wind share 0.70): all 10 PEM sites × 8,784 h close per site-hour
+  (available = dispatched + parent curtailment + PEM withheld vs base-case availability);
+  PEM / parent split exact; non-retrofit renewables unchanged (≤ 1.4e-14 MW); true
+  curtailment excludes `*_PEM` and equals objectives.csv (err 0 / 0 / 5.8e-11 MWh).
+  Max closure error 1.0e-6 MW on three run-#42 wind sites = Prescient's 6-decimal CSV
+  rounding (≈ 1e-9 relative to site availability); all others ≤ 2.3e-13. Local pilot
+  smoke also PASS.
 - [x] **G2 envs (local)** — `bogp-botorch` ready, no pin drift (ENV_READY.md, deb5f42).
   [ ] CRC `BOGP_CRC_botorch` — Kay runs the ENV_READY.md block, pastes import line + diff.
-- [ ] **G3 capacity** — Kay pastes `qacct -j 1526985`, `qacct -j <acq_bo_C_r1>`, `qquota -u ylu28`.
+- [x] **G3 capacity — recorded (10-12).** `qacct` is unavailable on CRC → walls from the
+  logs / bot-commit timestamps (upper bounds: include queue wait):
+  - per run: random_C 48 tasks SUBMITTED→results **≤ 9.4 h** (10-11 11:00→20:22);
+    bo_C_r1 16.1 h, bo_C_r2 21.6 h (prompt-30 rounds) → plan ≈ 10–22 h per round.
+  - per acquisition: r1 grade + propose (q-ParEGO, full lattice) **29 min** results→push
+    (10-08 15:00:49→15:30:15); grade-only 29 s. qNEHVI rounds: ≈ 30–40 min (G4 × 2).
+  - capacity (`qstat -g c`, 10-12): `long` 15,515 / 25,752 slots free, CQLOAD 0.47 —
+    the 128-task + 7-collector launch is not capacity-bound.
+  - Optional exact per-task walls (non-blocking): `grep -h "Total simulation time"
+    waves/random_C/random_C_array.o1526985.* | awk '{print $4/3600}' | sort -n`.
 - [x] **G4 qNEHVI benchmark** — 16.0 min wall, 2.6 GB peak (n = 40, full lattice, q = 8,
   4 threads) → no candidate-subset rule (G4_BENCHMARK.md).
 - [x] **G5 PREREG.md** — §5 + §6 verbatim (sha256 ef3b4670…) + executor clarifications;
