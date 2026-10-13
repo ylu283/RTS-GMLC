@@ -67,6 +67,7 @@ recipe:
 ```bash
 source "$(conda info --base)/etc/profile.d/conda.sh"
 export CONDA_PKGS_DIRS=/groups/adowling/ylu28/conda_pkgs PYTHONNOUSERSITE=1
+# NOTE: this export persists in the shell — run `unset PYTHONNOUSERSITE` before any PCM0826 work
 conda create -y -p /groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch --clone BOGP_CRC
 conda activate BOGP_CRC_botorch          # by name, via envs_dirs in ~/.condarc
 python -m pip install --no-cache-dir --no-deps botorch==0.16.1 pyro-ppl==1.9.1 pyro-api==0.1.2 \

@@ -91,10 +91,20 @@ HERE and in the session's final message only.
   marker removed (committed), array + collector resubmitted once (`relaunch=1`).
   Local dry run: 7 RELAUNCH, P2/P3 WAIT_BASE.
 - 37 unaffected (BOGP_CRC / BOGP_CRC_botorch only, no PCM0826).
-- [ ] Provenance (Kay, bastion, BEFORE the relaunch):
-  `conda activate PCM0826; PYTHONNOUSERSITE=1 python -c "import networkx"` (expect FAIL);
-  `python -c "import networkx, sys; print(networkx.__version__, networkx.__file__)"` (expect a
-  ~/.local path); `ls ~/.local/lib/python3.12/site-packages | head -50`.
+- [x] **Provenance (Kay, bastion, 10-12)** — PCM0826 = Python 3.12.13,
+  `site.ENABLE_USER_SITE = True`, user site `/users/ylu28/.local/lib/python3.12/site-packages`.
+  - `PYTHONNOUSERSITE=1 python -c "import networkx"` → ModuleNotFoundError (launch-1 failure reproduced).
+  - Without it: `networkx 3.6.1` from `/users/ylu28/.local/lib/python3.12/site-packages/networkx/__init__.py`.
+  - `prescient.__file__` = None: prescient resolves as a namespace package; a `prescient/` dir exists in ~/.local.
+  - `~/.local/lib/python3.12/site-packages` (top-level): coramin 0.1.1, gtep 0.1.dev0 (editable),
+    flexcache 0.3, flexparser 0.4, iniconfig 2.3.0, networkx 3.6.1, pint 0.25.3, pluggy 1.6.0,
+    prescient/, seaborn 0.13.2.
+  - The ~/.local user site is part of the effective frozen Stage-2 software stack (every
+    Stage-2 array script ran without PYTHONNOUSERSITE).
+  - **Caveat (first attempt void):** the first provenance attempt ran in a shell where the
+    ENV_READY build recipe had exported PYTHONNOUSERSITE=1 (`echo` → `[1]`), so both imports
+    failed. Interactive shells that ran that recipe must `unset PYTHONNOUSERSITE`. SGE jobs
+    are unaffected: submit_ready.sh / qsub do not pass `-V`.
 
 ## Submission log
 SUBMITTED wave=methods_C_S2_n0 array=1533458 collector=1533459
