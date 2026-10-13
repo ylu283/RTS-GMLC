@@ -15,12 +15,10 @@ HERE and in the session's final message only.
   rounding (≈ 1e-9 relative to site availability); all others ≤ 2.3e-13. Local pilot
   smoke also PASS.
 - [x] **G2 envs (local)** — `bogp-botorch` ready, no pin drift (ENV_READY.md, deb5f42).
-  [ ] CRC `BOGP_CRC_botorch` — being built by the strategy session at
-  `/groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch` (home quota full; activates by
-  name via envs_dirs). Freezes go to `/groups/adowling/ylu28/BOGP_CRC_*_pip_freeze*.txt`.
-  Kay pastes the import line, the diff and `ARM=N1 … --check-env` when the build ends.
-  Needed before N1's first acquisition. CRC rule: nothing written to `~`
-  (ENV_READY.md CRC section).
+  [x] CRC `BOGP_CRC_botorch` BUILT (10-12 evening) at /groups/…/conda_envs: imports
+  2.14.1+cpu / 1.15.2 / 0.6.1 / botorch 0.16.1; freeze diff vs BOGP_CRC = additions only
+  (the same 9 packages as local). Open before N1 r1 lands: BOGP_CRC-vs-committed-freeze
+  diff (expect empty) and `ARM=N1 … --check-env` PASS (ENV_READY.md).
 - [x] **G3 capacity — recorded (10-12).** `qacct` is unavailable on CRC (no accounting file on bastion) → walls from the
   logs / bot-commit timestamps (upper bounds: include queue wait):
   - per run: random_C 48 tasks SUBMITTED→results **≤ 9.4 h** (10-11 11:00→20:22);

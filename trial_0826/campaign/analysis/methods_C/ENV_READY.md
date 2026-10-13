@@ -85,3 +85,24 @@ Kay pastes the import line, the diff and the `--check-env` line when the
 build ends. The diff must show additions only, and `BOGP_CRC` must be
 unchanged against `analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt`. The CRC
 side is then recorded here.
+
+## CRC result (Kay, 2026-10-12 evening)
+
+**`BOGP_CRC_botorch` is built** at `/groups/adowling/ylu28/conda_envs/BOGP_CRC_botorch`.
+
+- **Import line:** `2.14.1+cpu 1.15.2 0.6.1 0.16.1` (torch / gpytorch /
+  linear_operator / botorch). The pins match `BOGP_CRC`, and botorch matches
+  local.
+- **Freeze diff** (`BOGP_CRC_pip_freeze_now.txt` → `BOGP_CRC_botorch_pip_freeze.txt`,
+  both under `/groups/adowling/ylu28/`): **additions only**. These are botorch
+  0.16.1, multipledispatch 1.0.0, mypy_extensions 1.1.0, opt_einsum 3.4.0,
+  pyre-extensions 0.0.32, pyro-api 0.1.2, pyro-ppl 1.9.1, tqdm 4.70.1 and
+  typing-inspect 0.9.0, the same set as the local env. No version changed.
+- The `torch.jit.script` FutureWarning on import is harmless; local shows it
+  too.
+- **Still open (non-blocking until N1 r1 lands):**
+  1. `BOGP_CRC` unchanged vs the committed prompt-30 freeze:
+     `diff analysis/bo_stage2/env/BOGP_CRC_pip_freeze.txt /groups/adowling/ylu28/BOGP_CRC_pip_freeze_now.txt`
+     (expect empty).
+  2. `ARM=N1 bash analysis/methods_C/acquire_arm_job.sh --check-env` → expect
+     `CHECK-ENV PASS (N1)`.
