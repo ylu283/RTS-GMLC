@@ -123,3 +123,11 @@ SUBMITTED wave=methods_C_Q2 array=1533557 collector=1533558 relaunch=1
 SUBMITTED wave=methods_C_Q3 array=1533559 collector=1533560 relaunch=1
 SUBMITTED wave=methods_C_P1_r3 array=1533561 collector=1533562 relaunch=1
 SUBMITTED wave=methods_C_N1_r1 array=1533563 collector=1533564 relaunch=1
+SUBMITTED acq arm=P1 round=3 acq=1543622
+SUBMITTED wave=methods_C_P1_r4 array=1543623 collector=1543624 held_on=1543622
+SUBMITTED acq arm=P2 round=0 acq=1543625
+SUBMITTED wave=methods_C_P2_r1 array=1543626 collector=1543627 held_on=1543625
+SUBMITTED acq arm=P3 round=0 acq=1543628
+SUBMITTED wave=methods_C_P3_r1 array=1543629 collector=1543630 held_on=1543628
+SUBMITTED acq arm=N1 round=1 acq=1543631
+SUBMITTED wave=methods_C_N1_r2 array=1543632 collector=1543633 held_on=1543631
