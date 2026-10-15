@@ -1,0 +1,14 @@
+base shed hours: 150, total 41500.115 MWh
+shed by bus: {'Arne': 41500.115342}
+share of Arne shed hours where Shortfall > local Demand: 0.71 (max shed 1023.7 MW vs max Arne demand 144.5 MW) -> slack-bus accounting, not local
+RT LMP at Arne on shed hours: unique = [np.float64(500.0)]
+DA LMP on shed hours: median 20.42, share < 40 (=B): 0.86, share == 0: 0.25
+available headroom on shed hours: max 0.0, median 0.0 (MW)
+available headroom on NON-shed hours: median 1109.9 MW
+
+base hours whose shed has the same fractional part as 22.425956:
+      Date  Hour  LoadShedding  ReserveShortfall     Price      Demand
+2020-12-18     7    984.425956        576.776796 12.540825 3890.587956
+  2020-12-18 h7: 984.425956 - 22.425956 = 962.000000 MWh
+
+shed hours that also have reserve shortfall: 1.00 of shed hours
