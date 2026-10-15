@@ -187,3 +187,28 @@ Q1 is USABLE for the 48-arm. No stop condition.
 - E3: winner-vs-default at 32: dNLPD -0.41/-0.24/-0.48 (all improve),
   cov95 stays in band. tuning_helps = true. H-BO: tuning fixes the r3
   overconfidence (above).
+
+## 2026-10-15T08:30Z — acquisition replay (refit_r1.py, library import)
+
+- acquire_next.py imported as a library from this clone; CLI never
+  invoked; writes confined to analysis/initial_design/ (replay_r1.json).
+- Seed rule as derived (torch.manual_seed(0); proposal seed 20261007);
+  weight regeneration check: rng.dirichlet draws match batch weights
+  exactly.
+- Overlap vs frozen waves/bo_C_r1: 16-start 0/8; 32-start 8/8 (the
+  replay reproduces the deployed r1 batch exactly on local hardware);
+  48-start 0/8. Pairwise between arms: all 0/8.
+- Scalarized-posterior Spearman over the full 9^6 lattice (8 r1 weight
+  vectors, mean [min, max]): 16-32 0.942 [0.912, 0.987]; 16-48 0.907
+  [0.892, 0.932]; 32-48 0.947 [0.895, 0.991].
+
+## 2026-10-15T08:35Z — deliverables closed out
+
+- N0_EVIDENCE.md finalized (verdict, E0 table, criteria, tuning + H-BO
+  tables, replay, shed supplement, disclosure sentence, STE-100
+  paper paragraph, strategy-session summary block).
+- Figures (PNG + PDF, bold labels + bold tick values):
+  figs/n0_curve_holdout, figs/e0_loo_16_32_48, figs/z_hist_32.
+- Zero PCM runs; zero writes outside analysis/initial_design/;
+  frozen waves, ledgers and BASE_WAVES untouched (git status clean
+  outside this directory throughout).

@@ -9,8 +9,12 @@ calibration at 32 passes on all three objectives (winner cov95 44/44/47
 in [43, 48]) and shed is noise-limited at 32; tuning needed: no for
 start-set calibration, yes for the BO-augmented GP — the Part-H winner
 repairs the r3 overconfidence (curtailment cov95 5/8 → 8/8); acquisition-
-replay agreement: REPLAY_OVERLAP_SENTENCE; BO-outcome sensitivity to n0
-is prompt 37's scope.**
+replay agreement: the 32-start replay reproduces the real r1 batch 8/8,
+but 16- and 48-start GPs select disjoint batches (0/8 overlap on every
+pair) even though the scalarized posterior landscapes stay
+rank-correlated (Spearman 0.91–0.95) — batch choice is n0-sensitive,
+landscape ranking is not; BO-outcome sensitivity to n0 is prompt 37's
+scope.**
 
 Scope. This verdict covers GP prediction quality on the uniform random_C
 holdout. It does not measure BO outcome quality. Accuracy at 32 is good
@@ -140,7 +144,23 @@ proposal seed = acq_seed_base + round = 20261006 + 1 = 20261007
 (round_records r1 confirms). Record-only q-ParEGO r1 batches proposed
 from the 16-, 32- and 48-start GPs over the full 9^6 lattice.
 
-REPLAY_RESULTS_BLOCK
+Results (`replay_r1.json`):
+
+- Overlap with the frozen `waves/bo_C_r1` batch: 16-start 0/8;
+  **32-start 8/8** (the replay reproduces the deployed round-1 batch
+  exactly, on local hardware); 48-start 0/8.
+- Pairwise batch overlap between arms: 16–32 0/8, 16–48 0/8, 32–48 0/8.
+- Spearman of the scalarized posterior mean over all 531,441 lattice
+  points (augmented Tchebycheff, the 8 real r1 weight vectors;
+  mean [min, max]): 16–32 0.942 [0.912, 0.987]; 16–48 0.907
+  [0.892, 0.932]; 32–48 0.947 [0.895, 0.991].
+
+Read: the GPs agree on the global landscape ranking at every n0
+(ρ ≥ 0.89 on every weight), but the EI argmax is a knife-edge — a
+different start set moves every batch member. The decision-relevant
+message: n0 changes WHICH points BO probes next, even when it barely
+changes the fitted landscape. Only prompt 37's outcome study can say
+whether those different probes change the final front.
 
 ## Shed supplement (pre-registered; Gaussian GP is misspecified at the
 ## floor plateau)
@@ -175,9 +195,36 @@ hyperparameter study selects an RBF kernel with a log1p output
 transform by leave-one-out likelihood. The tuned model repairs the
 over-confidence that appears after BO points enter training: coverage
 on the round-3 audit points rises from 5/8 to 8/8. Rank quality is
-high at every size (holdout Spearman ≥ 0.94 at 32). REPLAY_PAPER_SENTENCE
-Warning: these results measure surrogate quality, not BO outcomes.
-Prompt 37 owns the BO-outcome question.
+high at every size (holdout Spearman ≥ 0.94 at 32). A replay of the
+first acquisition round shows the same split: the 32-point model
+reproduces the deployed batch exactly, but the 16-point and 48-point
+models each select a fully different batch (0/8 overlap), while the
+scalarized posterior landscapes stay rank-correlated (Spearman
+0.91–0.95). Warning: these results measure surrogate quality, not BO
+outcomes. Prompt 37 owns the BO-outcome question.
+
+## Summary block for the strategy session (living report + 1014-D1)
+
+- **E0 extended:** curt LOO 17.1 → 6.6 → 3.0 × floor, cost 7.1 → 4.3 →
+  2.3 (16/32/48); shed flat at 0.4–0.5. The PI's 16/32 columns
+  reproduced to 4e-7 first.
+- **Holdout (new, stricter):** same shape. E1 diminishing-returns FAILS
+  on curt (I(32→48) = 0.47) and cost (0.33); shed passes by the
+  noise-limited escape. E2 calibration at 32 PASSES on all three
+  (winner 44/44/47 in [43, 48]). Spearman ≥ 0.94 at 32.
+- **Tuning (Part H):** winners rbf+log1p (shed, curt), rbf (cost);
+  NLPD improves ~0.2–0.5 nats; the Gamma lengthscale prior is harmful.
+  H-BO cell: tuning REPAIRS the r3 overconfidence (curt 5/8 → 8/8,
+  rms_z 2.008 → 1.05); the default cell reproduced the r3 audit exactly.
+- **Replay:** 32-start reproduces the real r1 batch 8/8; 16/48 pick
+  disjoint batches (0/8 everywhere) with landscape Spearman 0.91–0.95.
+- **1014-D1 scoping (does the seed study keep n0 = 32?):** for GP
+  quality alone, 32 is defensible on ranking + calibration but leaves
+  ~2 × accuracy on the table on curt/cost vs 48. The seed study should
+  keep n0 = 32 for comparability with the live campaign, cite this
+  curve as the known accuracy cost, and consider the rbf+log1p
+  prediction-layer tuning for BO-augmented rounds (acquisition layer
+  untouched). Zero new compute was spent here.
 
 ## Files
 

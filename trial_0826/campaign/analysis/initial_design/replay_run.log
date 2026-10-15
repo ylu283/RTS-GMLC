@@ -1,0 +1,10 @@
+arm 16: overlap vs real bo_C_r1 = 0/8
+arm 32: overlap vs real bo_C_r1 = 8/8
+arm 48: overlap vs real bo_C_r1 = 0/8
+batch overlap 16 vs 32: 0/8
+batch overlap 16 vs 48: 0/8
+batch overlap 32 vs 48: 0/8
+spearman 16-32: mean 0.9421 range [0.9116, 0.9866]
+spearman 16-48: mean 0.9070 range [0.8922, 0.9318]
+spearman 32-48: mean 0.9473 range [0.8946, 0.9913]
+replay_r1.json written
