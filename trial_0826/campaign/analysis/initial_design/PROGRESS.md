@@ -138,3 +138,52 @@ Q1 is USABLE for the 48-arm. No stop condition.
 - WINNERS (pre-named, committed to fits.json at 2026-10-15T07:34:02+00:00,
   BEFORE any holdout call): shed = rbf+log1p; curt = rbf+log1p;
   cost_ls = rbf.
+
+## 2026-10-15T07:50Z — holdout pass (two-config rule honored)
+
+- NLPD unit test re-asserted at script start (pre-holdout, §4).
+- Touches: per objective exactly default + winner, once per arm 16/32/48,
+  plus the §3 ribbon supplement (10 random 16-subsets of the 32, seed
+  20261015, default config). Winner E2 read reuses the 32-arm scores.
+- Holdout RMSE/floor (default): shed 0.755 / 0.763 / 0.590;
+  curt 17.374 / 9.398 / 4.984; cost_ls 15.382 / 7.881 / 5.275.
+- Holdout RMSE/floor (winner): shed 0.764 / 0.822 / 0.579;
+  curt 17.070 / 7.317 / 4.309; cost_ls 10.046 / 4.993 / 3.139.
+- cov95/48 at 32: default 47/45/48, winner 44/44/47 (band [43, 48]).
+- Ribbon (holdout RMSE/floor, min-median-max over 10 subsets):
+  shed 0.88-1.16-1.42; curt 15.0-20.5-30.8; cost_ls 8.4-16.1-18.7.
+- Winner LOOCV-vs-holdout gap at 32 (winner's curse visible): curt 4.79
+  LOO -> 7.32 holdout x floor; shed 0.58 -> 0.82; cost_ls 7.21 -> 4.99
+  (cost winner generalizes better than its LOO).
+
+## 2026-10-15T07:53Z — H-BO cell
+
+- Default refit on 32+r1+r2 (n=48) scored on the 8 P1_r3 designs
+  REPRODUCES the recorded r3 audit exactly: shed 0.731/1.706/7-8,
+  curt 1.426/2.008/5-8, cost -0.751/0.829/8-8.
+- Winner refit on the same set: shed 0.133/0.280/8-8, curt
+  0.967/1.050/8-8, cost -0.946/1.059/8-8. The tuned configs REPAIR the
+  r3 overconfidence (curt cov95 5/8 -> 8/8, rms_z 2.008 -> 1.050).
+
+## 2026-10-15T07:55Z — Part N E0 (sklearn pi_1008 recipe)
+
+- 16/32 columns reproduce n0_gp_loo.csv and n0_32pt_gp_loo.csv; worst
+  relative deviation 3.9e-7 (assert < 1e-6). 48 column added.
+- RMSE/floor 16 -> 32 -> 48: shed 0.50 -> 0.40 -> 0.44;
+  curt 17.07 -> 6.62 -> 3.03; cost_ls 7.12 -> 4.28 -> 2.25.
+  (cost_raw 7.24 -> 2.88 -> 2.31; reserve R2 .83 -> .89 -> .95;
+  thermal_starts R2 .68 -> .92 -> .97.)
+- Per the §0.1 statement: 32 -> 48 cuts curtailment LOO error by more
+  than half again (6.62 -> 3.03) — 32 was NOT enough on that axis.
+
+## 2026-10-15T07:57Z — E1/E2/E3 (criteria.json)
+
+- E1 default: shed PASS (noise-limited escape); curt FAIL
+  (I(16->32)=0.459, I(32->48)=0.470 > 1/3 rule and > 0.25 cap); cost_ls
+  FAIL (0.488 / 0.331). Overall FAIL (1 of 3, cap violated). Winner
+  config agrees (curt 0.411, cost 0.371).
+- E2 at 32 (winner, pre-named): cov95 44/44/47, all in [43, 48] ->
+  joint PASS. Default alongside: 47/45/48, PASS.
+- E3: winner-vs-default at 32: dNLPD -0.41/-0.24/-0.48 (all improve),
+  cov95 stays in band. tuning_helps = true. H-BO: tuning fixes the r3
+  overconfidence (above).
