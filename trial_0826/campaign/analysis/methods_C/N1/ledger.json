@@ -34,6 +34,17 @@
       "n_outside_ref": 0,
       "decision": "start",
       "at": "2026-10-13T00:13:36+00:00"
+    },
+    {
+      "round": 1,
+      "n": 40,
+      "hv": 7.358886164124163e+17,
+      "gain": 7.526146478770803e+16,
+      "gain_tau": 1.430011637455927,
+      "would_stop": false,
+      "n_outside_ref": 1,
+      "decision": "graded (record_only)",
+      "at": "2026-10-15T03:07:04+00:00"
     }
   ]
 }
