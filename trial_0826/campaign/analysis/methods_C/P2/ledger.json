@@ -1,0 +1,39 @@
+{
+  "ref_point": [
+    25391.591245900003,
+    794883.8825109,
+    659561466.9032173
+  ],
+  "threshold": 7.47225068184712e+16,
+  "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
+  "arm": "P2",
+  "acq": "qparego",
+  "seed_id": 2,
+  "stop_rule": "record_only",
+  "hard_cap": 4,
+  "acq_seed_base": 20261006,
+  "m_cols": [
+    "load_shed_mwh",
+    "true_curtailment_mwh",
+    "total_cost_less_synthetic_usd"
+  ],
+  "floors": [
+    3000.0,
+    5000.0,
+    500000.0
+  ],
+  "mc_seed": 20261006,
+  "init_at": "2026-10-15T03:06:53+00:00",
+  "source": "R_frozen_k = nadir + 0.1 span of this arm's 32 starts; tau_k by the prompt-30 MC",
+  "entries": [
+    {
+      "round": 0,
+      "n": 32,
+      "hv": 1.5725890940373233e+18,
+      "gain": null,
+      "n_outside_ref": 0,
+      "decision": "start",
+      "at": "2026-10-15T03:06:53+00:00"
+    }
+  ]
+}
