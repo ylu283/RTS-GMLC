@@ -80,6 +80,26 @@ Zero PCM runs. All work is local analysis under `analysis/initial_design/`.
    alpha=1e-8. 16/32 columns must reproduce n0_gp_loo.csv and
    n0_32pt_gp_loo.csv before the 48 column is added.
 
+## 2026-10-15T07:38Z — §3 pre-flight asserts: ALL PASS
+
+`preflight.py` run in env bogp (scipy 1.15.3):
+
+- (i) qmc.Sobol(6, scramble=True, seed=20260821).random(48), affine-mapped
+  to [0.05, 1.0]: all 48 pre-snap draws BIT-IDENTICAL to the recorded
+  snap_map.json pre_snap rows of stage2_C_n0 (draws 1-16), stage2_C_n0b
+  (17-32), methods_C_Q1 (33-48). Every draw kept (zero snap collisions).
+- (ii) nearest-level snap of the regenerated draws equals each wave's
+  design_matrix.csv AND its recorded post_snap, all 48 rows.
+- (iii) skips read from manifests: n0 skip 0 (n_drawn_total 16), n0b skip
+  16 (32), Q1 skip 32 (48). Chain is contiguous; no literals used.
+- (iv) 48-point train set vs random_C holdout, keyed by lattice indices:
+  48 unique keys each side, ZERO overlap.
+
+scipy's power-of-2 UserWarning on .random(48) is expected (documented in
+make_batches.build_stage2_n0 docstring), not an error.
+
+Q1 is USABLE for the 48-arm. No stop condition.
+
 ## Fixed facts verified against the repo (cite-not-rederive check)
 
 - stage2_C_n0 manifest sobol: seed 20260821, skip 0, n 16,
