@@ -1,0 +1,191 @@
+{
+  "written_at": "2026-10-15T07:56:34+00:00",
+  "e2_band": [
+    43,
+    48
+  ],
+  "E1": {
+    "default": {
+      "per_objective": {
+        "shed": {
+          "rmse_16": 2264.2418576877244,
+          "rmse_32": 2289.4633185137927,
+          "rmse_48": 1771.180250202297,
+          "I_16_32": 0.0,
+          "I_32_48": 0.0,
+          "rule": "noise-limited escape (32-pt LOO <= 1 x floor)",
+          "pass": true
+        },
+        "curt": {
+          "rmse_16": 86868.32421210306,
+          "rmse_32": 46991.9685675081,
+          "rmse_48": 24919.197876867263,
+          "I_16_32": 0.459,
+          "I_32_48": 0.4697,
+          "rule": "I(32->48) <= 1/3 I(16->32)",
+          "pass": false
+        },
+        "cost_ls": {
+          "rmse_16": 7691233.315673271,
+          "rmse_32": 3940437.52129743,
+          "rmse_48": 2637633.10093312,
+          "I_16_32": 0.4877,
+          "I_32_48": 0.3306,
+          "rule": "I(32->48) <= 1/3 I(16->32)",
+          "pass": false
+        }
+      },
+      "n_pass": 1,
+      "cap_I3248_le_025_all": false,
+      "overall_pass": false
+    },
+    "winner": {
+      "per_objective": {
+        "shed": {
+          "rmse_16": 2292.260143737889,
+          "rmse_32": 2464.6963087633712,
+          "rmse_48": 1736.2019499484609,
+          "I_16_32": 0.0,
+          "I_32_48": 0.0,
+          "rule": "noise-limited escape (32-pt LOO <= 1 x floor)",
+          "pass": true
+        },
+        "curt": {
+          "rmse_16": 85350.92375727068,
+          "rmse_32": 36583.60526079232,
+          "rmse_48": 21543.689612762348,
+          "I_16_32": 0.5714,
+          "I_32_48": 0.4111,
+          "rule": "I(32->48) <= 1/3 I(16->32)",
+          "pass": false
+        },
+        "cost_ls": {
+          "rmse_16": 5023051.981776031,
+          "rmse_32": 2496287.165029592,
+          "rmse_48": 1569388.3624025888,
+          "I_16_32": 0.503,
+          "I_32_48": 0.3713,
+          "rule": "I(32->48) <= 1/3 I(16->32)",
+          "pass": false
+        }
+      },
+      "n_pass": 1,
+      "cap_I3248_le_025_all": false,
+      "overall_pass": false
+    }
+  },
+  "E2": {
+    "winner": {
+      "cov95": {
+        "shed": 44,
+        "curt": 44,
+        "cost_ls": 47
+      },
+      "in_band": {
+        "shed": true,
+        "curt": true,
+        "cost_ls": true
+      },
+      "joint_pass": true
+    },
+    "default": {
+      "cov95": {
+        "shed": 47,
+        "curt": 45,
+        "cost_ls": 48
+      },
+      "in_band": {
+        "shed": true,
+        "curt": true,
+        "cost_ls": true
+      },
+      "joint_pass": true
+    }
+  },
+  "E2_caveat": "holdout hits share hyperparameters; the binomial band is approximate",
+  "E3": {
+    "delta_at_32": {
+      "shed": {
+        "d_nlpd": -0.409,
+        "d_cov95": -3,
+        "winner_cov95": 44
+      },
+      "curt": {
+        "d_nlpd": -0.239,
+        "d_cov95": -1,
+        "winner_cov95": 44
+      },
+      "cost_ls": {
+        "d_nlpd": -0.479,
+        "d_cov95": -1,
+        "winner_cov95": 47
+      }
+    },
+    "tuning_helps": true,
+    "hbo": {
+      "shed": {
+        "default": {
+          "mean_z": 0.731,
+          "rms_z": 1.706,
+          "cov95": 7,
+          "rmse_over_floor": 2.43
+        },
+        "winner": {
+          "mean_z": 0.133,
+          "rms_z": 0.28,
+          "cov95": 8,
+          "rmse_over_floor": 3.315
+        }
+      },
+      "curt": {
+        "default": {
+          "mean_z": 1.426,
+          "rms_z": 2.008,
+          "cov95": 5,
+          "rmse_over_floor": 27.244
+        },
+        "winner": {
+          "mean_z": 0.967,
+          "rms_z": 1.05,
+          "cov95": 8,
+          "rmse_over_floor": 23.645
+        }
+      },
+      "cost_ls": {
+        "default": {
+          "mean_z": -0.751,
+          "rms_z": 0.829,
+          "cov95": 8,
+          "rmse_over_floor": 10.143
+        },
+        "winner": {
+          "mean_z": -0.946,
+          "rms_z": 1.059,
+          "cov95": 8,
+          "rmse_over_floor": 7.039
+        }
+      }
+    },
+    "hbo_verdict": "tuned config restores r3 coverage: curt 5/8 -> 8/8, rms_z 2.008 -> 1.05"
+  },
+  "winner_loocv_vs_holdout": {
+    "shed": {
+      "loo_rmse_over_floor": 0.581,
+      "holdout_rmse_over_floor": 0.822,
+      "loo_nlpd": 8.609,
+      "holdout_nlpd": 8.89
+    },
+    "curt": {
+      "loo_rmse_over_floor": 4.788,
+      "holdout_rmse_over_floor": 7.317,
+      "loo_nlpd": 11.109,
+      "holdout_nlpd": 11.737
+    },
+    "cost_ls": {
+      "loo_rmse_over_floor": 7.212,
+      "holdout_rmse_over_floor": 4.993,
+      "loo_nlpd": 16.238,
+      "holdout_nlpd": 16.061
+    }
+  }
+}
