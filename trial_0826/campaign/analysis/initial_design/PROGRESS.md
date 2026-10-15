@@ -113,3 +113,28 @@ Q1 is USABLE for the 48-arm. No stop condition.
   1.426/2.008/5, cost -0.751/0.829/8. Matches §1. PASS.
 - pi_1008 LOO table (floors 3000/5000/0.5e6): shed 0.499 -> 0.402
   x floor, curt 17.072 -> 6.623, cost_ls 7.115 -> 4.279. Matches §1. PASS.
+
+## 2026-10-15T07:45Z — NLPD unit test + Part H LOOCV grid (no holdout contact)
+
+- `common.py::nlpd_unit_test`: analytic log1p change-of-variables NLPD vs
+  numerical density of synthetic lognormal data: max rel dev 7.1e-10. PASS.
+- FlexGP default == campaign PredGP parity on the 32 starts: max LOO
+  residual deviation within float32 precision (rel ~1e-5 or better) on all
+  three objectives. The default arm IS the campaign GP.
+- Part H main-effects (LOOCV on the 32 starts; part_h_loocv.csv, fits.json):
+  - shed: default 0.63 x floor / NLPD 9.24; log1p 8.66; rbf 9.21;
+    combo rbf+log1p NLPD 8.61 (best). gammaprior hurts badly (1.23 x floor).
+  - curt: default 8.12 x floor / NLPD 11.88; log1p 11.40; rbf 11.76;
+    combo rbf+log1p NLPD 11.11, 4.79 x floor (best). gammaprior 27 x floor.
+  - cost_ls: default 8.39 x floor / NLPD 16.53; rbf 16.24 (best; no other
+    axis beat default; log1p not applicable per §2 grid).
+  - Interaction rule: shed/curt combos beat every single change — no
+    pairwise crosses triggered. cost combo == rbf.
+- Targeted question (LOOCV): the 32-start default is NOT miscalibrated in
+  LOO (curt rms_z 0.81, cov95 31/32, band [28, 32]); every config stays in
+  band except gammaprior (29/32, and it wrecks RMSE). log1p mainly buys
+  accuracy (curt 8.1 -> 5.8 x floor), rbf+log1p 4.8 x floor. So LOOCV says:
+  nothing to repair at 32; the pathology must be sought in the H-BO cell.
+- WINNERS (pre-named, committed to fits.json at 2026-10-15T07:34:02+00:00,
+  BEFORE any holdout call): shed = rbf+log1p; curt = rbf+log1p;
+  cost_ls = rbf.
