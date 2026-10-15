@@ -1,0 +1,72 @@
+{
+  "written_at": "2026-10-15T07:36:26+00:00",
+  "train": "stage2_C_n0 + n0b + bo_C_r1 + bo_C_r2 (n=48)",
+  "test": "methods_C_P1_r3 (8 BO-selected designs)",
+  "r3_audit_recorded": {
+    "load_shed_mwh": {
+      "mean_z": 0.731,
+      "rms_z": 1.706,
+      "cov95": 7
+    },
+    "true_curtailment_mwh": {
+      "mean_z": 1.426,
+      "rms_z": 2.008,
+      "cov95": 5
+    },
+    "total_cost_less_synthetic_usd": {
+      "mean_z": -0.751,
+      "rms_z": 0.829,
+      "cov95": 8
+    }
+  },
+  "cells": {
+    "load_shed_mwh": {
+      "default": {
+        "config": "default",
+        "mean_z": 0.731,
+        "rms_z": 1.706,
+        "cov95": 7,
+        "rmse_over_floor": 2.43
+      },
+      "winner": {
+        "config": "rbf+log1p",
+        "mean_z": 0.133,
+        "rms_z": 0.28,
+        "cov95": 8,
+        "rmse_over_floor": 3.315
+      }
+    },
+    "true_curtailment_mwh": {
+      "default": {
+        "config": "default",
+        "mean_z": 1.426,
+        "rms_z": 2.008,
+        "cov95": 5,
+        "rmse_over_floor": 27.244
+      },
+      "winner": {
+        "config": "rbf+log1p",
+        "mean_z": 0.967,
+        "rms_z": 1.05,
+        "cov95": 8,
+        "rmse_over_floor": 23.645
+      }
+    },
+    "total_cost_less_synthetic_usd": {
+      "default": {
+        "config": "default",
+        "mean_z": -0.751,
+        "rms_z": 0.829,
+        "cov95": 8,
+        "rmse_over_floor": 10.143
+      },
+      "winner": {
+        "config": "rbf",
+        "mean_z": -0.946,
+        "rms_z": 1.059,
+        "cov95": 8,
+        "rmse_over_floor": 7.039
+      }
+    }
+  }
+}
