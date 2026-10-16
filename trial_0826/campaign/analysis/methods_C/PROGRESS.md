@@ -131,3 +131,10 @@ SUBMITTED acq arm=P3 round=0 acq=1543628
 SUBMITTED wave=methods_C_P3_r1 array=1543629 collector=1543630 held_on=1543628
 SUBMITTED acq arm=N1 round=1 acq=1543631
 SUBMITTED wave=methods_C_N1_r2 array=1543632 collector=1543633 held_on=1543631
+SUBMITTED acq arm=P1 round=4 acq=1552728
+SUBMITTED acq arm=P2 round=1 acq=1552730
+SUBMITTED wave=methods_C_P2_r2 array=1552732 collector=1552734 held_on=1552730
+SUBMITTED acq arm=P3 round=1 acq=1552736
+SUBMITTED wave=methods_C_P3_r2 array=1552737 collector=1552739 held_on=1552736
+SUBMITTED acq arm=N1 round=2 acq=1552741
+SUBMITTED wave=methods_C_N1_r3 array=1552743 collector=1552745 held_on=1552741
