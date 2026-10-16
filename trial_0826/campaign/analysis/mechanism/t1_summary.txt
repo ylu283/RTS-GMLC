@@ -1,0 +1,52 @@
+======================================================================
+Q2 — shed events in each fetched run
+           run  shed_hours  total_shed_mwh                                                                                     events
+ stage2_C_n0#1           1       22.425956                                                                    2020-12-18 h7:22.425956
+ stage2_C_n0#6           1       22.425956                                                                    2020-12-18 h7:22.425956
+stage2_C_n0b#6           1       22.425956                                                                    2020-12-18 h7:22.425956
+     bo_C_r2#7           1       22.425956                                                                    2020-12-18 h7:22.425956
+    random_C#5           1       22.425956                                                                    2020-12-18 h7:22.425956
+   random_C#14           1       22.425956                                                                    2020-12-18 h7:22.425956
+   random_C#15           1       22.425956                                                                    2020-12-18 h7:22.425956
+   random_C#39           2      128.174861                                          2020-04-26 h20:61.434080; 2020-04-27 h5:66.740781
+     bo_C_r1#4           2      139.632320                                         2020-02-01 h19:117.206364; 2020-12-18 h7:22.425956
+     bo_C_r2#3         100    29181.754990 2020-01-19 h21:71.892314; 2020-01-21 h7:331.834350; 2020-02-01 h17:170.443381; 2020-02-...
+   random_C#42          32     9312.023426 2020-02-01 h18:288.027319; 2020-02-01 h19:419.206364; 2020-02-01 h20:207.102546; 2020-0...
+stage2_C_n0#16          13     2516.280788 2020-04-26 h19:114.428141; 2020-04-26 h20:340.434080; 2020-04-26 h21:180.240864; 2020-0...
+   random_C#30          20     4548.702962 2020-02-01 h18:141.027319; 2020-02-01 h19:272.206364; 2020-02-01 h20:60.102546; 2020-02...
+     bo_C_r1#5           0        0.000000                                                                                           
+     bo_C_r2#2           0        0.000000                                                                                           
+
+Q2 identity check (expect one event, 2020-12-18 h7, 22.425956 MWh, at the slack bus):
+  stage2_C_n0#1: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  stage2_C_n0#6: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  stage2_C_n0b#6: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  bo_C_r2#7: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  random_C#5: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  random_C#14: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+  random_C#15: events=1, first=2020-12-18 h7 22.425956 MWh, buses=['Arne'] -> CONFIRMED
+
+Q2 — supply decomposition at 2020-12-18 h7 (vs no-PEM base):
+  base: shed=984.425956, demand=3890.6, committed=2389 MW (14 units), thermal disp=2389.0, headroom=0.0, renewables=517.2
+  stage2_C_n0#1: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  stage2_C_n0#6: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  stage2_C_n0b#6: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  bo_C_r2#7: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  random_C#5: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  random_C#14: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+  random_C#15: Δshed=962.000 = Δthermal +962.0 + Δparent-renew -131.6 + PEM +131.6 (resid +0.000); Δcommitted +962 MW / +4 units
+
+======================================================================
+H1/H2/H4 — LOW-design shed hours vs same hours in HIGH designs
+
+LOW bo_C_r2#3: 100 shed hours, 29182 MWh total
+  vs bo_C_r1#5: Δshed 29182 MWh over 100 h | committed 2520 -> 3796 MW (+1276); units 15.1 -> 20.1; headroom 0 -> 771 MW | shares: thermal +1.71, parent-ren -0.67, PEM -0.04 (resid +0) | res.short 49834 -> 4630 MWh
+  vs bo_C_r2#2: Δshed 29182 MWh over 100 h | committed 2520 -> 3750 MW (+1230); units 15.1 -> 19.6; headroom 0 -> 737 MW | shares: thermal +1.67, parent-ren -0.65, PEM -0.02 (resid +0) | res.short 49834 -> 4838 MWh
+  vs stage2_C_n0#16: Δshed 26665 MWh over 100 h | committed 2520 -> 3392 MW (+872); units 15.1 -> 18.2; headroom 0 -> 457 MW | shares: thermal +1.53, parent-ren -0.72, PEM +0.19 (resid +0) | res.short 49834 -> 12750 MWh
+  vs random_C#30: Δshed 24633 MWh over 100 h | committed 2520 -> 3388 MW (+868); units 15.1 -> 17.9; headroom 0 -> 492 MW | shares: thermal +1.51, parent-ren -0.73, PEM +0.23 (resid +0) | res.short 49834 -> 14911 MWh
+
+LOW random_C#42: 32 shed hours, 9312 MWh total
+  vs bo_C_r1#5: Δshed 9312 MWh over 32 h | committed 2694 -> 3526 MW (+832); units 15.1 -> 19.4; headroom 0 -> 495 MW | shares: thermal +1.15, parent-ren -0.25, PEM +0.10 (resid +0) | res.short 16370 -> 3753 MWh
+  vs bo_C_r2#2: Δshed 9312 MWh over 32 h | committed 2694 -> 3479 MW (+784); units 15.1 -> 18.8; headroom 0 -> 460 MW | shares: thermal +1.11, parent-ren -0.23, PEM +0.12 (resid +0) | res.short 16370 -> 3609 MWh
+  vs stage2_C_n0#16: Δshed 6796 MWh over 32 h | committed 2694 -> 3141 MW (+446); units 15.1 -> 17.5; headroom 0 -> 217 MW | shares: thermal +1.07, parent-ren -0.33, PEM +0.26 (resid -0) | res.short 16370 -> 10208 MWh
+  vs random_C#30: Δshed 4763 MWh over 32 h | committed 2694 -> 3052 MW (+358); units 15.1 -> 16.8; headroom 0 -> 183 MW | shares: thermal +1.18, parent-ren -0.41, PEM +0.23 (resid +0) | res.short 16370 -> 11490 MWh

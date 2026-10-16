@@ -1,128 +1,131 @@
-# Mechanism checks (prompt 38) — T0 state, before the CRC rsync
+# Mechanism checks (prompt 38) — FINAL (T1 complete, 2026-10-15)
 
-**Status: T0 complete (2026-10-15). All results below come from LOCAL
-data only: the git wave summaries of the five finished waves and the
-local no-PEM base case (`trial_0826/base_case_pcm_test`). 0 Prescient
-runs. Hourly per-run confirmation waits on `fetch_runs.sh` (Kay runs
-it). Verdicts marked PRELIMINARY become final in T1.**
+**Status: T0 + T1 complete. All evidence comes from the git wave
+summaries, the local no-PEM base case
+(`trial_0826/base_case_pcm_test`), and the 15 run dirs Kay rsynced
+into `runs/` (gitignored). 0 new Prescient runs.**
 
-Scripts: `t0_local_checks.py` (96-design table, run selection),
-`t0_base_evidence.py` (base-case hourly evidence),
-`fig_local_evidence.py` (figure). Outputs: `t0_summary.txt`,
-`t0_base_evidence.txt`, `run_selection.csv`,
-`fig_shed_shortfall_vs_mw.png`.
+Scripts: `t0_local_checks.py`, `t0_base_evidence.py`,
+`t1_hourly_analysis.py`, `fig_local_evidence.py`, `fig_t1_h1.py`.
+Outputs: `t0_summary.txt`, `t0_base_evidence.txt`, `t1_summary.txt`,
+`run_selection.csv`, `t1_q2_events.csv`, `t1_q2_decomposition.csv`,
+`t1_h1_table.csv`, `fig_shed_shortfall_vs_mw.png`,
+`fig_h1_commitment.png`.
 
-## Q1 — why does load shed fall as PEM MW rises?
+## Plain answer — Q1 (why shed falls as PEM MW rises)
 
-Headline correlations over the 96 designs (scenario C; shed range 0 to
-29,182 MWh/yr; base case 41,500 MWh/yr):
+Load shed in this system is a day-ahead under-commitment problem, not
+an energy shortage. On every base-case shed hour the online headroom
+is 0.0 MW and the DA LMP is low (median 20 $/MWh, 25% exactly 0): the
+RUC trusts cheap wind forecasts, commits little thermal, and real
+time comes up short. Pricing the PEM slices at B = 40 $/MWh removes
+"free" energy from the RUC's view, so the RUC commits more thermal
+(+780 to +1,280 MW and +4 to +5 units vs the zero-shed designs on
+the critical hours), online headroom returns (0 to 460–770 MW), and
+shed collapses. Extra thermal
+dispatch covers 107–171% of the shed difference, while the PEM
+slices' own grid sales cover between −4% and +26%; net renewable
+delivery is actually LOWER in the high-MW designs on those hours.
+Reserve shortfall falls with shed, not against it.
 
-| pair | Spearman |
-|---|---|
-| total PEM MW vs load shed | **−0.937** |
-| total PEM MW vs reserve shortfall | **−0.928** |
-| total PEM MW vs true curtailment | −0.914 |
-| total PEM MW vs thermal starts | **−0.950** |
-| load shed vs reserve shortfall | **+0.955** |
-| total PEM MW vs annual PEM grid sales | −0.298 |
+## Plain answer — Q2 (the recurring 22.426 MWh)
 
-Base-case anatomy of shed (from local hourly files):
+The 22.425956 MWh shared by 7 designs is one event: 2020-12-18, hour
+7 (a winter morning), booked at the slack bus. The no-PEM base sheds
+984.425956 MWh in that hour. Every high-MW design triggers the same
+commitment change (adds 221_CC_1 + 321_CC_1 + 116_STEAM_1 +
+202_STEAM_3 + 202_STEAM_4 = 1,017 MW, drops 315_CT_6 = 55 MW; net
++962 MW, all dispatched at full), which removes exactly 962.000 MWh
+and leaves the same 22.426 MWh residual with headroom again at 0.
+The event is PEM-independent in origin and its residual is identical
+across designs; "zero shed" vs "22 MWh" is not a material
+reliability difference.
 
-1. All 41,500 MWh of base shed is booked at ONE bus: **Arne (bus 113,
-   the reference bus)**. In 71% of shed hours the booked shortfall
-   exceeds the bus's own demand (max 1,024 MW shed vs 144 MW demand).
-   Prescient books system-wide real-time shortfall at the slack bus.
-   The "shed bus" is accounting, not geography.
-2. On every shed hour the RT LMP is exactly 500 $/MWh at Arne, and
-   463–653 $/MWh at ALL buses in the worst hour. This is system-wide
-   scarcity, not local congestion.
-3. **DA LMP on shed hours: median 20 $/MWh; 86% below B = 40; 25%
-   exactly 0.** The day-ahead market saw no scarcity on the hours that
-   later shed. The RUC under-commits on wind-rich forecasts; real-time
-   wind under-delivers.
-4. **Available headroom is 0.0 MW on all 150 shed hours** (median
-   1,110 MW on non-shed hours). Shed occurs exactly when online
-   headroom is exhausted.
-5. 100% of base shed hours also have reserve shortfall. The two
-   penalties co-bind.
+## Verdict table
 
-Preliminary verdicts:
+| Hypothesis | Verdict | Deciding evidence |
+|---|---|---|
+| H1 commitment headroom | **SUPPORTED (dominant)** | On the 100 shed hours of the lowest-MW design: committed thermal 2,520 MW vs 3,750–3,796 MW in zero-shed designs; headroom 0 vs 737–771 MW; extra thermal dispatch = 151–171% of the shed difference (`t1_h1_table.csv`, `fig_h1_commitment.png`). Thermal starts fall with PEM MW (Spearman −0.950): units cycle less, stay online. |
+| H2 PEM slice sells in scarcity | **CONTRADICTED as a main driver** | PEM grid-sales share of the shed difference is −0.04 to +0.26 across the 8 LOW-vs-HIGH pairs; parent + PEM renewable delivery is lower, not higher, in zero-shed designs on those hours (share −0.23 to −0.73). Annual PEM grid sales do not rise with PEM MW (Spearman −0.298). |
+| H3 location / congestion | **CONTRADICTED as stated** | 100% of shed (base and all 15 runs) is booked at bus "Arne" = bus 113, the reference bus; booked shortfall exceeds the bus's own demand in 71% of base shed hours (max 1,024 MW vs 144 MW). RT LMP is 463–653 $/MWh at ALL buses in the worst hour. Shed is system scarcity accounted at the slack bus, not bus-local congestion. |
+| H4 reserve substitution | **CONTRADICTED** | Reserve shortfall also falls with PEM MW (Spearman −0.928); shed and shortfall co-move across designs (+0.955) and on the critical hours (49,834 → 4,630 MWh alongside shed 29,182 → 0). `fig_shed_shortfall_vs_mw.png`. |
+| Nuclear u ≡ 1 as varying cause | **RULED OUT** | Nuclear ω ≥ 0.05 in all 96 designs; the fixed-commitment band is present everywhere. The 7 Q2 designs span nuclear ω from 0.05 to 1.00 with identical shed. |
 
-- **H1 (commitment headroom): SUPPORTED, preliminary.** Shed is a
-  zero-headroom, DA-complacent phenomenon (facts 3–4). Pricing the
-  wind slice at B = 40 removes "free" energy from the RUC's view, so
-  the RUC commits more thermal. Thermal starts fall steeply with PEM
-  MW (−0.950): units stay online instead of cycling. T1 confirms with
-  committed-MW and headroom comparisons on the shed hours (LOW vs
-  HIGH designs).
-- **H2 (PEM slice sells in scarcity): PLAUSIBLE, undetermined.** The
-  `_PEM` units are dispatchable at B = 40 and will sell when price
-  exceeds B. But annual PEM grid sales do NOT rise with PEM MW
-  (−0.298), which weakly disfavors H2 as the main driver. T1 checks
-  `_PEM` dispatch on the shed hours directly.
-- **H3 (location / congestion): CONTRADICTED as stated, preliminary.**
-  The bus-level shed location is slack-bus accounting (facts 1–2).
-  The wind-tier correlations with shed (BO_STAGE2 §4) reflect those
-  tiers' MW contribution, not bus-local relief. T1 checks line
-  binding if line files arrive; not required for the verdict.
-- **H4 (reserve substitution): CONTRADICTED.** Reserve shortfall also
-  FALLS with PEM MW (−0.928), and shed and shortfall move together
-  across designs (+0.955). There is no shed-to-reserve trade. See
-  `fig_shed_shortfall_vs_mw.png`.
-- **Nuclear u ≡ 1:** nuclear ω ≥ 0.05 in every design (min observed
-  0.05), so the fixed-commitment nuclear band is present everywhere
-  and is not the varying cause. Confirmed.
+## Paper-ready paragraph — Q1 (STE style)
 
-## Q2 — the recurring 22.425956 MWh shed
+> Load shed in this system is a commitment phenomenon, not an energy
+> deficit. In the no-PEM base case, all 150 shed hours have zero
+> online thermal headroom, and 86% of them clear the day-ahead
+> market below the PEM bid B = 40 $/MWh (25% at 0 $/MWh): the
+> day-ahead unit commitment trusts low-cost renewable forecasts and
+> schedules too little thermal capacity. A PEM retrofit prices its
+> renewable slice at B in the day-ahead market. This raises the
+> apparent cost of renewable energy, so the commitment model brings
+> more thermal units online. On the 100 shed hours of the smallest
+> design (407 MW of PEM, 29,182 MWh of shed), the zero-shed designs
+> (≈ 2,500–2,600 MW of PEM) commit 1,230–1,276 MW more thermal
+> capacity and hold 737–771 MW of online headroom where the small
+> design holds none (Fig. `fig_h1_commitment`). Added thermal
+> dispatch supplies 151–171% of the shed difference; the PEM slices'
+> own grid sales supply at most 26% and the net renewable delivery is
+> lower, not higher. Reserve shortfall falls together with load shed
+> (Spearman +0.955 across the 96 designs), so the gain is not a
+> transfer between penalties. The monotone shed decrease with total
+> PEM MW (Spearman −0.937) is therefore an induced day-ahead
+> commitment effect of priced withholding, not electrolyzer energy
+> returned to the grid.
 
-Seven designs share load shed = 22.425956 MWh exactly:
-stage2_C_n0 #1, #6; stage2_C_n0b #6; bo_C_r2 #7; random_C #5, #14,
-#15 (all with total PEM MW ≥ 2,078; full list in `t0_summary.txt`).
+## Paper-ready paragraph — Q2 (STE style)
 
-**Local smoking gun:** the no-PEM base case sheds **984.425956 MWh on
-2020-12-18, hour 7** — the only base hour whose fractional part
-matches. 984.425956 − 22.425956 = **962.000000 MW exactly**. The
-recurring value is the residual of this single base event after the
-retrofit adds exactly 962 MW of effective real-time supply (an
-integer, which points to a nameplate-quantum commitment difference).
-DA LMP in that base hour was 12.54 $/MWh — again a DA-complacent
-hour. The event is in the base case (at 984 MWh), so it is
-PEM-independent in origin; high-MW designs shave it to a common
-22.426 MWh floor. T1 confirms the bus-hour identity and the 962 MW
-composition from the fetched hourly files.
+> Seven designs report an identical load shed of 22.426 MWh. Hourly
+> output shows one shared event: 2020-12-18, hour 07, the only shed
+> hour in each of these designs. The no-PEM base case sheds 984.426
+> MWh in this hour with zero online headroom and a day-ahead price
+> of 12.5 $/MWh. Every design with enough priced PEM capacity
+> induces the same day-ahead commitment change in this hour: five
+> additional thermal units (1,017 MW) come online and one 55 MW
+> turbine drops, a net gain of 962 MW, dispatched in full. This
+> removes exactly 962.000 MWh of the base event and leaves the same
+> 22.426 MWh residual, again at zero headroom. The event is present
+> without any PEM and its residual does not depend on which sites
+> hold the PEM capacity (the seven designs span nuclear ω from 0.05
+> to 1.00). A reliability claim should therefore read "load shed at
+> or below 22.4 MWh/yr, one commitment-limited winter-morning event
+> that is independent of the PEM siting", not "zero load shed".
 
-Implication for wording (pending T1): "zero shed" vs "22 MWh" among
-front designs is one residual hour of one winter-morning event, not a
-material reliability difference. Say "≤ 22 MWh, one PEM-independent
-event" instead of "zero shed".
+## What this changes for the knee / S1 / recipe wording
 
-## T1 plan (after Kay's rsync)
+- Replace "zero shed" for front designs with "≤ 22.4 MWh/yr, one
+  PEM-independent commitment-limited event (2020-12-18 h07)". The
+  difference between 0 and 22.426 MWh among front designs is one
+  residual hour and is not a material reliability distinction.
+- The reliability gain from PEM MW is an induced DA-commitment
+  effect of priced withholding (H1). State it as such; do not imply
+  the electrolyzers return energy to the grid in scarcity (H2 is
+  minor) and do not attribute it to siting (H3: shed is booked at
+  the slack bus; the wind-tier correlations reflect MW share, not
+  location).
+- No shed-to-reserve substitution exists (H4): both penalties fall
+  together, so the economy–reliability front is not distorted by a
+  penalty swap.
+- Caveat to carry: the mechanism is a property of the RUC's
+  cost-based commitment under priced withholding. A market with
+  different DA bidding or reliability unit commitment practices may
+  not reproduce it; flag it as model-specific in the discussion.
 
-1. Q2: for each of the 7 designs, list shed bus-hours from
-   `hourly_summary.csv` / `bus_detail.csv`. Expect exactly one:
-   2020-12-18 h7, 22.425956 MWh at Arne. Identify the 962 MW from
-   `thermal_detail.csv` (committed units, Unit State, Dispatch DA vs
-   RT) and `renewables_detail.csv` (`_PEM` output).
-2. Q1/H1: on the shed hours of bo_C_r2 #3 and random_C #42 (LOW),
-   compare committed thermal MW, online headroom, and committed-unit
-   count with the same hours in bo_C_r1 #5 and bo_C_r2 #2 (HIGH).
-3. Q1/H2: sum `_PEM` dispatch (grid sales) on LOW-design shed hours
-   in the HIGH designs; ask whether it covers the shed difference.
-4. Q1/H4: reserve shortfall on the same hours (`reserves_detail.csv`)
-   to close the co-binding story.
-5. Write the two paper-ready paragraphs and final verdict table here.
+## Appendix — T0 evidence retained
 
-## Run selection (15 run dirs, finished waves only)
-
-See `run_selection.csv`. Q1 contrast set: bo_C_r2 #3 (407 MW, 29,182
-MWh), random_C #42 (827 MW, 9,312 MWh), stage2_C_n0 #16 (1,763 MW,
-2,516 MWh), random_C #30 (1,764 MW, 4,549 MWh), bo_C_r1 #5 (2,494
-MW, 0), bo_C_r2 #2 (2,622 MW, 0). Q1 base: the local
-`base_case_pcm_test` run IS the no-PEM base (full year, delta
-baseline of `summarize_wave.py`); no fetch needed. Q2 set: the 7
-designs above plus random_C #39 (128.17 MWh) and bo_C_r1 #4 (139.63
-MWh) as different-small-shed contrasts.
-
-**Kay: run `bash fetch_runs.sh` from this directory** (override the
-host with `CRC_HOST=...` if not crcfe01). It pulls only the needed
-CSVs of the 15 run dirs into `runs/` (gitignored), ≈ 1.5–1.8 GB.
+- 96 designs, scenario C. Spearman vs total PEM MW: shed −0.937,
+  reserve shortfall −0.928, true curtailment −0.914, thermal starts
+  −0.950, annual PEM grid sales −0.298. Shed range 0–29,182 MWh/yr;
+  base 41,500.115 MWh/yr (150 hours, all booked at Arne).
+- Q2 designs: stage2_C_n0 #1 #6, stage2_C_n0b #6, bo_C_r2 #7,
+  random_C #5 #14 #15 (total PEM MW 2,078–2,462). bo_C_r1 #4
+  (139.6 MWh) also contains the same 22.425956 event plus one other.
+- Q1 contrast set and fetch list: `run_selection.csv`,
+  `fetch_runs.sh` (15 run dirs, finished waves only; data fetched
+  2026-10-15).
+- The base no-PEM run at scenario C exists locally:
+  `trial_0826/base_case_pcm_test` (the `summarize_wave.py` delta
+  baseline). DA complacency persists in retrofit runs: the Q2 hour
+  clears DA at 21.47 $/MWh in stage2_C_n0 #1.
