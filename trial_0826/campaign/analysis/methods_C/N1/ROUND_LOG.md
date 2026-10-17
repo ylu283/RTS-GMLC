@@ -71,8 +71,14 @@ arm's JIDs from methods_C/PROGRESS.md.
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - botorch: 0.16.1
 - predictions: waves/methods_C_N1_r3/predictions.csv
+- graded_at: 2026-10-17T22:37:21+00:00
+- cumulative_hv: 7.776901042172783e+17
+- gain: 9957396595870720.0
+- gain_tau: 0.18919633109751482
 - threshold: 5.262996664950399e+16
-- decision: proposed
+- would_stop: True
+- n_outside_ref: 2
+- decision: graded (record_only) -> r4
 - designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
     - [0.64375, 0.76250, 0.05000, 0.64375, 0.64375, 0.88125]
     - [0.05000, 1.00000, 1.00000, 0.05000, 0.88125, 1.00000]
@@ -82,4 +88,26 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.05000, 0.05000, 1.00000, 1.00000, 0.64375, 0.05000]
     - [0.40625, 0.88125, 0.05000, 0.64375, 0.64375, 0.88125]
     - [0.05000, 1.00000, 1.00000, 0.05000, 0.76250, 0.52500]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": -0.038, "rms_z": 0.629, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.971, "rms_z": 1.132, "cov95": 7}, "total_cost_less_synthetic_usd": {"mean_z": -0.291, "rms_z": 0.806, "cov95": 8}}
 <!-- END r3 -->
+
+<!-- BEGIN r4 -->
+## Round 4 (methods_C_N1_r4)
+- proposed_at: 2026-10-17T22:55:00+00:00
+- acq: qnehvi
+- acq_seed: 20261410
+- bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
+- botorch: 0.16.1
+- predictions: waves/methods_C_N1_r4/predictions.csv
+- threshold: 5.262996664950399e+16
+- decision: proposed
+- designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
+    - [0.05000, 1.00000, 0.64375, 0.28750, 1.00000, 1.00000]
+    - [0.28750, 0.88125, 0.64375, 0.40625, 1.00000, 1.00000]
+    - [0.05000, 0.76250, 0.05000, 0.05000, 0.52500, 0.52500]
+    - [0.05000, 1.00000, 0.16875, 0.05000, 1.00000, 1.00000]
+    - [0.40625, 1.00000, 1.00000, 1.00000, 1.00000, 0.52500]
+    - [0.05000, 1.00000, 0.28750, 1.00000, 1.00000, 0.28750]
+    - [0.05000, 0.05000, 0.05000, 1.00000, 1.00000, 0.05000]
+    - [0.64375, 0.88125, 0.64375, 0.64375, 0.64375, 0.64375]
+<!-- END r4 -->
