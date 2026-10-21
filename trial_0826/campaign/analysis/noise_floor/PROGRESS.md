@@ -116,3 +116,53 @@ not give bin edges, so they are fixed here:
   update the Part C table.
 - [ ] Strategy session: consolidate. 1016-D2 → NXT-D3 replicate study.
   1016-D3 → stop rule provisional. Heteroscedastic model = Phase-B prompt.
+
+---
+
+# Prompt 41: replicate waves (executor PROGRESS)
+
+Worktree `RTS-GMLC-rep41`, branch `rep41`, cut from `floor40` at `4801f03`.
+That commit sits on origin/d6 `2a604ff`; at the 2026-10-21 fetch, d6 had
+nothing newer, so the "pull d6 before selecting" step is satisfied.
+Expectation statement (§0.1): verbatim in both wave READMEs.
+
+## Build (2026-10-21), done
+
+- [x] **Selection rule re-run** on the 304 non-grid pooled runs (P2_r4 and
+  P3_r4 have no objectives yet). It reproduces the expected picks exactly:
+  - LOW `methods_C_P2_r3:7`, shed 429.528861. 6-way plateau tie, broken
+    by wave sort.
+  - MID `methods_C_P1_r3:8` (≡ `P2_r1:5`).
+  - HIGH `methods_C_P1_r3:3` (≡ `P3_r2:3`, all-0.05).
+- [x] **Waves built** from clean commit `4598462`: `waves/replicate_C_noise_a` and
+  `waves/replicate_C_noise_b`, 6 rows each, built with `make_row(rho_h2=2.0)` and
+  `write_wave` (manifest: dirty = False, `replicate_rows`, `selection`).
+  - Rows 1, 3, 5 are exact copies; rows 2, 4, 6 are perturb-1 (A) /
+    perturb-2 (B).
+  - Realized values: 0.999/0.998, 0.7635/0.7615, 0.051/0.052. All are
+    exact at 4 decimals.
+- [x] **Exact copies are byte-identical** to the parent dicts and design rows,
+  and to the twins `P2_r1:5` / `P3_r2:3`.
+- [x] **Array scripts:** `submit_array.generate_script(max_concurrent=None)`.
+  - The diff vs `random_C_array.sh` is `-N`, `-t 1-6` and a comment only.
+  - No `-tc`, no `-pe`, no PYTHONNOUSERSITE.
+- [x] **Collectors:** `_render_random_collector(<wave>, 6)`.
+  - The diff vs `collect_random_C.sh` is the wave name and N only.
+  - `-r n`, and PYTHONNOUSERSITE=1 (deliberate).
+- [x] **No pool contamination:** `pool.wave_groups()` contains no `replicate*`.
+- Expected Population-1 df:
+  - LOW: 3 draws (parent + 2 exact), df 2.
+  - MID: parent, twin + 2 exact, df 3.
+  - HIGH: the same as MID, df 3.
+  - Standalone accidental pairs `bo_C_r2:3≡P2_r3:6` and
+    `P1_r4:8≡P3_r3:1`: df 1 each.
+  - **Total 10.**
+
+## Submit (Kay), pending
+
+- Wave A pair → confirm tasks RUNNING → wave B pair (READMEs carry the lines).
+- Submission JIDs: _(Kay pastes; recorded here)_
+
+## After landing, pending
+
+- `REPLICATE_RESULT.md` per prompt 41 §4.
