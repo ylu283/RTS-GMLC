@@ -61,3 +61,23 @@ The prompt leaves these choices to the executor. Fixed here:
   - (ii) F_pass = ∅.
 - **Holdout exposure:** every distinct (floor, config, n0) scored on
   `random_C` counts once; identical (config, floor) arms are scored once.
+
+## Run (2026-10-21) — STOPPED under §4 (fit convergence)
+
+- The sweep ran in full with the house fit: 63 rows, 42 distinct holdout
+  scorings, all fits converged by the pinned (exception) definition, no
+  jitter retries.
+- LOO winner: rbf+log1p at every floor, with no ties. F_pass = ∅, so route
+  (ii) under the house fit.
+- The default arm meets the full bar at floors 180–880; it is not the
+  winner, so it does not count.
+- The house `train_gp` (700 Adam steps) does not converge the noise. At
+  5,000 steps the noise sits on the bound at every floor
+  (`convergence_check.txt`).
+  - The prompt's "identical fits at 180 / 306" premise is an optimizer
+    artifact.
+  - The pinned ACTIVE flag (1.001) reads inactive on all fits, even at
+    3,000.
+- Decision for Kay in PROVISIONAL_GP.md §3: A (house fit, route ii) or B
+  (converged rerun, recommended) or C (campaign-wide fix, strategy).
+- Figures are not drawn until that decision.

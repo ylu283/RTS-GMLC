@@ -1,0 +1,8 @@
+m52+std f=  180 | ep700: noise   364.2 dloss100 2.05e-02 | ep5000: noise   185.3 dloss100 7.19e-04
+m52+std f=  306 | ep700: noise   441.2 dloss100 2.10e-02 | ep5000: noise   309.4 dloss100 7.44e-04
+m52+std f=  880 | ep700: noise   940.2 dloss100 2.24e-02 | ep5000: noise   880.8 dloss100 1.14e-03
+m52+std f= 3000 | ep700: noise  3040.0 dloss100 8.78e-03 | ep5000: noise  3000.7 dloss100 2.62e-04
+rbf+log1p f=  180 | ep700: noise   438.2 dloss100 3.35e-02 | ep5000: noise   216.4 dloss100 9.44e-04
+rbf+log1p f=  306 | ep700: noise   510.3 dloss100 3.27e-02 | ep5000: noise   308.1 dloss100 8.34e-04
+rbf+log1p f=  880 | ep700: noise  1006.3 dloss100 2.52e-02 | ep5000: noise   881.2 dloss100 6.57e-04
+rbf+log1p f= 3000 | ep700: noise  3064.3 dloss100 1.26e-02 | ep5000: noise  3001.0 dloss100 4.44e-04

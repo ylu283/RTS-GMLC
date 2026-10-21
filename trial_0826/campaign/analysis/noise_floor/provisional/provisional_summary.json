@@ -1,0 +1,87 @@
+{
+ "F": [
+  180.0,
+  306.0,
+  500.0,
+  880.0,
+  1500.0,
+  1800.0,
+  3000.0
+ ],
+ "F_pass": [],
+ "route": "(ii)",
+ "winner_path": [
+  {
+   "floor": 180.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 306.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 500.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 880.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 1500.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 1800.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 3000.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  }
+ ],
+ "holdout_exposures_this_prompt": 42,
+ "distinct_floor_config_scored": 14
+}
