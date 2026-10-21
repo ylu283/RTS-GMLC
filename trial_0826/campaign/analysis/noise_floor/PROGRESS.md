@@ -78,3 +78,41 @@ not give bin edges, so they are fixed here:
   - k = 3 and k = 5 smallest bins;
   - the classical estimator;
   - a power-law fit.
+
+## 3. Part A (2026-10-21) — ABSTAIN
+
+- Point nugget 6.05e5 MWh² (sd 778).
+- Bootstrap p5 / p50 / p90: −7.14e5 / 8.83e5 / 2.27e6. 18.9 % of resamples
+  are ≤ 0, so p5 < 0 and the branch is **ABSTAIN**. √p90 = 1,505 MWh.
+- Robustness rows (a) 1,631 and (b) 1,495 MWh: both ABSTAIN. The branch is
+  unchanged.
+- Resolution check: pure noise is recovered within 4 %. A smooth shed-scale
+  function biases the pinned intercept by −3.9e6 MWh², so the method cannot
+  resolve a floor of about 2,000 MWh or less.
+- Four h = 0 cross-wave replicates; pooled sd 306 MWh (n = 4).
+- log1p nugget < 0; only the high-shed stratum gives a positive nugget.
+  Flag: level-dependent noise.
+- Curt √p90 28.1k (×5.6) and cost √p90 $8.2M (×16.4): function variation,
+  not noise. No change.
+
+## 4. Part B — skipped (ABSTAIN branch)
+
+## 5. Part C — band {300, 3000}
+
+- The 3,000 row reproduces all four ledger τ values exactly.
+- τ₃₀₀ = 0.13–0.14 × τ_old.
+- At 300 MWh no arm stops. Flips:
+  - P1 r2 (live): VERIFIABLE
+  - P1 r3: VERIFIABLE
+  - P1 r4: CENSORED
+  - N1 r3: VERIFIABLE
+  - N1 r4: CENSORED
+  - P2 r3: PENDING (r4 not yet graded)
+- Break-even shed floor for the first stop: P1 1,997, N1 1,726, P2 1,133 MWh.
+
+## 6. Open
+
+- [ ] P2/P3 r4 grade (10-21 arrays). Rerun `part_c.py` (read-only) and
+  update the Part C table.
+- [ ] Strategy session: consolidate. 1016-D2 → NXT-D3 replicate study.
+  1016-D3 → stop rule provisional. Heteroscedastic model = Phase-B prompt.
