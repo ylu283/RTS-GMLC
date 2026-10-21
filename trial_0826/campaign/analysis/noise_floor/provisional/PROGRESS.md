@@ -81,3 +81,83 @@ The prompt leaves these choices to the executor. Fixed here:
 - Decision for Kay in PROVISIONAL_GP.md §3: A (house fit, route ii) or B
   (converged rerun, recommended) or C (campaign-wide fix, strategy).
 - Figures are not drawn until that decision.
+
+## Amendment 1 run (2026-10-21) — option B approved (Kay): converged rerun
+
+### Pre-run statement (written BEFORE any converged fit or holdout score)
+
+- **Fit, pinned (this diagnostic only):** 5,000 Adam steps, lr 0.01,
+  `torch.manual_seed(0)` per fit, same optimizer (Adam, weight_decay 1e-8)
+  — only the step count changes from the house 700. Per fit, the loss
+  change over the last 100 steps is recorded; a fit still moving more than
+  2e-3 is re-run from scratch at 10,000 steps with the same seed (a
+  deterministic trajectory, so the re-run IS the extension) and recorded.
+- **Mechanics:** `common.train_gp` is swapped inside `sweep_converged.py`
+  only (the convergence_check.py pattern) and restored; the LOO
+  reselection (`part_h.fit_and_score`) dispatches through the same wrapper,
+  so selection and scoring share the fit definition.
+- **Everything else identical to the house sweep:** grid F, 7 configs,
+  3 arms, 3 n0, tie hierarchy, jitter policy, joint bar, F_pass rule,
+  routes, verbatim cov95 band [43, 48].
+- **Pre-run verify, pinned:** default at floor 306 and 5,000 steps must
+  reproduce `convergence_check.txt` (learned noise ≈ 309 MWh raw) before
+  the sweep proceeds; the script asserts it.
+- **Expectation stated before running (Amendment 1):** at convergence the
+  noise rails on the bound at every floor, so the ACTIVE flag should read
+  ACTIVE everywhere and the floor genuinely controls the bars. Open
+  questions: does rbf+log1p keep winning the LOO; does its holdout
+  coverage recover; does the default's full-bar pass inside [180, 880]
+  survive convergence.
+- **Outputs (new, never overwriting the house files):**
+  `provisional_sweep_converged.csv`, `joint_bar_converged.csv`,
+  `loo_reselection_converged.csv`, `provisional_summary_converged.json`,
+  `convergence_log_converged.csv` (per-fit log),
+  `predictions_converged.csv` (holdout band per scored arm, for
+  assert-before-draw figures without refitting).
+- Holdout exposure of this rerun: 42 scorings (same distinct set as the
+  house sweep) → cumulative 100.
+
+### Run log (after the sweep)
+
+- Pre-run verify passed: default, floor 306, 5,000 steps → learned noise
+  309.4 MWh raw, dloss100 7.4e-4 (matches `convergence_check.txt`).
+- 94 converged fits (49 LOO + 45 holdout). **No fit moved more than 2e-3
+  over its last 100 steps; the 10,000-step extension never triggered**
+  (max 1.8e-3, a fixnoise LOO fit at floor 500). Per-fit log:
+  `convergence_log_converged.csv`. No jitter retries; all fits converged.
+- LOO winner: rbf+log1p at floors 180–1,800 (no ties). At 3,000 the tie
+  rule (0.018 < 0.02 nats) flips the winner to log1p via LOO RMSE
+  (1,520 vs 1,716).
+- **F_pass = {3,000} → route (iii), not WEAK** (clause a+b: cov95
+  44/44/44; RMSE 1,946 → 1,879 → 1,258 ≤ 3,000; ratio ≥ 2.13).
+- rbf+log1p coverage did NOT recover at low floors (cov95 33–41 at
+  f ≤ 880, n0 = 16/32; worse than the house fit). The default's house-fit
+  full-bar pass at 180/306 did not survive (cov95 38–39 at n0 = 32); the
+  default now passes at 500–1,800 only (sensitivity; not the winner).
+- Learned noise tracks the floor within 0.1–3 % at n0 = 16/32 everywhere;
+  the pinned 1.001 ACTIVE threshold still reads INACTIVE below
+  1,500–1,800 (softplus approaches the bound asymptotically) — logged as
+  context. Genuinely unconstrained: n0 = 48 fits at low floors (noise
+  ≈ 650 default / ≈ 1,630 rbf+log1p), floor-invariant across 180–500. No
+  pass propagates via the inactive rule (winner passes only at 3,000,
+  bound ACTIVE).
+- Holdout exposure ACTUAL: **45** distinct scorings (not the estimated
+  42) — the winner flip at 3,000 added (3,000, log1p) × 3 n0, forced by
+  the pinned per-floor-winner design. Cumulative: 58 + 45 = **103**.
+  Disclosed in PROVISIONAL_GP.md §4.
+- Figures drawn from the converged sweep only, via
+  `make_figs_converged.py`: fig1 criteria-vs-floor map + metric curves
+  (CI band, break-evens 1,133/1,726/1,997, INACTIVE-flag shading), fig2
+  parity 1×3 at floor 306 (winner rbf+log1p, bar not met — shown as
+  measured), fig3 parity n0 = 32 floor 3,000 (log1p) vs 306 (rbf+log1p)
+  with the CI text on the figure. All: PROVISIONAL watermark, bold axis
+  labels and tick values, annotations asserted against the `_converged`
+  CSVs (parity panels redraw `predictions_converged.csv`, no refits).
+  One assert tolerance note: recomputed RMSE vs CSV agrees to ~1e-8
+  relative (float32 predict_t round-trip); the figure assert uses 1e-6.
+- PROVISIONAL_GP.md rewritten: converged sweep = PRIMARY (route iii),
+  house sweep kept as §2 campaign-definition sensitivity, decision record
+  resolved (Kay chose B), exposure and honesty block updated.
+- House-fit outputs untouched: `provisional_sweep.csv`, `joint_bar.csv`,
+  `loo_reselection.csv`, `provisional_summary.json`,
+  `convergence_check.*`.

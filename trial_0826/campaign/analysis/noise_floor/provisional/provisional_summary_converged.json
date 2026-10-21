@@ -1,0 +1,93 @@
+{
+ "amendment": 1,
+ "fit": "5000 Adam steps, lr 0.01, seed 0 per fit; extend to 10000 when dloss100 > 0.002",
+ "F": [
+  180.0,
+  306.0,
+  500.0,
+  880.0,
+  1500.0,
+  1800.0,
+  3000.0
+ ],
+ "F_pass": [
+  3000.0
+ ],
+ "route": "(iii)",
+ "winner_path": [
+  {
+   "floor": 180.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 306.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 500.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 880.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 1500.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 1800.0,
+   "winner": "rbf+log1p",
+   "invoked": false,
+   "within_0.02": [
+    "rbf+log1p"
+   ],
+   "rmse_rule_changed_winner": false,
+   "nlpd_argmin": "rbf+log1p"
+  },
+  {
+   "floor": 3000.0,
+   "winner": "log1p",
+   "invoked": true,
+   "within_0.02": [
+    "rbf+log1p",
+    "log1p"
+   ],
+   "rmse_rule_changed_winner": true,
+   "nlpd_argmin": "rbf+log1p"
+  }
+ ],
+ "fits_extended_to_10000": 0,
+ "holdout_exposures_this_prompt": 45,
+ "distinct_floor_config_scored": 15
+}
