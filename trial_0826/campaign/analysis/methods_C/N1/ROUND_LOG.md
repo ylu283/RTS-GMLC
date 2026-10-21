@@ -99,8 +99,14 @@ arm's JIDs from methods_C/PROGRESS.md.
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - botorch: 0.16.1
 - predictions: waves/methods_C_N1_r4/predictions.csv
+- graded_at: 2026-10-21T03:41:49+00:00
+- cumulative_hv: 7.892476689418824e+17
+- gain: 1.1557564724604032e+16
+- gain_tau: 0.2196004569330837
 - threshold: 5.262996664950399e+16
-- decision: proposed
+- would_stop: True
+- n_outside_ref: 2
+- decision: graded (record_only)
 - designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
     - [0.05000, 1.00000, 0.64375, 0.28750, 1.00000, 1.00000]
     - [0.28750, 0.88125, 0.64375, 0.40625, 1.00000, 1.00000]
@@ -110,4 +116,5 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.05000, 1.00000, 0.28750, 1.00000, 1.00000, 0.28750]
     - [0.05000, 0.05000, 0.05000, 1.00000, 1.00000, 0.05000]
     - [0.64375, 0.88125, 0.64375, 0.64375, 0.64375, 0.64375]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": -0.12, "rms_z": 0.29, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.248, "rms_z": 0.573, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.043, "rms_z": 0.698, "cov95": 8}}
 <!-- END r4 -->
