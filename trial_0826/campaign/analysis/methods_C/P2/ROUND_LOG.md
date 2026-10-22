@@ -122,8 +122,14 @@ arm's JIDs from methods_C/PROGRESS.md.
 - acq_seed: 20261210
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - predictions: waves/methods_C_P2_r4/predictions.csv
+- graded_at: 2026-10-22T03:40:22+00:00
+- cumulative_hv: 1.8084153708870548e+18
+- gain: 1.948197069279181e+16
+- gain_tau: 0.2607242653156802
 - threshold: 7.47225068184712e+16
-- decision: proposed
+- would_stop: True
+- n_outside_ref: 4
+- decision: graded (record_only)
 - weights (8 x M, Dirichlet(1) draws):
     - [0.0089, 0.2913, 0.6998]
     - [0.6635, 0.2472, 0.0893]
@@ -142,4 +148,5 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.88125, 1.00000, 0.76250, 1.00000, 0.76250, 0.76250]
     - [0.05000, 0.28750, 0.05000, 0.05000, 1.00000, 0.76250]
     - [0.05000, 0.76250, 0.05000, 1.00000, 0.64375, 0.88125]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": 0.283, "rms_z": 0.644, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.372, "rms_z": 1.006, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.075, "rms_z": 0.726, "cov95": 8}}
 <!-- END r4 -->
