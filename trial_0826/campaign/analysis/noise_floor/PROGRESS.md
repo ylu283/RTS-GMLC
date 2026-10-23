@@ -158,11 +158,32 @@ Expectation statement (§0.1): verbatim in both wave READMEs.
     `P1_r4:8≡P3_r3:1`: df 1 each.
   - **Total 10.**
 
-## Submit (Kay), pending
+## Submit (Kay), done 2026-10-21
 
-- Wave A pair → confirm tasks RUNNING → wave B pair (READMEs carry the lines).
-- Submission JIDs: _(Kay pastes; recorded here)_
+- Submission JIDs: wave A array 1600195 / collector 1600196; wave B array
+  1600212 / collector 1600213. The A→B gap was about 6 minutes, so the
+  waves ran concurrently (disclosed in the result).
 
-## After landing, pending
+## After landing (2026-10-23), done
 
-- `REPLICATE_RESULT.md` per prompt 41 §4.
+- 12/12 runs landed; both collectors GATE PASS and pushed to d6
+  (`b455ee9`, `b0a6e1e`). rep41 fast-forwarded onto origin/d6.
+- Fetched objectives cross-checked against values read directly on CRC:
+  12/12 match. scp copies byte-identical to the collector commits.
+- `replicate_result.py` runs the §4 pinned recipe and writes
+  `REPLICATE_RESULT.md`. Headline (shed): pooled Population-1 sd
+  **285.3 MWh**, df 10, Satterthwaite ν ≈ 3.0, 95% CI **[162, 1,057]**.
+  Per-design sd: LOW 0 / MID 13.3 / HIGH 520 / ACC-29k 43.6 / ACC-17k 0.
+  Permutation homogeneity (10k, α 0.05): shed p = 0.149 (pool not
+  rejected; conditional pooled 569.6, NOT the handoff), curt p = 0.005
+  and cost p = 0.001 (do not pool). **Rejection trigger FIRES** (LOW
+  variance exactly 0 on all objectives → ratio infinite, test degenerate
+  → rejects): scalar-floor framing REJECTED, heteroscedastic Phase-B
+  route opens. Campaign floor unchanged (pinned).
+- Node disclosure: only tasks 5/6 of BOTH waves have a node record
+  (d12chas342, same node, live qstat); stdout has no hostname and qacct
+  has no accounting file, so tasks 1–4 are unknown. The HIGH fresh exact
+  pair is same-node. Runtimes from logs: HIGH 23.8–24.7 h, others
+  14.9–16.5 h (a 31–33 h figure circulated during the wait does not
+  match the logs).
+- `replicate_run_metadata.csv` holds per-task runtime/node provenance.
