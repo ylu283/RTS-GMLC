@@ -1,0 +1,248 @@
+{
+  "amendment": 1,
+  "primary": {
+    "name": "rbf+log1p+ii",
+    "kernel": "rbf",
+    "transform": "log1p",
+    "noise_form": "ii",
+    "idx": 4,
+    "role": "primary"
+  },
+  "control": {
+    "name": "rbf+log1p+ref",
+    "kernel": "rbf",
+    "transform": "log1p",
+    "noise_form": "ref",
+    "idx": 10,
+    "role": "control"
+  },
+  "loo_table_sha256": "6802ea78f65f09378bee260d0b326fab948471bbcd9f9f10b0c4fddcdde2fe54",
+  "graded_at_utc": "2026-10-25T19:30:45+00:00",
+  "cov_band": [
+    43,
+    48
+  ],
+  "sd_strat": 130.4093579847704,
+  "per_n0": [
+    {
+      "role": "primary",
+      "n0": 16,
+      "config": "rbf+log1p+ii",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 41,
+      "cov95_sigma_at_obs_diag": 41,
+      "rmse": 4992.829814779288,
+      "rmse_over_pooled_sd": 17.500279757375704,
+      "nlpd": 10.31154209595023,
+      "rms_z": 2.210520969655034,
+      "mean_z": -0.5141571812761948,
+      "spearman": 0.8451431353796902,
+      "r2": -0.25595299909205194,
+      "latent_sd_ratio": 2.9641672897334095,
+      "median_halfwidth_latent_raw": 7753.543796108881,
+      "median_halfwidth_total_raw": 7753.593445898707,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    },
+    {
+      "role": "primary",
+      "n0": 32,
+      "config": "rbf+log1p+ii",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 33,
+      "cov95_sigma_at_obs_diag": 33,
+      "rmse": 3099.430851725345,
+      "rmse_over_pooled_sd": 10.863760433667524,
+      "nlpd": 18.93469111379829,
+      "rms_z": 4.840142066047253,
+      "mean_z": -0.046215392099588026,
+      "spearman": 0.8778846265864974,
+      "r2": 0.5160017796686065,
+      "latent_sd_ratio": 7.255003310185128,
+      "median_halfwidth_latent_raw": 2006.0853574662062,
+      "median_halfwidth_total_raw": 2006.1566469291392,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    },
+    {
+      "role": "primary",
+      "n0": 48,
+      "config": "rbf+log1p+ii",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 34,
+      "cov95_sigma_at_obs_diag": 34,
+      "rmse": 10365.606895919173,
+      "rmse_over_pooled_sd": 36.332305979387215,
+      "nlpd": 16.414531018916183,
+      "rms_z": 4.149914446941999,
+      "mean_z": -0.8828158948342812,
+      "spearman": 0.8529619989514651,
+      "r2": -4.413390179205477,
+      "latent_sd_ratio": 8.661124526462677,
+      "median_halfwidth_latent_raw": 12224.496426656457,
+      "median_halfwidth_total_raw": 12224.577116513374,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    }
+  ],
+  "bar": {
+    "pass": false,
+    "c1": false,
+    "c2a": false,
+    "c2b": false,
+    "c3": true,
+    "rmse_clause": "-"
+  },
+  "control_per_n0": [
+    {
+      "role": "control",
+      "n0": 16,
+      "config": "rbf+log1p+ref",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 33,
+      "cov95_sigma_at_obs_diag": 44,
+      "rmse": 1806.0427638007523,
+      "rmse_over_pooled_sd": 6.330328649844907,
+      "nlpd": 15.57264072477121,
+      "rms_z": 4.133194817221922,
+      "mean_z": -1.2629539999021,
+      "spearman": 0.9116034757397763,
+      "r2": 0.8356627859871844,
+      "latent_sd_ratio": 3.6016461979485443,
+      "median_halfwidth_latent_raw": 1760.9342933504518,
+      "median_halfwidth_total_raw": 1882.113333861535,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    },
+    {
+      "role": "control",
+      "n0": 32,
+      "config": "rbf+log1p+ref",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 26,
+      "cov95_sigma_at_obs_diag": 36,
+      "rmse": 1455.9577570940817,
+      "rmse_over_pooled_sd": 5.1032518650335845,
+      "nlpd": 17.67836758683275,
+      "rms_z": 4.724062609517865,
+      "mean_z": -1.2887661278454172,
+      "spearman": 0.9334854342080073,
+      "r2": 0.8931984856630039,
+      "latent_sd_ratio": 4.2406957919343125,
+      "median_halfwidth_latent_raw": 851.325279667602,
+      "median_halfwidth_total_raw": 1040.5079528797864,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    },
+    {
+      "role": "control",
+      "n0": 48,
+      "config": "rbf+log1p+ref",
+      "converged": true,
+      "extended_to_10000": false,
+      "jitter_retry": false,
+      "cov95": 32,
+      "cov95_sigma_at_obs_diag": 40,
+      "rmse": 1702.7978391910422,
+      "rmse_over_pooled_sd": 5.968446684861696,
+      "nlpd": 14.562370152179392,
+      "rms_z": 3.9312699972552787,
+      "mean_z": -1.3169479714577068,
+      "spearman": 0.9034045285221514,
+      "r2": 0.8539148596434837,
+      "latent_sd_ratio": 5.440623669380383,
+      "median_halfwidth_latent_raw": 1353.2085943314937,
+      "median_halfwidth_total_raw": 1507.7123576982322,
+      "sd_strat": 130.4093579847704,
+      "fit_error": ""
+    }
+  ],
+  "control_bar_arithmetic_no_verdict": {
+    "pass": false,
+    "c1": false,
+    "c2a": true,
+    "c2b": false,
+    "c3": true,
+    "rmse_clause": "a",
+    "note": "arithmetic only \u2014 the control carries NO verdict (Amendment 1)"
+  },
+  "control_note": "CONTROL: identical machinery, NO verdict; better-looking control numbers are a RECORDED FINDING, never a re-selection",
+  "recorded_finding": [
+    "c2a"
+  ],
+  "sensitivity_high_anchor_ci": [
+    {
+      "high_anchor": 294.6,
+      "sd_strat": 74.32645911786732,
+      "per_n0": [
+        {
+          "n0": 16,
+          "cov95": 41,
+          "rmse": 4992.829814779288,
+          "rmse_le_sd_strat": false
+        },
+        {
+          "n0": 32,
+          "cov95": 33,
+          "rmse": 3099.430851725345,
+          "rmse_le_sd_strat": false
+        },
+        {
+          "n0": 48,
+          "cov95": 34,
+          "rmse": 10365.606895919173,
+          "rmse_le_sd_strat": false
+        }
+      ],
+      "c1": false,
+      "c2a": false,
+      "c2b": false,
+      "note": "recorded AFTER the verdict; cannot change it; no new holdout call"
+    },
+    {
+      "high_anchor": 1939.0,
+      "sd_strat": 484.8532381298489,
+      "per_n0": [
+        {
+          "n0": 16,
+          "cov95": 41,
+          "rmse": 4992.829814779288,
+          "rmse_le_sd_strat": false
+        },
+        {
+          "n0": 32,
+          "cov95": 33,
+          "rmse": 3099.430851725345,
+          "rmse_le_sd_strat": false
+        },
+        {
+          "n0": 48,
+          "cov95": 34,
+          "rmse": 10365.606895919173,
+          "rmse_le_sd_strat": false
+        }
+      ],
+      "c1": false,
+      "c2a": false,
+      "c2b": false,
+      "note": "recorded AFTER the verdict; cannot change it; no new holdout call"
+    }
+  ],
+  "exposure": {
+    "prior": 103,
+    "primary": 3,
+    "control": 3,
+    "total": 109
+  },
+  "holdout_retired_for_shed_selection": true
+}

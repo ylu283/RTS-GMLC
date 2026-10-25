@@ -1,0 +1,29 @@
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+/opt/anaconda3/envs/bogp-botorch/lib/python3.10/site-packages/gpytorch/models/exact_gp.py:299: GPInputWarning: The input matches the stored training data. Did you forget to call model.train()?
+  warnings.warn(
+hash gate PASS; Amendment-1 roles: PRIMARY rbf+log1p+ii (bar + verdict), CONTROL rbf+log1p+ref (context, no verdict)
+holdout strata {'LOW': 18, 'MID': 27, 'HIGH': 3}  max shed 16,586 MWh;  sd_strat 130.4 MWh (pinned ~130.4; disclosed ex ante: c2b is effectively unattainable at campaign-scale RMSE)
+[PRIMARY] n0=16: conv True ext False  cov95 41/48 (sigma-at-obs 41/48)  rmse 4,993  nlpd 10.312  latent ratio 2.96  half-width lat/tot 7,754/7,754 MWh
+[PRIMARY] n0=32: conv True ext False  cov95 33/48 (sigma-at-obs 33/48)  rmse 3,099  nlpd 18.935  latent ratio 7.26  half-width lat/tot 2,006/2,006 MWh
+[PRIMARY] n0=48: conv True ext False  cov95 34/48 (sigma-at-obs 34/48)  rmse 10,366  nlpd 16.415  latent ratio 8.66  half-width lat/tot 12,224/12,225 MWh
+[CONTROL] n0=16: conv True ext False  cov95 33/48 (sigma-at-obs 44/48)  rmse 1,806  nlpd 15.573  latent ratio 3.60  half-width lat/tot 1,761/1,882 MWh
+[CONTROL] n0=32: conv True ext False  cov95 26/48 (sigma-at-obs 36/48)  rmse 1,456  nlpd 17.678  latent ratio 4.24  half-width lat/tot 851/1,041 MWh
+[CONTROL] n0=48: conv True ext False  cov95 32/48 (sigma-at-obs 40/48)  rmse 1,703  nlpd 14.562  latent ratio 5.44  half-width lat/tot 1,353/1,508 MWh
+
+PRIMARY VERDICT: {"pass": false, "c1": false, "c2a": false, "c2b": false, "c3": true, "rmse_clause": "-"}
+CONTROL bar arithmetic (context, no verdict): {"pass": false, "c1": false, "c2a": true, "c2b": false, "c3": true, "rmse_clause": "a", "note": "arithmetic only \u2014 the control carries NO verdict (Amendment 1)"}
+RECORDED FINDING (never a re-selection): control grades better on c2a
+sensitivity HIGH=294.6: cov95 [41, 33, 34]  c1 False  sd_strat 74.3  c2b False
+sensitivity HIGH=1939.0: cov95 [41, 33, 34]  c1 False  sd_strat 484.9  c2b False
+
+holdout exposure: 103 + 3 + 3 = 109 scorings (one per n0 per role). The holdout is RETIRED for shed model selection; no third model ever touches it.
+PRIMARY FAIL -> pre-named next steps: targeted high-shed data (prompt 44 proposal) or form (i) amendment
