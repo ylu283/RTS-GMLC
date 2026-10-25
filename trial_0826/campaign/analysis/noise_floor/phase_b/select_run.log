@@ -1,0 +1,15 @@
+train-32 strata {'LOW': 14, 'MID': 18, 'HIGH': 0}  max shed 13,729 MWh (< 15,000: selection cannot test the HIGH-stratum noise)
+m52+log1p+ii     nlpd    7.904  rmse    1070.4  cov95 32/32  rms_z   0.97  (LOW 1.16 MID 0.79)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 4.4e-14 dsd 1.2e-14
+m52+log1p+iii    nlpd    7.905  rmse    1071.4  cov95 32/32  rms_z   0.97  (LOW 1.16 MID 0.79)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 2.8e-14 dsd 6.5e-15
+m52+std+ii       nlpd    8.225  rmse    1103.7  cov95 29/32  rms_z   1.02  (LOW 0.74 MID 1.19)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 1.1e-14 dsd 1.2e-14
+m52+std+iii      nlpd    8.227  rmse    1107.1  cov95 29/32  rms_z   1.02  (LOW 0.75 MID 1.19)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 5.4e-14 dsd 2.2e-14
+rbf+log1p+ii     nlpd    7.785  rmse    1094.5  cov95 30/32  rms_z   0.99  (LOW 1.07 MID 0.93)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 1.9e-13 dsd 7.8e-14
+rbf+log1p+iii    nlpd    7.785  rmse    1095.8  cov95 30/32  rms_z   1.00  (LOW 1.07 MID 0.93)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 7.9e-14 dsd 2.9e-14
+rbf+std+ii       nlpd    8.252  rmse    1182.1  cov95 30/32  rms_z   1.13  (LOW 0.91 MID 1.28)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 2.5e-14 dsd 1.5e-14
+rbf+std+iii      nlpd    8.253  rmse    1182.3  cov95 30/32  rms_z   1.13  (LOW 0.90 MID 1.28)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 4.8e-14 dsd 3.0e-14
+m52+log1p+ref    nlpd    7.768  rmse     946.5  cov95 30/32  rms_z   0.98  (LOW 0.96 MID 1.00)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 3.1e-14 dsd 1.6e-14
+m52+std+ref      nlpd    8.305  rmse    1126.9  cov95 30/32  rms_z   1.01  (LOW 0.70 MID 1.20)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 2.2e-14 dsd 2.4e-14
+rbf+log1p+ref    nlpd    7.768  rmse     894.6  cov95 30/32  rms_z   1.08  (LOW 1.06 MID 1.09)  conv True ext False  jitter_raw 2.95e-02 MWh  ut dmu/sy 2.9e-14 dsd 1.4e-14
+rbf+std+ref      nlpd    8.349  rmse    1216.1  cov95 28/32  rms_z   1.14  (LOW 0.87 MID 1.31)  conv True ext False  jitter_raw 3.70e-03 MWh  ut dmu/sy 2.1e-14 dsd 1.2e-14
+
+STOP-FOR-DECISION: 12-arm walk crowned reference arm rbf+log1p+ref. winner_commit.json NOT written; the frozen holdout stays untouched.

@@ -1,0 +1,41 @@
+{
+  "STOP_FOR_DECISION": true,
+  "reason": "the 12-arm tie walk crowned a reference (homoscedastic 285.3) arm; spending the one holdout scoring on the rejected scalar framing requires Kay's sign-off",
+  "walks": {
+    "walk8_winner": "rbf+log1p+ii",
+    "walk8_order": [
+      "rbf+log1p+ii",
+      "rbf+log1p+iii",
+      "m52+log1p+ii",
+      "m52+log1p+iii",
+      "m52+std+ii",
+      "m52+std+iii",
+      "rbf+std+ii",
+      "rbf+std+iii"
+    ],
+    "walk8_within_0.02_of_best": [
+      "rbf+log1p+ii",
+      "rbf+log1p+iii"
+    ],
+    "walk8_rmse_rule_changed_winner": false,
+    "walk12_crowned": "rbf+log1p+ref",
+    "walk12_order": [
+      "m52+log1p+ref",
+      "rbf+log1p+ref",
+      "rbf+log1p+ii",
+      "rbf+log1p+iii",
+      "m52+log1p+ii",
+      "m52+log1p+iii",
+      "m52+std+ii",
+      "m52+std+iii",
+      "rbf+std+ii",
+      "rbf+std+iii",
+      "m52+std+ref",
+      "rbf+std+ref"
+    ],
+    "stop_for_decision": true,
+    "note": "0.02-nat window is a pinned convention, not a significance claim"
+  },
+  "loo_table_sha256": "6802ea78f65f09378bee260d0b326fab948471bbcd9f9f10b0c4fddcdde2fe54",
+  "committed_at_utc": "2026-10-25T19:19:05+00:00"
+}
