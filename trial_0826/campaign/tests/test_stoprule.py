@@ -256,3 +256,69 @@ def test_q4_variants():
     rows = rules.apply_q4({"H_obs": Ho, "H_true": Ho, "H_star": 120.0, "tau": 1.0, "q": 4})
     assert [r["variant"] for r in rows] == ["unscaled", "scaled_q/8", "window16"]
     assert all(r["K"] == 8 for r in rows)
+
+
+# --------------------------------------------------------------------------- #
+# prompt 50: tau <= 0 guard (Z-dis x union box)
+# --------------------------------------------------------------------------- #
+_TAU_NAN = ("future_gain_tau", "regret_budget_tau", "regret_star_tau",
+            "early", "late", "wasted", "late_net", "wasted_net", "r_star")
+
+
+def _pre_patch_stop_metrics(s, fired, K, H_true, H_star, tau, q, w=1):
+    """Verbatim pre-patch body (f5e4c14) — the tau > 0 reference."""
+    R = len(H_true) - 1
+    fg = rules.future_gain(H_true, s)
+    early = bool(s < K and s < R and fg > tau)
+    cap = bool(not fired)
+    r_star = next(r for r in range(1, R + 1) if rules.future_gain(H_true, r) <= tau)
+    wasted = max(0, s - r_star)
+    wasted_net = max(0, wasted - (w - 1))
+    return {"stop": s, "fired": fired, "early": early, "cap": cap,
+            "late": wasted > 0, "wasted": wasted, "late_net": wasted_net > 0,
+            "wasted_net": wasted_net, "r_star": r_star,
+            "future_gain_tau": fg / tau,
+            "regret_star": (H_star - H_true[s]) / H_star,
+            "regret_budget_tau": (H_true[R] - H_true[s]) / tau,
+            "regret_star_tau": (H_star - H_true[s]) / tau,
+            "evals": s * q}
+
+
+def test_tau_zero_guard_columns():                                   # (a)
+    Ht = np.array([0.0, 0, 0, 5, 7, 7, 8, 8, 8])
+    m = rules.stop_metrics(3, True, 4, Ht, 20.0, tau=0.0, q=8, w=2)
+    assert m["tau_degenerate"] is True
+    assert all(np.isnan(m[c]) for c in _TAU_NAN)
+    assert m["stop"] == 3 and m["fired"] is True and m["cap"] is False and m["evals"] == 24
+    assert m["regret_star"] == pytest.approx((20 - 5) / 20)
+
+
+@pytest.mark.parametrize("t", range(40))
+def test_tau_positive_identical_to_pre_patch(t):                      # (b)
+    rng = np.random.default_rng(t)
+    R = int(rng.integers(2, 17))
+    Ht = np.r_[0.0, np.cumsum(rng.exponential(1.0, R) * (rng.random(R) < 0.7))]
+    tau = float(rng.choice([1e-12, 0.3, 1.0, 3.0]))
+    for s in range(1, R + 1):
+        for K, w in ((4, 1), (4, 2), (8, 3)):
+            new = rules.stop_metrics(s, bool(s % 2), K, Ht, 50.0, tau, 8, w)
+            old = _pre_patch_stop_metrics(s, bool(s % 2), K, Ht, 50.0, tau, 8, w)
+            assert new.pop("tau_degenerate") is False
+            assert new == old and all(type(new[k]) is type(old[k]) for k in old)
+
+
+def test_tau_zero_through_apply_all():                                # (c)
+    Ho = np.array([0.0, 0, 0, 3, 6, 6, 6, 6, 6])                     # monotone, H0 = 0
+    rows = rules.apply_all({"H_obs": Ho, "H_true": Ho, "H_star": 9.0, "tau": 0.0,
+                            "q": 8, "ehvi": None})
+    assert all(r["tau_degenerate"] for r in rows)
+    # S0 (mult and %H0 variants) never fires: gains >= 0 are never < 0
+    assert all(not r["fired"] for r in rows if r["rule"] == "S0")
+    # S-OCD: variance branch inert (inf / nan), slope branch may fire -> no crash
+    assert any(r["rule"] == "S-OCD" for r in rows)
+    # Oracle degenerates to the earliest max-HV round
+    o = [r for r in rows if r["rule"] == "Oracle"][0]
+    assert o["stop"] == 4
+    q4 = rules.apply_q4({"H_obs": np.linspace(0, 0, 17), "H_true": np.zeros(17),
+                         "H_star": 1.0, "tau": 0.0, "q": 4})
+    assert all(r["tau_degenerate"] and np.isnan(r["early"]) for r in q4)

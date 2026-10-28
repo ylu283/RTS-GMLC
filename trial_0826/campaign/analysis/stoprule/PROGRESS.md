@@ -64,3 +64,35 @@
   pandas 3.0.6; inherited from BOGP_CRC) → added crc/fingerprint.py with the
   Mac values (starts, 2-D starts, noise, candidate subset) as a CRN check
   before submission. GATE PASSED pending the fingerprint match.
+
+## 2026-10-28 — prompt 50 (collector fix)
+
+- Array 1533596: all 1,540 tasks done (0 missing). Collector 1533597 crashed
+  at `rules.py:112` (`fg / tau`, ZeroDivisionError), first on
+  `results/Z-dis/M1/seed0.npz`.
+- Diagnose (local, start designs only — truth evaluated at the 32 Sobol
+  starts with the CRN noise, NO 6-D method run): all 390 6-D
+  (problem, noise, seed) keys of tasks.csv. Frozen-box τ > 0 in 390/390.
+  Union-box τ = 0 in exactly 18 — all Z-dis (seeds 0–4, 6–10, 12–19);
+  seeds 5 / 11 τ_union = 3.49e14 / 1.95e15 (kept as-is, disclosed). H0_union
+  = 0 on the same runs + seed 5. H* > 0 in both boxes everywhere. Block R
+  (committed summaries): min τ frozen 3.7e16, union 3.7e17 → no zeros.
+  Exactly the prompt-50 §1 expectation → patch, no escalation.
+- Guard (rules.stop_metrics): τ ≤ 0 exact (no epsilon) → NaN for
+  future_gain_tau, regret_budget_tau, regret_star_tau, early, late, wasted,
+  late_net, wasted_net, r_star; retained stop, fired, cap, evals,
+  regret_star, density_at_stop; new column `tau_degenerate` on every row.
+  Rules still fire with τ as-is (S0 never fires at τ = 0; S-OCD variance
+  branch inert via numpy inf, slope branch may fire; Oracle = earliest
+  max-HV round). τ > 0 path unchanged.
+- Tests: +42 (τ = 0 columns; τ > 0 equal to the verbatim pre-patch body on
+  40 random trajectories incl. types; τ = 0 through apply_all/apply_q4).
+  119 passed, 0 skipped (bogp-botorch, BOGP_PATH set).
+- Golden no-op: `collector.collect("R-*")` regenerated into scratch → 680
+  runs / 114,240 rows; stops value-identical to the committed
+  `stops_R-.csv.gz` (exact, by column; `tau_degenerate` all False — the only
+  schema change is that added column) and `trajectories_R-.json` identical.
+- collector `__main__` now prints runs / stop rows per tasks.csv block.
+- Re-collect: plain `qsub crc/stoprule_collect.sh` (no -hold_jid; the array
+  finished). The script header's `-hold_jid` line is the original 37
+  submission form — not rewritten.

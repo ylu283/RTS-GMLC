@@ -106,14 +106,26 @@ def stop_metrics(s: int, fired: bool, K: int, H_true: np.ndarray, H_star: float,
     # net of the rule's own detection delay: a w-round window needs w - 1
     # rounds after r* before it can fire
     wasted_net = max(0, wasted - (w - 1))
-    return {"stop": s, "fired": fired, "early": early, "cap": cap,
-            "late": wasted > 0, "wasted": wasted, "late_net": wasted_net > 0,
-            "wasted_net": wasted_net, "r_star": r_star,
-            "future_gain_tau": fg / tau,
-            "regret_star": (H_star - H_true[s]) / H_star,
-            "regret_budget_tau": (H_true[R] - H_true[s]) / tau,
-            "regret_star_tau": (H_star - H_true[s]) / tau,
-            "evals": s * q}
+    # prompt 50 guard: tau <= 0 (exact, no epsilon) occurs only for Z-dis x
+    # union box (no start inside R_union -> HV == 0 under every MC draw). The
+    # /tau columns and the tau-comparison columns are undefined there -> NaN;
+    # the rule itself was evaluated with tau as-is by the caller.
+    degenerate = bool(tau <= 0)
+    inv_tau = np.nan if degenerate else None
+    out = {"stop": s, "fired": fired, "early": early, "cap": cap,
+           "late": wasted > 0, "wasted": wasted, "late_net": wasted_net > 0,
+           "wasted_net": wasted_net, "r_star": r_star,
+           "future_gain_tau": fg * inv_tau if degenerate else fg / tau,
+           "regret_star": (H_star - H_true[s]) / H_star,
+           "regret_budget_tau": (H_true[R] - H_true[s]) * inv_tau if degenerate
+           else (H_true[R] - H_true[s]) / tau,
+           "regret_star_tau": (H_star - H_true[s]) * inv_tau if degenerate
+           else (H_star - H_true[s]) / tau,
+           "evals": s * q, "tau_degenerate": degenerate}
+    if degenerate:
+        for c in ("early", "late", "wasted", "late_net", "wasted_net", "r_star"):
+            out[c] = np.nan
+    return out
 
 
 # --------------------------------------------------------------------------- #

@@ -102,6 +102,18 @@ def collect(pattern: str = "*") -> tuple[list[dict], pd.DataFrame]:
     return summ, df
 
 
+def block_counts(summ: list[dict], df: pd.DataFrame) -> pd.DataFrame:
+    """Runs and stop rows per tasks.csv block (prompt 50 §3.5 count asserts)."""
+    t = pd.read_csv(HERE / "tasks.csv")
+    key = ["problem", "method", "seed", "noise", "q"]
+    runs = pd.DataFrame([{k: s[k] for k in key} for s in summ])
+    runs = runs.merge(t[key + ["block"]], on=key, how="left")
+    rows = df[key].merge(t[key + ["block"]], on=key, how="left")
+    return pd.DataFrame({"runs": runs.groupby("block", dropna=False).size(),
+                         "stop_rows": rows.groupby("block", dropna=False).size()})
+
+
 if __name__ == "__main__":
     s, df = collect(sys.argv[1] if len(sys.argv) > 1 else "*")
     print(f"{len(s)} runs, {len(df)} stop rows")
+    print(block_counts(s, df).to_string())
