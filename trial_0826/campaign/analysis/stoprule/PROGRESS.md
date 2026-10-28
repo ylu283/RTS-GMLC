@@ -96,3 +96,18 @@
 - Re-collect: plain `qsub crc/stoprule_collect.sh` (no -hold_jid; the array
   finished). The script header's `-hold_jid` line is the original 37
   submission form — not rewritten.
+- Collect job ran on CRC (BOGP_CRC env): bot commit `9f45ea7` retrieved by
+  `git pull --ff-only` (b0263e2..9f45ea7; only summary/MISSING.txt,
+  stops.csv.gz, trajectories.json added; stops_R-/trajectories_R- untouched).
+  MISSING.txt = 1 byte (newline).
+- §3.5 count asserts: runs 1,540 = A 750 · B 120 · C 300 · D 30 · E 340 ✓.
+  Stop rows **247,020 ≠ pinned 249,420** (A 117,000 · B 18,720 · C 46,800 ·
+  D 5,340 · E 59,160 ✓). Every run has a uniform row count: 6-D q8 M1/M4 154,
+  **M3 160** (pinned 166); q4 M1/M4 176, **M3 182** (pinned 188); 2-D M3 174.
+  Gap = 400 6-D M3 runs × 6 = 2,400 exactly = the S-model rows in the UNION
+  box, which the collector has never emitted (collector.py: ehvi passed for
+  the frozen box only, since 37 — E[HVI] is computed at R_frozen). The pinned
+  per-run table counts S-model in both boxes for 6-D M3 but in the frozen box
+  only for 2-D M3 (174 = 168 + 6) → internally inconsistent; the data are
+  complete (S-model frozen rows 2,400 = 400 × 6, all with a stop). STOPPED
+  before analysis per §3.5 pending Kay.
