@@ -1,0 +1,397 @@
+{
+  "note": "prompt 36: rulers on v2 costs; no v1 floors carried",
+  "v1_frozen": {},
+  "groups": {
+    "base": {
+      "true_curt": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "h2": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "var_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "reserve": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "onoffs": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "total_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "fixed_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 3,
+        "low_confidence": false,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "_gen1_starts_by_solve": {
+        "base_2019_v2:1": 0.0,
+        "base_2019_v2:2": 0.0,
+        "base_2019_v2:3": 0.0,
+        "screening_v2/ercot:11": 0.0
+      },
+      "_mode_pinning": false
+    },
+    "wind_pocket": {
+      "true_curt": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "h2": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "var_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "reserve": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "onoffs": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "total_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "fixed_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "_gen1_starts_by_solve": {
+        "screening_v2/ercot:1": 0.0,
+        "screening_v2/ercot:12": 0.0,
+        "selection_t1_v2:3": 0.0
+      },
+      "_mode_pinning": false
+    },
+    "pv": {
+      "true_curt": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "h2": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "var_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "reserve": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "onoffs": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": false
+      },
+      "total_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "fixed_cost": {
+        "readings": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 2,
+        "low_confidence": true,
+        "qualitative_only": false,
+        "bimodal": true
+      },
+      "_gen1_starts_by_solve": {
+        "screening_v2/ercot:8": 0.0,
+        "selection_t1_v2:4": 0.0,
+        "selection_t1_v2:5": 0.0
+      },
+      "_mode_pinning": false
+    },
+    "nuclear": {
+      "true_curt": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": false
+      },
+      "h2": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": false
+      },
+      "var_cost": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": false
+      },
+      "reserve": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": false
+      },
+      "onoffs": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": false
+      },
+      "total_cost": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": true
+      },
+      "fixed_cost": {
+        "readings": [
+          0.0
+        ],
+        "floor": 0.0,
+        "df": 1,
+        "low_confidence": true,
+        "qualitative_only": true,
+        "bimodal": true
+      },
+      "_gen1_starts_by_solve": {
+        "selection_t1_v2:8": 0.0,
+        "selection_t1_v2:11": 0.0
+      },
+      "_mode_pinning": true
+    }
+  },
+  "campaign_floor_T1": {
+    "true_curt": 0.0,
+    "h2": 0.0,
+    "var_cost": 0.0,
+    "reserve": 0.0,
+    "onoffs": 0.0,
+    "total_cost": 0.0,
+    "fixed_cost": 0.0
+  },
+  "changes_vs_v1": [],
+  "base_modes_gen1_starts": {
+    "base_2019_v2:1": 0.0,
+    "base_2019_v2:2": 0.0,
+    "base_2019_v2:3": 0.0,
+    "screening_v2/ercot:11": 0.0
+  }
+}
