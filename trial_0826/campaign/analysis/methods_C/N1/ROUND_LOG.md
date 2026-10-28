@@ -43,8 +43,14 @@ arm's JIDs from methods_C/PROGRESS.md.
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - botorch: 0.16.1
 - predictions: waves/methods_C_N1_r2/predictions.csv
+- graded_at: 2026-10-16T03:35:17+00:00
+- cumulative_hv: 7.677327076214076e+17
+- gain: 3.184409120899136e+16
+- gain_tau: 0.605056268058484
 - threshold: 5.262996664950399e+16
-- decision: proposed
+- would_stop: False
+- n_outside_ref: 1
+- decision: graded (record_only) -> r3
 - designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
     - [0.05000, 0.88125, 1.00000, 0.88125, 0.76250, 0.52500]
     - [0.05000, 0.05000, 1.00000, 0.52500, 0.64375, 0.05000]
@@ -54,4 +60,61 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.40625, 1.00000, 1.00000, 0.76250, 0.76250, 0.52500]
     - [0.05000, 0.05000, 0.05000, 0.05000, 0.52500, 1.00000]
     - [0.05000, 1.00000, 0.05000, 0.88125, 1.00000, 1.00000]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": -0.074, "rms_z": 0.22, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.495, "rms_z": 0.626, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.426, "rms_z": 0.621, "cov95": 8}}
 <!-- END r2 -->
+
+<!-- BEGIN r3 -->
+## Round 3 (methods_C_N1_r3)
+- proposed_at: 2026-10-16T04:09:44+00:00
+- acq: qnehvi
+- acq_seed: 20261409
+- bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
+- botorch: 0.16.1
+- predictions: waves/methods_C_N1_r3/predictions.csv
+- graded_at: 2026-10-17T22:37:21+00:00
+- cumulative_hv: 7.776901042172783e+17
+- gain: 9957396595870720.0
+- gain_tau: 0.18919633109751482
+- threshold: 5.262996664950399e+16
+- would_stop: True
+- n_outside_ref: 2
+- decision: graded (record_only) -> r4
+- designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
+    - [0.64375, 0.76250, 0.05000, 0.64375, 0.64375, 0.88125]
+    - [0.05000, 1.00000, 1.00000, 0.05000, 0.88125, 1.00000]
+    - [0.05000, 1.00000, 1.00000, 0.05000, 0.64375, 0.05000]
+    - [0.05000, 0.05000, 0.05000, 0.64375, 0.64375, 0.88125]
+    - [0.05000, 1.00000, 1.00000, 0.40625, 0.64375, 0.05000]
+    - [0.05000, 0.05000, 1.00000, 1.00000, 0.64375, 0.05000]
+    - [0.40625, 0.88125, 0.05000, 0.64375, 0.64375, 0.88125]
+    - [0.05000, 1.00000, 1.00000, 0.05000, 0.76250, 0.52500]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": -0.038, "rms_z": 0.629, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.971, "rms_z": 1.132, "cov95": 7}, "total_cost_less_synthetic_usd": {"mean_z": -0.291, "rms_z": 0.806, "cov95": 8}}
+<!-- END r3 -->
+
+<!-- BEGIN r4 -->
+## Round 4 (methods_C_N1_r4)
+- proposed_at: 2026-10-17T22:55:00+00:00
+- acq: qnehvi
+- acq_seed: 20261410
+- bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
+- botorch: 0.16.1
+- predictions: waves/methods_C_N1_r4/predictions.csv
+- graded_at: 2026-10-21T03:41:49+00:00
+- cumulative_hv: 7.892476689418824e+17
+- gain: 1.1557564724604032e+16
+- gain_tau: 0.2196004569330837
+- threshold: 5.262996664950399e+16
+- would_stop: True
+- n_outside_ref: 2
+- decision: graded (record_only)
+- designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
+    - [0.05000, 1.00000, 0.64375, 0.28750, 1.00000, 1.00000]
+    - [0.28750, 0.88125, 0.64375, 0.40625, 1.00000, 1.00000]
+    - [0.05000, 0.76250, 0.05000, 0.05000, 0.52500, 0.52500]
+    - [0.05000, 1.00000, 0.16875, 0.05000, 1.00000, 1.00000]
+    - [0.40625, 1.00000, 1.00000, 1.00000, 1.00000, 0.52500]
+    - [0.05000, 1.00000, 0.28750, 1.00000, 1.00000, 0.28750]
+    - [0.05000, 0.05000, 0.05000, 1.00000, 1.00000, 0.05000]
+    - [0.64375, 0.88125, 0.64375, 0.64375, 0.64375, 0.64375]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": -0.12, "rms_z": 0.29, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.248, "rms_z": 0.573, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.043, "rms_z": 0.698, "cov95": 8}}
+<!-- END r4 -->

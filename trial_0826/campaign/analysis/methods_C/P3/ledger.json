@@ -45,6 +45,39 @@
       "n_outside_ref": 3,
       "decision": "graded (record_only)",
       "at": "2026-10-16T03:35:06+00:00"
+    },
+    {
+      "round": 2,
+      "n": 48,
+      "hv": 1.7078245879188093e+18,
+      "gain": 9.119758106278554e+16,
+      "gain_tau": 1.2803235322378785,
+      "would_stop": false,
+      "n_outside_ref": 5,
+      "decision": "graded (record_only)",
+      "at": "2026-10-17T22:37:09+00:00"
+    },
+    {
+      "round": 3,
+      "n": 56,
+      "hv": 1.728579873429406e+18,
+      "gain": 2.075528551059661e+16,
+      "gain_tau": 0.2913836107038632,
+      "would_stop": false,
+      "n_outside_ref": 5,
+      "decision": "graded (record_only)",
+      "at": "2026-10-21T03:41:42+00:00"
+    },
+    {
+      "round": 4,
+      "n": 64,
+      "hv": 1.7499769887755884e+18,
+      "gain": 2.13971153461824e+16,
+      "gain_tau": 0.3003942646336766,
+      "would_stop": true,
+      "n_outside_ref": 6,
+      "decision": "graded (record_only)",
+      "at": "2026-10-22T03:40:23+00:00"
     }
   ]
 }
