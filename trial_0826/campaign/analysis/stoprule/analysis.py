@@ -44,7 +44,13 @@ def save(fig, name):
 
 def load(tag: str = ""):
     traj = json.loads((SUMMARY / f"trajectories{tag}.json").read_text())
-    stops = pd.read_csv(SUMMARY / f"stops{tag}.csv.gz")
+    stops = pd.read_csv(SUMMARY / f"stops{tag}.csv.gz", low_memory=False)
+    # early / late / late_net are bool, or NaN on tau_degenerate rows -> float 1/0/NaN
+    tf = {True: 1.0, False: 0.0, "True": 1.0, "False": 0.0}
+    for c in ("early", "late", "late_net"):
+        stops[c] = stops[c].map(tf).astype(float)
+    if "tau_degenerate" not in stops:          # Block R summaries predate prompt 50 (no tau <= 0)
+        stops["tau_degenerate"] = False
     return traj, stops
 
 
@@ -62,10 +68,12 @@ def fixed_budget(traj: list[dict], box: str = "frozen") -> pd.DataFrame:
     for t in traj:
         b = t[box]
         Ht, Hs, tau = np.asarray(b["H_true"]), b["H_star"], b["tau"]
+        deg = not tau > 0                              # prompt 50: Z-dis x union, tau = 0
         for k in range(len(Ht)):
             rows.append({"cell": t["cell"], "problem": t["problem"], "method": t["method"],
                          "seed": t["seed"], "round": k, "n": t["n0"] + k * t["q"],
-                         "H_ratio": Ht[k] / Hs, "regret_tau": (Hs - Ht[k]) / tau})
+                         "H_ratio": Ht[k] / Hs, "regret_tau": np.nan if deg else (Hs - Ht[k]) / tau,
+                         "H_tau": np.nan if deg else Ht[k] / tau, "tau_degenerate": deg})
     return pd.DataFrame(rows)
 
 
@@ -118,11 +126,15 @@ def fig_method(fb: pd.DataFrame, cells: list[str], ns: list[int], name: str, nco
 def oc_table(stops: pd.DataFrame, box: str = "frozen") -> pd.DataFrame:
     s = stops[stops["box"] == box].copy()
     s["variant"] = s.apply(_variant, axis=1)
+    # tau-dependent columns are NaN on tau_degenerate rows (prompt 50) and
+    # pandas skips them; n_tau_degenerate says how many runs that is
     g = s.groupby(["cell", "method", "variant"])
-    out = g.agg(n_runs=("stop", "size"), mean_stop=("stop", "mean"),
+    out = g.agg(n_runs=("stop", "size"), n_tau_degenerate=("tau_degenerate", "sum"),
+                mean_stop=("stop", "mean"),
                 share_stop_r2=("stop", lambda x: float(np.mean(x == 2))),
                 early=("early", "mean"), cap=("cap", "mean"), late=("late", "mean"),
-                mean_wasted=("wasted", "mean"),
+                late_net=("late_net", "mean"), mean_wasted=("wasted", "mean"),
+                mean_wasted_net=("wasted_net", "mean"),
                 med_regret_budget_tau=("regret_budget_tau", "median"),
                 med_regret_star=("regret_star", "median"),
                 mean_evals=("evals", "mean"),
@@ -141,6 +153,8 @@ def _variant(r) -> str:
         return f"S-model w{int(r['w'])} K{int(r['K'])}"
     if r["rule"] == "S-OCD":
         return f"S-OCD K{int(r['K'])}"
+    if r["rule"] == "S0-q4":
+        return f"S0-q4 {r['variant']}"
     if r["rule"] == "S-fix":
         return f"S-fix-{int(r['k'])}"
     return r["rule"]

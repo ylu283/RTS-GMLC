@@ -111,3 +111,14 @@
   only for 2-D M3 (174 = 168 + 6) → internally inconsistent; the data are
   complete (S-model frozen rows 2,400 = 400 × 6, all with a stop). STOPPED
   before analysis per §3.5 pending Kay.
+- Kay approved proceeding on the 247,020-row count (no code change).
+- Analysis (prompt 50 §4–§5): `results.py` → tables/, figs/,
+  `STOPRULE_RESULTS.md`. analysis.py τ-guards (fixed_budget NaN τ columns,
+  oc_table n_tau_degenerate / late_net / wasted_net, load casts, q4 variant
+  names). **Verdict: S0(1·τ_j, w2, K4) NOT ACCEPTED**: primary early 49.2 %
+  (42.8–55.2), median regret 1.83 τ (1.71–1.97), S-fix line 1.833 vs 1.824;
+  Z-needle informative (M1 25 % / M3 35 %), passes early + regret, fails the
+  S-fix line by 0.004 τ. M2 trigger FIRES (M1 − M3 median H/τ −1.70 / −1.45
+  at n = 64 / 96) — not run (zero new simulation). Cap input (descriptive):
+  s = 2/3/4 → 81/64/105 of 250. Floor-robust HV cross-check (PREREG §6) not
+  done — disclosed open. Not pushed (prompt 50: the §3.1 push was the only one).
