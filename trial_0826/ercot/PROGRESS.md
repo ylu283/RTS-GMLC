@@ -1,4 +1,29 @@
-# ERCOT PROGRESS (prompts 26 → 36)
+# ERCOT PROGRESS (prompts 26 → 36, 57)
+
+## Prompt 57 Part A — objective-pool expansion (2026-11-06, zero simulation, local only)
+
+- [x] **Freeze** `analysis/pool/pool_definitions.json` at `f76d897` (28
+  candidates + D3, dirs, priorities, global order, EF COAL 1.00 / CT 0.55
+  t/MWh ± 20 %, 450 $/MWh LMP threshold, S1–S3, G, S, §4 ρ rules).
+- [x] **A1/A2** `pool_objectives.py` → `pool_wide_v2.csv` (31 rows, 23
+  distinct designs, 1 full extract, 0 SUSPECT); 144/144 legacy cells equal
+  the frozen `objectives_t1_v2.csv` (h2 copied on the 6 slim nuclear rows).
+  DEAD: E5, R1, R3 (max |value| 0). UNDETERMINED: E8, E9, N5 (one `--full`
+  run). Exact replicates → exact zeros. Commit `4863973`.
+- [x] **A3** first cut n = 16 (NON-USE): raw cluster {E1, V2, X1};
+  gen_pmax-partialled {V2, X1}. E1–X1 +0.92 raw → +0.52 partialled (the
+  pinned conflict is not visible at one size per site). V1–N3 −0.84/−0.87.
+  `figs/pool_firstcut_clustermap.png`. Commit `a613507`.
+- [x] **A4b** G_base = $196.7M = 17.4 × the $11.3M median single-site
+  |Δ total_cost|; 0 / 16 single-site E1 deltas GAP-READABLE; the 1 % gap
+  binds on every RUC day. E-D1 cost evidence must be re-read in Part B.
+- [x] **A5** storage line: 51 MB × 21 rows ≈ 1.07 GB (18 rows ≈ 0.92 GB).
+- [x] **A6** `ERCOT_BO_PLAN.md` AMENDMENT 2026-11-06 (E-D1b) appended.
+- [x] **Tests** `pytest tests/test_pool_objectives.py -q` → 13 passed
+  (pandas 2.3.3 local). **CRC run pending** under PCM_ERCOT (pandas 3.0.5).
+- [ ] **Part B** waits for wave D (`location_oat_v2`, all `--full`) and
+  Kay's three MW levels; ruler waits for prompt 52.
+- Session lock `57` inside this worktree. No push.
 
 ## Prompt 36 — cost-data fix (2026-10-12, T0 + T1 build done locally; CRC pending)
 

@@ -421,3 +421,55 @@ Drafted rows for pi-agenda §4 (strategy session pastes them):
    prompt's minimum.
 4. **Sensitivity-level rider rule (§7)** added for the sd = 0 case. The
    prompt does not cover it.
+
+## AMENDMENT 2026-11-06 (prompt 57 Part A; objective pool; E-D1b)
+
+**What changed.**
+- §1.1 pool widened from five columns to the prompt-57 §2 table: V1–V3,
+  E1–E9, R1–R8, N1–N5, X1, D1–D3 (28 candidates + the D3 check).
+  Formulas, directions, family-internal priorities, the global order
+  (priority → V < E < X < R < N → id), EF values (COAL 1.00, CT 0.55
+  t/MWh, ± 20 %), the 450 $/MWh LMP threshold and the §4 ρ rules are
+  FROZEN in `analysis/pool/pool_definitions.json` at commit `f76d897`.
+  Candidates may not be added after Part-B data is read.
+- **E-D1 stays OPEN.** The default of §1.1 (curt + total_cost if §1.2
+  passes, else var_cost) is unchanged as the default.
+- **§1.2 is unchanged.** It is immutable (§10) and governs E1 only. The
+  SUSPECT checks S1–S3 are now computed per run in `pool_wide_v2.csv`
+  (0 SUSPECT on the 31 v2 runs).
+- **New decision E-D1b (PI):** which Part-B survivors (prompt 57 §4, after
+  wave D) become objectives (≤ 4, at most one per family by the global
+  order), guardrails, or diagnostics. Part B writes the decision table.
+- Two noise-free scales join the evidence columns, never the verdict
+  labels of §1.2: the MIP-gap cost bound G_run = Σ_days gap × ruc_cost
+  (E1–E3 only; pair bound G_a + G_b; `GAP-READABLE` / `WITHIN GAP
+  BOUND`) and the scale-free location ratio S (prompt 57 §3 A4b).
+- The perturbation ruler of prompt 52 (median |Δ| over the 0.1 %
+  perturbed copies) replaces the vacuous exact-replicate ruler
+  (ruler = 0 on a deterministic instrument). Readability wording is
+  pinned in prompt 57 §3 A4; every Part-B read carries `RULER PENDING
+  (52)` until 52 lands.
+
+**Why.** ERCOT v2 shed ≡ 0, so the RTS argument that dropped reserve
+and cycling as redundant with shed does not transfer. Kay wants the
+selection step to see the widest honest pool.
+
+**What had been seen when this was written.** The 31 v2 runs' legacy 9
+columns; base values of N1/N3/N4/N5/E7; the uplift zeros; the n = 16
+first cut of relief/var_cost/h2/starts (`pool_correlations.csv`); the
+v2 fuel prices; and, after the freeze commit, the Part-A outputs
+computed on the same 31 runs (`analysis/pool/POOL_V2.md`: dead list E5,
+R1, R3; first-cut clusters {E1, V2, X1} raw / {V2, X1} partialled; G
+table). **No wave-D number and no prompt-52 number existed.** No
+priority was changed after any number was seen.
+
+**Finding disclosed, not acted on.** G_base = $196.7M, 17.4 × the
+$11.3M median single-site |Δ total_cost| of §1.1; 0 of 16 single-site
+E1 deltas exceed the pair bound. The §1.1 cost evidence must be re-read
+against this bound in Part B. §1.2 is not touched.
+
+**Storage addendum (prompt 36 §4.2, dated 11-06).** Wave D runs
+`--full` on every row: 51 MB × 21 rows ≈ 1.07 GB (18 rows ≈ 0.92 GB).
+
+Drafted pi-agenda row:
+- `| 2026-11-06 | E-D1b | ERCOT pool survivors → objectives / guardrails / diagnostics | decided after wave D (prompt 57 Part B); pool frozen f76d897; ≤ 4 objectives, one per family | analysis/pool/POOL_V2.md |`
