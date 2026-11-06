@@ -1,0 +1,4 @@
+ruc_date,tolerance,n_mip_solves,n_time_limit
+start_date,0.01,2,0
+2019-01-02,0.01,2,0
+2019-01-03,0.01,2,0
