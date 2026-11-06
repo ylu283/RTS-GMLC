@@ -1,0 +1,8 @@
+# Prompt 58 T2 (wave D location_oat_v2): every row is a --full extract
+# (51 MB each, 21 rows = 1.07 GB). The four gz tables (bus_lmps, line_flows,
+# renewables, thermal) stay in $GROUP storage on CRC and are listed by name +
+# md5 in each extract_manifest.json; the collector commits only the slim
+# tables + pool_full_metrics.json + runtimes.csv + the manifest (about 60 MB
+# in git for the wave). Earlier --full extracts (smoke_v2, base_2019_v2 run 1)
+# were committed before this rule and stay tracked.
+extracts/location_oat_v2/**/*.csv.gz
