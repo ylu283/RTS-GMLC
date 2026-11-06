@@ -603,7 +603,7 @@ def plot_clustermap(raw, par, path, defs, title_note):
     n = len(order)
     fig = plt.figure(figsize=(max(22, 1.05 * n + 6) * 1.9, max(13, 0.9 * n + 5)))
     gs = fig.add_gridspec(2, 3, height_ratios=[1, 6], width_ratios=[20, 20, 1],
-                          hspace=0.02, wspace=0.25)
+                          hspace=0.12, wspace=0.25)
     axd = fig.add_subplot(gs[0, 0])
     dendrogram(Z, ax=axd, labels=None, no_labels=True, color_threshold=0.10,
                above_threshold_color="0.4")
