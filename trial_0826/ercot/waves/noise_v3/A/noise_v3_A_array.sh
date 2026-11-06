@@ -5,7 +5,7 @@
 #$ -t 1-8
 #$ -pe smp 4
 #$ -r n
-# Prompt 52 v2.1 noise_v3 batch A: 8 full-year rows (layout 12; exact and
+# Prompt 52 v2.1 noise_v3 batch A: 8 full-year rows (layout 16; exact and
 # perturbed copies of 4 pre-registered v2 designs, PICK_RULE.md). Runs ONLY under
 # the identity in waves/GAP_DECISION.json (Kay, E-D6), read at run time below.
 set -euo pipefail

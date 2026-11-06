@@ -32,7 +32,7 @@ push_with_retries() {
 }
 
 missing=""
-for i in $(seq 1 4); do
+for i in $(seq 1 8); do
     [[ -f "$WAVE_DIR/runs/run_index_$i/overall_simulation_output.csv" ]] || missing="$missing $i"
 done
 if [[ -n "$missing" ]]; then
@@ -44,7 +44,7 @@ if [[ -n "$missing" ]]; then
     push_with_retries
     exit 1
 fi
-echo "GATE PASS: 4/4"
+echo "GATE PASS: 8/8"
 if [[ -f "$WAVE_DIR/FAILED_noise_v3_B.md" ]]; then
     git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_noise_v3_B.md" 2>/dev/null \
         || rm -f "$WAVE_DIR/FAILED_noise_v3_B.md"
@@ -56,7 +56,7 @@ mkdir -p "$EXTR"
 cp -f "$ERCOT_DIR/waves/GAP_DECISION.json" "$EXTR/GAP_DECISION_used.json"
 cp -f "$WAVE_DIR/design_matrix.csv" "$EXTR/design_matrix_used.csv"
 echo "task,start_epoch,end_epoch,wall_s" > "$EXTR/wallclock.csv"
-for i in $(seq 1 4); do
+for i in $(seq 1 8); do
     JOBLOG=$(ls -t "$WAVE_DIR"/noise_v3_B_array.o*."$i" 2>/dev/null | head -1 || true)
     python "$ERCOT_DIR/extract_ercot.py" --data_dir "$DATA_DIR" \
         "$WAVE_DIR/runs/run_index_$i" \
@@ -73,7 +73,7 @@ for i in $(seq 1 4); do
     python "$ERCOT_DIR/pool_objectives.py" --run-dir "$EXTR/run_index_$i" \
         --out "$EXTR/run_index_$i/pool_full_metrics.json"
 done
-{ echo "batch=B rows=4 collected_utc=$(date -u +%FT%TZ)";
+{ echo "batch=B rows=8 collected_utc=$(date -u +%FT%TZ)";
   echo "head=$(git -C "$REPO_DIR" rev-parse --short HEAD)";
   echo "identity=$(tr -d '\n' < "$ERCOT_DIR/waves/GAP_DECISION.json")"; } > "$EXTR/COLLECTED"
 

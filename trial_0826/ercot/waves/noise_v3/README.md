@@ -1,6 +1,6 @@
 # noise_v3 — ERCOT noise measurement (prompt 52 v2.1; built 2026-11-06, NOT submitted)
 
-Built by `tools/make_noise_v3.py --layout 12`. Kay submits ON CRC, batch A
+Built by `tools/make_noise_v3.py --layout 16`. Kay submits ON CRC, batch A
 first, batch B after batch A's collector email:
 
     cd trial_0826/ercot/waves/noise_v3/A && bash submit_this.sh
@@ -80,7 +80,7 @@ Achieved spread per candidate (1.00 = the pick holds the pool's min and max):
 Where several candidates show the same designs at min and max, they are
 correlated and the strata collapse (prompt 52 section 3: made visible).
 
-## 4. Rows (12: batch A 8, batch B 4; layout 12)
+## 4. Rows (16: batch A 8, batch B 8; layout 16)
 
 | batch | row | design | site | type | bus | copy | sign | delta_rel | PEM MW | nameplate MW | PEM_fraction |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -96,6 +96,10 @@ correlated and the strata collapse (prompt 52 section 3: made visible).
 | B | 2 | D2 (screening_v2/ercot:7) | 206 | WIND | 22 | exact | +0 | 0.000 | 899.9000 | 1799.8 | 0.500000 |
 | B | 3 | D3 (screening_v2/topup:4) | 146 | WIND | 75 | exact | +0 | 0.000 | 134.0000 | 268.0 | 0.500000 |
 | B | 4 | D4 (selection_t1_v2:10) | 1 | NUC | 107 | exact | +0 | 0.000 | 2430.0000 | 2430.0 | 1.000000 |
+| B | 5 | D1 (screening_v2/ercot:1) | 275 | WIND | 120 | perturbed | -1 | 0.001 | 518.9805 | 1039.0 | 0.499500 |
+| B | 6 | D2 (screening_v2/ercot:7) | 206 | WIND | 22 | perturbed | -1 | 0.001 | 899.0001 | 1799.8 | 0.499500 |
+| B | 7 | D3 (screening_v2/topup:4) | 146 | WIND | 75 | perturbed | +1 | 0.001 | 134.1340 | 268.0 | 0.500500 |
+| B | 8 | D4 (selection_t1_v2:10) | 1 | NUC | 107 | perturbed | -1 | 0.002 | 2425.1400 | 2430.0 | 0.998000 |
 
 `PEM_fraction = pem_mw / gen_pmax` (renewable; nameplate from the v2 design
 matrix) or `pem_mw / 2430.0` (nuclear). Exact copies carry the v2 design's
@@ -105,7 +109,7 @@ at 0 and at nameplate (PICK_RULE.md). `replicate_of` = the v2 origin row for
 every copy; `copy_type` tells exact from perturbed. Bid 40.0 $/MWh, full
 year from 01-01-2019. Retrofit dicts: renewable `{"<site>": {"PEM_bid",
 "PEM_fraction", "gen_pmax"}}`; nuclear `{"1": {"PEM_bid", "PEM_fraction"}}`
-with NO `gen_pmax` key. Nuclear rows: A:4 exact omega=1.000000, A:8 perturbed omega=0.999000, B:4 exact omega=1.000000.
+with NO `gen_pmax` key. Nuclear rows: A:4 exact omega=1.000000, A:8 perturbed omega=0.999000, B:4 exact omega=1.000000, B:8 perturbed omega=0.998000.
 
 ## 5. Batch split — resolution (DEVIATION to confirm)
 
@@ -115,14 +119,15 @@ cross-batch exact pairs between batch A and batch B"; ERCOT_BO_PLAN.md
 section 3 pins only "tau population = EXACT cross-batch replicates" and
 section 8 counts 12 replicate runs. Under v3 an exact v3 copy has no v3
 partner unless a second exact copy runs, so 12 rows cannot hold both 4
-cross-batch exact pairs and 8 perturbed copies. Resolution built here
-(layout 12): per design, exact in A, exact in B (the pair), one perturbed in
-A — batch A 8 rows, batch B 4 rows; the ruler population is 4 values
-(one per design), not the 8 of prompt 57 A4, and per-level sd has 1 df.
-Alternative kept in the builder: `python tools/make_noise_v3.py --layout 16`
-adds one antithetic perturbed copy per design to batch B (8 + 8 rows; ruler
-population 8; 16 x 36 core-h). Kay confirms the layout before submitting A;
-`analysis/noise_v3/read_noise.py` reads either.
+cross-batch exact pairs and 8 perturbed copies. Resolution (strategy
+session 11-06, layout 16): per design, exact in A, exact in B (the
+pair), one perturbed in A and one antithetic perturbed in B — batch A 8
+rows, batch B 8 rows; the ruler population is 8 values (4 designs x 2
+copies), exactly the population prompt 57 section 3 A4 pins. At a bound the
+antithetic copy cannot step outward, so it steps inward by 2 x delta
+(nuclear B:8, delta_rel 0.002) — disclosed in the row table. The thinner
+`--layout 12` (A 8, B 4; ruler population 4) is kept in the builder as the
+alternative and is NOT the committed wave. `analysis/noise_v3/read_noise.py` reads either.
 
 ## 6. Collector and the gz policy
 
@@ -139,15 +144,15 @@ Git receives the SLIM tables + `pool_full_metrics.json` + `runtimes.csv` +
 (`trial_0826/ercot/.gitignore`: `extracts/noise_v3/**/*.csv.gz`; the collector
 aborts if a gz is staged).
 
-Storage: 12 x 51 MB = 0.60 GB of full extracts on CRC;
-about 36 MB in git.
+Storage: 16 x 51 MB = 0.80 GB of full extracts on CRC;
+about 48 MB in git.
 
 ## 7. Expected wall-clock
 
 Projected full-year run at v3: 8–10 h wall / 32–40 core-h at 4 slots
 (ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b, from the January smoke days; replace
 with wave-D actuals when they land). Batch A: 8 x 4 = 32 slots; batch B:
-4 x 4 = 16 slots; no `-tc`. The collector's `wallclock.csv` feeds the
+8 x 4 = 32 slots; no `-tc`. The collector's `wallclock.csv` feeds the
 plan section 8 budget actuals (`read_noise.py` prints core-h per run).
 
 ## 8. After both batches land (local, zero simulation)

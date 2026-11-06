@@ -1,10 +1,10 @@
 {
   "prompt": "52 v2.1",
   "wave": "noise_v3",
-  "layout": "12",
+  "layout": "16",
   "rows": {
     "A": 8,
-    "B": 4
+    "B": 8
   },
   "pool_csv": "analysis/pool/pool_delta_v2.csv",
   "pool_freeze": "f76d897",

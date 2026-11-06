@@ -12,7 +12,7 @@ values choose designs ONLY (disclosed); they are never data.
 Rows: per design one EXACT copy in batch A, one EXACT copy in batch B (the
 cross-batch exact pair, both v3 runs) and one PERTURBED copy in batch A
 (delta = 0.001 relative on pem_mw, inward at 0 and at nameplate; sign from
-the pinned seed). Default layout = 12 rows (A: 8, B: 4). `--layout 16` adds
+the pinned seed). Default layout = 16 rows (A: 8, B: 8; strategy 11-06: ruler population 8 per prompt 57 A4). `--layout 12` is the thinner alternative (A: 8, B: 4). `--layout 16` adds
 one antithetic perturbed copy per design to batch B (A: 8, B: 8; ruler
 population 8 instead of 4). The split is a resolution of prompt 52 section
 3 ("4 designs x 3 copies ~ 12 runs", "TWO submission batches", exact pairs
@@ -457,7 +457,7 @@ qstat -u ylu28
 # --------------------------------------------------------------------------
 # build
 # --------------------------------------------------------------------------
-def build(waves=ERCOT / "waves", pool_csv=POOL_CSV, defs_json=DEFS_JSON, layout="12",
+def build(waves=ERCOT / "waves", pool_csv=POOL_CSV, defs_json=DEFS_JSON, layout="16",
           seed=SEED):
     d = waves / WAVE
     d.mkdir(parents=True, exist_ok=True)
@@ -599,14 +599,15 @@ cross-batch exact pairs between batch A and batch B"; ERCOT_BO_PLAN.md
 section 3 pins only "tau population = EXACT cross-batch replicates" and
 section 8 counts 12 replicate runs. Under v3 an exact v3 copy has no v3
 partner unless a second exact copy runs, so 12 rows cannot hold both 4
-cross-batch exact pairs and 8 perturbed copies. Resolution built here
-(layout 12): per design, exact in A, exact in B (the pair), one perturbed in
-A — batch A {n_a} rows, batch B {n_b} rows; the ruler population is 4 values
-(one per design), not the 8 of prompt 57 A4, and per-level sd has 1 df.
-Alternative kept in the builder: `python tools/make_noise_v3.py --layout 16`
-adds one antithetic perturbed copy per design to batch B (8 + 8 rows; ruler
-population 8; 16 x 36 core-h). Kay confirms the layout before submitting A;
-`analysis/noise_v3/read_noise.py` reads either.
+cross-batch exact pairs and 8 perturbed copies. Resolution (strategy
+session 11-06, layout {layout}): per design, exact in A, exact in B (the
+pair), one perturbed in A and one antithetic perturbed in B — batch A {n_a}
+rows, batch B {n_b} rows; the ruler population is 8 values (4 designs x 2
+copies), exactly the population prompt 57 section 3 A4 pins. At a bound the
+antithetic copy cannot step outward, so it steps inward by 2 x delta
+(nuclear B:8, delta_rel 0.002) — disclosed in the row table. The thinner
+`--layout 12` (A 8, B 4; ruler population 4) is kept in the builder as the
+alternative and is NOT the committed wave. `analysis/noise_v3/read_noise.py` reads either.
 
 ## 6. Collector and the gz policy
 
@@ -654,7 +655,7 @@ table spread columns, GAP_DECISION refusal, batch-B COLLECTED refusal,
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--layout", choices=sorted(LAYOUTS), default="12")
+    ap.add_argument("--layout", choices=sorted(LAYOUTS), default="16")
     args = ap.parse_args(argv)
     d, rows, picked, table = build(layout=args.layout)
     n = sum(len(v) for v in rows.values())
