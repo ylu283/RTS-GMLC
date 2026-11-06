@@ -216,3 +216,15 @@ record-keeping convention:
    Ground truth: only 3/9 proxy sites were in the actual top-12 —
    curtailment concentrates at congestion-trapped sites (bus 120 hosts
    5 of the top-8; site 163 curtails 2.5× its delivered energy).
+
+## Solver identity v3 (2026-11-06, E-D6, Kay) — campaign runs from wave D onward
+
+| option | v2 (frozen above) | **v3 (campaign)** | why |
+|---|---|---|---|
+| `ruc_mipgap` | 0.01 | **0.001** | 1 % hid ≈ $11M/yr of cost, the size of a single-site PEM effect (`analysis/pool/POOL_V2.md` §6, `analysis/gap_smoke/GAP_SMOKE.md`). |
+| `ruc_time_limit` (Gurobi TimeLimit) | 120 s | **1200 s** | The gap, never the clock, terminates the RUC (26 s median / 46 s max per day on the smoke; 25× margin). |
+
+Source of truth at run time: `waves/GAP_DECISION.json` (read by every
+campaign array script; a run without it refuses to start). The v2 rows
+above are unchanged and still describe the 31 screening/selection runs.
+Identity v3 runs are never pooled with v2 runs in any claim.

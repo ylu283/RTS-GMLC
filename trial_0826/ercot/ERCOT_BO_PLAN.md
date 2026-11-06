@@ -473,3 +473,44 @@ against this bound in Part B. §1.2 is not touched.
 
 Drafted pi-agenda row:
 - `| 2026-11-06 | E-D1b | ERCOT pool survivors → objectives / guardrails / diagnostics | decided after wave D (prompt 57 Part B); pool frozen f76d897; ≤ 4 objectives, one per family | analysis/pool/POOL_V2.md |`
+
+## AMENDMENT 2026-11-06b — solver identity v3 for the campaign (E-D6, decided by Kay)
+
+**What changed.** The campaign identity for every run from wave D onward
+is **identity v3: `ruc_mipgap = 0.001`, `ruc_time_limit = 1200 s`**,
+recorded in `waves/GAP_DECISION.json`. All other options stay as frozen
+(§2 of this plan; CONFIG_ERCOT.md table). The §1.2 readability test is
+unchanged in form; its prompt-52 replicate runs are v3 runs. §3 (noise
+plan) is unchanged. The 31 v2-identity runs (base, screening, selection
+T1) remain slate evidence (site ranking by curtailment) and are NOT
+re-run; no v2 cost value enters a v3 claim.
+
+**Why.** Prompt 57 Part A found that under the 1 % gap the solver-hidden
+cost bound (≈ $46M per run scaled to realized cost) exceeds the median
+single-site PEM cost effect ($11.3M) by about 4×, so cost had no
+readability evidence. The gap smoke (`extracts/smoke_gap`,
+`analysis/gap_smoke/GAP_SMOKE.md`): control arm byte-identical to
+smoke_v2 (plumbing clean); at 0.001 the 3-day cost falls by $89k
+(linear ×365/3 ≈ $10.9M/yr ≈ 0.96 × the $11.3M median) with the
+per-day RUC solve at 26 s median / 46 s max; at 0.0001 the fall is
+$104k with 120 s median / 222 s max.
+
+**Deviation from the pre-registered rule, disclosed.** Prompt 58 §2
+said "adopt the tightest passing arm"; all three arms passed, which
+pointed to 0.0001. Kay chose 0.001 on three grounds: (1) the smoke
+covers three January days; at 0.0001 the first day already took 222 s
+and summer days could reach the 1200 s limit, which would reinstate the
+v1 time-limit nondeterminism — 0.001 keeps a 25× margin; (2) 0.001
+recovers 86 % of the hidden cost at +18 % wall time, and G at 0.001
+(≈ $12M/yr on the RUC objective, ≈ $3M realized) is already ~4× below
+the median effect; (3) calendar cost: 0.0001 roughly triples core-hours
+and doubles the critical path (~289 runs, 8 serial batches). The
+alternative was available and is recorded.
+
+**What had been seen.** The three smoke arms and the Part-A tables.
+No wave-D number existed.
+
+**Budget actuals (appendable row).** Smoke wall-clock at 4 slots, 3
+days: 187 s (0.01), 221 s (0.001), 513 s (0.0001). Projected full-year
+run at v3: ≈ 8–10 h wall / 32–40 core-h (from January days; replace
+with wave-D actuals when they land).
