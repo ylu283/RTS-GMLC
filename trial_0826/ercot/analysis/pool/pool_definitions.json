@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "prompt": "57 v2.1 (admin/prompt/bogp/57-ercot-objective-pool.md)",
+    "frozen_on": "2026-11-06",
+    "scope": "Candidate pool, directions, family-internal priorities, global order, emission factors, thresholds. Frozen at the Part-A freeze commit BEFORE A3 and before any wave-D or prompt-52 number. Any later change is an AMENDMENT with disclosure.",
+    "base_run": "base_2019_v2:1",
+    "delta_convention": "value(run) - value(base_2019_v2:1); the three base runs are byte-identical",
+    "seen_before_pinning": [
+      "the 31 v2 runs' legacy 9 columns (objectives_t1_v2.csv machinery)",
+      "base-run values of N1/N3/N4/N5/E7 and the uplift zeros",
+      "the n = 16 first cut of relief/var_cost/h2/starts (pool_correlations.csv)",
+      "the v2 fuel prices"
+    ],
+    "not_seen_before_pinning": [
+      "any prompt-52 perturbed-copy value",
+      "any wave-D value"
+    ]
+  },
+  "family_order": ["V", "E", "X", "R", "N", "D"],
+  "family_order_note": "Global tie-break (ii): V < E < X < R < N. D (H2 diagnostics) can never survive a cluster and is listed last.",
+  "global_order_rule": "(i) lower family-internal priority; (ii) on a tie, family order V < E < X < R < N; (iii) on a remaining tie, the lower id number. Candidates with no priority (dir '-' and no rank) are appended in family-then-id order and can never survive a cluster.",
+  "global_order": [
+    "V1", "E1", "X1", "R4", "N1",
+    "E4", "R2", "R7", "N4", "N5",
+    "E6", "R5", "N3",
+    "E2", "R6", "N2",
+    "E3", "R8",
+    "E7",
+    "E8", "E9",
+    "V2",
+    "V3", "E5", "R1", "R3", "D1", "D2", "D3"
+  ],
+  "survivor_rule": "The cluster survivor is the first member in global_order that has a declared min/max direction and a step-1 status that is neither UNREADABLE nor DEAD. If no member qualifies, the cluster is reported with no survivor.",
+  "E1_handover": "If plan ERCOT_BO_PLAN.md section 1.2 FAILS, E1 is REMOVED before Part-B step 3 and E3 takes priority 1 in family E (E3 then precedes E4).",
+  "candidates": {
+    "V1": {"family": "V", "name": "true curtailment", "unit": "MWh", "dir": "min", "priority": 1,
+           "formula": "sum of gen_summary.curtailment_mwh over rows with is_pem == False and unit_type in {WIND, PV} (== compute_objectives.metrics true_curt)",
+           "source": "gen_summary.csv", "needs_full": false},
+    "V2": {"family": "V", "name": "renewables penetration", "unit": "%", "dir": "max", "priority": 9,
+           "formula": "overall['Overall renewables penetration rate']", "source": "overall.csv", "needs_full": false},
+    "V3": {"family": "V", "name": "PEM-twin delivered share", "unit": "fraction", "dir": "-", "priority": null,
+           "formula": "sum(gen_summary.output_mwh | is_pem) / sum(gen_summary.output_mwh + gen_summary.curtailment_mwh | is_pem == False and unit_type in {WIND, PV})",
+           "source": "gen_summary.csv", "needs_full": false, "role": "diagnostic only"},
+    "E1": {"family": "E", "name": "total cost", "unit": "$", "dir": "min", "priority": 1,
+           "formula": "overall['Total costs']", "source": "overall.csv", "needs_full": false,
+           "note": "objective if plan 1.2 passes; see E1_handover"},
+    "E2": {"family": "E", "name": "fixed (commitment) cost", "unit": "$", "dir": "min", "priority": 4,
+           "formula": "overall['Total fixed costs']", "source": "overall.csv", "needs_full": false},
+    "E3": {"family": "E", "name": "variable cost", "unit": "$", "dir": "min", "priority": 5,
+           "formula": "overall['Total generation costs']", "source": "overall.csv", "needs_full": false},
+    "E4": {"family": "E", "name": "total payments (consumer side)", "unit": "$", "dir": "min", "priority": 2,
+           "formula": "overall['Total payments']", "source": "overall.csv", "needs_full": false},
+    "E5": {"family": "E", "name": "uplift payments", "unit": "$", "dir": "min", "priority": null,
+           "formula": "overall['Total uplift payments']", "source": "overall.csv", "needs_full": false,
+           "note": "expected DEAD (0 on all 31 v2 runs); asserted in A2, kept in the dead list"},
+    "E6": {"family": "E", "name": "VRE energy payments", "unit": "$", "dir": "max", "priority": 3,
+           "formula": "sum over days of daily_summary['Renewables energy payments']", "source": "daily_summary.csv", "needs_full": false},
+    "E7": {"family": "E", "name": "mean settlement price (energy)", "unit": "$/MWh", "dir": "-", "priority": 7,
+           "formula": "overall['Total energy payments'] / overall['Total demand']", "source": "overall.csv", "needs_full": false,
+           "note": "NOT overall['Cumulative average price'], which is cost per MWh (E1 / demand) and never a price"},
+    "E8": {"family": "E", "name": "LMP dispersion", "unit": "$/MWh", "dir": "min", "priority": 8,
+           "formula": "standard deviation (ddof = 1) over all (bus, hour) rows of bus_lmps['LMP'] (real-time)", "source": "bus_lmps.csv.gz", "needs_full": true,
+           "slim_companion": "E8_slim_daily_settle_sd = standard deviation over days of daily_summary['Total energy payments'] / daily_summary['Demand']; reported alongside, never substituted"},
+    "E9": {"family": "E", "name": "scarcity bus-hours", "unit": "count", "dir": "min", "priority": 8,
+           "formula": "count of (bus, hour) rows with bus_lmps['LMP'] >= lmp_scarcity_threshold", "source": "bus_lmps.csv.gz", "needs_full": true},
+    "R1": {"family": "R", "name": "load shed", "unit": "MWh", "dir": "min", "priority": null,
+           "formula": "overall['Total load shedding']", "source": "overall.csv", "needs_full": false, "role": "guardrail (plan 1.3); expected DEAD"},
+    "R2": {"family": "R", "name": "reserve shortfall", "unit": "MWh", "dir": "min", "priority": 2,
+           "formula": "overall['Total reserve shortfall']", "source": "overall.csv", "needs_full": false, "role": "guardrail (plan 1.3); re-tested"},
+    "R3": {"family": "R", "name": "over generation", "unit": "MWh", "dir": "min", "priority": null,
+           "formula": "overall['Total over generation']", "source": "overall.csv", "needs_full": false, "note": "expected DEAD"},
+    "R4": {"family": "R", "name": "thermal starts", "unit": "count", "dir": "min", "priority": 1,
+           "formula": "overall['Total on/offs']", "source": "overall.csv", "needs_full": false},
+    "R5": {"family": "R", "name": "start/stop ramping", "unit": "MW", "dir": "min", "priority": 3,
+           "formula": "overall['Total sum on/off ramps']", "source": "overall.csv", "needs_full": false},
+    "R6": {"family": "R", "name": "nominal ramping", "unit": "MW", "dir": "min", "priority": 4,
+           "formula": "overall['Total sum nominal ramps']", "source": "overall.csv", "needs_full": false},
+    "R7": {"family": "R", "name": "committed capacity-hours", "unit": "MWh", "dir": "-", "priority": 2,
+           "formula": "sum over hours of committed_hourly['committed_mw']", "source": "committed_hourly.csv", "needs_full": false},
+    "R8": {"family": "R", "name": "committed unit-hours", "unit": "unit-h", "dir": "-", "priority": 5,
+           "formula": "sum over hours of committed_hourly['num_committed']", "source": "committed_hourly.csv", "needs_full": false},
+    "N1": {"family": "N", "name": "congested line-hours", "unit": "line-h", "dir": "min", "priority": 1,
+           "formula": "sum over lines of line_summary['hours_ge_99pct']", "source": "line_summary.csv", "needs_full": false},
+    "N2": {"family": "N", "name": "congested lines", "unit": "count", "dir": "min", "priority": 4,
+           "formula": "count of lines with line_summary['hours_ge_99pct'] > 0", "source": "line_summary.csv", "needs_full": false},
+    "N3": {"family": "N", "name": "flow violation", "unit": "MWh", "dir": "min", "priority": 3,
+           "formula": "sum over lines of line_summary['sum_violation']", "source": "line_summary.csv", "needs_full": false},
+    "N4": {"family": "N", "name": "pocket-120 congested line-hours", "unit": "line-h", "dir": "min", "priority": 2,
+           "formula": "sum of line_summary['hours_ge_99pct'] over the branches with From Bus == 120 or To Bus == 120 in branch.csv; per-line split in N4_<UID> columns",
+           "source": "line_summary.csv + data/ercot123_2019_v2/branch.csv", "needs_full": false,
+           "pocket_bus": 120, "pocket_lines": ["L4", "L5", "L100", "L113", "L197", "L198", "L240", "L252"]},
+    "N5": {"family": "N", "name": "congestion spread", "unit": "$/MWh", "dir": "min", "priority": 2,
+           "formula": "mean over hours t of ( LMP[t, bus_name(120)] - sum_b LMP[t,b] * L[t,b] / sum_b L[t,b] ); bus_name(120) from bus.csv 'Bus ID' -> 'Bus Name' (= 'Knox City 345'); L[t,b] = REAL_TIME_load.csv column str(b) (Area == Bus ID), joined on (Date, Hour) with Hour = Period - 1, year-end padding dropped by the join. NEVER weighted by bus.csv['MW Load'].",
+           "source": "bus_lmps.csv.gz + data/ercot123_2019_v2/{bus,REAL_TIME_load}.csv", "needs_full": true,
+           "check_column": "N5_unweighted_check = the same with equal bus weights (base reference -17.36 $/MWh, seen before pinning)"},
+    "X1": {"family": "X", "name": "CO2 (fuel-factor)", "unit": "t", "dir": "min", "priority": 1,
+           "formula": "sum over gen_summary rows with is_pem == False of output_mwh * EF[unit_type]", "source": "gen_summary.csv", "needs_full": false,
+           "sensitivity_columns": {
+             "X1_ef_lo": "all EF x 0.8", "X1_ef_hi": "all EF x 1.2",
+             "X1_gas_lo": "CT EF x 0.8, COAL unchanged", "X1_gas_hi": "CT EF x 1.2, COAL unchanged"}},
+    "D1": {"family": "D", "name": "H2 electricity", "unit": "MWh", "dir": "-", "priority": null,
+           "formula": "compute_objectives h2: twin curtailment (sum gen_summary.curtailment_mwh | is_pem) for VRE designs; thermal rule compute_objectives.thermal_h2 (sum over committed hours of pmax - Dispatch) for nuclear designs; copied from the frozen objectives_t1_v2.csv with h2_source = frozen_t1_v2 when thermal.csv.gz is absent",
+           "source": "gen_summary.csv / thermal.csv.gz / analysis/selection/objectives_t1_v2.csv", "needs_full": false, "role": "diagnostic (RTS convention); enters M only by PI adoption (D5)"},
+    "D2": {"family": "D", "name": "PEM utilization", "unit": "fraction", "dir": "-", "priority": null,
+           "formula": "D1 / (pem_mw * 8760); pem_mw = omega * gen_pmax from the wave design matrix, or sum of PEM_fraction * gen_pmax over retrofit_gen_dict_<index>.json for the __ALL__ row; NEVER gen_summary.pmax_mw", "source": "design_matrix.csv", "needs_full": false, "role": "diagnostic"},
+    "D3": {"family": "D", "name": "gen-1 / gen-93 starts", "unit": "count", "dir": "-", "priority": null,
+           "formula": "gen_summary.starts for Generator '1' and '93' (D3_gen1_starts, D3_gen93_starts)", "source": "gen_summary.csv", "needs_full": false, "role": "SUSPECT check S3 of plan 1.2"}
+  },
+  "emission_factors_t_per_mwh": {
+    "COAL": 1.00, "CT": 0.55, "NUC": 0.0, "HYDRO": 0.0, "WIND": 0.0, "PV": 0.0,
+    "sensitivity": "plus/minus 20 percent (x0.8 / x1.2), all factors together (X1_ef_lo/hi) and gas only (X1_gas_lo/hi)",
+    "source": [
+      "Fuel CO2 factors: US EPA, 40 CFR Part 98 Subpart C, Table C-1 (natural gas 53.06 kg CO2/MMBtu; bituminous coal 93.28 kg CO2/MMBtu).",
+      "Fleet heat rates: US EIA, Electric Power Annual, Table 8.2 'Average tested heat rates by prime mover and energy source' (coal steam about 10,400 Btu/kWh; natural-gas simple-cycle gas turbine about 11,000 Btu/kWh). 93.28 x 10.4 = 0.97 t/MWh -> pinned 1.00; 53.06 x 11.0 = 0.58 t/MWh -> pinned 0.55 (a combined-cycle fleet would be about 0.40).",
+      "Cross-check: US EIA FAQ 'How much carbon dioxide is produced per kilowatthour of U.S. electricity generation?' (2022: coal 2.30 lb/kWh = 1.04 t/MWh; natural gas 0.97 lb/kWh = 0.44 t/MWh fleet average incl. combined cycle)."
+    ],
+    "disclosure": "Heat rates CANNOT come from v2 gen.csv: its HR columns are synthetic (cost / fuel price, prompt 36). All 113 gas units are typed CT with generic peaker-like heat rates (fuelmix-check 2026-10-15), so the gas factor is a disclosed approximation. The executor cited the tables above from the public documents named; the numbers were not re-fetched in the executor session.",
+    "expectation_pinned": "X1 is expected to CONFLICT with E1 (coal C1 $18.5-19.8/MWh < all gas C1 $23.4-57/MWh in the v2 dataset: cheaper = more coal)."
+  },
+  "thresholds": {
+    "lmp_scarcity_threshold_usd_per_mwh": 450.0,
+    "lmp_scarcity_threshold_note": "0.9 x price_threshold 500 $/MWh; real-time LMP from bus_lmps.csv.gz",
+    "suspect_S1_abs_resid_usd": 1.0,
+    "suspect_S2": "every RUC status == OPTIMAL in ruc_quality.csv",
+    "suspect_S3": "non-nuclear designs: starts of units 1 and 93 == 0; any design: starts of units 1 and 93 equal across exact replicates",
+    "dead_rule": "zero variance of the raw value over the 31 v2 runs (max == min exactly); evidence = max |value|",
+    "mip_gap_bound": {
+      "G_run": "sum over RUC days of final_gap_pct / 100 * ruc_cost (ruc_quality.csv)",
+      "pair_bound": "G_a + G_b",
+      "labels": {"readable": "GAP-READABLE iff |delta| >= G_a + G_b", "otherwise": "WITHIN GAP BOUND (never 'zero')"},
+      "applies_to": ["E1", "E2", "E3"],
+      "disclosure": "ruc_cost is the RUC objective (day-ahead commitment + dispatch cost), not the realized total cost; G is an approximate bound. No gap bound exists for settlement quantities (E4, E6) and none is claimed.",
+      "reference_single_site_median_abs_delta_total_cost_usd": 11.3e6
+    },
+    "scale_free_S": {
+      "formula": "S_jl = range_jl / mean over the 6 VRE sites of |delta_jl| at MW level l; undefined (NO EFFECT AT THIS LEVEL) when the mean is 0",
+      "location_sensitive": "S_jl >= 0.5 at >= 2 of 3 levels",
+      "size_driven": "S_jl < 0.5 at >= 2 of 3 levels with a nonzero mean",
+      "first_cut_use": "printed on the 16-row first cut as a descriptor only (NON-USE clause)"
+    },
+    "perturbation_ruler": {
+      "definition": "ruler_j = median |delta_j| over the prompt-52 perturbed copies (delta = 0.001 relative; 4 designs x 2 copies = 8 values)",
+      "readable": "|delta_j| >= 2 x ruler_j",
+      "borderline": "ratio in [2, 3)",
+      "readable_wording": "exceeds twice the median response to a 0.1 % input perturbation at the prompt-52 designs",
+      "fail_wording": "not readable above the perturbation response",
+      "ruler_zero": "RULER=0: readable iff |delta_j| >= 1 natural unit (1 start, 1 line, 1 bus-hour, 1 MWh); continuous candidates report raw delta with the tag",
+      "unavailable": "RULER UNAVAILABLE for E8/E9/N5 if the 52 extracts are slim",
+      "pending": "RULER PENDING (52) on every Part-B readability statement until 52 lands"
+    },
+    "location_verdict": {
+      "location_sensitive": "range_jl >= 2 x ruler_j at >= 2 of 3 levels",
+      "location_insensitive_at_these_sizes": "per-site |delta_jl| >= 2 x ruler_j for >= 4 of 6 sites at >= 2 levels AND range_jl < 2 x ruler_j at >= 2 levels",
+      "otherwise": "UNREADABLE AT THIS SIZE",
+      "kendall_W": "descriptor only; exact permutation p (k = 6 sites, n = 3 level blocks)"
+    },
+    "redundancy": {
+      "orientation": "max candidates x (-1); '-' candidates shown, never clustered, never survive",
+      "redundant_pair": "rho_or >= +0.90 on the pooled 18-row matrix AND rho_or >= +0.90 at >= 2 of the 3 per-level matrices (n = 6)",
+      "trade_off_pair": "rho_or <= -0.90 -> never a cluster; routed to the conflict check",
+      "linkage": "complete",
+      "first_cut_A3": "the same +0.90 complete-linkage rule names clusters on the 16-row first cut; it may not drop any member (NON-USE)"
+    },
+    "conflict": {
+      "trade_off_size": "pooled rho_or <= -0.50 and negative at >= 2 of 3 levels",
+      "trade_off_location": "additionally rho_or <= -0.50 at >= 2 of 3 per-level matrices",
+      "null_band_n18": 0.47
+    },
+    "recommendation_cap": {"max_objectives": 4, "rule": "top 4 by global_order with at most one per family; the full survivor list is still shown"}
+  },
+  "first_cut_rows": {
+    "waves": ["screening_v2/ercot:1-9", "screening_v2/topup:1-7"],
+    "n": 16, "n_bus120": 5,
+    "excluded": ["screening_v2/ercot:10 (__ALL__ multi-site row)", "screening_v2/ercot:11 (base replicate)", "screening_v2/ercot:12 (replicate of row 1)"],
+    "partial_convention": "rank-residual partial Spearman on gen_pmax (pool_correlations.csv convention); no tie rule because the v2 ruler is 0"
+  },
+  "v1_to_v2_wave_names": {
+    "screening_ercot": "screening_v2/ercot", "screening_topup": "screening_v2/topup",
+    "selection_t1": "selection_t1_v2", "base_2019": "base_2019_v2", "base": "base_2019_v2:1"
+  }
+}
