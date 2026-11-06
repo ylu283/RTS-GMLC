@@ -1,0 +1,10 @@
+{
+  "G_base_usd": 196747707.99163762,
+  "ref_single_site_median_abs_delta_total_cost_usd": 11300000.0,
+  "G_base_over_ref": 17.41130159218032,
+  "G_base_exceeds_ref": true,
+  "G_run_min_usd": 152762887.34289542,
+  "G_run_max_usd": 215472381.57959637,
+  "n_single_site_E1_gap_readable": 0,
+  "n_single_site": 16
+}
