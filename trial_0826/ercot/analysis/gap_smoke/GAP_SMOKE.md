@@ -6,9 +6,9 @@ Extracts: `extracts/smoke_gap`; byte-identity reference: `extracts/smoke_v2`. Pu
 
 | task | role | gap | TL s | days | OPTIMAL | tol OK | tol read | max solve s | median solve s | max gap % | year RUC h (365 x median) | year RUC h (365 x max) | wall s | rule (i) | (ii) | (iii) | PASS |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | control (identical to smoke_v2) | 0.01 | 1200 | 3 | 3 | 3 | 3 | 23.0 | 19.6 | 0.9997 | 1.99 | 2.33 | 187 | Y | Y | Y | PASS |
-| 2 | candidate | 0.001 | 1200 | 3 | 3 | 3 | 3 | 46.1 | 26.3 | 0.0997 | 2.67 | 4.67 | 221 | Y | Y | Y | PASS |
-| 3 | stretch | 0.0001 | 1200 | 3 | 3 | 3 | 3 | 222.3 | 120.4 | 0.0100 | 12.21 | 22.54 | 513 | Y | Y | Y | PASS |
+| 1 | control (identical to smoke_v2) | 0.01 | 1200 | 3 | 3 | 3 | 3 | 9.7 | 9.2 | 0.9997 | 0.93 | 0.98 | 151 | Y | Y | Y | PASS |
+| 2 | candidate | 0.001 | 1200 | 3 | 3 | 3 | 3 | 18.1 | 10.2 | 0.0997 | 1.03 | 1.83 | 161 | Y | Y | Y | PASS |
+| 3 | stretch | 0.0001 | 1200 | 3 | 3 | 3 | 3 | 95.4 | 56.0 | 0.0100 | 5.68 | 9.67 | 297 | Y | Y | Y | PASS |
 
 A task whose `tol read` < `days` has an UNVERIFIED tolerance (no job log or no Gurobi tolerance line) and cannot pass rule (i). A tolerance line that reads 1.00e-02 on task 2 or 3 is a FAILED smoke, not a result.
 
@@ -24,15 +24,15 @@ A task whose `tol read` < `days` has an UNVERIFIED tolerance (no job log or no G
 
 | task | gap | day | status | tolerance read | tol OK | final gap % | solve s | MIP solves | RUC cost $ |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | 0.01 | start_date | OPTIMAL | 1.00e-02 | Y | 0.9511 | 19.1 | 2 | 27,892,155 |
-| 1 | 0.01 | 2019-01-02 | OPTIMAL | 1.00e-02 | Y | 0.9997 | 19.6 | 2 | 43,784,015 |
-| 1 | 0.01 | 2019-01-03 | OPTIMAL | 1.00e-02 | Y | 0.9897 | 23.0 | 2 | 40,875,156 |
-| 2 | 0.001 | start_date | OPTIMAL | 1.00e-03 | Y | 0.0985 | 46.1 | 2 | 27,865,302 |
-| 2 | 0.001 | 2019-01-02 | OPTIMAL | 1.00e-03 | Y | 0.0997 | 21.2 | 2 | 43,784,015 |
-| 2 | 0.001 | 2019-01-03 | OPTIMAL | 1.00e-03 | Y | 0.0736 | 26.3 | 1 | 40,802,748 |
-| 3 | 0.0001 | start_date | OPTIMAL | 1.00e-04 | Y | 0.0086 | 222.3 | 2 | 27,862,504 |
-| 3 | 0.0001 | 2019-01-02 | OPTIMAL | 1.00e-04 | Y | 0.0100 | 120.4 | 1 | 43,770,637 |
-| 3 | 0.0001 | 2019-01-03 | OPTIMAL | 1.00e-04 | Y | 0.0075 | 55.7 | 1 | 40,793,453 |
+| 1 | 0.01 | start_date | OPTIMAL | 1.00e-02 | Y | 0.9511 | 8.7 | 2 | 27,892,155 |
+| 1 | 0.01 | 2019-01-02 | OPTIMAL | 1.00e-02 | Y | 0.9997 | 9.2 | 2 | 43,784,015 |
+| 1 | 0.01 | 2019-01-03 | OPTIMAL | 1.00e-02 | Y | 0.9897 | 9.7 | 2 | 40,875,156 |
+| 2 | 0.001 | start_date | OPTIMAL | 1.00e-03 | Y | 0.0985 | 18.1 | 2 | 27,865,302 |
+| 2 | 0.001 | 2019-01-02 | OPTIMAL | 1.00e-03 | Y | 0.0997 | 9.5 | 2 | 43,784,015 |
+| 2 | 0.001 | 2019-01-03 | OPTIMAL | 1.00e-03 | Y | 0.0736 | 10.2 | 1 | 40,802,748 |
+| 3 | 0.0001 | start_date | OPTIMAL | 1.00e-04 | Y | 0.0086 | 95.4 | 2 | 27,862,504 |
+| 3 | 0.0001 | 2019-01-02 | OPTIMAL | 1.00e-04 | Y | 0.0100 | 56.0 | 1 | 43,770,637 |
+| 3 | 0.0001 | 2019-01-03 | OPTIMAL | 1.00e-04 | Y | 0.0075 | 23.6 | 1 | 40,793,453 |
 
 ## 4. Byte identity of the control arm (task 1 vs smoke_v2)
 
