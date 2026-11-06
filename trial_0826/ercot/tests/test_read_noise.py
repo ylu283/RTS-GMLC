@@ -2,13 +2,14 @@
 
 Run:  cd trial_0826/ercot && python -m pytest tests/test_read_noise.py -q
 
-Fixture: the 12 noise_v3 rows synthesized by copying the SLIM tables of
-extracts/base_2019_v2/run_index_1 (the --full reference) with tiny controlled
-edits to overall.csv and a synthetic pool_full_metrics.json (E8/E9/N5, as the
-CRC collector writes it), so every expected median is known. Paths tested:
-exact-zero (all exact pairs identical), RULER=0 (R4 untouched), a firing and
-a non-firing trigger, the exact-pair-differs path, the shed assert, the
-runtime table, and the chi-square / F quantiles against scipy.
+Fixture: the 16 noise_v3 rows (layout 16 = the committed wave: per design exact
+A, exact B, perturbed A, antithetic perturbed B) synthesized by copying the SLIM
+tables of extracts/base_2019_v2/run_index_1 (the --full reference) with tiny
+controlled edits to overall.csv and a synthetic pool_full_metrics.json (E8/E9/N5,
+as the CRC collector writes it), so every expected median and sd is known.
+Paths tested: exact-zero (all exact pairs identical), RULER=0 (R4 untouched),
+a firing and a non-firing trigger, the exact-pair-differs path, the shed assert,
+the runtime table, and the chi-square / F quantiles against scipy.
 """
 import json
 import shutil
@@ -32,12 +33,36 @@ SLIM = ["overall.csv", "daily_summary.csv", "gen_summary.csv", "committed_hourly
         "line_summary.csv", "ruc_quality.csv", "extract_manifest.json"]
 HAVE = all((REF / f).is_file() for f in SLIM) and (ERCOT / mn.V2_DATA_REL / "branch.csv").is_file()
 
-# controlled edits on the 4 perturbed rows (design 1..4), all in batch A rows 5..8
-E1_OFF = [100.0, -300.0, 200.0, 400.0]        # Total costs      -> ruler 250, ratio 16 (no fire)
-E3_OFF = [10.0, 10.0, 10.0, 10.0]             # Total generation costs -> ruler 10, ratio 1
-E4_OFF = [1.0, 0.5, 0.7, 50.0]                # Total payments   -> ratio 2500 -> fires (df 1/1)
-E8_OFF = [0.5, -0.1, 0.2, 0.3]                # pool_full_metrics E8 -> ruler 0.25
+# controlled edits on the 8 perturbed rows: OFF[batch][design_no - 1]; batch A rows 5..8, batch B rows 5..8.
+# Every perturbed row is read against the exact copy of its own batch, so its delta is exactly the offset.
+E1_OFF = {"A": [100.0, -300.0, 200.0, 400.0], "B": [-150.0, 250.0, -350.0, 50.0]}   # Total costs
+E3_OFF = {"A": [10.0] * 4, "B": [10.0] * 4}                                          # Total generation costs
+E4_OFF = {"A": [1.0, 0.5, 0.7, 50.0], "B": [1.0, 0.5, 0.7, 50.0]}                    # Total payments
+E8_OFF = {"A": [0.5, -0.1, 0.2, 0.3], "B": [0.4, -0.2, 0.1, 0.6]}                    # pool_full_metrics E8
 E8_BASE, E9_BASE, N5_BASE = 15.0, 0, -18.4
+N_RUNS = 16
+
+
+def _pop(off):
+    """The 8 signed perturbed deltas in read order (batch A designs 1-4, then batch B)."""
+    return list(off["A"]) + list(off["B"])
+
+
+def _levels(off):
+    """Per design: sd of {0, delta_A, delta_B} (ddof 1, df 2) — the read_noise level definition."""
+    return [float(np.std([0.0, off["A"][n], off["B"][n]], ddof=1)) for n in range(4)]
+
+
+def _pooled(off):
+    s = _levels(off)
+    num = sum(2 * x * x for x in s)
+    return np.sqrt(num / 8), (num * num / sum((2 * x * x) ** 2 / 2 for x in s) if num > 0 else 8)
+
+
+# known answers (derived from the offsets, independent of read_noise)
+E1_ABS_SORTED = sorted(abs(x) for x in _pop(E1_OFF))      # 50 ... 400
+E1_RULER, E1_MIN, E1_MAX = 225.0, 50.0, 400.0
+E8_RULER, E8_MIN, E8_MAX = 0.25, 0.1, 0.6
 
 
 def _edit_overall(path, **delta):
@@ -72,18 +97,19 @@ def fx(tmp_path_factory):
         bx.mkdir(parents=True)
         (bx / "GAP_DECISION_used.json").write_text('{"ruc_mipgap": 0.001, "ruc_time_limit": 1200}\n')
         wl = ["task,start_epoch,end_epoch,wall_s"]
+        assert len(rows[b]) == 8, "fixture expects the committed layout 16"
         for r in rows[b]:
             i = r["index"]
             run = bx / f"run_index_{i}"
+            n = r["design_no"] - 1
             e8 = E8_BASE
             if r["copy_type"] == "perturbed":
-                e8 = E8_BASE + E8_OFF[r["design_no"] - 1]
+                e8 = E8_BASE + E8_OFF[b][n]
             _make_run(run, e8=e8)
             if r["copy_type"] == "perturbed":
-                n = r["design_no"] - 1
-                _edit_overall(run / "overall.csv", **{"Total costs": E1_OFF[n],
-                                                      "Total generation costs": E3_OFF[n],
-                                                      "Total payments": E4_OFF[n]})
+                _edit_overall(run / "overall.csv", **{"Total costs": E1_OFF[b][n],
+                                                      "Total generation costs": E3_OFF[b][n],
+                                                      "Total payments": E4_OFF[b][n]})
             wall = 30000 + 1000 * r["global_index"]
             wl.append(f"{i},1000,{1000 + wall},{wall}")
         (bx / "wallclock.csv").write_text("\n".join(wl) + "\n")
@@ -112,19 +138,25 @@ def test_exact_zero_path(fx):
 def test_rulers_known_medians(fx):
     df = fx["df"]
     e1 = _row(df, "E1")
-    assert e1["n_perturbed"] == 4 and e1["ruler"] == pytest.approx(250.0) and e1["ruler_min"] == pytest.approx(100.0)
-    assert e1["ruler_max"] == pytest.approx(400.0) and e1["ruler_status"] == "RULER"
-    assert sorted(float(x) for x in e1["perturbed_abs_delta"].split("|")) == pytest.approx([100.0, 200.0, 300.0, 400.0])
+    assert e1["n_perturbed"] == 8 and e1["ruler"] == pytest.approx(E1_RULER) and e1["ruler_min"] == pytest.approx(E1_MIN)
+    assert e1["ruler_max"] == pytest.approx(E1_MAX) and e1["ruler_status"] == "RULER"
+    assert sorted(float(x) for x in e1["perturbed_abs_delta"].split("|")) == pytest.approx(E1_ABS_SORTED)
+    assert E1_ABS_SORTED == [50.0, 100.0, 150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
     e3 = _row(df, "E3")
-    assert e3["ruler"] == pytest.approx(10.0) and e3["ruler_min"] == e3["ruler_max"] == pytest.approx(10.0)
+    assert e3["n_perturbed"] == 8 and e3["ruler"] == pytest.approx(10.0) and e3["ruler_min"] == e3["ruler_max"] == pytest.approx(10.0)
     e8 = _row(df, "E8")
-    assert e8["ruler"] == pytest.approx(0.25) and e8["ruler_min"] == pytest.approx(0.1) and e8["ruler_max"] == pytest.approx(0.5)
+    assert e8["ruler"] == pytest.approx(E8_RULER) and e8["ruler_min"] == pytest.approx(E8_MIN) and e8["ruler_max"] == pytest.approx(E8_MAX)
     # E9 / N5 carried from pool_full_metrics (identical on every run): ruler 0
     assert _row(df, "N5")["ruler"] == 0.0 and _row(df, "E9")["ruler"] == 0.0
-    # exact pairs compare perturbed to the exact copy of the SAME batch
+    # every perturbed copy is read against the exact copy of the SAME batch (A against A, B against B)
     pert = fx["S"]["perturbed"]
-    assert (pert["batch"] == "A").all() and (pert["ref_key"].str.startswith("noise_v3/A:")).all()
-    assert list(pert["design_no"]) == [1, 2, 3, 4]
+    assert list(pert["batch"]) == ["A"] * 4 + ["B"] * 4 and list(pert["design_no"]) == [1, 2, 3, 4] * 2
+    for _, r in pert.iterrows():
+        assert r["ref_key"].startswith(f"noise_v3/{r['batch']}:")
+    assert list(pert["E1"]) == pytest.approx(_pop(E1_OFF))
+    for n in range(1, 5):
+        p = pert[pert["design_no"] == n]
+        assert len(p) == 2 and len(set(p["pem_mw"])) == 2           # the two perturbed copies are distinct
 
 
 def test_ruler_zero_path(fx):
@@ -138,23 +170,28 @@ def test_ruler_zero_path(fx):
 
 def test_sd_df_and_trigger(fx):
     df, S = fx["df"], fx["S"]
-    # E1: levels sd = |d| / sqrt(2), df 1 each; pooled = sqrt(sum d^2 / 2 / 4)
+    # E1: level = design, sd of {0, delta_A, delta_B} with df 2; pooled over 8 df
     e1 = S["per_candidate"]["E1"]
     sds = [lv["sd"] for lv in e1["levels"]]
-    assert sds == pytest.approx([abs(x) / np.sqrt(2) for x in E1_OFF]) and all(lv["df"] == 1 for lv in e1["levels"])
-    assert e1["pooled_sd"] == pytest.approx(np.sqrt(sum(x * x for x in E1_OFF) / 2 / 4))
-    num = sum(x * x / 2 for x in E1_OFF)
-    assert e1["pooled_df_satterthwaite"] == pytest.approx(num * num / sum((x * x / 2) ** 2 for x in E1_OFF))
+    assert sds == pytest.approx(_levels(E1_OFF)) and all(lv["df"] == 2 for lv in e1["levels"])
+    exp_sp, exp_df = _pooled(E1_OFF)
+    assert e1["pooled_sd"] == pytest.approx(exp_sp) and e1["pooled_df_satterthwaite"] == pytest.approx(exp_df)
+    assert exp_sp == pytest.approx(np.sqrt(np.mean([x * x for x in _levels(E1_OFF)])))   # equal df -> mean of variances
     t = e1["trigger"]
-    assert t["ratio"] == pytest.approx(16.0) and t["df_num"] == 1 and t["df_den"] == 1
-    assert t["p"] == pytest.approx(rn.f_sf(16.0, 1, 1)) and 0.1 < t["p"] < 0.2 and not t["fires"]
+    var = [x * x for x in _levels(E1_OFF)]
+    exp_ratio = max(var) / min(var)
+    assert t["ratio"] == pytest.approx(exp_ratio) and t["df_num"] == 2 and t["df_den"] == 2
+    assert exp_ratio == pytest.approx(77500.0 / 15833.3333, rel=1e-5)     # 4.89: > 3 but p = 1 / (1 + 4.89) = 0.17
+    assert t["p"] == pytest.approx(1.0 / (1.0 + exp_ratio)) and 0.1 < t["p"] < 0.2 and not t["fires"]
     assert "not detectable at this df" in t["verdict"]
-    # E3: equal levels -> ratio 1, Satterthwaite df = 4
+    # E3: equal levels -> ratio 1, Satterthwaite df = 8
     e3 = S["per_candidate"]["E3"]
-    assert e3["trigger"]["ratio"] == pytest.approx(1.0) and e3["pooled_df_satterthwaite"] == pytest.approx(4.0)
-    # E4: ratio (50 / 0.5)^2 = 10000 with df 1/1 -> p ~ 0.006 -> fires
+    assert e3["trigger"]["ratio"] == pytest.approx(1.0) and e3["pooled_df_satterthwaite"] == pytest.approx(8.0)
+    assert e3["pooled_sd"] == pytest.approx(np.std([0.0, 10.0, 10.0], ddof=1))
+    # E4: level 4 var 833.3 vs level 2 var 0.0833 -> ratio 10000 with df 2/2 -> p = 1 / (1 + 10000) -> fires
     e4 = S["per_candidate"]["E4"]
-    assert e4["trigger"]["ratio"] == pytest.approx(10000.0) and e4["trigger"]["p"] < 0.05 and e4["trigger"]["fires"]
+    assert e4["trigger"]["ratio"] == pytest.approx(10000.0) and e4["trigger"]["p"] == pytest.approx(1.0 / 10001.0, rel=1e-6)
+    assert e4["trigger"]["fires"]
     assert bool(_row(df, "E4")["trigger_fires"]) and "TRIGGER" in _row(df, "E4")["trigger_verdict"]
     # R4: all levels sd 0
     assert "exact zeros" in S["per_candidate"]["R4"]["trigger"]["verdict"] and not S["per_candidate"]["R4"]["trigger"]["fires"]
@@ -167,23 +204,24 @@ def test_sd_df_and_trigger(fx):
 def test_covariance_matrix(fx):
     cov = pd.read_csv(fx["out"] / "ercot_noise_cov.csv", index_col=0)
     assert cov.shape[0] == cov.shape[1] and {"E1", "E3", "E4", "E8", "R4", "V1"} <= set(cov.index)
-    assert cov.loc["E1", "E1"] == pytest.approx(np.var(E1_OFF, ddof=1))
-    assert cov.loc["E1", "E4"] == pytest.approx(np.cov(E1_OFF, E4_OFF, ddof=1)[0, 1])
-    assert cov.loc["R4", "R4"] == 0.0 and cov.loc["E8", "E8"] == pytest.approx(np.var(E8_OFF, ddof=1))
+    assert cov.loc["E1", "E1"] == pytest.approx(np.var(_pop(E1_OFF), ddof=1))
+    assert cov.loc["E1", "E4"] == pytest.approx(np.cov(_pop(E1_OFF), _pop(E4_OFF), ddof=1)[0, 1])
+    assert cov.loc["R4", "R4"] == 0.0 and cov.loc["E8", "E8"] == pytest.approx(np.var(_pop(E8_OFF), ddof=1))
+    assert cov.loc["E3", "E3"] == 0.0                     # constant +10 on every perturbed run
     assert np.allclose(cov.to_numpy(), cov.to_numpy().T)
 
 
 def test_shed_assert_and_runtime(fx):
     S = fx["S"]
-    assert S["shed_ok"] and "shed ≡ 0 on all 12 runs: **PASS**" in fx["md"]
+    assert S["shed_ok"] and f"shed ≡ 0 on all {N_RUNS} runs: **PASS**" in fx["md"]
     rt = S["runtime_table"]
-    assert len(rt) == 12 and (rt["core_h"] == rt["wall_s"] / 3600 * 4).all()
-    walls = [30000 + 1000 * g for g in range(1, 13)]
+    assert len(rt) == N_RUNS and (rt["core_h"] == rt["wall_s"] / 3600 * 4).all()
+    walls = [30000 + 1000 * g for g in range(1, N_RUNS + 1)]
     assert sorted(rt["wall_s"]) == walls
     assert S["runtime"]["core_h_median"] == pytest.approx(np.median(walls) / 3600 * 4)
     assert S["runtime"]["core_h_total"] == pytest.approx(sum(walls) / 3600 * 4)
     assert rn.PLAN_UNKNOWN in fx["md"]
-    assert S["identity"]["n_with_identity_line"] == 12 and S["identity"]["ruc_mipgap_values"] == [0.001]
+    assert S["identity"]["n_with_identity_line"] == N_RUNS and S["identity"]["ruc_mipgap_values"] == [0.001]
 
 
 def test_md_identity_lines_and_files(fx):
@@ -199,10 +237,11 @@ def test_md_identity_lines_and_files(fx):
 
 
 def test_exact_pair_differs_path(fx):
-    """Edit the B exact copy of design 2: E1 exact pair |delta| = 7, floor > 0, md5 3/4."""
+    """Edit the B exact copy of design 2: E1 exact pair |delta| = 7, floor > 0, md5 3/4.
+    The B perturbed copy of design 2 is read against that edited exact, so its E1 delta shifts by -7."""
     root = fx["root"] / "differs"
     shutil.copytree(fx["extr"], root / "extracts")
-    rows_b = [r for r in fx["rows"]["B"] if r["design_no"] == 2]
+    rows_b = [r for r in fx["rows"]["B"] if r["design_no"] == 2 and r["copy_type"] == "exact"]
     assert len(rows_b) == 1
     run = root / "extracts" / "noise_v3" / "B" / f"run_index_{rows_b[0]['index']}"
     _edit_overall(run / "overall.csv", **{"Total costs": 7.0})
@@ -213,6 +252,9 @@ def test_exact_pair_differs_path(fx):
     assert e1["exact_pooled_sd"] == pytest.approx(np.sqrt((49.0 / 2) / 4))
     assert S["per_candidate"]["V1"]["exact_zero"]
     assert "Exact pairs differ on 1 gradable candidates: E1" in md
+    pb2 = S["perturbed"][(S["perturbed"]["batch"] == "B") & (S["perturbed"]["design_no"] == 2)]
+    assert float(pb2["E1"].iloc[0]) == pytest.approx(E1_OFF["B"][1] - 7.0)
+    assert S["per_candidate"]["E1"]["n_perturbed"] == 8
     js = json.loads((root / "out" / "ercot_noise.json").read_text())
     assert js["noise_floor"]["floor"]["E1"] == pytest.approx(np.sqrt((49.0 / 2) / 4)) and js["exact_zero_finding"] is None
 
@@ -235,7 +277,10 @@ def test_missing_extract_is_listed(fx):
     shutil.rmtree(root / "extracts" / "noise_v3" / "B" / "run_index_3")
     S, df, md = rn.read_noise(extr=str(root / "extracts"), waves=str(fx["waves"]), out_dir=str(root / "out"))
     assert S["missing"] == ["noise_v3/B:3"] and S["n_exact_pairs"] == 3 and "WARNING: 1 extracts missing" in md
-    assert S["per_candidate"]["E1"]["n_perturbed"] == 4
+    # B:7 (perturbed, design 3) lost its B exact and falls back to the A exact: population stays 8
+    assert S["per_candidate"]["E1"]["n_perturbed"] == 8
+    pb3 = S["perturbed"][(S["perturbed"]["batch"] == "B") & (S["perturbed"]["design_no"] == 3)]
+    assert pb3["ref_key"].iloc[0] == "noise_v3/A:3"
 
 
 def test_special_functions_against_scipy():

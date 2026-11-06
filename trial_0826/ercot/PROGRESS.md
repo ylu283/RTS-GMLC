@@ -14,13 +14,16 @@
   E3 0.63 are the collapsed strata — nuclear :10 holds the max of 11
   candidates at once; visible in the README table). v2 values chose
   designs only; never data.
-- [x] **Rows (layout 12, DEVIATION to confirm)**: per design exact in A,
-  exact in B (the cross-batch exact pair, both v3 runs), one perturbed copy
-  in A (δ = 0.001 relative on `pem_mw`, sign from seed 52, inward at
-  nameplate: nuclear 2430 → 2427.57 MW). Batch A 8 rows, batch B 4 rows.
-  Prompt 52 §3's "12 runs" cannot hold 4 cross-batch exact pairs AND 8
-  perturbed copies under v3; `--layout 16` (one antithetic perturbed copy
-  per design in B; ruler n = 8) is kept in the builder. README §5.
+- [x] **Rows (layout 16 COMMITTED, 5f131f1; strategy 11-06)**: per design
+  exact in A, exact in B (the cross-batch exact pair, both v3 runs), one
+  perturbed copy in A and one antithetic perturbed copy in B (δ = 0.001
+  relative on `pem_mw`, sign from seed 52, inward at nameplate: nuclear
+  2430 → 2427.57 MW in A and 2425.14 MW in B, the antithetic copy stepping
+  2δ inward at the bound). Batch A 8 rows, batch B 8 rows; ruler population
+  8 (prompt 57 A4). Prompt 52 §3's "12 runs" cannot hold 4 cross-batch
+  exact pairs AND 8 perturbed copies under v3 — resolved to 16, disclosed
+  in README §5; `--layout 12` (A 8, B 4; ruler n = 4) stays in the builder
+  as the alternative and is NOT the committed wave.
 - [x] **Scripts** per batch (`waves/noise_v3/{A,B}/`): array `-t 1-n`,
   `-pe smp 4`, `-r n`, `-q long`, SMOKE_GATE, identity from
   `waves/GAP_DECISION.json` at run time (wave-D block; refuses without
@@ -42,18 +45,19 @@
   + `ercot_noise.csv/json` + `ercot_noise_cov.csv`.
 - [x] **Tests** `pytest tests/test_make_noise_v3.py tests/test_read_noise.py
   tests/test_pool_objectives.py -q` green; `bash -n` on the six scripts.
-  Fixture: 12 extracts from `base_2019_v2/run_index_1` slim tables with
-  controlled `overall.csv` edits (known medians; exact-zero, RULER=0,
-  firing and non-firing trigger, exact-pair-differs, shed FAIL paths).
-- [ ] **KAY (1):** confirm layout 12 vs 16 (README §5), then
-  `cd trial_0826/ercot/waves/noise_v3/A && bash submit_this.sh` (32 slots,
-  8 full-year rows, ≈ 8–10 h wall each at v3).
+  Fixture: 16 extracts from `base_2019_v2/run_index_1` slim tables with
+  controlled `overall.csv` edits (known medians and sds; exact-zero,
+  RULER=0, firing and non-firing trigger, exact-pair-differs, shed FAIL,
+  missing-extract paths); one test keeps layout 12 buildable.
+- [ ] **KAY (1):** `cd trial_0826/ercot/waves/noise_v3/A && bash submit_this.sh`
+  (32 slots, 8 full-year rows, ≈ 8–10 h wall each at v3).
 - [ ] **KAY (2):** after batch A's collector email:
-  `cd trial_0826/ercot/waves/noise_v3/B && bash submit_this.sh` (16 slots).
+  `cd trial_0826/ercot/waves/noise_v3/B && bash submit_this.sh` (32 slots,
+  8 rows; refuses until `extracts/noise_v3/A/COLLECTED` is pushed).
 - [ ] **Next session:** `python analysis/noise_v3/read_noise.py` → commit
   `ERCOT_NOISE.md`; feed `ruler_j` into prompt 57 Part B (replaces `RULER
   PENDING (52)`), the plan §8 core-h actuals, and §7 rider levels.
-- Storage: 12 × 51 MB ≈ 0.60 GB on CRC; ≈ 36 MB in git. Session lock `52`
+- Storage: 16 × 51 MB ≈ 0.80 GB on CRC; ≈ 48 MB in git. Session lock `52`
   in this worktree. No push.
 
 ## Prompt 58 — RUC-gap smoke (E-D6) + wave D build (2026-11-06, zero simulation, local only)

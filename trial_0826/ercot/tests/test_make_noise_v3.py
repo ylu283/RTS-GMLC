@@ -2,7 +2,8 @@
 
 Run:  cd trial_0826/ercot && python -m pytest tests/test_make_noise_v3.py -q
 
-Checks: row counts per batch and layout, exact copies byte-equal to the v2
+Checks: row counts per batch (layout 16 = the committed wave; layout 12 kept
+as the alternative in one test), exact copies byte-equal to the v2
 design, delta = 0.001 relative and inward at the bounds, the nuclear dict
 without gen_pmax, pick-table spread columns, PICK_RULE.md written before the
 pick, the GAP_DECISION refusal of the array block, submit_this.sh refusals
@@ -30,14 +31,16 @@ pytestmark = pytest.mark.skipif(not HAVE_POOL, reason="pool_delta_v2.csv / pool_
 
 @pytest.fixture(scope="module")
 def built(tmp_path_factory):
+    """The committed truth: builder default = layout 16 (A 8 + B 8)."""
     waves = tmp_path_factory.mktemp("waves")
     return mn.build(waves=waves)
 
 
 @pytest.fixture(scope="module")
-def built16(tmp_path_factory):
-    waves = tmp_path_factory.mktemp("waves16")
-    return mn.build(waves=waves, layout="16")
+def built12(tmp_path_factory):
+    """The thinner alternative kept in the builder (A 8 + B 4); NOT the committed wave."""
+    waves = tmp_path_factory.mktemp("waves12")
+    return mn.build(waves=waves, layout="12")
 
 
 def _dm(path):
@@ -90,31 +93,45 @@ def test_pick_composition_and_table(built):
     assert keys == [p["key"] for p in picked] and score == pytest.approx(meta["score_mean_spread"])
 
 
-def test_row_counts_and_batches(built, built16):
+def test_row_counts_and_batches(built):
     d, rows, picked, _ = built
+    assert mn.LAYOUTS["16"] == {"A": 1, "B": 1}
+    assert len(rows["A"]) == 8 and len(rows["B"]) == 8
+    dm = _dm(d / "design_matrix.csv")
+    assert len(dm) == 16 and list(dm["global_index"]) == list(range(1, 17))
+    assert list(dm["batch"]) == ["A"] * 8 + ["B"] * 8
+    assert list(dm["copy_type"]) == (["exact"] * 4 + ["perturbed"] * 4) * 2
+    for b in ("A", "B"):
+        bdm = _dm(d / b / "design_matrix.csv")
+        assert list(bdm["index"]) == list(range(1, 9)) and (bdm["batch"] == b).all()
+        for i in range(1, 9):
+            assert (d / b / f"retrofit_gen_dict_{i}.json").is_file()
+    # every design: exact in A, exact in B (the pair), one perturbed in A, one antithetic perturbed in B
+    for n in range(1, 5):
+        sub = dm[dm["design_no"] == n]
+        assert sorted(zip(sub["batch"], sub["copy_type"])) == [("A", "exact"), ("A", "perturbed"),
+                                                               ("B", "exact"), ("B", "perturbed")]
+        p = sub[sub["copy_type"] == "perturbed"]
+        assert len(p) == 2 and len(set(p["pem_mw"])) == 2         # two distinct perturbed values
+    assert (dm["copy_type"] == "perturbed").sum() == 8               # ruler population 8 (prompt 57 A4)
+    assert (dm["perturb_seed"] == mn.SEED).all()
+    assert (dm["bid"] == 40.0).all() and (dm["num_days"] == 365).all() and (dm["start_date"] == "01-01-2019").all()
+
+
+def test_layout_12_alternative(built12):
+    """The thinner layout stays buildable: A 8 (4 exact + 4 perturbed), B 4 (exact only)."""
+    d, rows, _, _ = built12
+    assert mn.LAYOUTS["12"] == {"A": 1, "B": 0}
     assert len(rows["A"]) == 8 and len(rows["B"]) == 4
     dm = _dm(d / "design_matrix.csv")
-    assert len(dm) == 12 and list(dm["global_index"]) == list(range(1, 13))
-    assert list(dm["batch"]) == ["A"] * 8 + ["B"] * 4
+    assert len(dm) == 12 and list(dm["batch"]) == ["A"] * 8 + ["B"] * 4
     assert list(dm["copy_type"]) == ["exact"] * 4 + ["perturbed"] * 4 + ["exact"] * 4
-    for b, n in (("A", 8), ("B", 4)):
-        bdm = _dm(d / b / "design_matrix.csv")
-        assert list(bdm["index"]) == list(range(1, n + 1)) and (bdm["batch"] == b).all()
-        for i in range(1, n + 1):
-            assert (d / b / f"retrofit_gen_dict_{i}.json").is_file()
-    # every design: exact in A, exact in B, one perturbed in A
     for n in range(1, 5):
         sub = dm[dm["design_no"] == n]
         assert sorted(zip(sub["batch"], sub["copy_type"])) == [("A", "exact"), ("A", "perturbed"), ("B", "exact")]
-    assert (dm["perturb_seed"] == mn.SEED).all()
-    assert (dm["bid"] == 40.0).all() and (dm["num_days"] == 365).all() and (dm["start_date"] == "01-01-2019").all()
-    d16, rows16, _, _ = built16
-    assert len(rows16["A"]) == 8 and len(rows16["B"]) == 8
-    dm16 = _dm(d16 / "design_matrix.csv")
-    assert (dm16["copy_type"] == "perturbed").sum() == 8
-    for n in range(1, 5):
-        p = dm16[(dm16["design_no"] == n) & (dm16["copy_type"] == "perturbed")]
-        assert len(p) == 2 and len(set(p["pem_mw"])) == 2         # two distinct perturbed values
+    assert "#$ -t 1-4" in (d / "B" / "noise_v3_B_array.sh").read_text()
+    assert (dm["copy_type"] == "perturbed").sum() == 4
+    assert list(dm.loc[dm["copy_type"] == "exact", "pem_mw"]) == list(dm.loc[dm["copy_type"] == "exact", "pem_mw_origin"])
 
 
 def test_exact_copies_match_v2_design(built):
@@ -148,10 +165,19 @@ def test_delta_relative_and_inward(built):
         assert abs(r["pem_mw"] / r["pem_mw_origin"] - 1) == pytest.approx(r["delta_rel"], rel=1e-9)
         assert 0.0 <= r["pem_mw"] <= r["gen_pmax"] and 0.0 <= r["omega"] <= 1.0
         assert r["omega"] == pytest.approx(r["pem_mw"] / r["gen_pmax"], rel=1e-12)
-    # nuclear at nameplate (omega 1.0): the perturbed copy is inward
-    nuc = dm[(dm["unit_type"] == "NUC") & (dm["copy_type"] == "perturbed")]
-    assert len(nuc) == 1 and nuc["perturb_sign"].iloc[0] == -1
-    assert nuc["pem_mw"].iloc[0] == pytest.approx(2430.0 * 0.999) and nuc["omega"].iloc[0] < 1.0
+    # non-nuclear designs: delta_rel 0.001 on both copies, antithetic signs between A and B
+    for n in range(1, 5):
+        p = dm[(dm["design_no"] == n) & (dm["copy_type"] == "perturbed")].sort_values("batch")
+        assert list(p["batch"]) == ["A", "B"]
+        if p["unit_type"].iloc[0] != "NUC":
+            assert list(p["delta_rel"]) == [0.001, 0.001]
+            assert p["perturb_sign"].iloc[0] == -p["perturb_sign"].iloc[1]
+    # nuclear at nameplate (omega 1.0): both copies inward; the antithetic copy steps 2 x delta
+    nuc = dm[(dm["unit_type"] == "NUC") & (dm["copy_type"] == "perturbed")].sort_values("batch")
+    assert len(nuc) == 2 and list(nuc["batch"]) == ["A", "B"]
+    assert list(nuc["perturb_sign"]) == [-1, -1] and list(nuc["delta_rel"]) == [0.001, 0.002]
+    assert nuc["pem_mw"].tolist() == pytest.approx([2430.0 * 0.999, 2430.0 * 0.998])
+    assert (nuc["omega"] < 1.0).all() and nuc["omega"].tolist() == pytest.approx([0.999, 0.998])
     # corner rule unit tests
     v, s, dl = mn.perturb(100.0, 100.0, +1)
     assert (v, s, dl) == (pytest.approx(99.9), -1, 0.001)
@@ -187,7 +213,7 @@ def _bash_n(path):
 
 def test_scripts_parse(built):
     d, _, _, _ = built
-    for b, n in (("A", 8), ("B", 4)):
+    for b, n in (("A", 8), ("B", 8)):
         for f in (f"noise_v3_{b}_array.sh", f"collect_noise_v3_{b}.sh", "submit_this.sh"):
             _bash_n(d / b / f)
         arr = (d / b / f"noise_v3_{b}_array.sh").read_text()
@@ -329,8 +355,13 @@ def test_seed_reproducible():
     distinct = mn.load_pool()
     ids, _ = mn.gradable_ids()
     keys, _, _, _ = mn.pick(distinct, ids)
-    a = mn.design_rows(distinct, keys, "12", seed=mn.SEED)
-    b = mn.design_rows(distinct, keys, "12", seed=mn.SEED)
-    assert [r["pem_mw"] for r in a["A"]] == [r["pem_mw"] for r in b["A"]]
+    a = mn.design_rows(distinct, keys, "16", seed=mn.SEED)
+    b = mn.design_rows(distinct, keys, "16", seed=mn.SEED)
+    for batch in mn.BATCHES:
+        assert [r["pem_mw"] for r in a[batch]] == [r["pem_mw"] for r in b[batch]]
     signs = np.array([r["perturb_sign"] for r in a["A"] if r["copy_type"] == "perturbed"])
     assert set(signs) <= {-1, 1}
+    # batch A of layout 12 == batch A of layout 16; B of 12 == the 4 exact rows of B of 16
+    c = mn.design_rows(distinct, keys, "12", seed=mn.SEED)
+    assert [r["pem_mw"] for r in c["A"]] == [r["pem_mw"] for r in a["A"]]
+    assert [r["pem_mw"] for r in c["B"]] == [r["pem_mw"] for r in a["B"][:4]]
