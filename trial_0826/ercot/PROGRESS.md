@@ -1,4 +1,60 @@
-# ERCOT PROGRESS (prompts 26 → 36, 57, 58)
+# ERCOT PROGRESS (prompts 26 → 36, 52, 57, 58)
+
+## Prompt 52 v2.1 — ERCOT noise measurement, `waves/noise_v3` BUILT (2026-11-06, zero simulation, local only)
+
+- [x] **Pick (pre-registered)** `tools/make_noise_v3.py` writes
+  `waves/noise_v3/PICK_RULE.md` BEFORE the pick, then `pick_table.csv` +
+  `pick.json`: pool = 16 single-site v2 rows + 6 nuclear rows (21 distinct
+  designs), objectives = the 22 gradable candidates of prompt 57 (frozen
+  f76d897; E8/E9/N5 NOT USED — no v2 value on slim extracts), composition
+  3 VRE + 1 NUC, score = mean achieved spread (exhaustive, 2,800 sets).
+  Picked: D1 `screening_v2/ercot:1` (site 275, 519.5 MW), D2 `ercot:7`
+  (206, 899.9 MW), D3 `topup:4` (146, 134.0 MW), D4 `selection_t1_v2:10`
+  (nuclear gen 1, 2430 MW, ω = 1.0); mean spread 0.88 (E1 0.51, N2 0.60,
+  E3 0.63 are the collapsed strata — nuclear :10 holds the max of 11
+  candidates at once; visible in the README table). v2 values chose
+  designs only; never data.
+- [x] **Rows (layout 12, DEVIATION to confirm)**: per design exact in A,
+  exact in B (the cross-batch exact pair, both v3 runs), one perturbed copy
+  in A (δ = 0.001 relative on `pem_mw`, sign from seed 52, inward at
+  nameplate: nuclear 2430 → 2427.57 MW). Batch A 8 rows, batch B 4 rows.
+  Prompt 52 §3's "12 runs" cannot hold 4 cross-batch exact pairs AND 8
+  perturbed copies under v3; `--layout 16` (one antithetic perturbed copy
+  per design in B; ruler n = 8) is kept in the builder. README §5.
+- [x] **Scripts** per batch (`waves/noise_v3/{A,B}/`): array `-t 1-n`,
+  `-pe smp 4`, `-r n`, `-q long`, SMOKE_GATE, identity from
+  `waves/GAP_DECISION.json` at run time (wave-D block; refuses without
+  it), `NOISE_V3_START/END` stamps; collector (held; email on it only):
+  every row `--full`, `runtimes.csv`, `wallclock.csv`, `identity.txt`,
+  `pool_objectives.py --run-dir` → `pool_full_metrics.json`, `COLLECTED`
+  marker, slim + json commit, gz asserted unstaged, 5-retry push.
+  `B/submit_this.sh` refuses until `extracts/noise_v3/A/COLLECTED` is in
+  the tree. `.gitignore`: `extracts/noise_v3/**/*.csv.gz`.
+- [x] **`analysis/noise_v3/read_noise.py`** (pandas/numpy; reuses
+  `pool_objectives.pool_row`; χ²/F quantiles from the incomplete gamma /
+  beta, tested against scipy): exact-pair |Δ| (exact zeros), perturbed |Δ|
+  population = `ruler_j` (median/min/max, `RULER=0` list), per-level sd +
+  χ² CIs, pooled sd + Satterthwaite df, per-objective variance-ratio
+  trigger (α 0.05 AND ratio > 3) with one family-wise line, covariance
+  matrix of the perturbed deltas, shed ≡ 0 assert (exit 1), runtime table
+  (wall → core-h; replaces plan §8 "UNKNOWN"), `ERCOT_NOISE.md` §0 = the
+  three-line v3 identity statement (GAP_SMOKE.md + AMENDMENT 2026-11-06b)
+  + `ercot_noise.csv/json` + `ercot_noise_cov.csv`.
+- [x] **Tests** `pytest tests/test_make_noise_v3.py tests/test_read_noise.py
+  tests/test_pool_objectives.py -q` green; `bash -n` on the six scripts.
+  Fixture: 12 extracts from `base_2019_v2/run_index_1` slim tables with
+  controlled `overall.csv` edits (known medians; exact-zero, RULER=0,
+  firing and non-firing trigger, exact-pair-differs, shed FAIL paths).
+- [ ] **KAY (1):** confirm layout 12 vs 16 (README §5), then
+  `cd trial_0826/ercot/waves/noise_v3/A && bash submit_this.sh` (32 slots,
+  8 full-year rows, ≈ 8–10 h wall each at v3).
+- [ ] **KAY (2):** after batch A's collector email:
+  `cd trial_0826/ercot/waves/noise_v3/B && bash submit_this.sh` (16 slots).
+- [ ] **Next session:** `python analysis/noise_v3/read_noise.py` → commit
+  `ERCOT_NOISE.md`; feed `ruler_j` into prompt 57 Part B (replaces `RULER
+  PENDING (52)`), the plan §8 core-h actuals, and §7 rider levels.
+- Storage: 12 × 51 MB ≈ 0.60 GB on CRC; ≈ 36 MB in git. Session lock `52`
+  in this worktree. No push.
 
 ## Prompt 58 — RUC-gap smoke (E-D6) + wave D build (2026-11-06, zero simulation, local only)
 
