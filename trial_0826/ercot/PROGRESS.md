@@ -1,4 +1,64 @@
-# ERCOT PROGRESS (prompts 26 → 36, 57)
+# ERCOT PROGRESS (prompts 26 → 36, 57, 58)
+
+## Prompt 58 — RUC-gap smoke (E-D6) + wave D build (2026-11-06, zero simulation, local only)
+
+- [x] **Precedence settled from the source** (2026-11-06): Prescient
+  `egret_plugin.py:49-53` passes `mipgap = options.ruc_mipgap` and
+  `options.deterministic_ruc_solver_options` (`:358-361`) to egret;
+  `solver_interface.py:145` → `_set_options`: `solver.options.MIPGap =
+  mipgap` at `:44-45` FIRST, then every solver-options key at `:71-73`
+  AFTER. `ruc_mipgap` is the canonical knob; a `MIPGap` solver option
+  would silently override it. Pinned commits (Prescient a4c0849, egret
+  e4a244d) == local HEADs on these files. Written in
+  `waves/smoke_gap/README.md` §3.
+- [x] **`run_ercot_pcm.py --ruc_mipgap`** (default 0.01 = inherited; every
+  other default unchanged; `--ruc_solver_option MIPGap/TimeLimit` refused;
+  banner prints `ruc_mipgap=`). Dry-run in the local prescient venv.
+- [x] **T1 `waves/smoke_gap/`** (`tools/make_smoke_gap.py`): array `-t 1-3`
+  (gap 0.01 / 0.001 / 0.0001, TL 1200, 3 days from 01-01-2019, base, 4
+  slots, `-r n`, `-q long`, date stamps), held collector (`--full` extracts
+  to `extracts/smoke_gap/task_N`, Prescient `runtimes.csv`,
+  `ruc_tolerance.csv` from the Gurobi tolerance line, wall-clock, then
+  `analysis/gap_smoke/read_smoke.py` → `GAP_SMOKE.md` + `gap_smoke.csv` +
+  `gap_smoke_days.csv`), `submit_this.sh` on the smoke_v2 pattern.
+  `read_smoke.py` prints the pre-registered rule's verdict and the
+  ×365/3 cost shift vs the $11.3M median; it never writes
+  `GAP_DECISION.json`. Fixture test (smoke_v2 × 3): all Δ = 0, identity
+  PASS.
+- [x] **T2 `waves/location_oat_v2/`** (`tools/make_wave_d.py`, NOT
+  submitted): 21 rows (163, 140, 146, 270, 110, 274 × 60/120/180 MW;
+  nuclear gen 1 × 60/120/180 MW, ω = 0.02469 / 0.04938 / 0.07407),
+  `design_matrix.csv` (+ `pem_mw`, `level_id`), dicts (nuclear without
+  `gen_pmax`), asserts (180 ≤ 185.4; fractions ≤ 1). Array reads
+  `--ruc_mipgap/--ruc_time_limit` from `waves/GAP_DECISION.json` at run
+  time (refuses without it; SMOKE_GATE; date stamps). Collector: every
+  row `--full` + `runtimes.csv` + wall-clock + `pool_objectives.py
+  --run-dir` on CRC; commits slim tables + `pool_full_metrics.json` +
+  `runtimes.csv` + manifest; `*.csv.gz` left in storage
+  (`trial_0826/ercot/.gitignore`). `submit_this.sh` refuses without
+  `GAP_DECISION.json`, prints it, asks `yes`. README per prompt 58 §3.
+  Storage: 21 × 51 MB ≈ 1.05 GB on CRC, ≈ 60 MB in git.
+- [x] **`pool_objectives.py --run-dir/--out`** per-run mode: E8, E9, N5
+  (+ checks), commitment-headroom diagnostic from `thermal.csv.gz`
+  (Σ committed (PMax − Dispatch); agrees with R7 to 1e-11 MW), R7/R8, RUC
+  quality, manifest md5s re-hashed. Base run 1: E8 15.483, E9 0, N5
+  −18.402 (= POOL_V2 §1). Runs under pandas 2.3.3 and 3.0.6 (local
+  ercot223 venv) with identical output.
+- [x] **Tests** `pytest tests/test_make_wave_d.py tests/test_pool_objectives.py
+  tests/test_read_smoke.py -q` green (see commit); `bash -n` on every
+  shell script.
+- [ ] **KAY (1):** `cd trial_0826/ercot/waves/smoke_gap && bash submit_this.sh`
+  (minutes). Read `analysis/gap_smoke/GAP_SMOKE.md` when the collector
+  pushes; task 1 must be byte-identical to `extracts/smoke_v2`; a task-2/3
+  tolerance line reading 1.00e-02 is a FAILED smoke. Then write
+  `waves/GAP_DECISION.json` (E-D6).
+- [ ] **KAY (2):** `cd trial_0826/ercot/waves/location_oat_v2 && bash submit_this.sh`
+  (refuses without `GAP_DECISION.json`; 84 slots; 21 full-year rows).
+- [ ] **Strategy session (after E-D6):** ERCOT_BO_PLAN §2/§3 amendment +
+  CONFIG_ERCOT.md row "identity v3"; Part B of prompt 57 after wave D lands.
+- Pi-agenda one-liners: "E-D6 gap smoke built (3 arms, control byte-identity
+  gate); wave D (21 rows, all --full) built and gated on GAP_DECISION.json".
+- Session lock `58` inside this worktree. No push.
 
 ## Prompt 57 Part A — objective-pool expansion (2026-11-06, zero simulation, local only)
 
