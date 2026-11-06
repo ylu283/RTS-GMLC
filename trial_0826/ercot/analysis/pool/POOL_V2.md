@@ -282,3 +282,19 @@ Run: `python pool_objectives.py --stage A1` then `--stage A3
    ids, not 16.
 8. **Session lock** `trial_0826/campaign/.session.lock` = `57` is
    written inside this worktree and left untracked.
+
+## 11. Strategy-session note on the gap bound scale (2026-11-06, appended after 3bd4064)
+
+`ruc_cost` is the 36-hour RUC objective (`ruc_horizon = 36`,
+CONFIG_ERCOT.md) and includes penalty terms, so Σ_days `ruc_cost` =
+$34.33B is 4.24 × the realized annual total cost ($8.09B). G as defined
+in §6.1 therefore overstates the realized-cost artifact bound by about
+that factor. Scaled to realized cost, G_base ≈ $196.7M / 4.24 ≈ **$46M**
+and the pair bound vs base ≈ **$93M**. The finding does not change: the
+median single-site |Δ total_cost| ($11.3M) is about 4 × below the scaled
+G_base, and the largest single-site Δ ($66.4M) is below the scaled pair
+bound. Both numbers (raw and scaled) are to be shown side by side in
+Part B. The §6.1 definition and the frozen `pool_definitions.json` are
+unchanged; this note is a scale disclosure, not a rule change. Solve
+times on base: median 19 s, p95 30 s, max 51 s per RUC day — a tighter
+`ruc_mipgap` is plausibly affordable and is raised as decision E-D6.
