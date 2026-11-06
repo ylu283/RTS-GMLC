@@ -6,3 +6,5 @@
 # in git for the wave). Earlier --full extracts (smoke_v2, base_2019_v2 run 1)
 # were committed before this rule and stay tracked.
 extracts/location_oat_v2/**/*.csv.gz
+# Prompt 52 v2.1 (noise_v3, batches A and B): same policy, every row --full.
+extracts/noise_v3/**/*.csv.gz
