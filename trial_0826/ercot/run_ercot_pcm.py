@@ -21,6 +21,28 @@ sced threads=1, ref-bus-and-branches slack, default ptdf network,
 compute_market_settlements=True) is inherited from multi_PEM_PCM — the
 cross-campaign comparability surface. See CONFIG_ERCOT.md.
 
+Prompt 58 adds --ruc_mipgap (default 0.01 = the inherited value, so every
+existing wave is unchanged). Precedence, read from the source (Prescient
+a4c0849 == local HEAD on these files; egret fork e4a244d == local HEAD):
+  prescient/engine/egret/egret_plugin.py:49   mipgap = options.ruc_mipgap
+  prescient/engine/egret/egret_plugin.py:51   -> _solve_unit_commitment(
+                                                 instance, solver, mipgap,
+                                                 None, ..., solver_options)
+  prescient/engine/egret/egret_plugin.py:358  solver_options =
+                                              options.deterministic_ruc_solver_options
+  egret/common/solver_interface.py:145        _set_options(solver, mipgap,
+                                              timelimit, solver_options)
+  egret/common/solver_interface.py:44-45      solver.options.MIPGap = mipgap   (FIRST)
+  egret/common/solver_interface.py:71-73      solver.options[key] = opt        (AFTER,
+                                              for every deterministic_ruc_solver_options key)
+So `ruc_mipgap` is written FIRST and a `MIPGap` key in
+deterministic_ruc_solver_options would silently OVERRIDE it. This wrapper
+therefore refuses `--ruc_solver_option MIPGap=...` (and TimeLimit=..., which
+has its own flag): the gap has exactly one source, `--ruc_mipgap`. Prescient
+passes timelimit=None to egret, so TimeLimit reaches Gurobi only through
+deterministic_ruc_solver_options (= --ruc_time_limit). Verify in the job log:
+`Optimal solution found (tolerance <gap>)` printed by Gurobi on every RUC day.
+
 The default --retrofit_gen_dict '{}' runs the BASE case (no retrofit;
 unlike multi_PEM_PCM.py, {} here never falls back to an RTS example dict).
 Generator names in this dataset are bare numeric strings ("1", "93") —
@@ -31,7 +53,7 @@ Usage:
         --start_date 01-01-2019 --output_directory <dir>/run \
         [--retrofit_gen_dict '{"91": {"PEM_bid": 40.0, "PEM_fraction": 0.5,
                                "gen_pmax": 250.0}}'] \
-        [--ruc_threads 1] [--ruc_time_limit 120] \
+        [--ruc_threads 1] [--ruc_time_limit 120] [--ruc_mipgap 0.01] \
         [--ruc_solver_option MIPFocus=1]
 """
 import json
@@ -60,6 +82,11 @@ def parse_args(argv=None):
     p.add_argument("--num_days", type=int, default=365)
     p.add_argument("--start_date", default="01-01-2019")
     p.add_argument("--ruc_time_limit", type=float, default=120.0)
+    p.add_argument("--ruc_mipgap", type=float, default=0.01,
+                   help="Prescient ruc_mipgap (relative MIPGap of every RUC "
+                   "solve); default 0.01 = the inherited multi_PEM value "
+                   "(prompt 58). Set BEFORE deterministic_ruc_solver_options "
+                   "by egret _set_options — see the module docstring.")
     p.add_argument("--ruc_threads", type=int, default=1,
                    help="Gurobi Threads for the RUC (= requested slot count)")
     p.add_argument("--ruc_solver_option", action="append", default=[],
@@ -83,11 +110,19 @@ def build_options(args):
         k, _, v = kv.partition("=")
         if not _:
             raise SystemExit(f"--ruc_solver_option needs KEY=VAL, got {kv!r}")
+        if k.lower() in ("mipgap", "timelimit"):
+            # egret _set_options applies deterministic_ruc_solver_options AFTER
+            # ruc_mipgap: a MIPGap key here would silently override --ruc_mipgap.
+            raise SystemExit(f"--ruc_solver_option {k} refused: use "
+                             f"--ruc_mipgap / --ruc_time_limit (one source each)")
         try:
             ruc_opts[k] = int(v)
         except ValueError:
             ruc_opts[k] = float(v)
     opts["deterministic_ruc_solver_options"] = ruc_opts
+    if not (0.0 <= args.ruc_mipgap < 1.0):
+        raise SystemExit(f"--ruc_mipgap must be in [0, 1), got {args.ruc_mipgap}")
+    opts["ruc_mipgap"] = args.ruc_mipgap  # prompt 58; 0.01 == inherited value
     opts["output_solver_logs"] = True  # rider (i): gap/SolCount from logs
     return opts
 
@@ -101,6 +136,7 @@ def main():
     print(f"run_ercot_pcm: data_dir={opts['data_path']}")
     print(f"run_ercot_pcm: index={args.index} start_date={opts['start_date']} "
           f"num_days={opts['num_days']} output={opts['output_directory']} "
+          f"ruc_mipgap={opts['ruc_mipgap']} "
           f"ruc_solver_options={opts['deterministic_ruc_solver_options']} "
           f"PEM_data={pem_data}")
     from utils import parameter_sweep_runner

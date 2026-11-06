@@ -1,0 +1,4 @@
+task,ruc_mipgap,ruc_time_limit,role,start_date,num_days
+1,0.01,1200,control_identical_to_smoke_v2,01-01-2019,3
+2,0.001,1200,candidate_identity,01-01-2019,3
+3,0.0001,1200,stretch_arm,01-01-2019,3
