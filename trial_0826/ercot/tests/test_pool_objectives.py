@@ -302,6 +302,81 @@ def test_base_run_reference_values(wide_real):
 
 
 # --------------------------------------------------------------------------
+# (4b) per-run mode (prompt 58 T2): --run-dir / --out
+# --------------------------------------------------------------------------
+def test_per_run_mode_synthetic(synth, tmp_path):
+    """Design-matrix independent; E8/E9/N5 equal pool_row; headroom NaN without thermal.csv.gz."""
+    d = po.run_dir("synth:2", synth["extr"])
+    m = po.per_run_metrics(d, data_dir=synth["data"], defs=DEFS)
+    r = _row(synth, 2)
+    for c in ("E8", "E9", "N5", "N5_unweighted_check", "E9_lmp_max"):
+        assert m[c] == pytest.approx(r[c]), c
+    assert m["full_extract"] is True and m["R7"] == pytest.approx(300.0) and m["R8"] == 7
+    assert np.isnan(m["H_headroom_mwh"])                 # no thermal.csv.gz in the fixture
+    assert m["manifest"]["manifest_present"] is False
+    assert m["n_ruc"] == 2 and m["n_ruc_optimal"] == 2 and m["G_run_usd"] == pytest.approx(2.0)
+    out = tmp_path / "x" / "pool_full_metrics.json"
+    assert po.main(["--run-dir", d, "--out", str(out), "--data_dir", synth["data"]]) == 0
+    back = json.loads(out.read_text())
+    assert back["E9"] == 1 and back["H_headroom_mwh"] is None    # NaN -> null, never imputed
+    # slim run: E8/E9/N5 NaN
+    m1 = po.per_run_metrics(po.run_dir("synth:1", synth["extr"]), data_dir=synth["data"], defs=DEFS)
+    assert m1["full_extract"] is False and all(np.isnan(m1[c]) for c in ("E8", "E9", "N5"))
+
+
+def test_headroom_diagnostic_synthetic(tmp_path):
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "gen.csv").write_text("GEN UID,Bus ID,Unit Type,PMax MW,PMin MW\n"
+                                  "1,107,NUC,2430.0,729.0\n5,3,COAL,500.0,100.0\n7,4,CT,200.0,50.0\n")
+    run = tmp_path / "run"
+    run.mkdir()
+    rows = ["Date,Hour,Generator,Dispatch,Unit State,Unit Cost,Unit Market Revenue,unit_type",
+            "2019-01-01,0,1,2430.0,True,1,1,NUC", "2019-01-01,0,5,400.0,True,1,1,COAL",
+            "2019-01-01,0,7,0.0,False,0,0,CT",
+            "2019-01-01,1,1,2430.0,True,1,1,NUC", "2019-01-01,1,5,500.0,True,1,1,COAL",
+            "2019-01-01,1,7,150.0,True,1,1,CT"]
+    with gzip.open(run / "thermal.csv.gz", "wt") as f:
+        f.write("\n".join(rows) + "\n")
+    (run / "committed_hourly.csv").write_text("Date,Hour,committed_mw,num_committed\n"
+                                              "2019-01-01,0,2930.0,2\n2019-01-01,1,3130.0,3\n")
+    h = po.headroom_diagnostic(str(run), str(data))
+    # hour 0: (2430-2430) + (500-400) = 100; hour 1: 0 + 0 + (200-150) = 50
+    assert h["H_headroom_mwh"] == pytest.approx(150.0) and h["H_headroom_mean_mw"] == pytest.approx(75.0)
+    assert h["H_headroom_min_mw"] == pytest.approx(50.0) and h["H_hours"] == 2
+    assert h["H_committed_cap_mwh"] == pytest.approx(2930.0 + 3130.0)
+    assert h["H_committed_cap_minus_R7_max_abs_mw"] == pytest.approx(0.0)
+    assert h["H_n_thermal_units"] == 3
+    # an unknown generator is refused, never silently dropped
+    (data / "gen.csv").write_text("GEN UID,Bus ID,Unit Type,PMax MW,PMin MW\n1,107,NUC,2430.0,729.0\n")
+    with pytest.raises(AssertionError):
+        po.headroom_diagnostic(str(run), str(data))
+
+
+@pytest.mark.skipif(not HAVE_EXTRACTS, reason="v2 extracts not on disk")
+def test_per_run_mode_base_run_index_1(tmp_path):
+    """The only local --full run; POOL_V2.md section 1 values: N5 -18.40
+    (load-weighted), E9 = 0, E8 = 15.48. Manifest md5s of the 4 gz tables verified."""
+    d = str(ERCOT / "extracts" / "base_2019_v2" / "run_index_1")
+    out = tmp_path / "pool_full_metrics.json"
+    m = po.write_per_run(d, str(out), defs=DEFS)
+    assert m["full_extract"] is True
+    assert m["N5"] == pytest.approx(-18.40, abs=0.01)
+    assert m["N5_unweighted_check"] == pytest.approx(-17.36, abs=0.01)
+    assert m["E9"] == 0 and m["E9_lmp_max"] == pytest.approx(446.1, abs=0.1)
+    assert m["E8"] == pytest.approx(15.48, abs=0.01)
+    assert m["R7"] == pytest.approx(361173142.3, rel=1e-9) and m["R8"] == 443791
+    assert m["H_hours"] == 8760 and m["H_headroom_mwh"] > 0 and m["H_headroom_min_mw"] >= 0
+    assert m["H_committed_cap_minus_R7_max_abs_mw"] < 1.0      # thermal.csv.gz agrees with committed_hourly
+    assert m["n_ruc"] == 365 and m["n_ruc_optimal"] == 365
+    assert sorted(m["manifest"]["gz_verified"]) == ["bus_lmps.csv.gz", "line_flows.csv.gz",
+                                                    "renewables.csv.gz", "thermal.csv.gz"]
+    assert m["manifest"]["gz_missing"] == []
+    back = json.loads(out.read_text())
+    assert back["N5"] == pytest.approx(m["N5"]) and back["manifest"]["md5"]["overall.csv"] == m["overall_md5"]
+
+
+# --------------------------------------------------------------------------
 # (5) helpers
 # --------------------------------------------------------------------------
 def test_norm_replicate_mapping():

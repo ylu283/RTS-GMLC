@@ -23,6 +23,13 @@ Red lines kept here:
 
 pandas-3 safe: no chained assignment, explicit copies, string keys.
 Tested locally under pandas 2.3.3; PCM_ERCOT (pandas 3.0.5) is the target.
+
+Per-run mode (prompt 58 T2; the wave-D collector runs it ON CRC per row):
+    python pool_objectives.py --run-dir extracts/location_oat_v2/run_index_N \\
+        --out extracts/location_oat_v2/run_index_N/pool_full_metrics.json
+emits E8, E9, N5 (+ checks), the commitment-headroom diagnostic from
+thermal.csv.gz, R7/R8, RUC quality and the manifest md5s of the gz tables
+(which stay uncommitted). Design-matrix independent.
 """
 
 import hashlib
@@ -682,6 +689,153 @@ def gap_table(wide, base_key=BASE_KEY, ref_median=11.3e6):
 
 
 # --------------------------------------------------------------------------
+# per-run mode (prompt 58 T2; wave-D collector runs this ON CRC per row)
+# --------------------------------------------------------------------------
+def headroom_diagnostic(d, data_dir=DATA):
+    """Commitment headroom from thermal.csv.gz (--full only; NaN on slim).
+
+    Per hour t: H_t = sum over committed thermal units g (Unit State True) of
+    (PMax_g - Dispatch_g,t), PMax from gen.csv 'PMax MW' keyed by 'GEN UID'.
+    Diagnostic only (not a pool candidate): the capacity the commitment held
+    above the dispatch, i.e. the RTS shed-mechanism variable (R7 companion).
+    Also returns the committed capacity sum (should equal R7 from
+    committed_hourly) and the max |difference| as a consistency check.
+    """
+    keys = ["H_headroom_mwh", "H_headroom_mean_mw", "H_headroom_min_mw",
+            "H_headroom_p05_mw", "H_hours", "H_committed_cap_mwh",
+            "H_committed_cap_minus_R7_max_abs_mw", "H_n_thermal_units"]
+    out = {k: np.nan for k in keys}
+    p = os.path.join(d, "thermal.csv.gz")
+    if not os.path.isfile(p):
+        return out
+    t = pd.read_csv(p, usecols=["Date", "Hour", "Generator", "Dispatch", "Unit State"])
+    t = t.copy()
+    t["Generator"] = t["Generator"].astype(str)
+    g = pd.read_csv(os.path.join(data_dir, "gen.csv"), dtype={"GEN UID": str})
+    pmax = {str(u): float(v) for u, v in zip(g["GEN UID"], g["PMax MW"])}
+    t["pmax"] = t["Generator"].map(pmax)
+    assert t["pmax"].notna().all(), (
+        f"thermal units without a gen.csv PMax: {sorted(t.loc[t['pmax'].isna(), 'Generator'].unique())}")
+    on = t["Unit State"].astype(bool).to_numpy()
+    disp = t["Dispatch"].astype(float).to_numpy()
+    t["head"] = np.where(on, t["pmax"].to_numpy() - disp, 0.0)
+    t["cap_on"] = np.where(on, t["pmax"].to_numpy(), 0.0)
+    hourly = t.groupby(["Date", "Hour"], sort=True)[["head", "cap_on"]].sum()
+    h = hourly["head"].to_numpy(dtype=float)
+    out.update({"H_headroom_mwh": float(h.sum()), "H_headroom_mean_mw": float(h.mean()),
+                "H_headroom_min_mw": float(h.min()),
+                "H_headroom_p05_mw": float(np.percentile(h, 5)),
+                "H_hours": int(len(h)),
+                "H_committed_cap_mwh": float(hourly["cap_on"].sum()),
+                "H_n_thermal_units": int(t["Generator"].nunique())})
+    chp = os.path.join(d, "committed_hourly.csv")
+    if os.path.isfile(chp):
+        ch = pd.read_csv(chp)
+        ch = ch.copy()
+        ch["Date"] = ch["Date"].astype(str)
+        ch = ch.set_index(["Date", "Hour"]).sort_index()
+        idx = hourly.index.intersection(ch.index)
+        if len(idx) == len(hourly):
+            diff = hourly.loc[idx, "cap_on"].to_numpy() - ch.loc[idx, "committed_mw"].astype(float).to_numpy()
+            out["H_committed_cap_minus_R7_max_abs_mw"] = float(np.abs(diff).max())
+    return out
+
+
+def manifest_md5(d, verify_gz=True):
+    """md5 dict from extract_manifest.json; the gz tables on disk are
+    re-hashed and must match (the committed manifest is the record of the
+    uncommitted gz files)."""
+    mp = os.path.join(d, "extract_manifest.json")
+    if not os.path.isfile(mp):
+        return {"manifest_present": False, "md5": {}, "gz_verified": [], "gz_missing": []}
+    with open(mp) as f:
+        man = json.load(f)
+    md5s = dict(man.get("md5", {}))
+    verified, missing, mismatch = [], [], []
+    if verify_gz:
+        for name, h in md5s.items():
+            if not name.endswith(".csv.gz"):
+                continue
+            p = os.path.join(d, name)
+            if not os.path.isfile(p):
+                missing.append(name)
+                continue
+            with open(p, "rb") as f:
+                got = hashlib.md5(f.read()).hexdigest()
+            (verified if got == h else mismatch).append(name)
+        assert not mismatch, f"{d}: gz md5 mismatch vs extract_manifest.json: {mismatch}"
+    return {"manifest_present": True, "mode": man.get("mode"), "md5": md5s,
+            "gz_verified": sorted(verified), "gz_missing": sorted(missing)}
+
+
+def per_run_metrics(d, data_dir=DATA, defs=None, pocket_bus=120):
+    """E8, E9, N5 (+ checks), the headroom diagnostic, R7/R8, RUC quality
+    and the manifest md5s for ONE extract dir; design-matrix independent."""
+    defs = defs or load_defs()
+    d = os.path.abspath(d)
+    out = {"run_dir": os.path.relpath(d, HERE) if d.startswith(HERE) else d,
+           "full_extract": bool(is_full(d)), "data_dir": os.path.abspath(data_dir),
+           "pandas_version": pd.__version__, "git_head": git_head(),
+           "generated_utc": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
+           "definitions": {"E8": defs["candidates"]["E8"]["formula"],
+                           "E9": defs["candidates"]["E9"]["formula"],
+                           "N5": defs["candidates"]["N5"]["formula"],
+                           "lmp_scarcity_threshold_usd_per_mwh":
+                               defs["thresholds"]["lmp_scarcity_threshold_usd_per_mwh"],
+                           "headroom": "per hour: sum over committed thermal units (Unit State "
+                                       "True in thermal.csv.gz) of (gen.csv PMax MW - Dispatch); "
+                                       "diagnostic, not a pool candidate"}}
+    out.update(lmp_candidates(d, data_dir, defs, pocket_bus))
+    out.update(headroom_diagnostic(d, data_dir))
+    chp = os.path.join(d, "committed_hourly.csv")
+    if os.path.isfile(chp):
+        ch = pd.read_csv(chp)
+        out["R7"] = float(ch["committed_mw"].astype(float).sum())
+        out["R8"] = int(ch["num_committed"].astype(int).sum())
+    rqp = os.path.join(d, "ruc_quality.csv")
+    if os.path.isfile(rqp):
+        rq = pd.read_csv(rqp)
+        status = rq["status"].astype(str)
+        gap = rq["final_gap_pct"].astype(float)
+        cost = rq["ruc_cost"].astype(float)
+        out.update({"n_ruc": int(len(rq)), "n_ruc_optimal": int((status == "OPTIMAL").sum()),
+                    "n_ruc_time_limit": int((status == "TIME_LIMIT").sum()),
+                    "max_gap_pct": float(gap.max()) if len(rq) else np.nan,
+                    "G_run_usd": float((gap / 100.0 * cost).sum()),
+                    "ruc_solve_time_median_s": float(rq["solve_time_s"].astype(float).median()) if len(rq) else np.nan,
+                    "ruc_solve_time_max_s": float(rq["solve_time_s"].astype(float).max()) if len(rq) else np.nan})
+    op = os.path.join(d, "overall.csv")
+    if os.path.isfile(op):
+        with open(op, "rb") as f:
+            out["overall_md5"] = hashlib.md5(f.read()).hexdigest()
+    out["manifest"] = manifest_md5(d)
+    return out
+
+
+def _json_safe(v):
+    if isinstance(v, dict):
+        return {k: _json_safe(x) for k, x in v.items()}
+    if isinstance(v, (list, tuple)):
+        return [_json_safe(x) for x in v]
+    if isinstance(v, (np.floating, float)):
+        return None if not np.isfinite(v) else float(v)
+    if isinstance(v, (np.integer,)):
+        return int(v)
+    if isinstance(v, (np.bool_,)):
+        return bool(v)
+    return v
+
+
+def write_per_run(run_dir, out_path, data_dir=DATA, defs=None):
+    m = per_run_metrics(run_dir, data_dir, defs)
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)) or ".", exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(_json_safe(m), f, indent=1)
+        f.write("\n")
+    return m
+
+
+# --------------------------------------------------------------------------
 # main
 # --------------------------------------------------------------------------
 def git_head(short=True):
@@ -699,8 +853,21 @@ def main(argv=None):
     ap.add_argument("--stage", choices=["A1", "A3", "all"], default="all",
                     help="A1 = pool_wide/delta/dead/replicate/gap; A3 = first cut (after the freeze commit)")
     ap.add_argument("--freeze-hash", default="", help="freeze commit of pool_definitions.json (printed in outputs)")
+    ap.add_argument("--run-dir", default=None,
+                    help="per-run mode (prompt 58): ONE extract dir -> E8/E9/N5 + headroom "
+                         "diagnostic + R7/R8 + RUC quality + manifest md5s as JSON (--out)")
+    ap.add_argument("--out", default=None, help="per-run mode: output JSON path")
+    ap.add_argument("--data_dir", default=DATA, help="per-run mode: RTS-GMLC data dir (v2)")
     args = ap.parse_args(argv)
     defs = load_defs()
+    if args.run_dir:
+        if not args.out:
+            raise SystemExit("--run-dir needs --out <json>")
+        m = write_per_run(args.run_dir, args.out, args.data_dir, defs)
+        print(f"per-run {m['run_dir']}: full={m['full_extract']} E8={m['E8']:.4f} E9={m['E9']} "
+              f"N5={m['N5']:.4f} headroom_mean_mw={m['H_headroom_mean_mw']:.1f} "
+              f"gz_verified={m['manifest']['gz_verified']} -> {args.out}")
+        return 0
     os.makedirs(os.path.join(POOL, "figs"), exist_ok=True)
     wide_path = os.path.join(POOL, "pool_wide_v2.csv")
 
