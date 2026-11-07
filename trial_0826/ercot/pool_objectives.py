@@ -235,13 +235,22 @@ def frozen_h2(key, frozen_csv=FROZEN_T1):
     return float(r["h2"].iloc[0])
 
 
+BASE_DROW = {"site": "__BASE_REPLICATE__", "unit_type": "", "bus": np.nan,
+             "omega": np.nan, "gen_pmax": np.nan, "replicate_of": ""}
+
+
 def pool_row(key, extr=EXTR, waves=WAVES, data_dir=DATA, defs=None,
-             frozen_csv=FROZEN_T1, pocket_bus=120):
-    """All section-2 candidates + SUSPECT inputs + G_run for one run."""
+             frozen_csv=FROZEN_T1, pocket_bus=120, drow=None, d=None):
+    """All section-2 candidates + SUSPECT inputs + G_run for one run.
+
+    `drow` / `d` (prompt 57 Part B): an explicit design row and extract dir
+    for runs that have no design matrix (a base replicate at another solver
+    identity, the gap-smoke tasks). `drow=BASE_DROW` = pem_mw 0, no site.
+    """
     defs = defs or load_defs()
     wave, idx = key.split(":")
-    d = run_dir(key, extr)
-    drow = design_row(wave, idx, waves)
+    d = d or run_dir(key, extr)
+    drow = drow or design_row(wave, idx, waves)
     nuclear = drow["unit_type"] == "NUC"
     full = is_full(d)
 
@@ -254,8 +263,9 @@ def pool_row(key, extr=EXTR, waves=WAVES, data_dir=DATA, defs=None,
     rq = pd.read_csv(os.path.join(d, "ruc_quality.csv"))
 
     # legacy 9 columns via compute_objectives (h2 for nuclear handled below)
-    co_extr_saved = co.EXTR
+    co_extr_saved, co_run_dir_saved = co.EXTR, co.run_dir
     co.EXTR = extr
+    co.run_dir = (lambda k, _d=d: _d)      # the explicit dir wins (module-global lookup)
     try:
         leg = co.metrics(key, nuclear=False)
         h2_source = "twin_curtailment"
@@ -269,7 +279,7 @@ def pool_row(key, extr=EXTR, waves=WAVES, data_dir=DATA, defs=None,
                 h2_source = ("frozen_t1_v2" if np.isfinite(leg["h2"])
                              else "unavailable")
     finally:
-        co.EXTR = co_extr_saved
+        co.EXTR, co.run_dir = co_extr_saved, co_run_dir_saved
 
     vre = (~g["is_pem"]) & g["unit_type"].isin(["WIND", "PV"])
     twin = g["is_pem"]
@@ -299,8 +309,12 @@ def pool_row(key, extr=EXTR, waves=WAVES, data_dir=DATA, defs=None,
     gap = rq["final_gap_pct"].astype(float)
     cost = rq["ruc_cost"].astype(float)
 
+    try:
+        idx_out = int(idx)
+    except ValueError:                      # e.g. smoke_gap:task_1
+        idx_out = idx
     row = {
-        "wave": wave, "index": int(idx), "key": key, "site": drow["site"],
+        "wave": wave, "index": idx_out, "key": key, "site": drow["site"],
         "unit_type": drow["unit_type"], "bus": drow["bus"], "pem_mw": pmw,
         "omega": drow["omega"], "gen_pmax": drow["gen_pmax"],
         "replicate_of": norm_replicate(wave, drow["replicate_of"],

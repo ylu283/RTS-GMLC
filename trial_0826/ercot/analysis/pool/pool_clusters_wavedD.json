@@ -1,0 +1,113 @@
+{
+ "clusters": [
+  [
+   "E1",
+   "V2",
+   "X1"
+  ]
+ ],
+ "survivor": {
+  "E1": "E1",
+  "V2": "E1",
+  "X1": "E1"
+ },
+ "survivors": [
+  "V1",
+  "E1",
+  "R4",
+  "N1",
+  "E4",
+  "R2",
+  "N4",
+  "N5",
+  "E6",
+  "R5",
+  "N3",
+  "E2",
+  "R6",
+  "N2",
+  "E3",
+  "E8"
+ ],
+ "eligible": [
+  "E1",
+  "E2",
+  "E3",
+  "E4",
+  "E6",
+  "E8",
+  "N1",
+  "N2",
+  "N3",
+  "N4",
+  "N5",
+  "R2",
+  "R4",
+  "R5",
+  "R6",
+  "V1",
+  "V2",
+  "X1"
+ ],
+ "members": [
+  "V1",
+  "V2",
+  "E1",
+  "E2",
+  "E3",
+  "E4",
+  "E6",
+  "E8",
+  "R2",
+  "R4",
+  "R5",
+  "R6",
+  "N1",
+  "N2",
+  "N3",
+  "N4",
+  "N5",
+  "X1"
+ ],
+ "redundant_pairs": [
+  "V2|E1",
+  "V2|E3",
+  "V2|X1",
+  "E1|X1"
+ ],
+ "tradeoff_pairs_le_-0.90": [
+  "V1|N5"
+ ],
+ "rule": {
+  "orientation": "max candidates x (-1); '-' candidates shown, never clustered, never survive",
+  "redundant_pair": "rho_or >= +0.90 on the pooled 18-row matrix AND rho_or >= +0.90 at >= 2 of the 3 per-level matrices (n = 6)",
+  "trade_off_pair": "rho_or <= -0.90 -> never a cluster; routed to the conflict check",
+  "linkage": "complete",
+  "first_cut_A3": "the same +0.90 complete-linkage rule names clusters on the 16-row first cut; it may not drop any member (NON-USE)"
+ },
+ "freeze_commit": "f76d897",
+ "defs_md5": "2d2ed9d9e09fdba6f56de135d738699d",
+ "base": "base_2019_v2:1",
+ "base_identity": {
+  "ruc_mipgap": 0.01,
+  "ruc_time_limit": 120.0,
+  "identity": "v2"
+ },
+ "row_identities": [
+  "v3"
+ ],
+ "delta_label": "CONTAMINATED (v2 base, v3 rows)",
+ "suspect_rows": [],
+ "dead_ids_A2": [
+  "E5",
+  "R1",
+  "R3"
+ ],
+ "E_D1b_recommended": [
+  "V1",
+  "E1",
+  "R4",
+  "N1"
+ ],
+ "git_head": "56b4ce6"
+}

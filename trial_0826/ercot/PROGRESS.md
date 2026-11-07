@@ -1,5 +1,47 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 57, 58)
 
+## Prompt 57 Part B — wave-D standings (2026-11-07, zero simulation, local only)
+
+- [x] **Wave D landed** (`extracts/location_oat_v2`, 304335c; 21 rows, all
+  `--full`, identity v3 = gap 0.001 / TL 1200; 7,665 / 7,665 RUCs
+  OPTIMAL; 0 SUSPECT). gz tables on CRC only; E8/E9/N5 from the per-row
+  `pool_full_metrics.json` (R7/R8/G/md5 asserted equal to the local slim
+  recomputation on 21 / 21).
+- [x] **`pool_standings.py`** (one command; `--base <wave:index | dir>`,
+  `--noise ercot_noise.json`, `--no-figs`): `pool_wavedD_wide.csv` (21
+  rows; `pool_wide_v2.csv` untouched), `pool_standings.csv`, per-level /
+  pooled / stratified oriented Spearman CSVs + pairs, clusters JSON,
+  conflicts, starts attribution, E-D1b table, gap-bound table, smoke
+  identity-shift table, wall-clock table; 25 heatmaps + 5 clustermaps
+  under `analysis/pool/figs/standings/`. Freeze f76d897 asserted against
+  git at every run.
+- [x] **Reads** (`analysis/pool/ERCOT_POOL_STANDINGS.md`): base is v2,
+  rows are v3 → every Δ `CONTAMINATED (v2 base, v3 rows)` with the
+  smoke-scaled identity shift beside it (R4 / N1 / E2 / E3 / R5–R7 / E8
+  DOMINATED; E1 ≈ half; V1 10–20 %; X1 / E6 clean). Status by the
+  base-free S′ = range / within-site 60→180 effect (S pinned, reported,
+  contaminated). RULER PENDING (52) on every row. Cluster {E1, V2, X1} →
+  E1 (E1–X1 +0.98: the pinned conflict did not appear). 16 survivors;
+  E-D1b ≤ 4 by global order: **V1, E1, R4, N1** (R4, N1 provisional: S′
+  passes, W p ≥ 0.75, discrete → ruler). Cost: every E1–E3 Δ WITHIN GAP
+  BOUND; bound is 90 % the v2 base's own slack; even the v3-only between-
+  site range is inside the v3 pair bound. E9 DEAD ON WAVE D. Nuclear
+  rows overlay only; E1–E4 / E7 UNCORRECTED (patch cost curve); D1 NaN
+  (thermal.csv.gz on CRC).
+- [x] **Wall-clock** (replaces plan §8 UNKNOWN; strategy amends the plan):
+  two node groups — A (15 rows) 5.1–5.5 h wall / 20.5–21.9 core-h at 4
+  slots, RUC median 20–23 s; B (rows 14–19) 10.5–11.8 h / 42–47 core-h,
+  RUC median 46–56 s. 584 core-h total; array 11.8 h calendar.
+- [x] **Tests** `pytest tests/test_pool_standings.py tests/test_pool_objectives.py -q`
+  → 23 passed (synthetic 18-row fixture: range, S / S′, planted cluster
+  and trade-off, nuclear exclusion, exact W distribution mean 1/3 and
+  p = 1/518,400 at W = 1). `pool_row` gained `drow` / `d` overrides.
+- [ ] **Recommended, not decided:** buy ONE v3 base run (≈ 5.3 h wall /
+  21 core-h on a fast node; `waves/base_v3` below), then
+  `python pool_standings.py --base extracts/base_v3/run_index_1`. Re-run
+  with `--noise` when 52 lands.
+- Session lock `57B` inside this worktree. No push; plan not amended.
+
 ## base_v3 — the identity-v3 base run, `waves/base_v3` BUILT (2026-11-07, zero simulation, local only)
 
 - [x] **Why**: wave D and every later campaign run are identity v3 (gap
