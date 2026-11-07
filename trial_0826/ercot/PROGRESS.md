@@ -1,5 +1,39 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 57, 58)
 
+## base_v3 — the identity-v3 base run, `waves/base_v3` BUILT (2026-11-07, zero simulation, local only)
+
+- [x] **Why**: wave D and every later campaign run are identity v3 (gap
+  0.001 / TL 1200); the only base on disk (`extracts/base_2019_v2`) is
+  identity v2 (gap 0.01 / TL 120). The gap smoke (task 2 vs 1, × 365/3)
+  shows the identity change alone moves cost ≈ −$10.9M/yr, true
+  curtailment ≈ −68 GWh/yr and starts ≈ −1,950/yr — the size of a
+  single-site PEM effect — so every Δ-vs-base of a v3 run needs a v3 base.
+  One run (deterministic instrument; exact replicates byte-identical). The
+  v2 base stays the reference for the 31 v2 runs; never mixed (README §6).
+- [x] **Build** `tools/make_base_v3.py` (wave-D conventions): one row
+  (`__BASE_REPLICATE__`, full year, `design_matrix.csv` == base_2019_v2
+  row 1), `retrofit_gen_dict_1.json` = `{}` (array aborts otherwise);
+  array `-t 1-1`, `-pe smp 4`, `-r n`, `-q long`, SMOKE_GATE, identity
+  from `waves/GAP_DECISION.json` at run time (wave-D block verbatim;
+  refuses without it), `BASE_V3_START/END` stamps; collector (held; email
+  on it only): `--full` → `extracts/base_v3/run_index_1`, `runtimes.csv`,
+  `wallclock.csv`, `identity.txt`, `GAP_DECISION_used.json`,
+  `pool_objectives.py --run-dir` → `pool_full_metrics.json`, slim + json +
+  manifest committed, gz asserted unstaged, 5-retry push.
+  `submit_this.sh`: branch / pull / GAP_DECISION present AND `"identity":
+  "v3"` / SMOKE_PASS / data dir / dict `{}` / `--ruc_mipgap` / gitignore
+  asserts, prints GAP_DECISION + `qquota`, literal `yes`. `.gitignore`:
+  `extracts/base_v3/**/*.csv.gz`.
+- [x] **Tests** `pytest tests/test_make_base_v3.py -q` (10 passed); `bash -n`
+  on the three scripts.
+- [ ] **KAY:** `cd trial_0826/ercot/waves/base_v3 && bash submit_this.sh`
+  (4 slots, one full-year row, ≈ one CRC day). Can run alongside wave D.
+- [ ] **Next session:** after the collector pushes, read
+  `extracts/base_v3/run_index_1/identity.txt` + `GAP_DECISION_used.json`;
+  point every wave-D / noise_v3 Δ-vs-base at `extracts/base_v3`, never at
+  `base_2019_v2`.
+- Storage: 51 MB on CRC; ≈ 3 MB in git. No push.
+
 ## Prompt 52 v2.1 — ERCOT noise measurement, `waves/noise_v3` BUILT (2026-11-06, zero simulation, local only)
 
 - [x] **Pick (pre-registered)** `tools/make_noise_v3.py` writes
