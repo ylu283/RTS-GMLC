@@ -104,8 +104,9 @@ order already measured by prompt 52, not a modeled discontinuity.
 Disclosed for any reading of the response near u = 0.
 
 Where the designs sit: Sobol never lands on 0 (min u over the 48 grading
-rows = 1.044e-3, row 13 site 163 → 0.194 MW; same row is the minimum of
-the first 32). The random_E minimum is u = 1.20e-4 → 0.089 MW.
+rows = 1.044e-3 at `sobol_index` 13 = wave row 14, site 163 → 0.194 MW;
+the same row is the minimum of the first 32). The random_E minimum is
+u = 1.20e-4 at row 41, site 274 → 0.089 MW.
 `optimize_acqf` can clamp to exactly 0, which takes the omitted (absent)
 branch. No minimum MW, no snapping: full float precision.
 

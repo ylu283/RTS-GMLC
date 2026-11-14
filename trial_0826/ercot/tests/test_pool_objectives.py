@@ -432,3 +432,59 @@ def test_definitions_global_order_complete():
                       int(c[1:]))
     assert ranked == sorted(ranked, key=keyf)
     assert DEFS["thresholds"]["lmp_scarcity_threshold_usd_per_mwh"] == 450.0
+
+
+# --------------------------------------------------------------------------
+# prompt 53 v3.1: the 6-site `__ALL__` rows of waves/n0_E + waves/random_E
+# (tools/make_ercot_n0.py) through the UNCHANGED reader (contract section 5)
+# --------------------------------------------------------------------------
+sys.path.insert(0, str(ERCOT / "tools"))
+import make_ercot_n0 as mk  # noqa: E402
+
+WAVE_D_RUN = ERCOT / "extracts" / "location_oat_v2" / "run_index_1"
+
+
+@pytest.fixture(scope="module")
+def e_waves(tmp_path_factory):
+    waves = tmp_path_factory.mktemp("waves_e")
+    rows, space = mk.build(waves=waves)
+    return waves, rows, space
+
+
+def test_all_row_six_sites_design_row_and_pem_mw(e_waves):
+    waves, rows, space = e_waves
+    r = rows["n0_E"][13]                                  # the min-u row (site 163 at 0.19 MW)
+    drow = po.design_row("n0_E", r["index"], str(waves))
+    assert drow["site"] == "__ALL__" and drow["unit_type"] == ""
+    assert np.isnan(drow["bus"]) and np.isnan(drow["omega"]) and np.isnan(drow["gen_pmax"])
+    dct = json.loads((waves / "n0_E" / f"retrofit_gen_dict_{r['index']}.json").read_text())
+    assert sorted(dct) == sorted(space["sites"])          # 6 sites, none at exactly 0
+    want = sum(v["PEM_fraction"] * v["gen_pmax"] for v in dct.values())
+    assert po.pem_mw("n0_E", r["index"], drow, str(waves)) == pytest.approx(want, rel=0, abs=1e-12)
+
+
+@pytest.mark.skipif(not (WAVE_D_RUN / "overall.csv").is_file(), reason="wave-D slim extract not on disk")
+def test_pool_row_on_copied_wave_d_extract_with_all_row(e_waves, tmp_path):
+    """pool_row() runs on a 6-site __ALL__ row (the design is a label here: the
+    tables are wave-D row 1's, copied; only the reader path is under test)."""
+    import shutil
+    waves, rows, _ = e_waves
+    extr = tmp_path / "extracts"
+    shutil.copytree(WAVE_D_RUN, extr / "n0_E" / "run_index_1")
+    row = po.pool_row("n0_E:1", extr=str(extr), waves=str(waves), defs=DEFS)
+    assert row["site"] == "__ALL__" and row["is_nuclear_design"] is False
+    assert row["pem_mw"] == pytest.approx(rows["n0_E"][0]["pem_mw"], rel=0, abs=1e-9)
+    for k in ("V1", "E1", "E3", "R1", "R2", "R4", "N1"):
+        assert np.isfinite(float(row[k])), k
+
+
+def test_generator_pem_mw_equals_reader_on_all_96_rows(e_waves):
+    waves, rows, _ = e_waves
+    n = 0
+    for wave, rs in rows.items():
+        dm = pd.read_csv(waves / wave / "design_matrix.csv", dtype={"oat_site": str})
+        for _, r in dm.iterrows():
+            drow = po.design_row(wave, int(r["index"]), str(waves))
+            assert abs(float(r["pem_mw"]) - po.pem_mw(wave, int(r["index"]), drow, str(waves))) <= 1e-9
+            n += 1
+    assert n == 96
