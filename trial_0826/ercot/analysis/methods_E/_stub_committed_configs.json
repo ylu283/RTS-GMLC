@@ -1,0 +1,8 @@
+{"identity": "v3", "design_space_version": "2026-11-13", "n0_tier_recommended": 32,
+ "E-D7_decided": 32,
+ "_STUB": "Part A placeholder for analysis/ercot_gp/committed_configs.json (contract 6.2; prompt 54 Part B writes the real one). E-D7_decided = 32 here is a STUB value so the Part A dry round can select a start set; it is NOT a decision. Part B asserts the real file.",
+ "objectives": {
+   "V1": {"cfg": ["m52", "std", "inferred", "none"], "floor": 0.0, "floor_rule": "exact sd_j > 0 AND df_j >= 3 else inferred-only 1e-9", "loo_nlpd_mean": null, "holdout_cov95": [null, 48], "holdout_rmse": null, "exposure_rows": []},
+   "E1": {"cfg": ["m52", "std", "inferred", "none"], "floor": 0.0, "floor_rule": "exact sd_j > 0 AND df_j >= 3 else inferred-only 1e-9", "loo_nlpd_mean": null, "holdout_cov95": [null, 48], "holdout_rmse": null, "exposure_rows": []},
+   "R4": {"cfg": ["m52", "std", "inferred", "none"], "floor": 0.0, "floor_rule": "exact sd_j > 0 AND df_j >= 3 else inferred-only 1e-9", "loo_nlpd_mean": null, "holdout_cov95": [null, 48], "holdout_rmse": null, "exposure_rows": []},
+   "N1": {"cfg": ["m52", "std", "inferred", "none"], "floor": 0.0, "floor_rule": "exact sd_j > 0 AND df_j >= 3 else inferred-only 1e-9", "loo_nlpd_mean": null, "holdout_cov95": [null, 48], "holdout_rmse": null, "exposure_rows": []}}}
