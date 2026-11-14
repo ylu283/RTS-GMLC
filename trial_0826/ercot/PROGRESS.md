@@ -1,4 +1,16 @@
-# ERCOT PROGRESS (prompts 26 → 36, 52, 57, 58)
+# ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
+
+## Prompt 55 — ERCOT BO machinery build (v3.1, 2026-11-13; executor writes here only)
+
+(pre-seeded section; see admin/prompt/bogp/53-55-shared-contract.md §4)
+
+## Prompt 54 — ERCOT GP loader + fit/validation pack (v3.1, 2026-11-13; executor writes here only)
+
+(pre-seeded section)
+
+## Prompt 53 — ERCOT design-space freeze + n0_E / random_E waves (v3.1, 2026-11-13; executor writes here only)
+
+(pre-seeded section)
 
 ## Prompt 57 Part B — wave-D standings (2026-11-07, zero simulation, local only)
 

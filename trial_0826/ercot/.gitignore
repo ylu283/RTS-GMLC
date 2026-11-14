@@ -11,3 +11,7 @@ extracts/noise_v3/**/*.csv.gz
 # base_v3 (the identity-v3 base, one --full row): same policy; the four gz
 # tables stay in $GROUP storage, listed by name + md5 in extract_manifest.json.
 extracts/base_v3/**/*.csv.gz
+# Prompts 53 / 55 (n0_E, random_E, methods_E_* rounds): same gz policy, every row --full.
+extracts/n0_E/**/*.csv.gz
+extracts/random_E/**/*.csv.gz
+extracts/methods_E_*/**/*.csv.gz
