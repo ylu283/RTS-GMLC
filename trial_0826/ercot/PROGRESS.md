@@ -6,7 +6,49 @@
 
 ## Prompt 54 — ERCOT GP loader + fit/validation pack (v3.1, 2026-11-13; executor writes here only)
 
-(pre-seeded section)
+### Part A — build (2026-11-14, zero data; branch `ercot/54-gp-loader`, worktree `RTS-GMLC-e54`; 0807c52)
+
+- [x] **Loader** `analysis/ercot_gp/ercot_gp_loader.py` per contract §6.1:
+  `load(waves, objectives=None, design_space, extr, floors) -> (X_mw, U, Y, meta)`,
+  index = pool key. Refusals in `meta.attrs["refused"]` = {`no_overall`,
+  `not_v3` (identity.txt missing / not gap 0.001 + TL 1200, via
+  `read_noise.read_identity`), `site_not_in_space`: [keys]}, total in
+  `meta.attrs["n_refused"]`; `floors` passed through in `meta.attrs["floors"]`.
+  One-site rows → pool_row `pem_mw` (ω × gen_pmax) in the site column;
+  `__ALL__` rows → design-matrix `mw_*` (round-trip float parse; asserted to
+  sum to the retrofit-dict pem_mw). Y from `pool_row` only; R1 / R2 /
+  G_run_usd / suspect in meta. SUSPECT = not (S1 ∧ S2 ∧ S3a); S3b (equal
+  nuclear starts across exact replicates) is cross-run, not evaluated per row.
+- [x] **Harness** `analysis/ercot_gp/ercot_gp_status.py`: D-1025 `FlexGP` /
+  `metrics` / `binom_band` imported from the n0evidence clone (I/O
+  re-implemented; RTS campaign dir removed from sys.path after import). Plan §5
+  arms in tie-priority order m52+std (default, floor 1e-9) · m52+std+meas
+  (iff exact sd > 0 AND df ≥ 3) · rbf+std · m52+log1p · rbf+log1p (iff
+  min y ≥ 0 and max / max(min, 1) > 10); LOO-NLPD selection (> 2 paired se);
+  holdout once per committed config at n0 = 32 / 48 vs [43, 48]
+  (`binom_band(48, level=0.90)`); `exposure_ledger.csv` append-only; refuses
+  the 25th scoring, a repeat (objective, n0), a non-plan tier, and any scoring
+  after `committed_configs.json` exists; sufficiency curves LOO-only at Sobol
+  prefixes 16/24/32/40/48 (config committed at 48); `committed_configs.json`
+  written LAST (contract §6.2 keys + `arm`, `by_tier`, `exact_sd/df`).
+- [x] **Sufficiency criterion, pinned before data** (E-D7 cites it verbatim):
+  "32 is sufficient iff, for every objective, LOO cov95 at 32 is inside [28, 32]
+  (binom.interval(0.90, 32, 0.95)) and LOO RMSE_32 / LOO RMSE_48 <= 1.1 and the
+  committed config at 32 passes the holdout bar [43, 48]; otherwise the
+  recommendation is 48."
+- [x] **Smoke on committed data**: wave D → 18 WIND rows, rows 19–21 (NUC)
+  refused; noise_v3 A → rows 3, 7 (site 146), rows 1/2/4/5/6/8 (sites
+  275/206/1) refused; 0 SUSPECT. 53's `design_space_E.json` (99ca929) equals
+  the contract and loads. Synthetic 6-D end-to-end: 4 scorings, committed
+  written, re-run refused (holdout retired).
+- [x] **Tests** (bogp-botorch, by file name):
+  `python -m pytest tests/test_ercot_gp_loader.py tests/test_ercot_gp_status.py -q`
+  → 28 passed, 1 skipped (the committed-JSON check skips until 53's freeze is
+  on this branch).
+- [ ] **STOP** — Part B waits on its four gates: (i) n0_E + random_E landed;
+  (ii) noise_v3 B + base_v3 landed and `read_noise.py` run (Part B step 0,
+  owned here); (iii) §1.2 verdict in `ERCOT_NOISE.md`; (iv) E-D1b → new dated
+  `design_space_E.json` (`--real` refuses PENDING / PROVISIONAL objectives).
 
 ## Prompt 53 — ERCOT design-space freeze + n0_E / random_E waves (v3.1, 2026-11-13; executor writes here only)
 
