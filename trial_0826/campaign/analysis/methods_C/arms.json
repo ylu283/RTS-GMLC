@@ -51,6 +51,20 @@
       "acq": "qnehvi",
       "seed_id": 4,
       "init": "copy_P1_ref"
+    },
+    "V1": {
+      "dir": "analysis/methods_C/V1",
+      "base_waves": ["stage2_C_n0", "stage2_C_n0b"],
+      "round_waves": {},
+      "round_wave_pattern": "methods_C_V1_r{k}",
+      "env": "BOGP_CRC_botorch",
+      "local_env": "bogp-botorch",
+      "acq": "qnehvi",
+      "seed_id": 5,
+      "init": "copy_P1_ref",
+      "gp_floor": 1e-9,
+      "rulers45": true,
+      "prompt": "49 (forward-graded stop rule; D-1025 GP, tau_het headline, record_only)"
     }
   }
 }

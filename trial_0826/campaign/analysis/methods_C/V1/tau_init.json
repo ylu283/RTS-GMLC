@@ -1,0 +1,40 @@
+{
+  "arm": "V1",
+  "tau": {
+    "old_3000": 5.262996664950399e+16,
+    "scalar_285.3": 6508669620258344.0,
+    "het_ii": 3021374766420009.5
+  },
+  "tau_over_old": {
+    "old_3000": 1.0,
+    "scalar_285.3": 0.12366851120396224,
+    "het_ii": 0.0574078791753991
+  },
+  "headline": "het_ii",
+  "het_ii_label": "heteroscedastic in shed only; curt/cost at assumed floors (unmeasured)",
+  "sensitivity": {
+    "scalar_285.3": {
+      "tau_acted_on": 6508669620258344.0,
+      "tau_shed_only": 5790242094801931.0,
+      "shed_only_over_acted": 0.8896199119985603,
+      "floor_contribution_sd_frac": 0.11038008800143972,
+      "floor_contribution_var_frac": 0.2085764121756739
+    },
+    "het_ii": {
+      "tau_acted_on": 3021374766420009.5,
+      "tau_shed_only": 112178307851259.72,
+      "shed_only_over_acted": 0.03712823351079298,
+      "floor_contribution_sd_frac": 0.962871766489207,
+      "floor_contribution_var_frac": 0.998621494276368
+    }
+  },
+  "het_sigma_starts": {
+    "min": 0.0,
+    "median": 7.158950178880378,
+    "max": 151.7479054449973,
+    "n_zero": 7
+  },
+  "recipe": "part_c45.tau verbatim: N=1000, default_rng(20261006), np.std ddof=0, exact HV, frozen ref; het floors [sigma_ii(shed_i), 5000, 0.5e6]",
+  "provenance": "constants asserted == phaseb 42f3a9d noise_floor/stop_regrade45/tau_regrade45.json arms.P1.tau to rel 1e-12",
+  "computed_at": "2026-11-14T04:25:38+00:00"
+}

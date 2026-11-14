@@ -210,3 +210,41 @@ def test_ingest_gate_and_stop_file(tmp_path, monkeypatch, small_candidates):
     open(os.path.join(root, "analysis", "methods_C", "T", "STOP_T"), "w").write("")
     aa.run_round(root, cfg, "T", 1, no_submit=True)
     assert os.path.isfile(os.path.join(root, "analysis", "methods_C", "T", "DONE_T.md"))
+
+
+def test_v1_three_rulers_dry_round(tmp_path, monkeypatch, small_candidates):
+    """Prompt 49 arm V1: D-1025 GP floor, tau rulers once at init (== prompt 45),
+    read-back asserted, stateless two-strike under tau_het / tau(285.3) / tau_old,
+    record_only to the cap; first fire = "the stop", later fires recorded."""
+    root, cfg = _mk_scratch(tmp_path, monkeypatch, ["stage2_C_n0", "stage2_C_n0b", "bo_C_r1", "bo_C_r2",
+                                                    "methods_C_N1_r1"])
+    aa.cmd_init(root, cfg, "P1", SHA)
+    assert aa.run_round(root, cfg, "V1", 0, no_submit=True) == 0
+    led = aa.load_ledger(root, cfg, "V1")
+    p1 = aa.load_ledger(root, cfg, "P1")
+    assert led["ref_point"] == p1["ref_point"] and led["threshold"] == p1["threshold"]
+    for k, v in aa.TAU45_P1.items():
+        assert led["tau_rulers"][k] == pytest.approx(v, rel=1e-12)
+    ti = json.load(open(aa.tau_init_path(root, cfg, "V1")))
+    assert ti["sensitivity"]["het_ii"]["tau_shed_only"] < ti["tau"]["het_ii"]
+    rec1 = json.load(open(aa.records_path(root, cfg, "V1")))["1"]
+    assert rec1["gp_floor"] == 1e-9 and set(rec1["loo_rms_z"]) == set(aa.M_COLS)
+    assert rec1["acq"] == "qnehvi" and rec1["acq_seed"] == 20261006 + 500 + 1
+    for k, mode in ((1, "strong"), (2, "dup"), (3, "dup"), (4, "dup")):
+        _fake_objectives(root, cfg, "V1", k, mode=mode, seed=k)
+        assert aa.run_round(root, cfg, "V1", k, no_submit=True) == 0
+    led = aa.load_ledger(root, cfg, "V1")
+    e = led["entries"][1:]
+    assert [x["would_stop_het"] for x in e] == [False, False, True, True]
+    assert [x["would_stop_285"] for x in e] == [False, False, True, True]
+    assert led["first_stop_het"] == 3 and all("loo_rms_z" in x for x in e)
+    assert e[0]["gain_tau_het"] == pytest.approx(e[0]["gain"] / led["tau_rulers"]["het_ii"])
+    done = open(os.path.join(root, "analysis", "methods_C", "V1", "DONE_V1.md")).read()
+    assert "first_stop_het: 3" in done
+    assert not os.path.exists(os.environ["SHIM_LOG"])
+    # read-back: a tau edited after init is caught at the next grade
+    t = json.load(open(aa.tau_init_path(root, cfg, "V1")))
+    t["tau"]["het_ii"] *= 1.0000001
+    json.dump(t, open(aa.tau_init_path(root, cfg, "V1"), "w"))
+    with pytest.raises(AssertionError, match="tau_rulers"):
+        aa.check_rulers45(root, cfg, "V1", led)

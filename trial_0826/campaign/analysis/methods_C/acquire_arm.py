@@ -187,7 +187,8 @@ def write_round_section(root, cfg, arm, k, updates) -> dict:
     lines = [f"<!-- BEGIN r{k} -->", f"## Round {k} ({round_wave(cfg, arm, k)})"]
     for key in ("proposed_at", "acq", "acq_seed", "bo_gp_sha", "botorch", "predictions",
                 "graded_at", "cumulative_hv", "gain", "gain_tau", "threshold",
-                "would_stop", "n_outside_ref", "decision"):
+                "would_stop", "gain_tau_het", "would_stop_het", "gain_tau_285", "would_stop_285",
+                "gp_floor", "loo_rms_z", "n_outside_ref", "decision"):
         if key in rec:
             lines.append(f"- {key}: {rec[key]}")
     if "weights" in rec:
@@ -310,6 +311,107 @@ def _mc_threshold(Y, ref):
     return float(np.std(hvs, ddof=0))
 
 
+# --- prompt 49: three-ruler tau, COPIED VERBATIM from noise_floor/stop_regrade45/part_c45.py
+# (branch phaseb, commit 42f3a9d): constants lines 50-51/68-71, sigma_ii 74-78, tau 89-102.
+MC_SEED45, N_MC = 20261006, 1000
+OTHER = (5000.0, 0.5e6)
+ANCHOR_Y, ANCHOR_SD = (429.5, 4672.0, 37834.0), (0.0, 13.34, 520.1)
+SLOPE1 = (ANCHOR_SD[1] - ANCHOR_SD[0]) / (ANCHOR_Y[1] - ANCHOR_Y[0])
+SLOPE2 = (ANCHOR_SD[2] - ANCHOR_SD[1]) / (ANCHOR_Y[2] - ANCHOR_Y[1])
+assert round(SLOPE1, 7) == 0.0031444 and round(SLOPE2, 7) == 0.0152813, (SLOPE1, SLOPE2)
+
+
+def sigma_ii(y):
+    y = np.asarray(y, float)
+    return np.where(y <= ANCHOR_Y[0], 0.0,
+                    np.where(y <= ANCHOR_Y[1], (y - ANCHOR_Y[0]) * SLOPE1,
+                             ANCHOR_SD[1] + (y - ANCHOR_Y[1]) * SLOPE2))
+
+
+def tau45(Y, ref, shed_floor, other=OTHER):
+    """part_c45.tau; `other` added (default = part_c45's OTHER) for the
+    shed-only sensitivity row only (curt/cost floors 0)."""
+    if np.ndim(shed_floor) == 0:
+        floors = np.array([shed_floor, *other])
+    else:
+        sv = np.asarray(shed_floor, float)
+        assert sv.shape == (len(Y),)
+        floors = np.column_stack([sv, np.full(len(Y), other[0]), np.full(len(Y), other[1])])
+    rng = np.random.default_rng(MC_SEED45)
+    hvs = np.empty(N_MC)
+    for i in range(N_MC):
+        hvs[i] = hypervolume_exact(Y + rng.normal(0.0, floors, size=Y.shape), ref)
+    return float(np.std(hvs, ddof=0))
+
+
+# tau_regrade45.json arms.P1 (phaseb 42f3a9d) -- the init asserts' reference values
+TAU45_P1 = {"old_3000": 5.262996664950399e+16, "scalar_285.3": 6508669620258344.0,
+            "het_ii": 3021374766420009.5}
+TAU45_JSON = os.environ.get("TAU45_JSON", "/Users/yilu/Documents/GitHub/RTS-GMLC-phaseb/trial_0826/"
+                            "campaign/analysis/noise_floor/stop_regrade45/tau_regrade45.json")
+TAU_LABEL = "heteroscedastic in shed only; curt/cost at assumed floors (unmeasured)"
+
+
+def tau_init_path(root, cfg, arm): return os.path.join(arm_dir(root, cfg, arm), "tau_init.json")
+
+
+def init_rulers45(root, cfg, arm, Y, ref, thr) -> dict:
+    """Prompt 49 §2: tau computed ONCE from the 32 starts, never on accumulated Y."""
+    if os.path.isfile(TAU45_JSON):  # local T0: the constants above == the prompt-45 file
+        ref45 = json.load(open(TAU45_JSON))["arms"]["P1"]["tau"]
+        assert all(ref45[k] == v for k, v in TAU45_P1.items()), "TAU45_P1 != tau_regrade45.json"
+    sig = sigma_ii(Y[:, 0])
+    taus = {"old_3000": tau45(Y, ref, 3000.0), "scalar_285.3": tau45(Y, ref, 285.3),
+            "het_ii": tau45(Y, ref, sig)}
+    for k, v in TAU45_P1.items():
+        assert abs(taus[k] / v - 1) < 1e-12, f"{k}: {taus[k]!r} does not reproduce tau_regrade45 {v!r}"
+    assert abs(taus["old_3000"] / thr - 1) < 1e-12, (taus["old_3000"], thr)
+    shed_only = {"scalar_285.3": tau45(Y, ref, 285.3, (0.0, 0.0)), "het_ii": tau45(Y, ref, sig, (0.0, 0.0))}
+    sens = {k: {"tau_acted_on": taus[k], "tau_shed_only": shed_only[k],
+                "shed_only_over_acted": shed_only[k] / taus[k],
+                "floor_contribution_sd_frac": 1 - shed_only[k] / taus[k],
+                "floor_contribution_var_frac": 1 - (shed_only[k] / taus[k]) ** 2} for k in shed_only}
+    out = {"arm": arm, "tau": taus, "tau_over_old": {k: v / taus["old_3000"] for k, v in taus.items()},
+           "headline": "het_ii", "het_ii_label": TAU_LABEL, "sensitivity": sens,
+           "het_sigma_starts": {"min": float(sig.min()), "median": float(np.median(sig)),
+                                "max": float(sig.max()), "n_zero": int((sig == 0).sum())},
+           "recipe": "part_c45.tau verbatim: N=1000, default_rng(20261006), np.std ddof=0, exact HV, "
+                     "frozen ref; het floors [sigma_ii(shed_i), 5000, 0.5e6]",
+           "provenance": "constants asserted == phaseb 42f3a9d noise_floor/stop_regrade45/"
+                         "tau_regrade45.json arms.P1.tau to rel 1e-12",
+           "computed_at": _now()}
+    with open(tau_init_path(root, cfg, arm), "w") as f:
+        json.dump(out, f, indent=2)
+        f.write("\n")
+    return out
+
+
+def check_rulers45(root, cfg, arm, led) -> dict:
+    """Read back the init-time rulers; equality-asserted every round."""
+    t = json.load(open(tau_init_path(root, cfg, arm)))["tau"]
+    assert led["tau_rulers"] == t, ("ledger tau_rulers != tau_init.json", led["tau_rulers"], t)
+    assert led["tau_rulers"]["old_3000"] == led["threshold"]
+    return t
+
+
+def gp_floors(cfg, arm):
+    """Per-objective GP noise lower bound (physical units): the arm's `gp_floor`
+    (prompt 49, D-1025: 1e-9 on all three) else the campaign FLOORS."""
+    a = arm_cfg(cfg, arm)
+    return np.full(len(M_COLS), float(a["gp_floor"])) if "gp_floor" in a else FLOORS
+
+
+def loo_rms_z(gp) -> float:
+    """Closed-form LOO z-scores of a fitted PredGP (learned constant mean)."""
+    with torch.no_grad():
+        K = gp.model.covar_module(gp._tx).evaluate().double()
+        Kn = K + gp.lik.noise.double() * torch.eye(len(gp._tx), dtype=torch.float64)
+        Ki = torch.linalg.inv(Kn)
+        alpha = Ki @ (gp._ty.double() - gp.model.mean_module.constant.double())
+        z = (alpha / Ki.diagonal().sqrt()).numpy()
+    return float(np.sqrt((z ** 2).mean()))
+
+
 def cmd_init(root, cfg, arm, bo_gp_sha):
     a = arm_cfg(cfg, arm)
     d = arm_dir(root, cfg, arm)
@@ -356,6 +458,12 @@ def cmd_init(root, cfg, arm, bo_gp_sha):
            **common, "source": source,
            "entries": [{"round": 0, "n": 32, "hv": hv0, "gain": None, "n_outside_ref":
                         int((~np.all(Y < ref, axis=1)).sum()), "decision": "start", "at": _now()}]}
+    if a.get("rulers45"):
+        assert a["init"] == "copy_P1_ref" and np.array_equal(ref, np.asarray(p1["ref_point"], float))
+        r45 = init_rulers45(root, cfg, arm, Y, ref, thr)
+        led.update({"tau_rulers": r45["tau"], "tau_headline": "het_ii", "tau_het_label": TAU_LABEL,
+                    "gp_floor": a.get("gp_floor")})
+        print(f"init {arm}: tau rulers {r45['tau']} (het/old {r45['tau_over_old']['het_ii']:.4f})")
     save_ledger(root, cfg, arm, led)
     with open(round_log_path(root, cfg, arm), "w") as f:
         f.write(round_log_header(cfg, arm))
@@ -377,7 +485,7 @@ def _propose_designs(cfg, arm, X, Y, seed, led):
         import botorch
         import qnehvi
         r = qnehvi.propose_qnehvi_batch(X, Y, an.lattice_candidates(), led["ref_point"],
-                                        FLOORS, q=q, seed=seed)
+                                        gp_floors(cfg, arm), q=q, seed=seed)
         return np.asarray(r["x_batch"], float), {
             "botorch": botorch.__version__, "qnehvi_mc_samples": qnehvi.MC_SAMPLES,
             "qnehvi_seconds": round(float(r["seconds"]), 1)}
@@ -389,7 +497,14 @@ def propose_round(root, cfg, arm, k) -> str:
     _step(root, cfg, arm, f"propose r{k}: loading training data")
     X, Y = load_training(root, cfg, arm, k - 1)
     _step(root, cfg, arm, f"propose r{k}: fitting prediction GPs on n={len(X)}")
-    gps = an.fit_prediction_gps(X, Y)
+    a = arm_cfg(cfg, arm)
+    if "gp_floor" in a:  # prompt 49: D-1025 deployed GP (floor lifted), report-only LOO
+        gps = [an.PredGP(X, Y[:, j], f) for j, f in enumerate(gp_floors(cfg, arm))]
+        extra_rec = {"gp_floor": a["gp_floor"],
+                     "loo_rms_z": {c: round(loo_rms_z(g), 4) for c, g in zip(M_COLS, gps)}}
+    else:
+        gps = an.fit_prediction_gps(X, Y)
+        extra_rec = {}
     seed = acq_seed(cfg, arm, k)
     _step(root, cfg, arm, f"propose r{k}: acquisition ({arm_cfg(cfg, arm)['acq']}, seed {seed})")
     designs, extra = _propose_designs(cfg, arm, X, Y, seed, led)
@@ -399,6 +514,12 @@ def propose_round(root, cfg, arm, k) -> str:
     keys = {tuple(r) for r in designs.round(10).tolist()}
     assert len(keys) == q, "duplicate designs in batch"
     assert not (keys & {tuple(r) for r in X.round(10).tolist()}), "re-proposed an evaluated design"
+    if k == 1 and a.get("rulers45"):  # prompt 49 §2 init assert: seed_id 5 is not a re-buy
+        for w in ("bo_C_r1", "methods_C_N1_r1"):
+            Xw, _ = load_wave_xy(root, w)
+            same = keys & {tuple(r) for r in Xw.round(10).tolist()}
+            print(f"r1 overlap with {w}: {len(same)}/{q}")
+            assert keys != {tuple(r) for r in Xw.round(10).tolist()}, f"r1 proposals == {w} designs"
     _step(root, cfg, arm, f"propose r{k}: building wave + predictions")
     wave = round_wave(cfg, arm, k)
     wave_dir = make_batches.build_methods_round(
@@ -409,7 +530,7 @@ def propose_round(root, cfg, arm, k) -> str:
     pred_path = an.write_predictions(wave_dir, designs, gps)
     write_round_section(root, cfg, arm, k, {
         "proposed_at": _now(), "acq": arm_cfg(cfg, arm)["acq"], "acq_seed": seed,
-        "bo_gp_sha": led["bo_gp_sha"], **extra, "designs": designs.tolist(),
+        "bo_gp_sha": led["bo_gp_sha"], **extra, **extra_rec, "designs": designs.tolist(),
         "predictions": os.path.relpath(pred_path, root),
         "threshold": led["threshold"], "decision": "proposed"})
     return wave_dir
@@ -461,13 +582,24 @@ def grade_round(root, cfg, arm, k) -> dict:
     thr = led["threshold"]
     gains = [e["gain"] for e in led["entries"] if e["gain"] is not None] + [gain]
     would_stop = len(gains) >= 2 and gains[-1] < thr and gains[-2] < thr
+    rulers = {}
+    if "tau_rulers" in led:  # prompt 49: stateless two-strike under tau_het (headline) + tau(285.3)
+        t = check_rulers45(root, cfg, arm, led)
+        for tag, key in (("het", "het_ii"), ("285", "scalar_285.3")):
+            rulers[f"gain_tau_{tag}"] = gain / t[key]
+            rulers[f"would_stop_{tag}"] = bool(len(gains) >= 2 and gains[-1] < t[key] and gains[-2] < t[key])
+        prev = json.load(open(records_path(root, cfg, arm))).get(str(k), {})
+        if "loo_rms_z" in prev:
+            rulers["loo_rms_z"] = prev["loo_rms_z"]  # of the GP that proposed round k
     led["entries"].append({"round": k, "n": int(len(Ycum)), "hv": hv, "gain": gain,
-                           "gain_tau": gain / thr, "would_stop": bool(would_stop),
+                           "gain_tau": gain / thr, "would_stop": bool(would_stop), **rulers,
                            "n_outside_ref": n_out, "decision": "graded (record_only)", "at": _now()})
+    if "tau_rulers" in led and led.get("first_stop_het") is None and rulers["would_stop_het"]:
+        led["first_stop_het"] = k  # "the stop"; later fires stay in the entries
     save_ledger(root, cfg, arm, led)
     write_round_section(root, cfg, arm, k, {
         "graded_at": _now(), "cumulative_hv": hv, "gain": gain, "gain_tau": gain / thr,
-        "would_stop": bool(would_stop), "n_outside_ref": n_out, "calibration": calib,
+        "would_stop": bool(would_stop), **rulers, "n_outside_ref": n_out, "calibration": calib,
         "realized": Yk.tolist(), "decision": "graded (record_only)"})
     return led
 
@@ -520,7 +652,10 @@ def run_round(root, cfg, arm, k, no_submit) -> int:
         if k >= cfg["hard_cap"]:
             body = (f"# DONE {arm}\n\nreason: hard_cap {cfg['hard_cap']} reached at round {k} ({_now()}).\n"
                     f"HV trajectory: {[round(x['hv'], 6) for x in led['entries']]}\n"
-                    f"would_stop by round: {[x.get('would_stop') for x in led['entries']]}\n")
+                    f"would_stop by round: {[x.get('would_stop') for x in led['entries']]}\n"
+                    + (f"would_stop_het by round: {[x.get('would_stop_het') for x in led['entries']]}\n"
+                       f"would_stop_285 by round: {[x.get('would_stop_285') for x in led['entries']]}\n"
+                       f"first_stop_het: {led.get('first_stop_het')}\n" if "tau_rulers" in led else ""))
             with open(os.path.join(d, f"DONE_{arm}.md"), "w") as f:
                 f.write(body)
             commit_and_push(root, cfg, paths,
