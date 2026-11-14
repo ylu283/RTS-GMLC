@@ -12,6 +12,38 @@
 
 (pre-seeded section)
 
+- [x] **Freeze (§2.1)** — first commit on `ercot/53-design-space`:
+  **99ca929**. `waves/design_space_E.json` byte-for-byte from contract §3
+  (pmax/bus asserted = wave D to 1e-6, = gen.csv); `waves/DESIGN_SPACE_E.md`
+  (bounds, u, tiers, objective statuses, guardrails). Continuity at u → 0
+  (`parameters.py:139` → `_update_renewable_generator`): every PEM term
+  scales to 0 with MW; the only non-scaling effect is the structural
+  `<site>_PEM` twin (MIP-path noise within the v3 gap), disclosed. No
+  prompt-32 constraint binds (all six WIND, PMin 0, no nuclear/hydro).
+- [x] **Generator** `tools/make_ercot_n0.py` → `waves/n0_E/` (Sobol seed 53,
+  `random_base2(6)`, rows 0–47; nav = first 32 per E-D7) and
+  `waves/random_E/` (`default_rng(5353).random((48, 6))`; bar [43, 48],
+  exposure 24, retirement, E-D2 dual pinned in its README). `__ALL__`
+  schema of contract §5; `pem_mw` by `math.fsum` (bit-equal on py 3.10 /
+  3.13). Min u: n0_E 1.04e-3 (row 14, site 163, 0.19 MW); random_E 1.2e-4
+  (row 41, site 274, 0.09 MW). Draws bit-identical under scipy 1.15.3 and
+  1.16.3. Disclosed: `tier = "grading"` on all 48 n0_E rows (nav carried by
+  `sobol_index` until E-D7).
+- [x] **Reader regression (§2.5, reader unchanged)**: 3 tests in
+  `tests/test_pool_objectives.py` (6-site `design_row`/`pem_mw`;
+  `pool_row` on a copied wave-D slim extract: V1/E1/E3/R1/R2/R4/N1 finite,
+  not nuclear; generator `pem_mw` = reader on all 96 rows to 1e-9).
+- [x] **Verification (§3)**: `bash -n` on 6 scripts; `/opt/anaconda3/bin/python
+  -m pytest tests/test_make_ercot_n0.py tests/test_pool_objectives.py -q`
+  → 33 passed (generator tests also pass in bogp-botorch).
+- [x] **Budget (§2.6)**: README lines + plan AMENDMENT 2026-11-14 (wave-D
+  actuals 21 / 44.6 core-h per run; 96 runs ≈ 2.0–4.3k core-h; 4.9 GB).
+- [ ] **STOP — Kay action K2/K3**: wave commit SHA reported → strategy FF
+  `ercot/tx123` → push → on CRC `cd trial_0826/ercot/waves/n0_E && bash
+  submit_this.sh` (`yes`), same in `waves/random_E`.
+- [ ] Landing report `waves/n0_E/LANDING.md` + `landing_R.json` (after the
+  collectors push).
+
 ## Prompt 57 Part B — wave-D standings (2026-11-07, zero simulation, local only)
 
 - [x] **Wave D landed** (`extracts/location_oat_v2`, 304335c; 21 rows, all

@@ -514,3 +514,31 @@ No wave-D number existed.
 days: 187 s (0.01), 221 s (0.001), 513 s (0.0001). Projected full-year
 run at v3: ≈ 8–10 h wall / 32–40 core-h (from January days; replace
 with wave-D actuals when they land).
+
+## AMENDMENT 2026-11-14 — budget actuals from wave D (prompt 53 §2.6; appendable, §10)
+
+**What changed.** §8's "Per-run core-h on v2 is UNKNOWN" and the
+January-day projection of AMENDMENT 2026-11-06b (8–10 h wall / 32–40
+core-h per full-year v3 run) are replaced by the wave-D actuals
+(`analysis/pool/ERCOT_POOL_STANDINGS.md` §8, `extracts/location_oat_v2/wallclock.csv`;
+4 slots per task, core-h = wall × 4). No rule, bar or option changes.
+
+| node group | wave-D rows | wall h / run | core-h / run |
+|---|---|---|---|
+| fast | 15 | 5.12 – 5.48 | 20.5 – 21.9 (mean 21.1) |
+| slow | 6 | 10.5 – 11.8 | 42.1 – 47.3 (mean 44.6) |
+
+Wave D: 21 runs, 584 core-h, 11.8 h calendar. The split is node speed
+(the RUC median solve time doubles with the wall time), not problem size.
+Per-run core-h range for planning: **21 (fast) – 44.6 (slow)**, which
+replaces "v2 plausibly 12–25" and the 32–40 projection.
+
+**Applied to the fixed rows (prompt 53):** n0_E 48 + random_E 48 = 96
+runs ≈ 2.0k (all fast) – 4.3k (all slow) core-h; 4,896 MB of `--full`
+extracts in $GROUP storage. Per plan §8 option (dual random_E, totals ×
+21 – 44.6): A 140 runs ≈ 2.9k – 6.2k; B 236 ≈ 5.0k – 10.5k; C 268 ≈
+5.6k – 12.0k; D 588 ≈ 12.3k – 26.2k core-h.
+
+**What had been seen.** Wave-D wall-clock and the prompt-57 standings.
+No n0_E or random_E result exists at this amendment. Prompt 53's landing
+report appends the n0_E / random_E actuals as a further block.
