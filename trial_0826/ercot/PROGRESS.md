@@ -2,7 +2,72 @@
 
 ## Prompt 55 — ERCOT BO machinery build (v3.1, 2026-11-13; executor writes here only)
 
-(pre-seeded section; see admin/prompt/bogp/53-55-shared-contract.md §4)
+### Part A — BUILD (2026-11-14, zero simulation, worktree `../RTS-GMLC-e55`, branch `ercot/55-machinery`, rebased on `ercot/tx123` 03eca72)
+
+- [x] **Build commit `9dc177e`** — `analysis/methods_E/` (22 files, 3,956 lines): `arms_E.json`
+  (option C = arm `qnehvi` x seed_ids 0–4 x cap 4 x q 8; B/D one edit; pinned qNEHVI block;
+  guardrail / SUSPECT / calibration blocks), `common_E.py` (paths, design space, committed-config
+  + loader fallbacks, `pin_bogp`, exact HV import), `_stub_loader.py` (contract 6.1 signature,
+  synthetic Y, v3-identity refusal, per-run overrides), `tau_E.py` (M-general `tau_joint` /
+  `tau_marginal` / sensitivity row; explicit Sigma = 0 branch; heteroscedastic D·C·D; rider levels),
+  `qnehvi_E.py` (float64 SingleTaskGP per objective with the D-1025 cfg axes + floor, `optimize_acqf`
+  over [0,1]^6, q 8 sequential 20 x 512, SobolQMC 128, alpha 0, prune_baseline; constrained branch =
+  shed GP as the last output + botorch constraint, degenerate-constant -> dropped and recorded),
+  `wave_writer_E.py` (contract-5 `__ALL__` rows mw_*/u_* full precision, retrofit dicts with mw = 0
+  omitted, collision check, `.gitignore` assert; generic `methods_E_array.sh` / `methods_E_collect.sh`
+  with the noise_v3 blocks), `acquire_E.py` (lanes, init, propose, C1 gate, form-agnostic
+  `grade_round`, HALT files, run), `submit_state_E.py` + `submit_ready_E.sh` (login-node state
+  machine, hold mode with `-hold_jid` chains, SUBMITTED markers), `acquire_E_job.sh`, runbook
+  `ERCOT_BO_MACHINERY.md`, `_scratch_E.py` + `dry_round_E.py`, `DRY_ROUND_REPORT.md`.
+- [x] **Donor port, lattice-free**: `assert_on_lattice` / `lattice_candidates` / `build_methods_round` /
+  the omega parse are gone; `optimize_acqf_discrete` -> `optimize_acqf`; `tau45` generalised to M = 4
+  and a covariance sample — `tau_marginal` with the donor floors reproduces `tau_regrade45.json`
+  arms.P1 (old_3000 / scalar_285.3 / het_ii) **bit-for-bit** on the RTS 32 S1 starts (test);
+  `hypervolume_exact` M = 4 three-point toy = 86.0 = botorch `Hypervolume` (test); `pareto.hypervolume`
+  never imported. `write_round_section` prints every record key (the donor's silent skip is gone).
+- [x] **Guardrails + SUSPECT wired (plan 1.2–1.3)**: R1 > 1 MWh -> ledger-marked, out of HV/fronts,
+  kept in GP training; the round after the first violation flips `guardrail_mode` monitor -> constrain
+  (constrained qNEHVI, shed <= 1 MWh); >= 2 violations in a round -> `HALT_FOR_DECISION.md`
+  (propose/run/submit refuse while it exists). R2 > 891.8 MWh -> round flag only. SUSPECT -> out of HV,
+  gain and (build choice, disclosed in the arm README) GP training; >= 2 -> HALT.
+- [x] **Stop rule, form-agnostic, record_only**: gain_k, gain/tau and the stateless two-strike
+  `would_stop_k` under tau_joint (headline) and tau_marginal (recorded) + the joint-vs-marginal
+  sensitivity column, `first_fire_round` per ruler, runs to the cap; never halts on the rule or on
+  C2/C3. tau = 0 -> `gain_tau` null, `would_stop` false, README states "budget-cap-only and the cap
+  governs" in the plan-3 words. Arm README carries BOTH E-D5 readings labelled OPEN, the 49 v2.1
+  banned-framings block verbatim, and the M = 4 any-objective false-alarm note (C2 1.5e-3, C3 4.4e-6).
+- [x] **Tests green in bogp-botorch by file name** (31 passed, 23:50 wall):
+  `tests/test_methods_E_tau.py` (7), `tests/test_methods_E_hv.py` (6), `tests/test_methods_E_wave.py`
+  (5), `tests/test_methods_E_acquire.py` (13: init/readback, seed rule, random_E assert, record-only to
+  cap + DONE, Sigma = 0, one-violation flip, two-violation HALT, SUSPECT + two-SUSPECT HALT, C1 gate
+  incl. tampered mw_*/u_*/retrofit-dict refusal, C2/C3 flags never halt, STOP + double-spend, wave
+  files, one REAL botorch acquisition in ERCOT_E_FAST). The other 12 acquisition tests swap the
+  botorch call for `_scratch_E.cheap_propose` (same schema).
+- [x] **Pinned-settings dry round** (`dry_round_E.py`, scratch root, stub loader, placeholder
+  R = nadir + 0.1 span of the 48 stub n0_E rows, placeholder Sigma = diag(0.02 sd)^2):
+  `init-all` 5 lanes (r1 sets pairwise disjoint; acq seeds 20261007 / 107 / 207 / 307 / 407),
+  `recompute-tau` equality, s0 r1 -> r2 -> r3 (gain 47 / 22 tau; C2/C3 clean), s1 one violation ->
+  constrain + r2 under the shed constraint, s2 two violations -> HALT, s3 two SUSPECT -> HALT,
+  s4 one SUSPECT + R2 flag -> excluded + flagged + r2; scratch B Sigma = 0 -> tau 0, cap-only.
+  qsub shim never called; six bot commits reached the scratch origin. `DRY_ROUND_REPORT.md`.
+- **Timing (this Mac, M = 4, n = 32–48)**: one pinned proposal ~100 s alone (GP fit 14 s), 140–410 s
+  under CPU contention; `ERCOT_E_FAST` does not help (the cost is the sequential q = 8 optimisation).
+  Budget per round (standings 8): 170–360 core-h per lane; ~1 round per calendar day per lane.
+- **Disclosures / build choices**: (1) SUSPECT runs are excluded from GP training as well as from HV
+  (plan 1.2 names HV and gain only). (2) botorch 0.16 advises `qLogNoisyExpectedHypervolumeImprovement`;
+  the plan's pinned qNEHVI is kept (one-line alternative, not adopted). (3) Plan 6.2's Sigma is the
+  DELTA covariance (2x per-run under independence; tau larger by sqrt 2) — used as frozen, noted in the
+  README. (4) The heteroscedastic anchor key in `ercot_noise.json.levels[]` is read defensively
+  (`y` / `mean` / …); Part B pins it against the real file. (5) 54 Part A landed during the build
+  (`analysis/ercot_gp/ercot_gp_loader.py`, extra `waves_dir` kwarg): `common_E.get_loader` now imports
+  it in the live tree (and refuses a loader resolved outside the root, so scratch roots stay on the
+  stub); Part B asserts it. (6) Tests live in `tests/test_methods_E_*.py` (own `sys.path.insert`;
+  `conftest.py` untouched); `import common_E` must precede any `bogp` import (the editable
+  feat/pt-system install has no `hypervolume_exact`).
+- **STOP — Part A exit.** Part B waits for the five header gates: 54 B `committed_configs.json`
+  (+ `E-D7_decided`), 52 frozen incl. `ercot_noise_exact_cov.csv`, 53 `landing_R.json`, E-D5 plan
+  AMENDMENT (README wording), then `arms_E.json["part"] = "B"`, rerun the dry round, K6 push.
+  No push by the executor; integration per contract 2 (rebase onto `ercot/tx123`, FF, Kay pushes).
 
 ## Prompt 54 — ERCOT GP loader + fit/validation pack (v3.1, 2026-11-13; executor writes here only)
 
