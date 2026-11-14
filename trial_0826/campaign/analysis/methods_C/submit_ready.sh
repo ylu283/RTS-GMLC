@@ -45,7 +45,8 @@ if ! git -C "$REPO_DIR" diff --quiet -- "$PROGRESS"; then
     BOT=(-c user.name="methods-bot" -c user.email="methods-bot@noreply.github.com")
     git -C "$REPO_DIR" add -- "$PROGRESS"
     # stage removed FAILED markers of relaunched items (tracked files only; -u never adds runs/logs)
-    git -C "$REPO_DIR" add -u -- "$CAMPAIGN"/waves/methods_C_*
+    # (the glob also matches the gitignored methods_C_logs/ dir; an unmatched pathspec must not abort the commit — 11-14 V1 r1)
+    git -C "$REPO_DIR" add -u -- "$CAMPAIGN"/waves/methods_C_* 2>/dev/null || true
     git -C "$REPO_DIR" "${BOT[@]}" commit -m "methods-bot: SUBMITTED ($(grep -c '^SUBMITTED' "$PROGRESS") lines total)"
     for attempt in 1 2 3 4 5; do
         git -C "$REPO_DIR" push origin d6 && break
