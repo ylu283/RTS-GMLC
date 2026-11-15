@@ -1,0 +1,27 @@
+{"contract_version": "2026-11-13", "identity": "v3",
+ "slate_rule": "E-D3 fallback = wave-D top-6 (analysis/cost_fix/WAVE_D_TOPK_RULE.md); 32 T2 never bought",
+ "sites": [
+   {"site": "110", "unit_type": "WIND", "bus": 2,   "gen_pmax": 338.599998942999},
+   {"site": "140", "unit_type": "WIND", "bus": 2,   "gen_pmax": 250.5999989428539},
+   {"site": "146", "unit_type": "WIND", "bus": 75,  "gen_pmax": 267.9999991911224},
+   {"site": "163", "unit_type": "WIND", "bus": 120, "gen_pmax": 185.3999876467921},
+   {"site": "270", "unit_type": "WIND", "bus": 120, "gen_pmax": 578.9999877407346},
+   {"site": "274", "unit_type": "WIND", "bus": 120, "gen_pmax": 746.3999877635443}],
+ "x_columns": ["mw_110", "mw_140", "mw_146", "mw_163", "mw_270", "mw_274"],
+ "bounds_mw_lo": [0, 0, 0, 0, 0, 0],
+ "bounds_mw_hi": [338.599998942999, 250.5999989428539, 267.9999991911224, 185.3999876467921, 578.9999877407346, 746.3999877635443],
+ "u": "u_s = mw_s / gen_pmax_s in [0, 1]; the GP and acquisition input (plan §2); mw = 0 means site absent",
+ "bid": 40.0,
+ "tiers": {"nav": "E-D7 (32 or 48), decided after 54 Part B", "grading": 48, "holdout": 48},
+ "objectives": {
+   "V1": {"seat": "V", "status": "RECOMMENDED (E-D1b provisional standings, pi-agenda 11-07)"},
+   "E1": {"seat": "E", "status": "PENDING plan §1.2 verdict from prompt 52 (READABLE -> E1 total_cost; else E3 var_cost)"},
+   "R4": {"seat": "R", "status": "PROVISIONAL (E-D1b, PI)"},
+   "N1": {"seat": "N", "status": "PROVISIONAL (E-D1b, PI)"}},
+ "objective_rule": "<= 4 objectives, one per family, frozen global order V < E < X < R < N (plan AMENDMENT 2026-11-06); the final list is a NEW dated version of this file after E-D1b + the §1.2 verdict; the old version is kept",
+ "guardrails": {
+   "R1": {"name": "load shed (MWh)", "mode": "monitor->constrain", "violation_mwh": 1.0,
+          "response": "plan §1.3: violating run stays in the ledger, infeasible-for-claims, excluded from reported fronts; from the round AFTER the first violation acquisition = constrained qNEHVI with a shed GP constraint shed <= 1 MWh; >= 2 violations in one round -> HALT FOR DECISION"},
+   "R2": {"name": "reserve shortfall (MWh)", "mode": "monitor", "flag_at": "2 x base = 891.8 MWh (plan §1.3)", "response": "record the round flag; never halts; no acquisition role"}},
+ "suspect": "plan §1.2 S1-S3 per run; a SUSPECT run is excluded from HV and gain and flagged; >= 2 SUSPECT in one round -> HALT FOR DECISION",
+ "objective_source": "pool_objectives.pool_row(key) on the committed slim tables (keys V1, E1, E3, R1, R2, R4, N1, G_run_usd, SUSPECT inputs); the per-run pool_full_metrics.json carries ONLY E8/E9/N5/headroom/R7/R8/G_run_usd/gap/md5 and is never the Y source"}
