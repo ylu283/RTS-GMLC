@@ -1,0 +1,32 @@
+{
+ "mode": "full",
+ "data_dir": "/groups/adowling/ylu28/RTS-GMLC-ercot/trial_0826/ercot/data/ercot123_2019_v2",
+ "hourly_summary.csv": 8760,
+ "reserves.csv": 8760,
+ "daily_summary.csv": 365,
+ "overall.csv": 1,
+ "gen_summary": 298,
+ "renewables_hourly": 35040,
+ "committed_hourly": 8760,
+ "line_summary": 255,
+ "bus_lmps": 1077480,
+ "renewables": 1489200,
+ "thermal": 1121280,
+ "line_flows": 2233800,
+ "ruc_quality": 365,
+ "md5": {
+  "bus_lmps.csv.gz": "4c81923b8bbe6dd93a66f222832bf807",
+  "committed_hourly.csv": "b46b0b56344e0063e776f62e46a514ac",
+  "daily_summary.csv": "67b6950196796428f9afcf7d65841c66",
+  "gen_summary.csv": "0b4164aeecc394aa750398b7e5b5e496",
+  "hourly_summary.csv": "e4fd79e5af874b4c4c6a7f449f63b525",
+  "line_flows.csv.gz": "da5682c0a95f969bcc597b19414463ea",
+  "line_summary.csv": "f3c10c98072ab6e4b4aea87c335acdd7",
+  "overall.csv": "15e178f4e54f7b77454f56e7630806d9",
+  "renewables.csv.gz": "b728ef92318f498e266c3e8ebc460fc5",
+  "renewables_hourly.csv": "ccc03e936a16ced7fc7506634b47e819",
+  "reserves.csv": "de32e2f348693fb7f83905a2860c66fd",
+  "ruc_quality.csv": "05c75097b09379681771358d81fe2b20",
+  "thermal.csv.gz": "e189f0ddd5133eee57d75ab6cf640596"
+ }
+}
