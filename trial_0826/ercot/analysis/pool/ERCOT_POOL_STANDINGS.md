@@ -40,7 +40,7 @@ which needs a base and is contaminated.
 instruction (Kay). **Data read:** wave D rows 1–21 and `base_v3:1` only —
 no n0_E / random_E value was read. The 11-07 text below is kept verbatim as the
 provisional record; this block states what the two new inputs change. Code
-change (own commit `eb846a0`, disclosed): `pool_standings.py` hard-coded the
+change (own commit `bac38e7` (pre-rebase id eb846a0), disclosed): `pool_standings.py` hard-coded the
 label `CONTAMINATED (v2 base, v3 rows)` in the per-level rows, the gap-bound
 rows and the heatmap titles regardless of `--base`; the computed label is now
 threaded through (`same identity (v3)`). No number changed by that edit.

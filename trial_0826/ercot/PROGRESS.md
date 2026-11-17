@@ -203,11 +203,11 @@
 - [x] **E-D1b objective-selection study (strategy session's instruction, 2026-11-17; before any GP
   fit)** — prompt 57 Part B standings rerun on the v3 base + the 52 ruler:
   `pool_standings.py --base extracts/base_v3/run_index_1 --noise analysis/noise_v3/ercot_noise.json`
-  (py 3.13; wave D + base_v3 only, no n0_E / random_E Y). Code change in its own commit `eb846a0`
+  (py 3.13; wave D + base_v3 only, no n0_E / random_E Y). Code change in its own commit `bac38e7` (pre-rebase id eb846a0)
   (minimal, disclosed): the per-level rows, gap-bound rows and heatmap titles hard-coded
   `CONTAMINATED (v2 base, v3 rows)` regardless of `--base`; the computed label is now threaded through
   (7 standings tests green; no number changed). Outputs + dated RERUN block in
-  `analysis/pool/ERCOT_POOL_STANDINGS.md` (11-07 text kept): commit `a74a77b`. **Result:** CONTAMINATED
+  `analysis/pool/ERCOT_POOL_STANDINGS.md` (11-07 text kept): commit `d6a8933` (pre-rebase id a74a77b). **Result:** CONTAMINATED
   caveat lifted (same identity v3); ruler columns filled — every candidate with a ruler is
   LOCATION-SENSITIVE (range ≥ 2 rulers at ≥ 2 levels); **R4 (7.7 / 6.9 / 13.5 rulers) and N1 (4.9 / 9.4 /
   8.9) are no longer provisional on the ruler** (site order still unstable, W p 0.79 / 0.75; a real
