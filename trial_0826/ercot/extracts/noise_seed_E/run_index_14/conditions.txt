@@ -1,0 +1,9 @@
+NOISE_SEED_E_HOST d32cepyc128.crc.nd.edu
+NOISE_SEED_E_CPU Model name: AMD EPYC 7543 32-Core Processor
+NOISE_SEED_E_GUROBI (13, 0, 2)
+NOISE_SEED_E_THREADS ruc_threads=4 nslots=4 seed=2
+NOISE_SEED_E_CODE prescient=unknown(TypeError) egret=e4a244d repo=6b6e178
+NOISE_SEED_E_TASK=14 seed=2 ruc_threads=4 dict={"110":{"PEM_bid":40.0,"PEM_fraction":0.39672185853123665,"gen_pmax":338.599998942999},"140":{"PEM_bid":40.0,"PEM_fraction":0.5287875728681684,"gen_pmax":250.5999989428539},"146":{"PEM_bid":40.0,"PEM_fraction":0.8721831431612372,"gen_pmax":267.9999991911224},"163":{"PEM_bid":40.0,"PEM_fraction":0.6187337376177311,"gen_pmax":185.3999876467921},"270":{"PEM_bid":40.0,"PEM_fraction":0.9932488994672894,"gen_pmax":578.9999877407346},"274":{"PEM_bid":40.0,"PEM_fraction":0.36577039398252964,"gen_pmax":746.3999877635443}}
+NOISE_SEED_E_START 2026-11-17T09:56:44Z epoch=1794909404
+run_ercot_pcm: index=14 start_date=01-01-2019 num_days=365 output=/groups/adowling/ylu28/RTS-GMLC-ercot/trial_0826/ercot/waves/noise_seed_E/runs/run ruc_mipgap=0.001 ruc_solver_options={'TimeLimit': 1200.0, 'Threads': 4, 'Seed': 2} PEM_data={'110': {'PEM_bid': 40.0, 'PEM_fraction': 0.39672185853123665, 'gen_pmax': 338.599998942999}, '140': {'PEM_bid': 40.0, 'PEM_fraction': 0.5287875728681684, 'gen_pmax': 250.5999989428539}, '146': {'PEM_bid': 40.0, 'PEM_fraction': 0.8721831431612372, 'gen_pmax': 267.9999991911224}, '163': {'PEM_bid': 40.0, 'PEM_fraction': 0.6187337376177311, 'gen_pmax': 185.3999876467921}, '270': {'PEM_bid': 40.0, 'PEM_fraction': 0.9932488994672894, 'gen_pmax': 578.9999877407346}, '274': {'PEM_bid': 40.0, 'PEM_fraction': 0.36577039398252964, 'gen_pmax': 746.3999877635443}}
+NOISE_SEED_E_END 2026-11-17T14:42:33Z epoch=1794926553
