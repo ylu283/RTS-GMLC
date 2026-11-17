@@ -332,7 +332,7 @@ def scale_free_verdict(S_by_level, means, thr=S_THRESHOLD):
     return "UNDETERMINED (scale-free; < 2 levels agree)"
 
 
-def level_reads(wide_vre, base_row, ids, G_base=None, ruler=None, levels=LEVELS):
+def level_reads(wide_vre, base_row, ids, G_base=None, ruler=None, levels=LEVELS, delta_label=CONTAMINATED):
     """Per candidate: per-site delta at each level, range, mean |delta|, S (v2 base,
     contaminated), S' (base-free), W + exact p, gap-bound statuses (E1-E3),
     ruler ratios when `ruler` (dict id -> ruler_j) is given."""
@@ -410,11 +410,11 @@ def level_reads(wide_vre, base_row, ids, G_base=None, ruler=None, levels=LEVELS)
             for s in sites:
                 long.append({"id": c, "level_id": l, "pem_mw": LEVEL_MW[l], "site": s,
                              "value": float(X.loc[s, l]), "delta_vs_base": float(D.loc[s, l]),
-                             "delta_label": CONTAMINATED})
+                             "delta_label": delta_label})
     return out, pd.DataFrame(long)
 
 
-def gap_bound_reads(wide_vre, base_row, G_base, levels=LEVELS, cost_ids=("E1", "E2", "E3")):
+def gap_bound_reads(wide_vre, base_row, G_base, levels=LEVELS, cost_ids=("E1", "E2", "E3"), delta_label=CONTAMINATED):
     """Per site x level: |delta| vs G_base + G_row (raw RUC-objective scale) and the
     realized-cost scaled version (G / (ruc_cost_sum / E1)); plus the between-site
     range at each level vs the v3-only pair bound max_(a,b) G_a + G_b (what a v3 base
@@ -446,7 +446,7 @@ def gap_bound_reads(wide_vre, base_row, G_base, levels=LEVELS, cost_ids=("E1", "
                              "range_vs_v3_pair_bound": "GAP-READABLE" if rng >= v3_pair_max else "WITHIN GAP BOUND",
                              "v3_pair_bound_max_scaled_usd": v3_pair_max_scaled,
                              "range_vs_v3_pair_bound_scaled": "GAP-READABLE" if rng >= v3_pair_max_scaled else "WITHIN GAP BOUND",
-                             "delta_label": CONTAMINATED})
+                             "delta_label": delta_label})
     return pd.DataFrame(rows)
 
 
@@ -804,7 +804,7 @@ def _fmt(v):
     return f"{v:+.3g}"
 
 
-def plot_heatmap(c, rec, nuc_vals, defs, path, base_label, uncorrected=False):
+def plot_heatmap(c, rec, nuc_vals, defs, path, base_label, uncorrected=False, delta_label=CONTAMINATED):
     plt = _rc()
     from matplotlib.patches import Rectangle
     D = rec["D"]
@@ -848,7 +848,7 @@ def plot_heatmap(c, rec, nuc_vals, defs, path, base_label, uncorrected=False):
     ax.set_ylabel("site (6 VRE) + nuclear stratum", fontsize=18, fontweight="bold")
     cd = defs["candidates"][c]
     ax.set_title(f"{c} {cd['name']} [{cd['unit']}], dir {cd['dir']}\n"
-                 f"delta vs {base_label}: {CONTAMINATED}\n"
+                 f"delta vs {base_label}: {delta_label}\n"
                  f"S' = {', '.join(f'{rec['S_prime'][l]:.2f}' if np.isfinite(rec['S_prime'][l]) else 'n/a' for l in LEVELS)}"
                  f"  |  W = {rec['W']:.2f}, exact p = {rec['W_p_exact']:.3f}",
                  fontsize=16, fontweight="bold")
@@ -968,9 +968,9 @@ def run(base=None, noise=None, wave=WAVE, extr=po.EXTR, waves=po.WAVES, out_dir=
     ids = [c for c in GRADED if c not in dead_ids]
 
     G_base = float(base_row["G_run_usd"])
-    reads, long = level_reads(vre, base_row, ids, G_base, ruler)
+    reads, long = level_reads(vre, base_row, ids, G_base, ruler, delta_label=delta_label)
     long.to_csv(os.path.join(out_dir, "pool_standings_levels.csv"), index=False)
-    gap = gap_bound_reads(vre, base_row, G_base)
+    gap = gap_bound_reads(vre, base_row, G_base, delta_label=delta_label)
     gap.to_csv(os.path.join(out_dir, "pool_gap_bound_wavedD.csv"), index=False)
     shift = smoke_identity_shift(ids, defs=defs)
     shift.to_csv(os.path.join(out_dir, "pool_identity_shift_smoke.csv"), index=False)
@@ -1019,7 +1019,7 @@ def run(base=None, noise=None, wave=WAVE, extr=po.EXTR, waves=po.WAVES, out_dir=
             if "D" not in rec_c:
                 continue
             plot_heatmap(c, rec_c, nuc_d[c], defs, os.path.join(figs_dir, f"{c}.png"), base_label,
-                         uncorrected=c in COST_FAMILY_UNCORRECTED)
+                         uncorrected=c in COST_FAMILY_UNCORRECTED, delta_label=delta_label)
         red = [(r["a"], r["b"]) for _, r in pairs[pairs["redundant_pair"]].iterrows()]
         plot_cluster_panel(cb["pooled"], defs, os.path.join(figs_dir, "clustermap_pooled.png"),
                            "wave D pooled (n = 18 VRE rows; size + site variation)", red)
