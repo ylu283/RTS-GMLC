@@ -17,3 +17,4 @@ extracts/random_E/**/*.csv.gz
 extracts/methods_E_*/**/*.csv.gz
 extracts/location_contrast_E/**/*.csv.gz
 extracts/screening_v3/**/*.csv.gz
+extracts/noise_seed_E/**/*.csv.gz
