@@ -252,6 +252,40 @@ def test_committed_waves_match_builder(built):
     for w in E_WAVES:
         names = sorted(p.name for p in (waves / w).iterdir())
         assert names == sorted(p.name for p in (WAVES / w).iterdir() if p.name != "runs"
-                               and not p.name.startswith(("FAILED", "LANDING", "landing_R"))), w
+                               and not p.name.startswith(("FAILED", "LANDING", "landing_"))), w
         for n in names:
             assert (WAVES / w / n).read_text() == (waves / w / n).read_text(), (w, n)
+
+
+def test_landing_ref_point_orientation():
+    """plan §6.3 R = nadir + 0.1 (nadir - ideal), minimized; 'max' as -x in raw units."""
+    import land_ercot_n0 as land
+    sys.path.insert(0, str(ERCOT))
+    import pool_objectives as po
+    defs = po.load_defs()
+    rng = np.random.default_rng(0)
+    wide = pd.DataFrame({j: rng.random(48) for j in defs["global_order"]})
+    wide["R1"] = 0.0
+    ids, ideal, nadir, R, dirs, notes = land.ref_point(wide, defs)
+    assert len(ids) == 29
+    v = wide["V1"]                                     # dir min
+    assert (ideal["V1"], nadir["V1"]) == (v.min(), v.max())
+    assert R["V1"] == pytest.approx(v.max() + 0.1 * (v.max() - v.min()))
+    e = wide["E6"]                                     # dir max
+    assert dirs["E6"] == "max" and (ideal["E6"], nadir["E6"]) == (e.max(), e.min())
+    assert R["E6"] == pytest.approx(e.min() - 0.1 * (e.max() - e.min()))
+    assert R["R1"] == 0.0 and "zero range" in notes["R1"] and "dir '-'" in notes["R7"]
+
+
+def test_committed_landing_R_matches_contract():
+    p = WAVES / "n0_E" / "landing_R.json"
+    if not p.is_file():
+        pytest.skip("landing not written")
+    js = json.loads(p.read_text())
+    assert js["identity"] == "v3" and js["n_rows"] == 48 and js["tier"] == "grading"
+    assert len(js["candidates"]) == 29 and set(js["R"]) == set(js["ideal"]) == set(js["nadir"]) == set(js["candidates"])
+    for j in js["candidates"]:
+        lo, hi = (js["nadir"][j], js["ideal"][j]) if js["dir"][j] == "max" else (js["ideal"][j], js["nadir"][j])
+        s = -1.0 if js["dir"][j] == "max" else 1.0
+        assert js["R"][j] == pytest.approx(s * (s * js["nadir"][j] + 0.1 * (s * js["nadir"][j] - s * js["ideal"][j])))
+        assert lo <= hi
