@@ -97,6 +97,15 @@ Worktree `RTS-GMLC-e63`, branch `ercot/63-noise-followup`, created by the execut
 - Deviation (README): §2.3 pins a replacement text containing "holdout" and also asks for no "holdout" in the scripts; the pinned text is kept and the check excludes that one phrase.
 - **STOP — Kay action:** strategy FF tx123 → push → on CRC `cd trial_0826/ercot/waves/location_contrast_E && bash submit_this.sh`. Landing (§2.6) waits for COLLECTED.
 
+### Landing (v1.1 §2.6; 2026-11-17, on tx123 465f99a = ercot-bot COLLECTED)
+
+- [x] Guards: COLLECTED; 9/9 identity 0.001/1200 (+ 18 wave-D singles + base_v3:1); 9/9 `pool_full_metrics.json`; SUSPECT 0/28; `exact_pooled_sd` = 0 all ids; B_j recomputed from the 63-re-emitted `ercot_noise.json` (D2 excluded, 6 δ) = json (V1 16,173 MWh; E1 $2.38M; E3 $3.47M; R2 102.3; R4 146.7; N1 114.9; N4 37.0; R1 0). N4 = N4_L252 asserted on all 28 runs.
+- [x] `analysis/location_contrast/` — `location_contrast_E.py`, `location_contrast_E.csv` (702 rows; md rendered from it only; deterministic), `LOCATION_CONTRAST_E.md`, 3 figures (bold labels + ticks; csv round-trip asserted before drawing).
+- Interaction V1: g = 0.038 / 0.073 / 0.123 at 60 / 120 / 180 (predicted 0.07 / 0.12 / 0.18); guard PASS at all three; reads WITHIN 10 % / WITHIN 10 % / SUB-ADDITIVE (ΣR − R_J = 2.2 / 7.7 / 17.7 r_I) → not "ADDITIVE WITHIN 10 %" overall.
+- Location: V1 raw 4–5 −23.0 B, 7–8 −2.8 B; H_C residual +3.0 / +6.7 / +6.4 / +2.9 B (4–5, 7–8, 4–6, 5–6) → LOCATION EFFECT on all four under the §3 rule (residual = "not explained by H_C"; magnitude ≤ the pre-stated ≈ 9-ruler profile-only prediction for 7–8; no network claim). N4 residual: 4–5 COMPOSITION (+0.5 B), the other three LOCATION EFFECT (−2.3 / −3.6 / −3.5 B). N1 not readable (chatter-limited). E1/E3 NOT READABLE or WITHIN GAP BOUND everywhere.
+- Saturation (row 9): R = 4.03 TWh = 82.9 % of the 4.87 TWh behind-cut pool (computed 4,865,415 MWh); H_C = 1.14 × pool; e = 0.730 (lowest; row 6 0.787).
+- Physics check: no-residual-location CONTRADICTED (7/8 reads); E1 within gap bound at 800 HOLDS (bounds $41.9–43.7M); R4 unreadable CONTRADICTED (2/4 pairs, both vs row 6).
+
 ## Prompt 55 — ERCOT BO machinery build (v3.1, 2026-11-13; executor writes here only)
 
 ### Part A — BUILD (2026-11-14, zero simulation, worktree `../RTS-GMLC-e55`, branch `ercot/55-machinery`, rebased on `ercot/tx123` 03eca72)
