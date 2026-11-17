@@ -68,6 +68,36 @@
   stub); Part B asserts it. (6) Tests live in `tests/test_methods_E_*.py` (own `sys.path.insert`;
   `conftest.py` untouched); `import common_E` must precede any `bogp` import (the editable
   feat/pt-system install has no `hypervolume_exact`).
+### Part B step 0 — noise_v3 A + B read, exact covariance, §1.2 verdict (2026-11-16, zero simulation; run by 55 on Kay's instruction — contract 6.3 names 54 B step 0; disclosed)
+
+- [x] **`read_noise.py` on A + B** (`analysis/noise_v3/`, commit `02d9ba0`): 16 / 16 runs at the v3
+  identity, 4 / 4 exact cross-batch pairs byte-identical (`overall.csv` md5), every gradable
+  candidate exact-zero → `all_exact_zero: true`, GP noise floor 0 (inferred-only 1e-9). RULER=0:
+  N2, E9. Shed ≡ 0 on 16 / 16. Wall-clock (4 slots): 36.5–44.8 core-h per run,
+  median 40.3, 655 total (all 16 on slow-group nodes; standings 8 group B).
+- [x] **NEW `ercot_noise_exact_cov.csv`** (contract 6.3): covariance (ddof 1) of the EXACT pair
+  deltas over the 22 gradable ids, rows = the 4 pairs — **identically 0 → Σ_exact = 0 → τ_joint =
+  τ_marginal = 0: the stop rule is budget-cap-only and the cap governs (plan 3).** `ercot_noise_cov.csv`
+  (perturbed) is labelled rider-only in the md / json. md §5b, json `exact_covariance`.
+- [x] **SUSPECT + S3b + plan 1.2 verdict (md §5c, json `suspect` / `readability`, FINAL)**: per run
+  S1 (max residual 9.5e-7 $), S2 (365 / 365 OPTIMAL), S3a (units 1 / 93 starts 0 on the 12 non-nuclear
+  runs; n/a on the 4 nuclear); S3b per exact pair (starts equal, 4 / 4) → 0 SUSPECT. R1 PASS;
+  R2 max |Δ total_cost| = $0 ≤ $1,132,088; R3 max |Δ fixed_cost| = $0 ≤ $1,325,082 (thresholds from
+  `plan51_refs.json`) → **total_cost READABLE → the campaign cost objective is E1 (total_cost)**.
+  Recorded once; never switched mid-campaign.
+- [x] **Tests**: `tests/test_read_noise.py` 17 passed (`/opt/anaconda3/bin/python`; 5 new: exact-cov
+  file zero / shape / rider labels, non-zero exact cov on an edited pair (12.25 = var ddof 1 of
+  [0, 7, 0, 0]), S1 flags the fixture's total-only edits (8 SUSPECT, R1 FAIL), READABLE on an
+  S1-consistent copy, NOT READABLE on a $2M pair delta (R2) and on a gen-1 starts mismatch (S3a +
+  S3b)). `tests/test_methods_E_tau.py` 7 passed (bogp-botorch).
+- [x] **tau_E gate (methods_E, disclosed)**: the heteroscedastic branch now applies only where the
+  exact sd_j > 0 (plan 3: an exact-zero objective contributes 0 to τ; the 52 trigger fires on the
+  PERTURBED levels for almost every candidate, and those anchors must never enter τ). With
+  `all_exact_zero` the Part B init will compute τ = 0 regardless of the triggers.
+- **Gates now**: 52 frozen incl. the exact cov ✔, §1.2 verdict ✔ (E1). Still open: 54 B
+  `committed_configs.json` + E-D7, 53 `landing_R.json`, E-D5 amendment, E-D1b final objective list
+  (new dated `design_space_E.json`). STOP.
+
 - **STOP — Part A exit.** Part B waits for the five header gates: 54 B `committed_configs.json`
   (+ `E-D7_decided`), 52 frozen incl. `ercot_noise_exact_cov.csv`, 53 `landing_R.json`, E-D5 plan
   AMENDMENT (README wording), then `arms_E.json["part"] = "B"`, rerun the dry round, K6 push.
