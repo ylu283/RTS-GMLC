@@ -65,6 +65,25 @@ Worktree `RTS-GMLC-e63`, branch `ercot/63-noise-followup`, created by the execut
   trial_0826/ercot/waves/screening_v3 && bash submit_this.sh` (literal `yes`). The real Part B read
   (`pool_n0E.py`, writes `analysis/pool/`) runs only after the strategy session says so.
 
+### 2026-11-17 — Part B read (n0_E pool level; GO from the strategy session after tx123 = 6b6e178)
+
+- Read date 2026-11-17T09:27Z; pre-registration (i) 6aa29dd, (ii) 6b5e85a + follow-ups e09193b, f7ef2d3,
+  143b6a3 (citation only), 82bb71d (FIX, below). 48 rows, SUSPECT 0, landing_rows cross-check OK, D3 starts 0,
+  N1_off cross-checked on 48 runs. No GP; random_E Y not read (landing_rows' random_E rows dropped on load).
+- **DEVIATION — implementation fix after the first real execution.** The seat walk treated a cluster SURVIVOR as
+  "absorbed": family V (V1 = survivor of {E6, V1}; V2 REDUNDANT->E4) took no seat and the first run printed M = 2.
+  That contradicted the registered R-4 (skip REDUNDANT members only). 82bb71d restores R-4 (regression test added);
+  nothing from the first execution was committed. Disclosed in POOL_N0E_STANDINGS.md Deviations.
+- **Seats (R-4): V1 / E1 / R EMPTY / N1 → M = 3** (M != 4 reopens plan §6.4 for the PI). R family: R4 RESPONDS only
+  BORDERLINE (IDR/B_j 2.11) with wave-D B_j UNREADABLE → not seat-eligible; R5/R6 NOT RESPONDS; R2 guardrail;
+  R7/R8 dir '-'. X1 REDUNDANT->E1 (raw 0.982, resid 0.968). E1 RESPONDS STRONG (14.1); no HALT FOR PI.
+- Clusters: {V1, E6} -> V1; {E1, E2, X1} -> E1; {E4, N5, V2} -> E4. N1–N4 SIZE-CO-MONOTONE (raw 0.950, resid 0.394),
+  not redundant; N4 is the quieter member (IDR/B_j 17.4 vs 6.4). R-5 conflicts (wave-D B_j UNREADABLE, n0_E
+  RESPONDS = BOX-ONLY RESPONSE): E2, E3, E6, E7, R4, R7, N1, N4, N5. Cost gap (evidence only): E1 IDR 0.83 x the
+  median pair bound G_a+G_b.
+- Outputs: POOL_N0E_STANDINGS.md, pool_n0E_standings.csv, pool_spearman_n0E_{raw,resid}.csv,
+  pool_ed1b_combined.csv, figs/n0E/ (3 PNG; tick-label fix = plotting only). **STOP for E-D1b (PI).**
+
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)
