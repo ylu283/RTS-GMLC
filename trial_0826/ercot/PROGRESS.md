@@ -148,10 +148,59 @@
   `python -m pytest tests/test_ercot_gp_loader.py tests/test_ercot_gp_status.py -q`
   → 28 passed, 1 skipped (the committed-JSON check skips until 53's freeze is
   on this branch).
-- [ ] **STOP** — Part B waits on its four gates: (i) n0_E + random_E landed;
+- [x] **Part A STOP** (gates (i)–(iii) met 11-16/17; (iv) OPEN) — Part B waits on its four gates: (i) n0_E + random_E landed;
   (ii) noise_v3 B + base_v3 landed and `read_noise.py` run (Part B step 0,
   owned here); (iii) §1.2 verdict in `ERCOT_NOISE.md`; (iv) E-D1b → new dated
   `design_space_E.json` (`--real` refuses PENDING / PROVISIONAL objectives).
+
+### Part B — pre-fit work (2026-11-17, zero simulation, NO n0_E Y read; HEAD after this section's commit)
+
+- [x] **Gates**: (i) n0_E + random_E landed (53 landing a023215 / 1695153: 96 / 96 v3, 0 SUSPECT,
+  `landing_R.json`); (ii) step 0 run by 55 on Kay's instruction (5ca9650: `ercot_noise_exact_cov.csv`
+  identically 0 → τ = 0; S3b per pair); (iii) §1.2 verdict READABLE → cost seat E1 (`ERCOT_NOISE.md` §5c);
+  **(iv) OPEN** — `design_space_E.json` is still 2026-11-13 with PENDING / PROVISIONAL seats; no n0_E Y
+  has been read by this prompt. Branch fast-forwarded to `ercot/tx123` 80e5d79 (a stale no-op
+  cherry-pick state was cleared with `--quit`).
+- [x] **§3.5 v3.2 mechanism machinery, pinned before Y — commit `d9355f7`**
+  (`analysis/ercot_gp/ercot_gp_mechanism.py`): (a) network facts computed and ASSERTED from
+  `branch.csv` + base_v3 `line_summary.csv` — buses 2 / 75 / 121 exit only via bus 120 (L4, L5, L240);
+  L252 700 MW, 5,426 h/yr ≥ 99 %; (b) location share L_j = 1 − Var(E[f|T])/Var(f) (40 T-quantile bins)
+  and interaction share I_j = 1 − Σ first-order Sobol (Jansen) over 256 posterior sample paths on a
+  Sobol base of 2^13 (seed 5454) — paths by decoupled sampling (RFF prior, 8192 features, Matern /
+  RBF spectral t-draws + canonical update), verified against the exact gpytorch posterior (mean within
+  0.1 sd, sd ratio 0.91–1.06); (c) the null: additive PCHIP truth through wave D's per-site V1 at
+  0 / 60 / 120 / 180 MW (0 = base_v3 5.8287e6; last segment extrapolated to nameplate, floored at 0)
+  and a total-only concave truth base − a(1 − e^{−T/b}) (a = 2.52e6, b = 689 MW), evaluated at the
+  n0_E X (design matrix only) and refitted with the default config: **additive null I 0.0097
+  [0.0050, 0.0144], L 0.026; total-only null L 0.024 [0.019, 0.031], I 0.047** → thresholds
+  INTERACTION if I_p05 > 0.0144, LOCATION if L_p05 > 0.0314 (`ercot_gp_null.json`,
+  `fig_null_truths.png`, `ERCOT_GP_MECHANISM_NULL.md`; recomputed with the committed config at fit
+  time). Finding visible already: the wave-D site curves are so alike that the additive null's L
+  (0.026) sits inside the total-only null band — L can separate the two only above ≈ 0.03.
+  R4 / N1 flag suppression pinned to the contract addendum 2026-11-17 bar B_j = max(3σ̂_j, max|δ_ij|)
+  with "chatter readable" ⇔ grading-tier range ≥ 2 B_j and the [43, 48] pass.
+- [x] **Part B deliverables code — commit `184779e`** (`ercot_gp_status.py`): §3.3 noise cross-check
+  table (inferred vs 52 exact / perturbed pooled and per-level, standardized residuals of the perturbed
+  deltas, trigger reported — descriptive, adds no arm); holdout parity figures (dual latent / total
+  95 % bands, bold labels + ticks, assert-before-draw); LOO sufficiency figure with per-n binomial
+  90 % bands; `ERCOT_GP_STATUS.md` writer (selection, gp_status_47 grading columns, cross-check,
+  sufficiency + the pinned criterion verbatim, committed configs, mechanism page, deviations); drafted
+  pi-agenda E-D7 row (`pi_agenda_E-D7_draft.md`); `deliverables()` runs AFTER `committed_configs.json`
+  and never touches it. `--real` now runs fit → committed → deliverables → mechanism in one command.
+- [x] **Tests** (bogp-botorch, by file name): `tests/test_ercot_gp_loader.py` (13),
+  `tests/test_ercot_gp_status.py` (18; +2 deliverables), `tests/test_ercot_gp_mechanism.py` (7: network
+  facts from data, sampler vs exact posterior, estimators on known truths, PCHIP / concave nulls, flag
+  logic + B_j suppression, a small real null run) → **38 passed**. Synthetic end-to-end with
+  `--synthetic --mechanism` produces every Part B file.
+- **Disclosures**: the L / I null is built on V1 and its scale-free thresholds are applied to every
+  objective; the additive-null PCHIP curves are extrapolated linearly beyond 180 MW (no wave-D data
+  there); the RFF path sampler is an approximation of the exact posterior (sd within ±10 % at 8192
+  features, tested).
+- [ ] **STOP — waiting on gate (iv) (E-D1b → dated `design_space_E.json`, or Kay's word to fit the four
+  provisional seats V1 / E1 / R4 / N1).** Then ONE command: `python analysis/ercot_gp/ercot_gp_status.py
+  --real` (fits plan-5 arms at 32 / 48, LOO selection, holdout once per config per tier, exposure ≤ 8 of
+  24, `committed_configs.json` LAST, cross-check, figures, mechanism flags, `ERCOT_GP_STATUS.md`,
+  E-D7 draft row); then E-D7 to Kay; 55 Part B waits on `E-D7_decided`.
 
 ## Prompt 53 — ERCOT design-space freeze + n0_E / random_E waves (v3.1, 2026-11-13; executor writes here only)
 
