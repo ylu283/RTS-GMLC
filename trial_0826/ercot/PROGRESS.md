@@ -28,10 +28,10 @@ Worktree `RTS-GMLC-e63`, branch `ercot/63-noise-followup`, created by the execut
 
 - **Gates (§1.1).** Worktree from `ercot/tx123` 30c7877; `merge-base --is-ancestor 62afe9e` OK; `.gitignore` carries
   `extracts/screening_v3/**/*.csv.gz` (not edited); this section exists. Interpreter `/opt/anaconda3/bin/python`
-  (py3.13, scipy 1.16.3, sklearn 1.7.2). Branch rebased onto tx123 074c65d (61's wave) before (ii).
-- **(i) Plan AMENDMENT 2026-11-17 committed alone** (6dcb53c after the rebase; block sha256 `8dd06917…a1d1e`,
+  (py3.13, scipy 1.16.3, sklearn 1.7.2). Branch rebased onto tx123 074c65d (61's wave) before (ii), then onto 6fd3352 (63 A + B) before the Part C wave commit; SHAs below are post-rebase.
+- **(i) Plan AMENDMENT 2026-11-17 committed alone** (6aa29dd after the rebase onto tx123 6fd3352; block sha256 `8dd06917…a1d1e`,
   asserted by the script). Rules = prompt 62 v1.1 §3.2–§3.4 verbatim.
-- **(ii) `analysis/pool/pool_n0E.py` + `tests/test_pool_n0E.py`** (25d8f28): 11 tests green on SYNTHETIC Y at the
+- **(ii) `analysis/pool/pool_n0E.py` + `tests/test_pool_n0E.py`** (6b5e85a): 11 tests green on SYNTHETIC Y at the
   real n0_E X (`waves/n0_E/design_matrix.csv` sha256 `87ee148e…b19a049`); with `test_pool_standings.py` +
   `test_pool_objectives.py` 37 green. **No n0_E Y read; no GP; random_E never read.** STOP for the strategy
   fast-forward before the Part B read.
@@ -43,9 +43,27 @@ Worktree `RTS-GMLC-e63`, branch `ercot/63-noise-followup`, created by the execut
 - **Part A (§2) — the 54 rerun reproduces.** One `RERUN 2026-11-17` block in `ERCOT_POOL_STANDINGS.md`.
   `ps.run(base='extracts/base_v3/run_index_1', noise='analysis/noise_v3/ercot_noise.json', make_figs=False)` into a
   scratch dir (with `pool_wide_v2.csv` copied in): **17 of 17 csv byte-identical** to `analysis/pool/` (16 written by
-  `run` + the copied input); `pool_clusters_wavedD.json` differs only in `git_head` (scratch 25d8f28 vs committed
+  `run` + the copied input); `pool_clusters_wavedD.json` differs only in `git_head` (scratch HEAD vs committed
   eb846a0 — the pre-rebase SHA; cosmetic, not cited further). Nothing written under `analysis/pool/` for Part A.
   Part A decides nothing; its labels enter §5 as the wave-D column.
+- **(ii) follow-ups (strategy review).** e09193b: `--synthetic` mode (planted Y at the real X; refuses output under
+  `analysis/pool/`; an injected `wide` requires `synthetic=True`); amendment cited via `git log -S <title>`;
+  `landing_rows.csv` cross-check (suspect, G_run_usd, R1, R2; its random_E rows dropped on load); E1 failing ->
+  status HALT FOR PI; combined table gains the wave-D cost-gap column, the n0_E gap read for E1/E2/E3 and a per-id
+  reason; `waveD_B_readable` False for ids not graded on wave D. f7ef2d3: `bars()` reads 63 A1's re-emitted
+  `ercot_noise.json` (D2 already dropped; `bar.B` asserted equal to the own computation). 15 tests green; still
+  **no n0_E Y read**.
+- **Part C wave built (§4.1–4.4), NOT submitted.** eae9574 = the one `make_wave_d.py` refactor commit
+  (default build == committed wave D, all 26 files byte-identical; `test_make_wave_d.py` 9 green). c986da0 =
+  wave commit: `waves/screening_v3/` 11 rows (ranks 7–16 read from `wave_d_selection.json` + the replicate of
+  `location_oat_v2:3`), omega 0.100 (206) – 0.971 (163); `covariates.csv` pre-registered before any Y (16 sites;
+  H_C(s, 180) over 4,410 h, PV on the solar profile; base_v3 own-site curtailment; DC PTDF with a load-weighted
+  distributed slack — `bus.csv` has no Ref bus — on 8 pocket + 36 congested lines; buses 120/2/75 share
+  L252 PTDF −0.346). README carries §4.4–§4.5 verbatim. Tests: `test_make_screening_v3.py` 11 green with
+  `test_make_wave_d.py` in the same process. 11 tasks × 4 slots = 44; ≈ 232–491 core-h.
+- **STOP.** Strategy: fast-forward tx123 to this branch. Kay: push, then on CRC `cd
+  trial_0826/ercot/waves/screening_v3 && bash submit_this.sh` (literal `yes`). The real Part B read
+  (`pool_n0E.py`, writes `analysis/pool/`) runs only after the strategy session says so.
 
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
