@@ -24,6 +24,29 @@ Worktree `RTS-GMLC-e63`, branch `ercot/63-noise-followup`, created by the execut
 
 (pre-seeded by the strategy session; Part C = 10 single-site runs at 180 MW for the non-slate screened sites; analysis-only, never in GP X / HV / holdout / baseline)
 
+### 2026-11-17 — gates, pre-registration (i)/(ii), Part A verify (executor e62; worktree `RTS-GMLC-e62`, branch `ercot/62-objective-study`)
+
+- **Gates (§1.1).** Worktree from `ercot/tx123` 30c7877; `merge-base --is-ancestor 62afe9e` OK; `.gitignore` carries
+  `extracts/screening_v3/**/*.csv.gz` (not edited); this section exists. Interpreter `/opt/anaconda3/bin/python`
+  (py3.13, scipy 1.16.3, sklearn 1.7.2). Branch rebased onto tx123 074c65d (61's wave) before (ii).
+- **(i) Plan AMENDMENT 2026-11-17 committed alone** (6dcb53c after the rebase; block sha256 `8dd06917…a1d1e`,
+  asserted by the script). Rules = prompt 62 v1.1 §3.2–§3.4 verbatim.
+- **(ii) `analysis/pool/pool_n0E.py` + `tests/test_pool_n0E.py`** (25d8f28): 11 tests green on SYNTHETIC Y at the
+  real n0_E X (`waves/n0_E/design_matrix.csv` sha256 `87ee148e…b19a049`); with `test_pool_standings.py` +
+  `test_pool_objectives.py` 37 green. **No n0_E Y read; no GP; random_E never read.** STOP for the strategy
+  fast-forward before the Part B read.
+- **Bar B_j (D2 excluded) — deviation from the prompt's quoted numbers:** V1 16,173 MWh, E1 $2.383M (as quoted),
+  but N2 3.0 / N1 114.9 / N4 37.0, where prompt 62 quotes 2.60 / 99.5 / 32 (those are the 8-value, D2-included
+  numbers). The pinned definition (61 §3, contract addendum) is applied; zero-bar set {E5, E9, R1, R3} as expected.
+  B_j / 57-ruler spans 3.93–13.27× (prompt text 3.5–11.5×; V3's 2.3e-6 ruler sets the top). Note for 54: its
+  `ercot_gp_mechanism.readability_bar` averages all 8 deltas (D2 included) — not edited here.
+- **Part A (§2) — the 54 rerun reproduces.** One `RERUN 2026-11-17` block in `ERCOT_POOL_STANDINGS.md`.
+  `ps.run(base='extracts/base_v3/run_index_1', noise='analysis/noise_v3/ercot_noise.json', make_figs=False)` into a
+  scratch dir (with `pool_wide_v2.csv` copied in): **17 of 17 csv byte-identical** to `analysis/pool/` (16 written by
+  `run` + the copied input); `pool_clusters_wavedD.json` differs only in `git_head` (scratch 25d8f28 vs committed
+  eb846a0 — the pre-rebase SHA; cosmetic, not cited further). Nothing written under `analysis/pool/` for Part A.
+  Part A decides nothing; its labels enter §5 as the wave-D column.
+
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)
