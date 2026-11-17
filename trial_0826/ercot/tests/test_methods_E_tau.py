@@ -134,3 +134,71 @@ def test_rider_levels_sensitivity_label():
     r = tau_E.rider_levels(noise, ["V1", "E1"])
     assert r["V1"]["label"].startswith("sensitivity-level rider") and r["V1"]["level"] == pytest.approx(np.sqrt((3 * 9 + 3 * 25) / 6))
     assert r["E1"]["label"].startswith("noise-level") and r["E1"]["level"] == 12.5
+
+
+# --------------------------------------------------------------------------- #
+# prompt 63 A5: tau_res (REPORT-ONLY) and the PROVISIONAL Sigma_c
+# --------------------------------------------------------------------------- #
+def test_tau_res_is_the_tau_joint_code_path_and_report_only():
+    Y, ref = _toy()
+    sd = 0.02 * Y.std(0)
+    Sc = np.diag(sd ** 2); Sc[0, 1] = Sc[1, 0] = 0.3 * sd[0] * sd[1]
+    out = tau_E.tau_res(Y, ref, Sc, n_draws=200)
+    tj, hv = tau_E.tau_joint(Y, ref, Sigma=Sc, n_draws=200)
+    assert out["tau_res"] == tj and out["tau_res"] > 0 and out["hv_mean"] == float(np.mean(hv))   # bit-for-bit
+    assert out["tau_exact"] == 0.0 and out["report_only"] and "REPORT-ONLY" in out["label"]
+    np.testing.assert_allclose(out["sd_marginal"], sd)
+    # Sigma_c = 0 -> 0 without drawing (same branch as tau_joint)
+    assert tau_E.tau_res(Y, ref, np.zeros((4, 4)), n_draws=5)["tau_res"] == 0.0
+    # tau_exact stays the rule: the frozen recipe with Sigma_exact = 0 is unchanged
+    assert tau_E.rulers_from_files(Y, ref, ["V1", "E1", "R4", "N1"], Sigma=np.zeros((4, 4)), n_draws=5)["tau_joint"] == 0.0
+
+
+def test_sigma_c_from_deltas_scale_shrinkage_and_zero_columns():
+    rng = np.random.default_rng(7)
+    D = rng.normal(size=(6, 4)) * np.array([5000.0, 8e5, 50.0, 0.0])
+    S, info = tau_E.sigma_c_from_deltas(D)
+    rms = np.sqrt(np.mean(D ** 2, axis=0))
+    np.testing.assert_allclose(np.diag(S), 0.5 * rms ** 2)           # per-run = two-run second moment / 2
+    assert np.all(S[3, :] == 0.0) and np.all(S[:, 3] == 0.0) and info["zero_columns"] == 1
+    assert 0.0 <= info["lw_shrinkage"] <= 1.0 and np.allclose(S, S.T)
+    assert np.linalg.eigvalsh(S).min() >= -1e-6 * np.abs(S).max()    # PSD
+    S0, i0 = tau_E.sigma_c_from_deltas(D, shrink=False)
+    np.testing.assert_allclose(S0, 0.5 * D.T @ D / 6, rtol=1e-12)     # no shrinkage = raw second moment / 2
+    # shrinkage keeps the diagonal and pulls every correlation toward 0
+    c = lambda M: M[0, 1] / np.sqrt(M[0, 0] * M[1, 1])
+    assert abs(c(S)) <= abs(c(S0)) + 1e-15
+
+
+def _noise_json(excluded, deltas):
+    keys = [f"noise_v3/A:{k}" for k in (5, 7, 8)]
+    return {"structural_zero": {"keys_excluded": excluded},
+            "per_candidate": {j: {"perturbed_keys": keys, "perturbed_delta_signed": d} for j, d in deltas.items()}}
+
+
+def test_sigma_c_provisional_excludes_structural_zeros():
+    deltas = {"V1": [1000.0, -2000.0, 500.0], "E1": [1e5, 3e5, -2e5], "D1": [10.0, float("nan"), 5.0]}
+    df, info = tau_E.sigma_c_provisional(_noise_json(["noise_v3/A:6"], deltas))
+    assert list(df.index) == ["V1", "E1"] and info["status"] == "PROVISIONAL"     # D1 has a NaN -> dropped
+    assert df.loc["V1", "V1"] == pytest.approx(0.5 * np.mean(np.square(deltas["V1"])))
+    with pytest.raises(AssertionError, match="structural-zero"):
+        tau_E.sigma_c_provisional(_noise_json(["noise_v3/A:7"], deltas))
+    with pytest.raises(AssertionError, match="pre-63"):
+        tau_E.sigma_c_provisional(_noise_json([], deltas))
+
+
+def test_committed_sigma_c_provisional_matches_the_noise_json():
+    js_p = ERCOT / "analysis" / "noise_v3" / "ercot_noise.json"
+    csv_p = ERCOT / "analysis" / "noise_v3" / "ercot_noise_sigma_c_provisional.csv"
+    if not csv_p.is_file():
+        pytest.skip("provisional Sigma_c not written")
+    df, info = tau_E.sigma_c_provisional(json.loads(js_p.read_text()))
+    got = pd.read_csv(csv_p, index_col=0)
+    assert list(got.index) == list(df.index) and "V1" in got.index and "E1" in got.index
+    np.testing.assert_allclose(got.to_numpy(), df.to_numpy(), rtol=1e-12, atol=0)
+    assert "noise_v3/A:6" in info["excluded"] and len(info["pairs"]) == 6
+    # per-run chatter sd = the 61 bar sigma_hat / sqrt(2) (same RMS)
+    js = json.loads(js_p.read_text())
+    assert np.sqrt(got.loc["V1", "V1"]) == pytest.approx(js["per_candidate"]["V1"]["bar"]["sigma_hat"] / np.sqrt(2))
+    S4 = tau_E.read_cov_csv(csv_p, ["V1", "E1", "R4", "N1"])
+    assert S4.shape == (4, 4) and np.linalg.eigvalsh(S4).min() > 0

@@ -249,3 +249,92 @@ def rider_levels(noise_json, objectives):
                 pooled = float(np.sqrt(np.mean(np.square(lv)))) if lv else 0.0
             out[o] = {"level": pooled, "label": "sensitivity-level rider (52 perturbed-population sd; NOT a noise level)"}
     return out
+
+
+# --------------------------------------------------------------------------- #
+# prompt 63 A5: tau_res — the RESOLUTION ruler (REPORT-ONLY; never replaces
+# tau_exact = 0, which stays the frozen pre-registered rule of plan 3 / 6.2)
+# --------------------------------------------------------------------------- #
+
+TAU_RES_LABEL = ("REPORT-ONLY resolution ruler tau_res: the plan-6.2 recipe (tau_joint code path) with the chatter "
+                 "covariance Sigma_c in place of Sigma_exact; printed beside tau_exact, never replaces it")
+
+
+def sigma_c_from_deltas(D, pair_scale=0.5, shrink=True):
+    """Per-run chatter covariance Sigma_c from signed two-run deltas D (n x M; rows =
+    pairs, columns = objectives; NaN-free). Chatter model: delta = c_1 - c_0 with c
+    i.i.d. zero-mean per run, so E[delta delta^T] = 2 Sigma_c -> pair_scale = 1/2,
+    second moment about 0 (not the sample mean; the 61 bar uses the same RMS).
+    Shrinkage (Ledoit-Wolf 2004) of the RMS-scaled second-moment matrix R toward
+    the identity, i.e. toward the diagonal of Sigma: the marginal variances are
+    kept, only the correlations shrink. A column with RMS 0 gets zero row and column.
+    Returns (Sigma_c, info)."""
+    D = np.atleast_2d(np.asarray(D, float))
+    assert np.isfinite(D).all(), "deltas must be finite"
+    n, M = D.shape
+    rms = np.sqrt(np.mean(D ** 2, axis=0))
+    nz = rms > 0
+    R = np.eye(M)
+    lam = 0.0
+    if nz.sum() >= 1:
+        Z = D[:, nz] / rms[nz]
+        p = int(nz.sum())
+        Rs = Z.T @ Z / n                                             # diag = 1
+        d2 = float(np.sum((Rs - np.eye(p)) ** 2))
+        if shrink and d2 > 0:
+            b2 = float(sum(np.sum((np.outer(z, z) - Rs) ** 2) for z in Z)) / n ** 2
+            lam = min(b2, d2) / d2
+        Rs = lam * np.eye(p) + (1.0 - lam) * Rs
+        R[np.ix_(nz, nz)] = Rs
+    S = pair_scale * (np.outer(rms, rms) * R)
+    S[~nz, :] = 0.0
+    S[:, ~nz] = 0.0
+    S = 0.5 * (S + S.T)
+    return S, {"n_pairs": int(n), "M": int(M), "pair_scale": pair_scale, "lw_shrinkage": float(lam),
+               "zero_columns": int((~nz).sum()), "estimator": "second moment about 0 / 2, Ledoit-Wolf toward diag"}
+
+
+def sigma_c_provisional(noise_json, ids=None):
+    """PROVISIONAL Sigma_c (prompt 63 A5) from ercot_noise.json: the signed perturbed deltas
+    `per_candidate.<j>.perturbed_delta_signed` with the structural-zero pairs EXCLUDED (63 A1:
+    D2 / site 206). Ids = `ids` or every candidate finite on all remaining pairs. Replaced by
+    the Seed-replicate Sigma_c of prompt 63 Part C."""
+    pc = noise_json["per_candidate"]
+    excl = set(noise_json.get("structural_zero", {}).get("keys_excluded", []))
+    assert excl, "ercot_noise.json carries no structural_zero.keys_excluded (pre-63 A1 file?)"
+    ref = None
+    cols = {}
+    for j, p in pc.items():
+        keys = list(p.get("perturbed_keys", []))
+        assert not (set(keys) & excl), f"{j}: a structural-zero pair is still in the population"
+        d = np.asarray(p.get("perturbed_delta_signed", []), float)
+        assert len(d) == len(keys), j
+        ref = keys if ref is None else ref
+        assert keys == ref, f"{j}: perturbed rows not aligned across candidates"
+        cols[j] = d
+    if ids is None:
+        ids = [j for j in pc if len(cols[j]) and np.isfinite(cols[j]).all()]
+    D = np.column_stack([cols[j] for j in ids])
+    S, info = sigma_c_from_deltas(D)
+    info.update({"ids": list(ids), "pairs": ref, "excluded": sorted(excl), "status": "PROVISIONAL"})
+    return pd.DataFrame(S, index=ids, columns=ids), info
+
+
+def write_sigma_c_provisional(noise_json_path, out_csv):
+    import json
+    with open(noise_json_path) as f:
+        js = json.load(f)
+    df, info = sigma_c_provisional(js)
+    df.to_csv(out_csv)
+    return df, info
+
+
+def tau_res(Y, ref, Sigma_c, tau_exact=0.0, n_draws=N_DRAWS, seed=TAU_SEED):
+    """tau_res = the plan-6.2 recipe with Sigma_c in place of Sigma_exact — the SAME code path
+    as tau_joint (homoscedastic branch: every start perturbed jointly by
+    multivariate_normal(0, Sigma_c, method='svd'), std ddof 0 of the exact HV over N draws,
+    default_rng(seed)). REPORT-ONLY: tau_exact (0 on ERCOT, frozen) stays the rule."""
+    t, hvs = tau_joint(Y, ref, Sigma=Sigma_c, n_draws=n_draws, seed=seed)
+    return {"tau_res": t, "tau_exact": float(tau_exact), "label": TAU_RES_LABEL, "report_only": True,
+            "n_draws": int(n_draws), "seed": int(seed), "hv_mean": float(np.mean(hvs)),
+            "sd_marginal": np.sqrt(np.clip(np.diag(np.asarray(Sigma_c, float)), 0.0, None)).tolist()}
