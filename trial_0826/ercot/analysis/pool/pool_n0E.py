@@ -138,6 +138,14 @@ def amendment_commit(plan_path=PLAN):
     return out[-1] if out else "uncommitted"
 
 
+def script_commits():
+    """(ii) and its follow-ups: every commit that touched this script, oldest first."""
+    out = subprocess.run(["git", "-C", ERCOT, "log", "--reverse", "--format=%h", "--",
+                          os.path.abspath(__file__), os.path.join(ERCOT, "tests", "test_pool_n0E.py")],
+                         capture_output=True, text=True).stdout.split()
+    return (out[0] + (f" (+ follow-ups {', '.join(out[1:])})" if out[1:] else "")) if out else "uncommitted"
+
+
 def git_short(path=None, ref="HEAD"):
     cmd = ["git", "-C", ERCOT, "log", "-1", "--format=%h", ref] + (["--", path] if path else [])
     return subprocess.run(cmd, capture_output=True, text=True).stdout.strip() or "uncommitted"
@@ -842,7 +850,7 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
         f"R-3 band computed exactly ([{border_band()[0]:.3f}, {border_band()[1]:.3f}]); prompt text says about 0.86-0.93.",
     ]
     info = {"read_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-            "sha_i": amendment_commit(plan), "sha_ii": git_short(os.path.abspath(__file__)),
+            "sha_i": amendment_commit(plan), "sha_ii": script_commits(),
             "git_head": git_short(), "amend_sha256": amend, "design_sha256": X.attrs["design_sha256"],
             "d3": d3, "landing": landing, "synthetic": synthetic, "n1off_min": float(off.min()), "n1off_max": float(off.max()), "deviations": deviations}
 
