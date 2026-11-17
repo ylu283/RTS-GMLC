@@ -42,16 +42,17 @@ T0_FIX = "7c5fb8d"
 FULL_EXTRACT_MB = 51
 
 
-def nameplates(data_dir=ERCOT / V2_DATA_REL):
+def nameplates(sites=SITES, data_dir=ERCOT / V2_DATA_REL):
     g = pd.read_csv(data_dir / "gen.csv", dtype={"GEN UID": str})
     g = g.set_index("GEN UID")
     return {s: (float(g.loc[s, "PMax MW"]), int(g.loc[s, "Bus ID"]), str(g.loc[s, "Unit Type"]))
-            for s in SITES}
+            for s in sites}
 
 
-def design_rows(levels=LEVELS_MW, sites=SITES, data_dir=ERCOT / V2_DATA_REL):
-    """21 dict rows in the pinned order; asserts of prompt 58 section 3."""
-    npl = nameplates(data_dir)
+def design_rows(levels=LEVELS_MW, sites=SITES, data_dir=ERCOT / V2_DATA_REL,
+                include_nuclear=True, unit_types=("WIND",)):
+    """Dict rows in the pinned order (wave D: 21); asserts of prompt 58 section 3."""
+    npl = nameplates(sites, data_dir)
     min_npl = min(v[0] for v in npl.values())
     assert max(levels) <= min_npl, (
         f"max level {max(levels)} MW > min chosen nameplate {min_npl:.1f} MW "
@@ -60,7 +61,7 @@ def design_rows(levels=LEVELS_MW, sites=SITES, data_dir=ERCOT / V2_DATA_REL):
     idx = 0
     for s in sites:
         pmax, bus, ut = npl[s]
-        assert ut == "WIND", (s, ut)
+        assert ut in unit_types, (s, ut)
         for lv in levels:
             idx += 1
             omega = lv / pmax
@@ -69,7 +70,7 @@ def design_rows(levels=LEVELS_MW, sites=SITES, data_dir=ERCOT / V2_DATA_REL):
                          "omega": omega, "bid": BID, "gen_pmax": pmax,
                          "start_date": START_DATE, "num_days": NUM_DAYS, "replicate_of": "",
                          "pem_mw": lv, "level_id": f"L{int(lv)}"})
-    for lv in levels:
+    for lv in (levels if include_nuclear else []):
         idx += 1
         omega = lv / NUC_PMAX
         assert omega <= 1.0
@@ -77,7 +78,7 @@ def design_rows(levels=LEVELS_MW, sites=SITES, data_dir=ERCOT / V2_DATA_REL):
                      "omega": omega, "bid": BID, "gen_pmax": NUC_PMAX,
                      "start_date": START_DATE, "num_days": NUM_DAYS, "replicate_of": "",
                      "pem_mw": lv, "level_id": f"L{int(lv)}"})
-    assert len(rows) == len(sites) * len(levels) + len(levels)
+    assert len(rows) == len(sites) * len(levels) + (len(levels) if include_nuclear else 0)
     return rows
 
 
@@ -124,48 +125,78 @@ RUN_D = """python "$ERCOT_DIR/run_ercot_pcm.py" \\
 """
 
 
-def build(waves=ERCOT / "waves", data_dir=ERCOT / V2_DATA_REL, levels=LEVELS_MW):
-    d = waves / WAVE
-    rows = design_rows(levels, data_dir=data_dir)
+def _texts(wave, n, prompt_tag):
+    """Script header text: wave D keeps its exact prompt-58 text; any other wave
+    gets a generic text that names only `wave` (prompt 62 §4.2)."""
+    if wave == WAVE:
+        return {"stamp": "WAVE_D",
+                "array": f"""# Prompt 58 T2 wave D ({WAVE}): {n} full-year rows on v2 costs
+# (6 WIND sites x 60/120/180 MW + nuclear gen 1 x 60/120/180 MW, formulation A,
+# fix {T0_FIX}). GP training data (prompt 53): runs ONLY under the identity in
+# waves/GAP_DECISION.json (Kay, E-D6), read at run time below.
+""",
+                "collect": "Prompt 58 T2 collector", "submit": "Prompt 58 T2 wave D"}
+    return {"stamp": wave.upper(),
+            "array": f"""# {prompt_tag} ({wave}): {n} full-year single-site rows on v2 costs.
+# Analysis-only; runs ONLY under the identity in waves/GAP_DECISION.json
+# (Kay, E-D6), read at run time below.
+""",
+            "collect": f"{prompt_tag} collector", "submit": f"{prompt_tag} ({wave})"}
+
+
+def build(waves=ERCOT / "waves", data_dir=ERCOT / V2_DATA_REL, levels=LEVELS_MW, wave=WAVE,
+          sites=SITES, include_nuclear=True, readme_fn=None, unit_types=("WIND",),
+          extra_rows=(), prompt_tag="Prompt 58 T2"):
+    """Default call == the committed wave D, byte for byte (tests/test_make_screening_v3.py).
+    `extra_rows` (complete dict rows, indices continuing the design rows) are
+    appended before anything is written, so the array/collector ranges cover them."""
+    readme_fn = readme_fn or readme
+    d = waves / wave
+    rows = design_rows(levels, sites, data_dir=data_dir, include_nuclear=include_nuclear,
+                       unit_types=unit_types) + [dict(r) for r in extra_rows]
+    assert [r["index"] for r in rows] == list(range(1, len(rows) + 1))
     n = len(rows)
+    tx = _texts(wave, n, prompt_tag)
+    st = tx["stamp"]
+    gap_read = GAP_READ if wave == WAVE else GAP_READ.replace("wave D runs only", f"{wave} runs only")
+    who = "wave D" if wave == WAVE else wave
     dm = pd.DataFrame(rows, columns=COLS)
     d.mkdir(parents=True, exist_ok=True)
     dm.to_csv(d / "design_matrix.csv", index=False)   # repr floats: 40.0, 2430.0, full omega
     for r in rows:
         write(d / f"retrofit_gen_dict_{r['index']}.json",
               json.dumps(retrofit_dict(r), indent=2) + "\n", 0o644)
-    write(d / f"{WAVE}_array.sh", f"""#!/bin/bash
-#$ -N {WAVE}_array
+    nuc_assert = (f'git -C "$REPO_DIR" merge-base --is-ancestor {T0_FIX} HEAD || '
+                  f'{{ echo "ABORT: fix {T0_FIX} not in HEAD (nuclear rows)"; exit 1; }}\n'
+                  if include_nuclear else "")
+    write(d / f"{wave}_array.sh", f"""#!/bin/bash
+#$ -N {wave}_array
 #$ -q long
 #$ -cwd
 #$ -t 1-{n}
 #$ -pe smp 4
 #$ -r n
-# Prompt 58 T2 wave D ({WAVE}): {n} full-year rows on v2 costs
-# (6 WIND sites x 60/120/180 MW + nuclear gen 1 x 60/120/180 MW, formulation A,
-# fix {T0_FIX}). GP training data (prompt 53): runs ONLY under the identity in
-# waves/GAP_DECISION.json (Kay, E-D6), read at run time below.
-{HEADER}{SMOKE_GATE}mkdir -p "$WAVE_DIR/runs"
+{tx["array"]}{HEADER}{SMOKE_GATE}mkdir -p "$WAVE_DIR/runs"
 {ENV}module load gurobi
-{GAP_READ}
+{gap_read}
 eval "$(python "$TRIAL_DIR/campaign/get_row.py" "$SGE_TASK_ID" "$WAVE_DIR/design_matrix.csv")"
 OUT_PARENT="$WAVE_DIR/runs"
 DICT="$WAVE_DIR/retrofit_gen_dict_${{SGE_TASK_ID}}.json"
-echo "WAVE_D_TASK=$SGE_TASK_ID dict=$(tr -d '\\n ' < "$DICT")"
-echo "WAVE_D_START $(date -u +%FT%TZ) epoch=$(date +%s)"
-{RUN_D}echo "WAVE_D_END $(date -u +%FT%TZ) epoch=$(date +%s)"
+echo "{st}_TASK=$SGE_TASK_ID dict=$(tr -d '\\n ' < "$DICT")"
+echo "{st}_START $(date -u +%FT%TZ) epoch=$(date +%s)"
+{RUN_D}echo "{st}_END $(date -u +%FT%TZ) epoch=$(date +%s)"
 """)
     check = f"""for i in $(seq 1 {n}); do
     [[ -f "$WAVE_DIR/runs/run_index_$i/overall_simulation_output.csv" ]] || missing="$missing $i"
 done"""
     ext = extract_cmd('"$WAVE_DIR/runs/run_index_$i"', '"$EXTR/run_index_$i"', "--full",
-                      f'"$WAVE_DIR"/{WAVE}_array.o*."$i"')
-    write(d / f"collect_{WAVE}.sh", f"""#!/bin/bash
-#$ -N collect_{WAVE}
+                      f'"$WAVE_DIR"/{wave}_array.o*."$i"')
+    write(d / f"collect_{wave}.sh", f"""#!/bin/bash
+#$ -N collect_{wave}
 #$ -q long
 #$ -cwd
 #$ -r n
-# Prompt 58 T2 collector ({WAVE}): gate -> --full extracts (every row) +
+# {tx["collect"]} ({wave}): gate -> --full extracts (every row) +
 # runtimes.csv + wall-clock -> per-run pool metrics (pool_objectives.py
 # --run-dir, ON CRC under PCM_ERCOT) -> ercot-bot commit of the SLIM tables +
 # pool_full_metrics.json + runtimes.csv + extract_manifest.json; *.csv.gz
@@ -176,22 +207,22 @@ done"""
 missing=""
 {check}
 if [[ -n "$missing" ]]; then
-    marker="$WAVE_DIR/FAILED_{WAVE}.md"
-    {{ echo "# FAILED — {WAVE} incomplete"; echo; echo "missing:$missing";
+    marker="$WAVE_DIR/FAILED_{wave}.md"
+    {{ echo "# FAILED — {wave} incomplete"; echo; echo "missing:$missing";
       echo "Generated $(date -u +%FT%TZ)"; }} > "$marker"
     git -C "$REPO_DIR" add -- "$marker"
-    git -C "$REPO_DIR" "${{BOT[@]}}" commit -m "ercot-bot: FAILED marker ({WAVE})"
+    git -C "$REPO_DIR" "${{BOT[@]}}" commit -m "ercot-bot: FAILED marker ({wave})"
     push_with_retries
     exit 1
 fi
 echo "GATE PASS: {n}/{n}"
-if [[ -f "$WAVE_DIR/FAILED_{WAVE}.md" ]]; then
-    git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_{WAVE}.md" 2>/dev/null \\
-        || rm -f "$WAVE_DIR/FAILED_{WAVE}.md"
+if [[ -f "$WAVE_DIR/FAILED_{wave}.md" ]]; then
+    git -C "$REPO_DIR" rm -q -- "$WAVE_DIR/FAILED_{wave}.md" 2>/dev/null \\
+        || rm -f "$WAVE_DIR/FAILED_{wave}.md"
     echo "stale FAILED marker cleared"
 fi
 
-EXTR="$ERCOT_DIR/extracts/{WAVE}"
+EXTR="$ERCOT_DIR/extracts/{wave}"
 mkdir -p "$EXTR"
 cp -f "$ERCOT_DIR/waves/GAP_DECISION.json" "$EXTR/GAP_DECISION_used.json"
 echo "task,start_epoch,end_epoch,wall_s" > "$EXTR/wallclock.csv"
@@ -200,8 +231,8 @@ for i in $(seq 1 {n}); do
     cp -f "$WAVE_DIR/runs/run_index_$i/run/runtimes.csv" "$EXTR/run_index_$i/runtimes.csv" \\
         || echo "WARNING: row $i has no Prescient runtimes.csv"
     if [[ -n "$JOBLOG" ]]; then
-        S=$(grep -h "WAVE_D_START" "$JOBLOG" | sed -n 's/.*epoch=\\([0-9]*\\).*/\\1/p' | head -1)
-        E=$(grep -h "WAVE_D_END" "$JOBLOG" | sed -n 's/.*epoch=\\([0-9]*\\).*/\\1/p' | tail -1)
+        S=$(grep -h "{st}_START" "$JOBLOG" | sed -n 's/.*epoch=\\([0-9]*\\).*/\\1/p' | head -1)
+        E=$(grep -h "{st}_END" "$JOBLOG" | sed -n 's/.*epoch=\\([0-9]*\\).*/\\1/p' | tail -1)
         echo "$i,${{S:-}},${{E:-}},$(( ${{E:-0}} - ${{S:-0}} ))" >> "$EXTR/wallclock.csv"
         grep -h "IDENTITY from GAP_DECISION.json" "$JOBLOG" > "$EXTR/run_index_$i/identity.txt" || true
     fi
@@ -215,13 +246,13 @@ git -C "$REPO_DIR" add -- "$EXTR"
 if git -C "$REPO_DIR" diff --cached --name-only | grep -q '\\.csv\\.gz$'; then
     echo "ABORT: a *.csv.gz is staged — .gitignore line missing?"; git -C "$REPO_DIR" reset -q; exit 1
 fi
-git -C "$REPO_DIR" "${{BOT[@]}}" commit -m "ercot-bot: {WAVE} extracts (slim + pool_full_metrics; gz left in storage)"
+git -C "$REPO_DIR" "${{BOT[@]}}" commit -m "ercot-bot: {wave} extracts (slim + pool_full_metrics; gz left in storage)"
 push_with_retries
-echo "collect_{WAVE} done"
+echo "collect_{wave} done"
 """)
     write(d / "submit_this.sh", f"""#!/bin/bash
-# Prompt 58 T2 wave D — run ON CRC (Kay, by hand) AFTER waves/GAP_DECISION.json
-# exists:   cd trial_0826/ercot/waves/{WAVE} && bash submit_this.sh
+# {tx["submit"]} — run ON CRC (Kay, by hand) AFTER waves/GAP_DECISION.json
+# exists:   cd trial_0826/ercot/waves/{wave} && bash submit_this.sh
 # {n} tasks x 4 slots = {4 * n} slots; no -tc. Collector held on the array.
 cd "$(dirname "${{BASH_SOURCE[0]}}")"
 set -euo pipefail
@@ -233,23 +264,22 @@ git -C "$REPO_DIR" pull --rebase --autostash origin ercot/tx123
 [[ -f "$W/GAP_DECISION.json" ]] || {{ echo "ABORT: waves/GAP_DECISION.json absent — decide E-D6 first (read analysis/gap_smoke/GAP_SMOKE.md)"; exit 1; }}
 [[ -f "$W/smoke_v2/SMOKE_PASS" ]] || {{ echo "ABORT: waves/smoke_v2/SMOKE_PASS absent — smoke gate not passed"; exit 1; }}
 [[ -f "$W/../{V2_DATA_REL}/gen.csv" ]] || {{ echo "ABORT: v2 data dir missing"; exit 1; }}
-git -C "$REPO_DIR" merge-base --is-ancestor {T0_FIX} HEAD || {{ echo "ABORT: fix {T0_FIX} not in HEAD (nuclear rows)"; exit 1; }}
-grep -q -- "--ruc_mipgap" "$W/../run_ercot_pcm.py" || {{ echo "ABORT: run_ercot_pcm.py has no --ruc_mipgap"; exit 1; }}
-grep -q "location_oat_v2/\\*\\*/\\*.csv.gz" "$W/../.gitignore" || {{ echo "ABORT: trial_0826/ercot/.gitignore gz line missing"; exit 1; }}
-echo "--- waves/GAP_DECISION.json (the identity wave D will run under; eyeball it) ---"
+{nuc_assert}grep -q -- "--ruc_mipgap" "$W/../run_ercot_pcm.py" || {{ echo "ABORT: run_ercot_pcm.py has no --ruc_mipgap"; exit 1; }}
+grep -q "{wave}/\\*\\*/\\*.csv.gz" "$W/../.gitignore" || {{ echo "ABORT: trial_0826/ercot/.gitignore gz line missing"; exit 1; }}
+echo "--- waves/GAP_DECISION.json (the identity {who} will run under; eyeball it) ---"
 cat "$W/GAP_DECISION.json"
 echo "-----------------------------------------------------------------------------"
 echo "--- qquota (need {4 * n} slots for {n} tasks x 4) ---"; qquota -u ylu28 || true
 read -r -p "Submit {n} full-year rows under this identity? [yes/NO] " ANS
 [[ "$ANS" == "yes" ]] || {{ echo "not submitted"; exit 1; }}
-J=$(qsub -terse {WAVE}_array.sh | cut -d. -f1)
+J=$(qsub -terse {wave}_array.sh | cut -d. -f1)
 [[ "$J" =~ ^[0-9]+$ ]] || {{ echo "BAD ARRAY JID: $J"; exit 1; }}
-C=$(qsub -terse -hold_jid "$J" -cwd -M {EMAIL} -m ea collect_{WAVE}.sh)
+C=$(qsub -terse -hold_jid "$J" -cwd -M {EMAIL} -m ea collect_{wave}.sh)
 [[ "$C" =~ ^[0-9]+$ ]] || {{ echo "BAD COLLECTOR JID: $C"; exit 1; }}
-echo "SUBMITTED {WAVE}: array=$J ({n} tasks x 4 slots) collector=$C"
+echo "SUBMITTED {wave}: array=$J ({n} tasks x 4 slots) collector=$C"
 qstat -u ylu28
 """)
-    write(d / "README.md", readme(rows), 0o644)
+    write(d / "README.md", readme_fn(rows), 0o644)
     return d, rows
 
 
