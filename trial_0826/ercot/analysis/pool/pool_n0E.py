@@ -622,6 +622,10 @@ def plot_idr(tab, path):
     for x, ls in ((IDR_BARS, "--"), (BORDER_BARS, ":"), (STRONG_BARS, "-.")):
         ax.axvline(x, color="red", ls=ls, lw=2)
     ax.set_xscale("log")
+    tk = [t for t in (0.1, 0.3, 1, 2, 3, 10, 30, 100, 300, 1000) if t <= max(10.0, 1.5 * float(np.nanmax(v)))]
+    ax.xaxis.set_major_locator(__import__("matplotlib").ticker.FixedLocator(tk))
+    ax.xaxis.set_minor_locator(__import__("matplotlib").ticker.NullLocator())
+    ax.set_xticklabels([f"{t:g}" for t in tk])        # plain labels: ps._rc() disables mathtext
     ax.set_yticks(range(len(t)))
     ax.set_yticklabels(list(t.index), fontsize=16, fontweight="bold")
     ax.set_xlabel("IDR / B_j on n0_E (Q90 - Q10 over 48 rows; lines 2, 3, 10)", fontsize=18, fontweight="bold")
