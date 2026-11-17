@@ -1,5 +1,9 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
 
+## Prompt 62 — ERCOT objective-selection study v3: standings rerun (A) · n0_E population (B) · 16-site v3 screening `screening_v3` (C) (v1, 2026-11-17; executor writes here only)
+
+(pre-seeded by the strategy session; Part C = 10 single-site runs at 180 MW for the non-slate screened sites; analysis-only, never in GP X / HV / holdout / baseline)
+
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)
