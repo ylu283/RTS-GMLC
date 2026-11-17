@@ -196,6 +196,24 @@
   objective; the additive-null PCHIP curves are extrapolated linearly beyond 180 MW (no wave-D data
   there); the RFF path sampler is an approximation of the exact posterior (sd within ±10 % at 8192
   features, tested).
+- [x] **E-D1b objective-selection study (strategy session's instruction, 2026-11-17; before any GP
+  fit)** — prompt 57 Part B standings rerun on the v3 base + the 52 ruler:
+  `pool_standings.py --base extracts/base_v3/run_index_1 --noise analysis/noise_v3/ercot_noise.json`
+  (py 3.13; wave D + base_v3 only, no n0_E / random_E Y). Code change in its own commit `eb846a0`
+  (minimal, disclosed): the per-level rows, gap-bound rows and heatmap titles hard-coded
+  `CONTAMINATED (v2 base, v3 rows)` regardless of `--base`; the computed label is now threaded through
+  (7 standings tests green; no number changed). Outputs + dated RERUN block in
+  `analysis/pool/ERCOT_POOL_STANDINGS.md` (11-07 text kept): commit `a74a77b`. **Result:** CONTAMINATED
+  caveat lifted (same identity v3); ruler columns filled — every candidate with a ruler is
+  LOCATION-SENSITIVE (range ≥ 2 rulers at ≥ 2 levels); **R4 (7.7 / 6.9 / 13.5 rulers) and N1 (4.9 / 9.4 /
+  8.9) are no longer provisional on the ruler** (site order still unstable, W p 0.79 / 0.75; a real
+  non-monotone location effect, not chatter); cost gap bound on the v3 base G_base $18.7M (was $196.7M),
+  E1 8 / 18 single-site Δ GAP-READABLE under the scaled v3 pair bound, between-site ranges WITHIN; E1
+  sign + vs the v3 base (+$3.8–14.1M); redundancy (C1 = {E1, V2, X1} → E1) and conflicts unchanged.
+  **E-D1b table (RERUN): RECOMMENDED V1 (V), E1 (E; §1.2 READABLE), R4 (R), N1 (N) — membership
+  unchanged, qualification changed; REDUNDANT→E1: X1, V2; GUARDRAIL: R2 (+ R1 dead); SURVIVORS: E4, N4,
+  N5, E6, R5, N3, E2, R6, N2, E3, E8; DIAGNOSTIC: R7, R8, V3, E7, D1, D2; DEAD: E9 (wave D), E5, R1, R3.**
+  The strategy session drafts E-D1b from this table.
 - [ ] **STOP — waiting on gate (iv) (E-D1b → dated `design_space_E.json`, or Kay's word to fit the four
   provisional seats V1 / E1 / R4 / N1).** Then ONE command: `python analysis/ercot_gp/ercot_gp_status.py
   --real` (fits plan-5 arms at 32 / 48, LOO selection, holdout once per config per tier, exposure ≤ 8 of
