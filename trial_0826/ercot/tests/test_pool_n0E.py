@@ -264,3 +264,19 @@ def test_landing_crosscheck(X, B, tmp_path):
     lr.assign(R2_reserve_shortfall_mwh=lr["R2_reserve_shortfall_mwh"] + 1).to_csv(p, index=False)
     with pytest.raises(AssertionError):
         pn.landing_crosscheck(w, p)
+
+
+def test_survivor_family_is_not_absorbed():
+    """Regression (first real run): V1 survives a cluster with E6 and V2 is REDUNDANT->E4; V must still seat."""
+    import pool_objectives as _po
+    defs = _po.load_defs()
+    ids = [c for c in defs["global_order"]]
+    tab = pd.DataFrame({"responds": True, "borderline": False, "waveD_B_readable": True,
+                        "respond_label": "RESPONDS IN BOX"}, index=ids)
+    clusters = [{"cluster": "a", "members": ["E6", "V1"], "survivor": "V1"},
+                {"cluster": "b", "members": ["E4", "V2"], "survivor": "E4"},
+                {"cluster": "c", "members": ["E1", "X1"], "survivor": "E1"}]
+    red_to = {"E6": "V1", "V2": "E4", "X1": "E1"}
+    seats, M, log = pn.seat_walk(tab, defs, red_to, clusters)
+    assert [(s["family"], s["seat"]) for s in seats] == [("V", "V1"), ("E", "E1"), ("R", "R4"), ("N", "N1")]
+    assert M == 4 and any("family X" in x for x in log)

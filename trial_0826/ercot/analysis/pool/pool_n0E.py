@@ -507,7 +507,13 @@ def seat_walk(tab, defs, red_to, clusters=()):
                           "E1 fails R-1/R-4 -> HALT FOR PI (never passed to E3/E4)"})
             continue
         in_cl = {m: set(cl["members"]) for cl in clusters for m in cl["members"]}
-        absorbed = all(m in in_cl and any(cands[o]["family"] != fam for o in in_cl[m]) for m in mem)
+        # absorbed = every member is REDUNDANT (a non-survivor) to another family's survivor, or sits in a
+        # survivor-less cluster with another family. A cluster SURVIVOR is never absorbed (R-4 skips
+        # REDUNDANT members only). Fixed 2026-11-17 after the first real run seated no V (V1 = survivor
+        # of {E6, V1}); disclosed in POOL_N0E_STANDINGS.md Deviations.
+        surv = {m: cl["survivor"] for cl in clusters for m in cl["members"]}
+        absorbed = all(m in in_cl and surv[m] != m and any(cands[o]["family"] != fam for o in in_cl[m])
+                       and (surv[m] is None or cands[surv[m]]["family"] != fam) for m in mem)
         if absorbed:
             log.append(f"family {fam}: every member is in a cluster with another family "
                        + ", ".join(f"{c}->{red_to.get(c, 'no survivor')}" for c in mem) + " (no seat consumed)")
@@ -847,6 +853,11 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
         "63 A1 d265580 with the D2 pair excluded; ruler_zero now {E9} only, N2 left it).",
         "No input md5 exists for the noise runs; the D2 exclusion asserts the md5 of the effective PEM slice "
         "(RT + DA wind, site 206) plus equal overall.csv md5.",
+        "Implementation fix after the first real execution (same day, before any output was committed): "
+        "the seat walk's 'absorbed family' test treated a cluster SURVIVOR as absorbed, so family V (V1 = "
+        "survivor of {E6, V1}; V2 REDUNDANT->E4) consumed no seat and the first run reported M = 2 "
+        "(E1 / R EMPTY / N1). That contradicted the pinned R-4 (skip REDUNDANT members only). The fix restores "
+        "R-4 as registered; no threshold, statistic or order changed. Fix commit: see PROGRESS (prompt 62).",
         f"R-3 band computed exactly ([{border_band()[0]:.3f}, {border_band()[1]:.3f}]); prompt text says about 0.86-0.93.",
     ]
     info = {"read_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
