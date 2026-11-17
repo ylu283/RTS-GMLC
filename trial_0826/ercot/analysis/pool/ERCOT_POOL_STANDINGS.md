@@ -32,6 +32,139 @@ sense of §3 A4 is made. The primary location read is the base-free
 scale-free ratio S′ (section 0.2); the secondary read is S (§3 A4b),
 which needs a base and is contaminated.
 
+## RERUN 2026-11-17 — v3 base (`base_v3:1`) + prompt-52 ruler (`ercot_noise.json`); objective-selection study for E-D1b
+
+**Run:** `/opt/anaconda3/bin/python pool_standings.py --base extracts/base_v3/run_index_1
+--noise analysis/noise_v3/ercot_noise.json` on branch `ercot/54-gp-loader` (base
+`ercot/tx123` 80e5d79), by the prompt-54 session on the strategy session's
+instruction (Kay). **Data read:** wave D rows 1–21 and `base_v3:1` only —
+no n0_E / random_E value was read. The 11-07 text below is kept verbatim as the
+provisional record; this block states what the two new inputs change. Code
+change (own commit `eb846a0`, disclosed): `pool_standings.py` hard-coded the
+label `CONTAMINATED (v2 base, v3 rows)` in the per-level rows, the gap-bound
+rows and the heatmap titles regardless of `--base`; the computed label is now
+threaded through (`same identity (v3)`). No number changed by that edit.
+Outputs refreshed in place: `pool_standings.csv`, `pool_standings_levels.csv`,
+`pool_wavedD_delta.csv`, `pool_gap_bound_wavedD.csv`, `pool_ed1b_decision.csv`,
+`pool_clusters_wavedD.json`, `pool_starts_attribution_wavedD.csv`, 25 heatmaps
+under `figs/standings/` (clustermaps unchanged: base-free). `pool_wavedD_wide.csv`
+is byte-identical (raw values are base-free).
+
+### R.1 What changed
+
+1. **The CONTAMINATED caveat (0.1) is LIFTED.** Base and rows are both identity
+   v3 (`delta label: same identity (v3)`). Every Δ-vs-base column is now a PEM
+   effect, not an identity shift. The secondary read S (0.2) is clean and
+   agrees with S′ on every verdict except E3 (S′ LOCATION-SENSITIVE 0.61 / 0.88 /
+   1.62; S SIZE-DRIVEN 0.47 / 0.44 / 0.71) and N4 (S′ 0.40 / 0.53 / 1.69; S
+   0.28 / 0.34 / 0.70). The `identity_shift_*` columns are retained only as the
+   v2→v3 size reference from the gap smoke; with a v3 base they are no longer a
+   contamination read (ratios such as E2 55 / 80 compare the identity shift to
+   small PEM effects and mean nothing here).
+2. **The ruler columns are FILLED (prompt 52, `per_candidate.<id>.ruler` =
+   median |Δ| of the 8 perturbed copies, 0.1 % MW moves).** The three-way
+   verdict (`range_jℓ ≥ 2 × ruler_j` at ≥ 2 of 3 levels → LOCATION-SENSITIVE;
+   < 1 at every level → INSENSITIVE AT THESE SIZES; else UNREADABLE) reads
+   **LOCATION-SENSITIVE for every candidate with a ruler** (range / ruler in
+   the table below), RULER=0 for E9 (dead) and N2 (no read; status by S′),
+   so the 11-07 "provisional on the ruler" sentence for R4 / N1 is resolved:
+   their between-site spread is 5–14 rulers at every level, far above the
+   solver-indifference chatter the perturbed copies measure. Their site
+   ORDER is still unstable (W p 0.79 / 0.75): a real, non-monotone location
+   effect, not chatter.
+3. **Sign and monotonicity on the v3 base** (`sign_pattern_sites`): V1 `------`
+   (6 / 6, monotone 6 / 6); E1 `++++++` (PEM RAISES total cost vs the v3
+   base, +$3.8M … +$14.1M; the 11-07 negative Δ were the v2→v3 identity
+   shift); E3 `++++++`; E2 `mm----` (4 / 6, −$2.0M … +$0.7M); R4 `---mm-`
+   (4 / 6; −246 … +49 starts; monotone 0 / 6); N1 `m+m-mm` (2 / 6; −63 … +102
+   line-h; monotone 3 / 6); R2 `-m-mm-` (−97 … +23 MWh); N4 `------` (−183 …
+   −72 h, monotone 3 / 6). E8 / N5 / D2: S undefined (no base value for E8 /
+   N5 on the slim-only path of `pool_row`; D2 has no base) — S′ carries them.
+4. **Cost gap bound on the v3 base (section 2 superseded):** G_base(v3) =
+   **$18.7M** (was $196.7M on v2); wave-D G_row $18.4–25.1M; pair bound
+   vs base $37.1–43.8M raw (G_base share 43–50 %, no longer dominated by the
+   base), $8.75–10.3M scaled. **E1: 0 / 18 GAP-READABLE raw, 8 / 18 scaled**
+   (L120: 110, 270, 274; L180: 110, 140, 146, 270, 274 — site 163 never);
+   E3 8 / 18 scaled; E2 0 / 18. Between-site ranges ($2.2 / 5.5 / 9.2M for E1)
+   stay WITHIN the v3-only pair bound at every level, raw ($41–48M) and
+   scaled ($9.7–11.4M; L180 at 95 %). Plan §1.2 is settled separately
+   (ERCOT_NOISE.md §5c: READABLE → E1); G stays an evidence column.
+5. **Redundancy (section 4) is unchanged** (base-free): cluster C1 = {E1, V2,
+   X1}, survivor E1; redundant pairs V2–E1, V2–X1, E1–X1, V2–E3; E1–X1 +0.98
+   (the pinned conflict did not appear). **Conflicts (section 6) unchanged**:
+   16 survivors; V1–E1 −0.70 and E1–R4 −0.53 TRADE-OFF (size); V1–E4 −0.85,
+   V1–N5 −0.93, E1–R2 −0.62, E1–N4 −0.77, E4–N4, N4–N5, N4–E3, R5–E2
+   TRADE-OFF (location). Among the recommended four: V1–E1 size, E1–R4 size,
+   E1–N1 −0.26 (not labelled), V1–R4 +0.34, V1–N1 +0.53, R4–N1 +0.02.
+
+### R.2 Step 1 with the ruler (18 VRE rows; `pool_standings.csv`)
+
+| id | S′ verdict | range / ruler L60 / L120 / L180 | ruler_j | ruler verdict | W, exact p | status |
+|---|---|---|---|---|---|---|
+| V1 true curt | SIZE-DRIVEN (0.06 / 0.14 / 0.29) | 11.6 / 27.1 / 54.6 | 1,949 MWh | LOCATION-SENSITIVE | 0.72, 0.025 | **LOCATION-SENSITIVE** (ruler); size-driven by S′ |
+| E1 total cost | LOCATION-SENSITIVE (0.39 / 0.97 / 1.62) | 10.1 / 25.2 / 42.2 | $218k | LOCATION-SENSITIVE | 0.87, 0.0018 | **LOCATION-SENSITIVE** |
+| E2 fixed cost | LOCATION-SENSITIVE (1.70 / 1.12 / 2.09) | 3.0 / 2.0 / 3.7 | $656k | LOCATION-SENSITIVE | 0.47, 0.23 | LOCATION-SENSITIVE |
+| E3 variable cost | LOCATION-SENSITIVE (0.61 / 0.88 / 1.62) | 3.5 / 5.0 / 9.3 | $851k | LOCATION-SENSITIVE | 0.57, 0.11 | LOCATION-SENSITIVE |
+| E4 total payments | LOCATION-SENSITIVE (0.54 / 1.22 / 1.24) | 6.3 / 14.2 / 14.5 | $1.24M | LOCATION-SENSITIVE | 0.62, 0.070 | LOCATION-SENSITIVE |
+| E6 VRE payments | SIZE-DRIVEN (0.18 / 0.72 / 0.39) | 1.4 / 5.6 / 3.1 | $552k | LOCATION-SENSITIVE | 0.59, 0.090 | LOCATION-SENSITIVE (ruler); size-driven by S′ |
+| E8 LMP dispersion | LOCATION-SENSITIVE (1.57 / 3.27 / 2.41) | 2.9 / 6.0 / 4.4 | 0.073 $/MWh | LOCATION-SENSITIVE | 0.23, 0.70 | LOCATION-SENSITIVE |
+| E9 scarcity bus-h | NO EFFECT | — | 0 (RULER=0) | UNREADABLE | — | DEAD ON WAVE D |
+| R2 reserve shortfall | LOCATION-SENSITIVE (3.05 / 1.66 / 1.69) | 5.2 / 2.8 / 2.9 | 23.1 MWh | LOCATION-SENSITIVE | 0.48, 0.21 | LOCATION-SENSITIVE (guardrail) |
+| R4 thermal starts | LOCATION-SENSITIVE (1.74 / 1.57 / 3.06) | 7.7 / 6.9 / 13.5 | 20 starts | LOCATION-SENSITIVE | 0.19, 0.79 | **LOCATION-SENSITIVE** (order unstable) |
+| R5 on/off ramps | LOCATION-SENSITIVE (2.15 / 1.81 / 1.90) | 3.7 / 3.1 / 3.3 | 2,896 MW | LOCATION-SENSITIVE | 0.23, 0.70 | LOCATION-SENSITIVE |
+| R6 nominal ramps | LOCATION-SENSITIVE (0.93 / 2.67 / 3.74) | 3.5 / 10.1 / 14.1 | 9,842 MW | LOCATION-SENSITIVE | 0.15, 0.86 | LOCATION-SENSITIVE |
+| N1 congested line-h | LOCATION-SENSITIVE (1.46 / 2.83 / 2.67) | 4.9 / 9.4 / 8.9 | 15 line-h | LOCATION-SENSITIVE | 0.20, 0.75 | **LOCATION-SENSITIVE** (order unstable) |
+| N2 congested lines | LOCATION-SENSITIVE (1.80 / 1.20 / 3.00) | — | 0 (RULER=0) | LOCATION-SENSITIVE (natural-unit rule) | 0.12, 0.90 | LOCATION-SENSITIVE |
+| N3 flow violation | LOCATION-SENSITIVE (5.9 / 15.4 / 7.7) | 2.3 / 5.9 / 2.9 | 2.58 MWh | LOCATION-SENSITIVE | 0.37, 0.41 | LOCATION-SENSITIVE |
+| N4 pocket-120 line-h | LOCATION-SENSITIVE (0.40 / 0.53 / 1.69) | 2.8 / 3.8 / 12.0 | 8.5 line-h | LOCATION-SENSITIVE | 0.37, 0.38 | LOCATION-SENSITIVE |
+| N5 congestion spread | SIZE-DRIVEN (0.36 / 0.45 / 1.08) | 4.3 / 5.3 / 12.8 | 0.040 $/MWh | LOCATION-SENSITIVE | 0.54, 0.13 | LOCATION-SENSITIVE (ruler); size-driven by S′ |
+| X1 CO2 | LOCATION-SENSITIVE (0.22 / 0.98 / 1.59) | 10.3 / 45.3 / 73.6 | 4,359 t | LOCATION-SENSITIVE | 0.95, 1.4e-4 | REDUNDANT→E1 |
+| V2 penetration | LOCATION-SENSITIVE (0.28 / 1.04 / 1.68) | 37 / 138 / 223 | 4.7e-4 pts | LOCATION-SENSITIVE | 0.97, 3e-5 | REDUNDANT→E1 |
+| V3, E7, R7, R8, D1, D2 | (rulers filled; see csv) | | | | | DIAGNOSTIC (`—`) |
+| E5, R1, R3 | | | 0 | | | DEAD (0 on 31 v2 runs, wave D and base_v3) |
+
+Reading note: the prompt-52 ruler is a SENSITIVITY ruler (median |Δ| under
+0.1 % MW moves, 8 values on 4 off-slate designs), so "LOCATION-SENSITIVE by
+ruler" means the between-site spread exceeds the solver's input-chatter by a
+wide margin; it does not by itself say the spread is large relative to the
+size effect — that is S′, which still separates the size-driven renewables
+quantities (V1, E6, N5, D1) from the location-sensitive rest.
+
+### R.3 E-D1b decision table, RERUN (one page; PI decides) — `pool_ed1b_decision.csv`
+
+Rule (f76d897): recommended ≤ 4 objectives = the survivors in the global
+order with at most one per family. Both new inputs leave the recommended
+four unchanged; what changes is their qualification.
+
+| id | role (RERUN) | 11-07 role | what the v3 base + ruler changed |
+|---|---|---|---|
+| **V1** true curtailment | RECOMMENDED OBJECTIVE (V) | RECOMMENDED | contamination lifted (10–20 % → 0); ruler 1,949 MWh, spread 12–55 rulers; still SIZE-DRIVEN by S′ (does not separate the six sites at 60–180 MW) |
+| **E1** total cost | RECOMMENDED OBJECTIVE (E) | RECOMMENDED | plan §1.2 verdict READABLE (ERCOT_NOISE.md) → the E seat is E1; sign now + vs the v3 base (+$3.8–14.1M); 8 / 18 single-site Δ GAP-READABLE under the scaled v3 pair bound (0 / 18 on 11-07); site order stable (W p 0.002) |
+| X1 CO2 | REDUNDANT → E1 | REDUNDANT → E1 | unchanged (ρ +0.98; base-free) |
+| **R4** thermal starts | RECOMMENDED OBJECTIVE (R) — **no longer provisional on the ruler** | RECOMMENDED, PROVISIONAL | spread 7.7 / 6.9 / 13.5 rulers (ruler 20 starts); Δ vs v3 base −246 … +49 (the 11-07 "DOMINATED by the identity shift" read was the v2 base); site order unstable (W p 0.79), monotone 0 / 6 — a real but non-monotone location effect |
+| **N1** congested line-hours | RECOMMENDED OBJECTIVE (N) — **no longer provisional on the ruler** | RECOMMENDED, PROVISIONAL | spread 4.9 / 9.4 / 8.9 rulers (ruler 15 line-h); Δ vs v3 base −63 … +102; W p 0.75, monotone 3 / 6 |
+| E4 total payments | SURVIVOR (family E taken) | SURVIVOR | 6–15 rulers; sign mixed (`+mmmmm`) on the v3 base; no gap bound |
+| R2 reserve shortfall | GUARDRAIL (survivor) | GUARDRAIL | 3–5 rulers; Δ −97 … +23 MWh vs the v3 base 156 MWh (plan §1.3 flag at 2 × base = 312 MWh: never approached on wave D) |
+| N4 pocket-120 line-h | SURVIVOR (family N taken) | SURVIVOR | 2.8 / 3.8 / 12.0 rulers; Δ −183 … −72 h, sign-consistent 6 / 6 (PEM relieves the L252 pocket at every site) |
+| N5, E6 | SURVIVOR (size-driven by S′) | SURVIVOR | ruler-readable but size-driven |
+| R5, N3, E2, R6, N2, E3, E8 | SURVIVOR (family taken) | SURVIVOR | all ruler-readable; E2 / E3 within the gap bound on the v3 base (E3 8 / 18 scaled-readable) |
+| R7, R8, V3, E7, D1, D2 | DIAGNOSTIC | DIAGNOSTIC | unchanged |
+| E9 | DEAD ON WAVE D | DEAD ON WAVE D | unchanged (RULER=0) |
+| E5, R1, R3 | DEAD | DEAD | 0 on base_v3 too; R1 stays the plan §1.3 guardrail |
+
+What the PI should weigh now: all four recommended seats are readable above
+the prompt-52 chatter and clean of identity contamination. V1 and E1 have a
+stable site order; R4 and N1 have large, readable but non-monotone,
+order-unstable location effects — they are legitimate objectives whose
+optimum will not be a simple "more MW" or "this site" story. The honest
+alternative of 11-07 (fix V1 + E1 now, fill R / N later) is no longer
+forced by the ruler; it would now rest only on the order instability. The
+standings do not decide. The strategy session drafts E-D1b from this table;
+the GP fit (prompt 54 Part B step 1) starts after Kay's word and a dated
+`design_space_E.json`.
+
+---
+
 ## 0. Two caveats that govern every number below
 
 ### 0.1 Base contamination is MATERIAL: `CONTAMINATED (v2 base, v3 rows)`
