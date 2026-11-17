@@ -12,6 +12,15 @@
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)
 
+### Build the wave (v1.1 §2.1–2.5; 2026-11-17, zero simulation, worktree `../RTS-GMLC-e61`, branch `ercot/61-location-contrast` from tx123 849fdcf; 80e5d79 ancestor asserted; `.gitignore` gz line asserted, not edited)
+
+- [x] **Wave commit `3b40c2d`** — `tools/make_location_contrast_E.py`, `tests/test_make_location_contrast_E.py`, `waves/location_contrast_E/` (9 rows, `tier = "contrast"`, `level_id` = label; dicts, array 1-9 × 4 slots, collector `--full`, submit literal `yes`; README = disclosures + §3 VERBATIM; `H_C.csv`). v1.1 has 9 rows (the pre-seed line above says 8: v1).
+- [x] Table as built (MW 110/140/146/163/270/274 · total · u): P1_60/120/180 all six at 60/120/180 (u 0.08–0.32 / 0.16–0.65 / 0.24–0.97); P2_800_b120 0/0/0/98.17/306.59/395.23 · 800 · 0.530; P2_800_b275 316.01/233.88/250.12/0/0/0 · 800 · 0.933; P2_800_all 114.39/84.66/90.54/62.64/195.61/252.16 · 800 · 0.338; P2_500_270 site 270 at 500 · 0.864; P2_500_110_140 287.34/212.66 · 500 · 0.849; P3_1500_all 214.48/158.74/169.76/117.44/366.77/472.80 · 1,500 · 0.633. Matches §2.2.
+- [x] H_C (MWh, 4,410 h, inputs only, no Y existed): 1,488,501 / 2,831,797 / 4,000,863 / 3,092,965 / 2,691,591 / 3,208,407 / 1,655,333 / 1,729,211 / 5,529,516. H_C(b120)/H_C(b275) = 1.1491 (predicted ≈ 1.149); H_C(270)/H_C(110+140) = 0.9573.
+- [x] Tests: `pytest tests/test_make_location_contrast_E.py tests/test_make_ercot_n0.py -q` → 28 passed (12 + 16); `bash -n` clean on the three scripts.
+- Deviation (README): §2.3 pins a replacement text containing "holdout" and also asks for no "holdout" in the scripts; the pinned text is kept and the check excludes that one phrase.
+- **STOP — Kay action:** strategy FF tx123 → push → on CRC `cd trial_0826/ercot/waves/location_contrast_E && bash submit_this.sh`. Landing (§2.6) waits for COLLECTED.
+
 ## Prompt 55 — ERCOT BO machinery build (v3.1, 2026-11-13; executor writes here only)
 
 ### Part A — BUILD (2026-11-14, zero simulation, worktree `../RTS-GMLC-e55`, branch `ercot/55-machinery`, rebased on `ercot/tx123` 03eca72)
