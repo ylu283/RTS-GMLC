@@ -325,3 +325,24 @@ Old (all perturbed copies, 5ca9650) vs new (structural zeros excluded), gradable
 Trigger fires (gradable): old 21 (V1, E1, X1, R4, N1, E4, R2, R7, N4, N5, E6, R5, N3, E2, R6, N2, E3, R8, E7, E8, V2); new 4 (E1, X1, E7, V2). The old reading fired wherever a structural level had sd 0; the new reading is the order-of-magnitude detector of section 9 (df 2 per level).
 `RULER=0` (gradable, new): E9.
 
+## 11. 2026-11-17 — per-day RUC divergence (prompt 63 A2; memo F2)
+
+Per pair, day by day: the daily RUC objective `ruc_cost` of `ruc_quality.csv` (slim table), perturbed copy vs the exact copy of the same design in the same batch, and, as the control, exact B vs exact A. A day is divergent iff the two values differ. Relative change = |Δ| / |reference| per day; median and p90 are over ALL days of the year (and the median over divergent days only); `> 1e-3` counts the days above the v3 MIP gap. File: `ercot_noise_daily_divergence.csv`.
+
+| pair | key vs ref | design | δ rel | structural zero | days | divergent days | median rel (all days) | p90 rel (all days) | median rel (divergent days) | days > 1e-3 | max rel | first divergent day |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| perturbed | noise_v3/A:5 vs noise_v3/A:1 | D1 | 0.001 | no | 365 | 350 | 1.333e-04 | 8.544e-04 | 1.469e-04 | 28 | 0.004323 | day 1 (2019-01-01) |
+| perturbed | noise_v3/A:6 vs noise_v3/A:2 | D2 | 0.001 | yes | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+| perturbed | noise_v3/A:7 vs noise_v3/A:3 | D3 | 0.001 | no | 365 | 357 | 1.522e-04 | 9.317e-04 | 1.567e-04 | 32 | 0.007255 | day 1 (2019-01-01) |
+| perturbed | noise_v3/A:8 vs noise_v3/A:4 | D4 | 0.001 | no | 365 | 365 | 1.808e-04 | 9.088e-04 | 1.808e-04 | 32 | 0.005707 | day 1 (2019-01-01) |
+| perturbed | noise_v3/B:5 vs noise_v3/B:1 | D1 | 0.001 | no | 365 | 354 | 1.383e-04 | 7.710e-04 | 1.527e-04 | 29 | 0.004246 | day 1 (2019-01-01) |
+| perturbed | noise_v3/B:6 vs noise_v3/B:2 | D2 | 0.001 | yes | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+| perturbed | noise_v3/B:7 vs noise_v3/B:3 | D3 | 0.001 | no | 365 | 358 | 1.140e-04 | 6.588e-04 | 1.225e-04 | 19 | 0.005457 | day 1 (2019-01-01) |
+| perturbed | noise_v3/B:8 vs noise_v3/B:4 | D4 | 0.002 | no | 365 | 365 | 2.543e-04 | 8.063e-04 | 2.543e-04 | 26 | 0.0064 | day 1 (2019-01-01) |
+| exact | noise_v3/B:1 vs noise_v3/A:1 | D1 | 0.000 | no | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+| exact | noise_v3/B:2 vs noise_v3/A:2 | D2 | 0.000 | no | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+| exact | noise_v3/B:3 vs noise_v3/A:3 | D3 | 0.000 | no | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+| exact | noise_v3/B:4 vs noise_v3/A:4 | D4 | 0.000 | no | 365 | 0 | 0 | 0 | 0 | 0 | 0 | none |
+
+Non-structural perturbed pairs (6): 350–365 of 365 days divergent; median relative change 1.140e-04–2.543e-04 (inside the 1e-3 gap); 19–32 days per pair above 1e-3. Control (exact pairs and structural-zero pairs, 6): max 0 divergent days. This is the day-level evidence that the perturbed ruler measures solver-path chatter (incumbent selection inside the gap), not a smooth slope.
+

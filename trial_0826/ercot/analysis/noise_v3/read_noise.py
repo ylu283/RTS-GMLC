@@ -634,6 +634,65 @@ def summarize(recs, ids, gradable, defs, missing, data_dir=po.DATA):
 
 
 # --------------------------------------------------------------------------
+# prompt 63 A2: per-day RUC divergence (memo F2), from the slim ruc_quality.csv
+# --------------------------------------------------------------------------
+DIV_REL_BIG = 1e-3      # the v3 MIP gap
+
+
+def _ruc_cost(run_dir):
+    p = os.path.join(run_dir, "ruc_quality.csv")
+    if not os.path.isfile(p):
+        return None
+    q = pd.read_csv(p, usecols=["ruc_date", "ruc_cost"])
+    dates = [str(x) for x in q["ruc_date"]]
+    if dates and dates[0] == "start_date" and len(dates) > 1:          # the collector labels day 1 'start_date'
+        dates[0] = (pd.Timestamp(dates[1]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    return pd.Series(q["ruc_cost"].to_numpy(dtype=float), index=dates)
+
+
+def divergence_row(c1, c0):
+    """Day-by-day comparison of two daily RUC cost series (c1 vs reference c0)."""
+    assert list(c1.index) == list(c0.index), "RUC day sequences differ"
+    a, b = c1.to_numpy(float), c0.to_numpy(float)
+    rel = np.abs(a - b) / np.abs(b)
+    div = a != b
+    first = int(np.argmax(div)) if div.any() else None
+    return {"n_days": int(len(a)), "n_divergent": int(div.sum()),
+            "frac_divergent": float(div.mean()) if len(a) else np.nan,
+            "median_rel_all_days": float(np.median(rel)), "p90_rel_all_days": float(np.percentile(rel, 90)),
+            "median_rel_divergent_days": (float(np.median(rel[div])) if div.any() else 0.0),
+            "max_rel": float(rel.max()), "n_rel_gt_1e-3": int((rel > DIV_REL_BIG).sum()),
+            "first_divergent_day_no": (first + 1 if first is not None else None),
+            "first_divergent_date": (str(c1.index[first]) if first is not None else None)}
+
+
+def daily_divergence(S, extr):
+    """One row per perturbed copy (vs its exact copy, same batch) and, as the control,
+    one row per exact cross-batch pair (B exact vs A exact)."""
+    szk = set(S["structural_zero_keys"])
+    rows, cache = [], {}
+
+    def cost(k):
+        if k not in cache:
+            cache[k] = _ruc_cost(po.run_dir(k, extr))
+        return cache[k]
+    pairs = [("perturbed", r["key"], r["ref_key"], int(r["design_no"]), r["batch"], float(r["delta_rel"]))
+             for _, r in S["perturbed"].iterrows()] if len(S["perturbed"]) else []
+    pairs += [("exact", v["key_B"], v["key_A"], int(n), "B-A", 0.0)
+              for n, v in sorted(S["exact_pairs"].items()) if v.get("complete")]
+    for kind, k1, k0, n, b, dr in pairs:
+        c1, c0 = cost(k1), cost(k0)
+        row = {"pair_type": kind, "key": k1, "ref_key": k0, "design_no": n, "batch": b, "delta_rel": dr,
+               "structural_zero": k1 in szk}
+        if c1 is None or c0 is None:
+            row.update({"n_days": np.nan, "note": "ruc_quality.csv missing"})
+        else:
+            row.update(divergence_row(c1, c0))
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+# --------------------------------------------------------------------------
 # free data (prompt 52 section 2) — read if present, quoted as history only
 # --------------------------------------------------------------------------
 def free_data(ercot=ERCOT):
@@ -888,7 +947,43 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
           f"- Outputs: `{os.path.relpath(out_dir, ERCOT)}/ercot_noise.csv`, `ercot_noise.json`, `ercot_noise_cov.csv` "
           "(perturbed; rider only), `ercot_noise_exact_cov.csv` (exact; tau).", ""]
     L += md_structural_zero_section(S, gradable)
+    if "daily_divergence" in S:
+        L += md_daily_divergence_section(S["daily_divergence"])
     return "\n".join(L)
+
+
+def md_daily_divergence_section(dv):
+    L = ["## 11. 2026-11-17 — per-day RUC divergence (prompt 63 A2; memo F2)", "",
+         "Per pair, day by day: the daily RUC objective `ruc_cost` of `ruc_quality.csv` (slim table), perturbed copy vs the "
+         "exact copy of the same design in the same batch, and, as the control, exact B vs exact A. A day is divergent iff the "
+         "two values differ. Relative change = |Δ| / |reference| per day; median and p90 are over ALL days of the year "
+         f"(and the median over divergent days only); `> 1e-3` counts the days above the v3 MIP gap. "
+         "File: `ercot_noise_daily_divergence.csv`.", "",
+         "| pair | key vs ref | design | δ rel | structural zero | days | divergent days | median rel (all days) | p90 rel (all days) | median rel (divergent days) | days > 1e-3 | max rel | first divergent day |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for _, r in dv.iterrows():
+        if not np.isfinite(float(r.get("n_days", np.nan))):
+            L.append(f"| {r['pair_type']} | {r['key']} vs {r['ref_key']} | D{r['design_no']} | {r['delta_rel']:.3f} | "
+                     f"{'yes' if r['structural_zero'] else 'no'} | — | ruc_quality.csv missing | | | | | | |")
+            continue
+        fd_ = ("none" if r["first_divergent_day_no"] is None or (isinstance(r["first_divergent_day_no"], float) and not np.isfinite(r["first_divergent_day_no"]))
+               else f"day {int(r['first_divergent_day_no'])} ({r['first_divergent_date']})")
+        L.append(f"| {r['pair_type']} | {r['key']} vs {r['ref_key']} | D{r['design_no']} | {r['delta_rel']:.3f} | "
+                 f"{'yes' if r['structural_zero'] else 'no'} | {int(r['n_days'])} | {int(r['n_divergent'])} | "
+                 f"{_f(r['median_rel_all_days'])} | {_f(r['p90_rel_all_days'])} | {_f(r['median_rel_divergent_days'])} | "
+                 f"{int(r['n_rel_gt_1e-3'])} | {_f(r['max_rel'])} | {fd_} |")
+    pv = dv[(dv["pair_type"] == "perturbed") & (~dv["structural_zero"])] if len(dv) else dv
+    ctrl = dv[((dv["pair_type"] == "exact") | dv["structural_zero"]) & dv["n_days"].notna()] if len(dv) else dv
+    if len(pv) and "n_divergent" in pv:
+        L += ["", f"Non-structural perturbed pairs ({len(pv)}): {int(pv['n_divergent'].min())}–{int(pv['n_divergent'].max())} "
+              f"of {int(pv['n_days'].max())} days divergent; median relative change {_f(pv['median_rel_all_days'].min())}–"
+              f"{_f(pv['median_rel_all_days'].max())} (inside the 1e-3 gap); "
+              f"{int(pv['n_rel_gt_1e-3'].min())}–{int(pv['n_rel_gt_1e-3'].max())} days per pair above 1e-3. "
+              f"Control (exact pairs and structural-zero pairs, {len(ctrl)}): max {int(ctrl['n_divergent'].max()) if len(ctrl) else 0} "
+              "divergent days. This is the day-level evidence that the perturbed ruler measures solver-path chatter "
+              "(incumbent selection inside the gap), not a smooth slope."]
+    L += [""]
+    return L
 
 
 def _trig_short(t):
@@ -962,6 +1057,8 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
     df.to_csv(os.path.join(out_dir, "ercot_noise.csv"), index=False)
     S["cov"].to_csv(os.path.join(out_dir, "ercot_noise_cov.csv"))
     S["exact_cov"].to_csv(os.path.join(out_dir, "ercot_noise_exact_cov.csv"))
+    if "daily_divergence" in S:
+        S["daily_divergence"].to_csv(os.path.join(out_dir, "ercot_noise_daily_divergence.csv"), index=False)
     runs = []
     for r in recs:
         runs.append({k: r.get(k) for k in ("key", "batch", "index", "design_no", "design_id", "copy_type", "site",
@@ -986,6 +1083,8 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
                               "source": "prompt 63 A1; noise memo debug/noise-assessment-2026-11-17.md F6",
                               "previous_json": "ercot_noise_2026-11-16.json"},
           "step_flagged": S["step_flagged"],
+          "daily_divergence": {"file": "ercot_noise_daily_divergence.csv", "source": "prompt 63 A2 (memo F2); ruc_quality.csv ruc_cost",
+                               "rows": (S["daily_divergence"].to_dict(orient="records") if "daily_divergence" in S else [])},
           "bar_rule": "B_j = max(3 sigma_hat_j, max_i |delta_ij|), sigma_hat_j = sqrt(mean delta_ij^2) over per_candidate.<j>.perturbed_delta_signed (prompt 61 section 3)",
           "noise_floor": {"definition": "exact sd if > 0, else inferred-only with the 1e-9 bound (D-1025 pattern)",
                           "all_exact_zero": S["all_exact_zero"],
@@ -1025,6 +1124,7 @@ def read_noise(extr=po.EXTR, waves=po.WAVES, data_dir=po.DATA, out_dir=HERE, def
     if not recs:
         raise SystemExit(f"no noise_v3 extracts under {extr}/{WAVE} (missing: {missing})")
     S = summarize(recs, ids, gradable, defs, missing, data_dir)
+    S["daily_divergence"] = daily_divergence(S, extr)
     fd = free_data(ercot)
     df, md = write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir)
     return S, df, md

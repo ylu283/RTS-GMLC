@@ -502,3 +502,39 @@ def test_bar_B_helper():
     b = rn.bar_B([10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])      # one heavy value: max term binds
     assert b["B"] == pytest.approx(10.0) and 3 * b["sigma_hat"] < 10.0
     assert rn.bar_B([])["n"] == 0
+
+
+# --------------------------------------------------------------------------
+# Prompt 63 A2: per-day RUC divergence table (memo F2)
+# --------------------------------------------------------------------------
+def test_daily_divergence_identical_tables(fx):
+    """Every fixture run copies the same ruc_quality.csv: 0 divergent days on all 12 pairs."""
+    dv = fx["S"]["daily_divergence"]
+    assert len(dv) == 8 + 4 and set(dv["pair_type"]) == {"perturbed", "exact"}
+    assert (dv["n_divergent"] == 0).all() and (dv["median_rel_all_days"] == 0.0).all()
+    assert dv["first_divergent_day_no"].isna().all()
+    assert (fx["out"] / "ercot_noise_daily_divergence.csv").is_file() and "## 11. 2026-11-17" in fx["md"]
+
+
+def test_daily_divergence_counts_and_first_day(fx):
+    root = fx["root"] / "divergence"
+    shutil.copytree(fx["extr"], root / "extracts")
+    pt = [r for r in fx["rows"]["A"] if r["design_no"] == 1 and r["copy_type"] == "perturbed"][0]
+    p = root / "extracts" / "noise_v3" / "A" / f"run_index_{pt['index']}" / "ruc_quality.csv"
+    q = pd.read_csv(p)
+    n = len(q)
+    base = q["ruc_cost"].to_numpy(float).copy()
+    q.loc[2, "ruc_cost"] = base[2] * (1 + 2e-3)          # day 3: above the gap
+    q.loc[5, "ruc_cost"] = base[5] * (1 - 1e-4)          # day 6: inside the gap
+    q.to_csv(p, index=False)
+    S, df, md = rn.read_noise(extr=str(root / "extracts"), waves=str(fx["waves"]), out_dir=str(root / "out"))
+    dv = S["daily_divergence"]
+    r = dv[dv["key"] == f"noise_v3/A:{pt['index']}"].iloc[0]
+    assert r["n_days"] == n and r["n_divergent"] == 2 and r["n_rel_gt_1e-3"] == 1
+    assert r["first_divergent_day_no"] == 3 and r["first_divergent_date"] == str(q.loc[2, "ruc_date"])
+    assert r["max_rel"] == pytest.approx(2e-3, rel=1e-6) and r["median_rel_all_days"] == 0.0
+    assert r["median_rel_divergent_days"] == pytest.approx(np.median([2e-3, 1e-4]), rel=1e-6)
+    assert (dv[dv["key"] != r["key"]]["n_divergent"] == 0).all()
+    # day 1 is labelled 'start_date' by the collector and reported as the calendar date
+    c = rn._ruc_cost(str(p.parent))
+    assert c.index[0] == (pd.Timestamp(c.index[1]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
