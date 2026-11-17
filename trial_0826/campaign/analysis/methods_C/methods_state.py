@@ -171,7 +171,11 @@ class Submitter:
         if not self.execute:
             self._fake += 1
             return str(self._fake)
-        out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout.strip()
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            # show SGE's reason (the CalledProcessError hid it — V1 r1 acq, 2026-11-16)
+            raise RuntimeError(f"qsub exit {r.returncode}\nSTDOUT: {r.stdout.strip()}\nSTDERR: {r.stderr.strip()}")
+        out = r.stdout.strip()
         jid = out.split(".")[0]
         if not re.fullmatch(r"\d+", jid):
             raise RuntimeError(f"BAD JID from qsub: {out!r}")
