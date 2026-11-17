@@ -574,3 +574,120 @@ no rule, bar or option changes. Source: `waves/n0_E/LANDING.md`,
 **What had been seen.** The 96 landed runs' objective values (to compute
 R, the ledger and this table). No GP has been fit on them and no holdout
 scoring has been made: the exposure budget (§4) is untouched.
+
+## AMENDMENT 2026-11-17 — E-D1b input widened to n0_E (pool level); new n0_E rules; Part C disclosure
+
+**What changed.** Source: prompt 62 v1.1 §1.4 (pre-registration; this
+block is committed ALONE, before `analysis/pool/pool_n0E.py` and before
+any n0_E statistic is computed).
+
+- E-D1b input = wave D (57 rules f76d897 unchanged for wave D) + n0_E
+  (pool level). Candidates, directions, family priorities,
+  `global_order` and the survivor rule are unchanged (f76d897).
+- NEW rules for the n0_E population, stated below verbatim from prompt
+  62 v1.1 §3.2–§3.4 (bar = 61 §3 B_j with D2 excluded; RESPONDS IN BOX;
+  SIZE SHARE; residual-guarded REDUNDANT; TRADE-OFF; adjudication
+  R-1…R-5; seat walk incl. M < 4; the E-seat clause).
+- Plan §1.2 is final (READABLE → E1). No Part B or Part C read moves the
+  E seat; if E1 fails RESPONDS IN BOX the E seat is HALT FOR PI, never
+  passed to E3/E4. The gap read is an evidence column only.
+- Objectives selected on the grading tier are then graded by 54 on the
+  same tier (LOO / sufficiency); random_E stays unread; 54 adds one
+  Deviations line in `ERCOT_GP_STATUS.md`.
+- R2 flag re-instantiated: 2 × base_v3 reserve shortfall (2 × 156 = 312
+  MWh; `design_space_E.json`'s 891.8 was 2 × the v2 base) — the strategy
+  session's dated `design_space_E.json` carries it.
+- Part C (16-site screening under identity v3, `waves/screening_v3`) is
+  disclosure; E-D3 (the slate) is not reopened in this campaign.
+- The five conditions that make post-n0 objective choice defensible
+  (independent filtering, Bourgon–Gentleman–Huber 2010): rules use only
+  properties of the objectives (spread, structure, concordance), never
+  performance quantities (front, HV, optimum, GP fit); every statistic,
+  threshold, tie band and substitution rule is committed before the
+  read; random_E unread; no GP; seen-data disclosed.
+
+**What had been seen (pre-registered, NOT blind).** Per-candidate ideal
+/ nadir / R over the 48 n0_E rows for all 29 ids (`landing_R.json`,
+`LANDING.md` §3, AMENDMENT 2026-11-16), read by the strategy session and
+Kay; the 54 session's rerun read wave D + base_v3 only; 54's mechanism
+code read n0_E X only; B_j was fixed 11-17 after `LANDING.md` existed;
+no n0_E correlation, cluster, size-share or composition statistic has
+been computed; no GP fitted; holdout exposure 0 of 24.
+
+**Rules for the n0_E population (verbatim, prompt 62 v1.1 §3.2–§3.4;
+numbering kept).**
+
+2. **Bar:** `B_j` per 61 §3 from `per_candidate.<j>.perturbed_delta_signed`
+   with the D2 structural-zero pairs excluded (6 values; assert input
+   md5 equality for the excluded pair): `B_j = max(3·sqrt(mean δ²),
+   max|δ|)`. Zero-bar set = {j : B_j == 0} (expected {E5, E9, R1, R3};
+   assert): readable iff range ≥ 1 natural unit (57 A4 RULER=0 rule),
+   DEAD if constant over 48. N2 (in `ruler_zero` but B_j = 2.60) is
+   graded on B_j. D3 has no bar: check only. Assert `exact_pooled_sd ==
+   0` for all ids. Print B_j, 57's median ruler and their ratio
+   (3.5–11.5×) side by side; the two are never merged.
+3. **Pre-registered statistics (per graded j):**
+   - **RESPONDS IN BOX** iff ALL of: `IDR_j = Q90 − Q10 over 48 ≥ 2·B_j`;
+     STRUCTURED by a Mantel permutation test (Spearman between
+     |y_i − y_k| and ‖u_i − u_k‖ over the 1,128 pairs; 9,999
+     permutations; `default_rng(6262)`; one-sided p ≤ 0.01); signal
+     share `1 − (σ̂_j²/2)/Var(y_j) ≥ 0.5`. `IDR/B_j ∈ [2, 3)` =
+     BORDERLINE (no seat may rest on it alone). STRONG iff `IDR ≥ 10·B_j`
+     (descriptive). Also print range/B_j. Disclose: B_j is transferred
+     from single-site off-slate designs; box chatter cannot be measured
+     on n0_E (no replicates); false-RESPONDS under pure chatter ≈ 0.1 %
+     per id for IDR at 1× chatter (3.5 % for the raw range).
+   - **SIZE SHARE:** f̂_j = PCHIP through the medians of 6 equal-count
+     bins of T; `η²_T = 1 − Var(y − f̂)/Var(y)`; adjusted `(η² −
+     0.107)/(1 − 0.107)`; print the null 95th percentile 0.23. Secondary:
+     isotonic regression (`scipy.optimize.isotonic_regression`, direction
+     = sign of ρ(y, T)) with leave-one-out R². Descriptive only.
+   - **COMPOSITION:** partial Spearman `ρ(y − f̂_y(T), s − f̂_s(T))` (both
+     residualised with the same bins), Fisher-z 95 % interval.
+     Descriptive only; 61 tests location directly, and this and 54's L
+     flag come from the same 48 rows (never two independent pieces of
+     evidence).
+   - **REDUNDANT** (pairs of directed ids) iff raw `ρ_or ≥ 0.90` on the
+     48 rows AND residual `ρ_or ≥ 0.50` on the T-residuals (outside the
+     n = 48 null band ±0.29) AND complete linkage. A pair with raw ≥ 0.90
+     but residual < 0.50 is `SIZE-CO-MONOTONE`: disclosed, not clustered
+     (the n0_E analogue of 57's per-level guard). A raw ρ whose Fisher-z
+     90 % interval contains 0.90 (≈ 0.86–0.93) is BORDERLINE → rule R-3.
+     Orientation `ps.oriented_frame(wide, ids, defs)` (base_row=None),
+     matrix `ps.spearman_matrix`, clusters `ps.clusters_from_pairs`;
+     survivor = the FIRST member in `pool_definitions.json` `global_order`
+     (priority first, then V<E<X<R<N, then id — e.g. E1 survives {E1,
+     V2, X1}, not V2) that is directed and RESPONDS IN BOX. dir "—" ids
+     shown, never clustered; dead ids = 57 A2 list. Clustermap via
+     `ps.plot_cluster_panel` to `analysis/pool/figs/n0E/`.
+   - **TRADE-OFF (size)** iff raw `ρ_or ≤ −0.50`; **TRADE-OFF
+     (composition)** iff residual `ρ_or ≤ −0.50`; Fisher-z intervals
+     printed. Multiplicity: expected false redundancy < 0.01 and false
+     trade-off ≈ 0.07 over 231 pairs — printed, no correction.
+   - Sampling facts to print in the md: at n = 48, P(ρ̂ ≥ 0.90 | ρ = 0.80)
+     = 0.8 %, P(ρ̂ ≥ 0.90 | ρ = 0.90) = 44 %; Sobol points are not
+     i.i.d. (bands mildly conservative); chatter attenuates ρ
+     (permissive for R4/N1).
+4. **Adjudication with wave D (pinned):**
+   - R-1 (response): a seat needs RESPONDS IN BOX on n0_E. Wave-D
+     readable (2·B_j at ≥ 2 of 3 levels) but n0_E not → DIAGNOSTIC,
+     "readable as single sites ≤ 180 MW, chatter-level across the box".
+     n0_E responds but wave D not → eligible, tagged BOX-ONLY RESPONSE.
+   - R-2 (redundancy): clusters on n0_E; wave-D-redundant-only pairs
+     disclosed, not clustered.
+   - R-3 (borderline): a BORDERLINE n0_E pair takes wave D's frozen-rule
+     verdict (57 pooled + per-level). X1–E1: X1 stays REDUNDANT→E1 unless
+     raw < ≈ 0.86 or residual < 0.50.
+   - R-4 (seats): walk `global_order`, fill ≤ 4 seats, ≤ 1 per family;
+     skip guardrails (R1, R2; plan §1.3), dir "—", REDUNDANT, not
+     RESPONDS, or BORDERLINE-only. E seat = E1 (§1.2); E1 failing →
+     HALT FOR PI. A family with no eligible member leaves its seat
+     empty: M < 4 is reported and the next family does not fill it until
+     the PI decides; M ≠ 4 reopens plan §6.4 gate numbers for the PI.
+   - R-5 (conflict): any id whose wave-D B_j verdict and n0_E verdict
+     disagree gets a row printing both; never a merged label.
+   - N family: report N1 and N4 both (N1 = N4 + N1_off; on wave D N4 is
+     −72…−183 and N1_off is +58…+230 on 18/18 rows). If N1–N4 are
+     REDUNDANT the table shows both range/B_j and flags that the 57
+     priority keeps the noisier member (bar 99.5 vs 32); a PI override
+     is a recorded rule change.
