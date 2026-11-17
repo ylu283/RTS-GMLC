@@ -131,6 +131,13 @@ def sha256_file(path):
         return hashlib.sha256(f.read()).hexdigest()
 
 
+def amendment_commit(plan_path=PLAN):
+    """The commit that ADDED the AMENDMENT 2026-11-17 block (git log -S), not the plan's last commit."""
+    out = subprocess.run(["git", "-C", ERCOT, "log", "--format=%h", "-S", AMEND_TITLE, "--", plan_path],
+                         capture_output=True, text=True).stdout.split()
+    return out[-1] if out else "uncommitted"
+
+
 def git_short(path=None, ref="HEAD"):
     cmd = ["git", "-C", ERCOT, "log", "-1", "--format=%h", ref] + (["--", path] if path else [])
     return subprocess.run(cmd, capture_output=True, text=True).stdout.strip() or "uncommitted"
@@ -219,6 +226,24 @@ def check_wide(wide, X):
     w["index"] = w["index"].astype(int)
     w = w.set_index("index", drop=False).loc[X.index]
     return w
+
+
+LANDING_ROWS = os.path.join(po.WAVES, WAVE, "landing_rows.csv")
+
+
+def landing_crosscheck(wide, path=LANDING_ROWS):
+    """§3.1 cross-check only: suspect, G_run_usd, R1, R2 vs 53's landing_rows.csv.
+    The file also lists random_E rows; they are dropped on load (random_E Y stays unread)."""
+    lr = pd.read_csv(path)
+    lr = lr[lr["wave"] == WAVE].copy()
+    assert len(lr) == N_ROWS, len(lr)
+    lr = lr.set_index(lr["index"].astype(int))
+    w = wide.set_index(wide["index"].astype(int))
+    assert (lr["suspect"].astype(bool) == w.loc[lr.index, "suspect"].astype(bool)).all(), "suspect differs"
+    for a, b in (("G_run_usd", "G_run_usd"), ("R1_shed_mwh", "R1"), ("R2_reserve_shortfall_mwh", "R2")):
+        x, y = lr[a].to_numpy(dtype=float), w.loc[lr.index, b].to_numpy(dtype=float)
+        assert np.allclose(x, y, rtol=1e-9, atol=1e-6), (a, b, np.abs(x - y).max())
+    return {"rows": int(len(lr)), "checked": ["suspect", "G_run_usd", "R1", "R2"]}
 
 
 def line_summary_reader(key, extr=po.EXTR):
@@ -500,10 +525,48 @@ def status_column(tab, defs, dead57, red_to, seated, cmono_with):
             out[c] = f"REDUNDANT->{red_to[c]}"
         elif c in seated:
             out[c] = "OBJECTIVE"
+        elif c == E_SEAT and "HALT FOR PI" in seated:
+            out[c] = "HALT FOR PI (E seat; plan §1.2 final)"
         elif c in cmono_with:
             out[c] = f"SIZE-CO-MONOTONE (with {', '.join(cmono_with[c])})"
         else:
             out[c] = "DIAGNOSTIC"
+    return pd.Series(out)
+
+
+def reasons(tab, defs, seats, red_to, walk_log):
+    """Per id: why it holds a seat, or why it lost (§5)."""
+    cands, go = defs["candidates"], defs["global_order"]
+    by_fam = {s["family"]: s for s in seats}
+    reached = {s["family"] for s in seats} | {x.split(":")[0].split()[-1] for x in walk_log}
+    out = {}
+    for c in tab.index:
+        f, st = cands[c]["family"], str(tab.loc[c, "status"])
+        if st == "OBJECTIVE":
+            out[c] = f"seat {f}: {by_fam[f]['reason']}"
+        elif st.startswith("DEAD"):
+            out[c] = "dead (57 A2 list or constant on n0_E)"
+        elif st == "GUARDRAIL":
+            out[c] = "guardrail (plan §1.3); never seated"
+        elif st.startswith("HALT FOR PI"):
+            out[c] = f"E1 fails: {tab.loc[c, 'respond_label']}; E seat HALT FOR PI (never passed to E3/E4)"
+        elif f == "D" or cands[c]["dir"] not in ("min", "max"):
+            out[c] = "dir '-': shown, never clustered or seated"
+        elif c in red_to:
+            out[c] = f"REDUNDANT->{red_to[c]} on n0_E ({tab.loc[c, 'cluster']})"
+        elif not bool(tab.loc[c, "responds"]):
+            out[c] = f"{tab.loc[c, 'respond_label']} (n0_E)" + (
+                "; wave-D readable -> DIAGNOSTIC (R-1)" if bool(tab.loc[c, "waveD_B_readable"]) else "")
+        elif bool(tab.loc[c, "borderline"]) and not bool(tab.loc[c, "waveD_B_readable"]):
+            out[c] = "BORDERLINE-only response (IDR/B_j in [2, 3), no wave-D backing)"
+        elif f == "E":
+            out[c] = "E seat is E1 only (plan §1.2 final)"
+        elif f in by_fam and by_fam[f]["seat"] not in ("EMPTY", "HALT FOR PI"):
+            out[c] = f"family {f} seat held by {by_fam[f]['seat']} (earlier in global_order)"
+        elif f not in reached:
+            out[c] = f"family {f} not reached (cap {MAX_SEATS})"
+        else:
+            out[c] = "eligible, not seated (see seat walk)"
     return pd.Series(out)
 
 
@@ -577,7 +640,8 @@ def write_md(path, info, B, tab, pairs, clusters, seats, M, walk_log, conf, nfam
          f"{info['sha_i']}, block sha256 `{info['amend_sha256']}`); script + tests commit (ii) {info['sha_ii']}. "
          f"Definitions frozen at {FREEZE}. `waves/n0_E/design_matrix.csv` sha256 `{info['design_sha256']}`. "
          f"git HEAD at the read {info['git_head']}.", "",
-         "Input: 48 n0_E grading rows at pool level (`pool_standings.build_wave(\"n0_E\")`); no GP fitted; "
+         ("**SYNTHETIC DRY RUN — planted Y, not n0_E data.**\n\n" if info["synthetic"] else "")
+         + "Input: 48 n0_E grading rows at pool level (`pool_standings.build_wave(\"n0_E\")`); no GP fitted; "
          "random_E not read; holdout exposure 0 of 24.", "",
          "## 1. Disclosures", ""] + [f"- {d}" for d in DISCLOSURES] + [
          "", "Sampling facts:", ""] + [f"- {d}" for d in SAMPLING_FACTS] + [
@@ -597,7 +661,7 @@ def write_md(path, info, B, tab, pairs, clusters, seats, M, walk_log, conf, nfam
          _md_table(tab.reset_index(), ["id", "B_j", "IDR", "IDR_over_B", "range_over_B", "mantel_p", "signal_share",
                                        "respond_label", "eta2_T", "eta2_T_adj", "iso_loo_R2", "comp_rho",
                                        "comp_ci_lo", "comp_ci_hi"]), "",
-         f"D3 check (no bar): {info['d3']}.", "",
+         f"D3 check (no bar): {info['d3']}. landing_rows.csv cross-check: {info['landing']}.", "",
          f"N1_off = N1 - N4 cross-checked against line_summary.csv on all 48 runs: range "
          f"{info['n1off_min']:.0f}-{info['n1off_max']:.0f} line-hours.", "",
          "## 4. Pairs (directed ids; oriented Spearman, raw and T-residual)", ""]
@@ -624,8 +688,51 @@ def write_md(path, info, B, tab, pairs, clusters, seats, M, walk_log, conf, nfam
 # --------------------------------------------------------------------------
 # driver
 # --------------------------------------------------------------------------
+def _under(path, root):
+    path, root = os.path.realpath(path), os.path.realpath(root)
+    return os.path.commonpath([path, root]) == root
+
+
+def synthetic_wide(X, B, seed=62):
+    """Planted synthetic Y at the real X (dry runs only; never written under analysis/pool/)."""
+    rng = np.random.default_rng(seed)
+    z = lambda v: (np.asarray(v, float) - np.mean(v)) / np.std(v)  # noqa: E731
+    zT, zs = z(X["T"]), z(X["s"] - bin_pchip(X["T"], X["s"]))
+    b = B["B_j"]
+    Y = {c: b[c] * 6.0 * rng.standard_normal(len(X)) + 1e6 for c in po.CAND_IDS}
+    Y.update({"V1": b["V1"] * (-8 * zT - 3 * zs) + 4e6, "E1": b["E1"] * (5 * zT + 4 * zs) + 8e9,
+              "R5": b["R5"] * (4 * zT + 0.2 * rng.standard_normal(len(X))),
+              "N1": np.round(b["N1"] * (5 * zs + 2 * zT)) + 36000})
+    Y["X1"], Y["N4"] = 2 * Y["E1"], 0.3 * Y["N1"]
+    for c in ZERO_BAR_EXPECTED:
+        Y[c] = np.zeros(len(X))
+    w = pd.DataFrame(Y)
+    w.insert(0, "index", X.index.to_numpy())
+    w.insert(0, "key", [f"{WAVE}:{i}" for i in X.index])
+    w["suspect"], w["G_run_usd"] = False, 1.5e6
+    for c in D3_COLS:
+        w[c] = 0.0
+    return w
+
+
+def synthetic_reader(wide, data_dir=po.DATA):
+    pl = po.pocket_lines(data_dir, 120)
+    by = {k: (n1, n4) for k, n1, n4 in zip(wide["key"], wide["N1"], wide["N4"])}
+    return lambda key: pd.DataFrame({"Line": [pl[0], "SYNTH_OFF"],
+                                     "hours_ge_99pct": [by[key][1], by[key][0] - by[key][1]]})
+
+
 def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_reader, make_figs=True,
-        noise=NOISE, waves=po.WAVES, data_dir=po.DATA, wave_d_dir=po.POOL, plan=PLAN, verbose=True):
+        noise=NOISE, waves=po.WAVES, data_dir=po.DATA, wave_d_dir=po.POOL, plan=PLAN, verbose=True,
+        synthetic=False, landing_rows=LANDING_ROWS):
+    """synthetic=True: `wide` is synthetic (injected, or planted here); outputs must lie
+    OUTSIDE analysis/pool/ and the landing_rows cross-check is skipped. synthetic=False:
+    the real read (`wide` must be None) — only after the strategy fast-forward."""
+    if synthetic:
+        for d in (out_dir, figs_dir):
+            assert not _under(d, po.POOL), f"REFUSED: synthetic output under analysis/pool/ ({d})"
+    else:
+        assert wide is None, "REFUSED: an injected wide is synthetic — pass synthetic=True"
     amend = assert_amendment(plan)
     ps.assert_frozen_defs()
     defs = po.load_defs()
@@ -636,7 +743,10 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
     zero = set(B.index[B["B_j"] == 0])
     assert zero == ZERO_BAR_EXPECTED, f"zero-bar set {sorted(zero)} != {sorted(ZERO_BAR_EXPECTED)}"
     if wide is None:
-        wide = load_wide()
+        wide = synthetic_wide(X, B) if synthetic else load_wide()
+        if synthetic:
+            line_reader = synthetic_reader(wide, data_dir)
+    landing = {"skipped": "synthetic run"} if synthetic else landing_crosscheck(wide, landing_rows)
     wide = check_wide(wide, X)
     off = n1_off(wide, line_reader, data_dir)
     d3 = {c: sorted(set(wide[c].astype(float))) for c in D3_COLS}
@@ -644,6 +754,8 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
     tab = per_id(wide, X, B, ids)
     wd = wave_d_columns(B, os.path.join(wave_d_dir, "pool_standings.csv"))
     tab = tab.join(wd, how="left")
+    tab["waveD_B_readable"] = tab["waveD_B_readable"].astype("boolean").fillna(False).astype(bool)
+    tab["waveD_B_verdict"] = tab["waveD_B_verdict"].fillna("n/a (not graded on wave D)")
     tab["family"] = [defs["candidates"][c]["family"] for c in tab.index]
     tab["dir"] = [defs["candidates"][c]["dir"] for c in tab.index]
     tab["global_order"] = [defs["global_order"].index(c) + 1 for c in tab.index]
@@ -694,11 +806,17 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
     g = wide["G_run_usd"].astype(float).to_numpy()
     pair_g = float(np.median((g[:, None] + g[None, :])[np.triu_indices(len(g), 1)]))
     tab["n0E_cost_gap_read"] = ""
-    tab.loc[E_SEAT, "n0E_cost_gap_read"] = (f"IDR {tab.loc[E_SEAT, 'IDR']:.4g} vs median pair bound "
-                                            f"G_a+G_b {pair_g:.4g} ({tab.loc[E_SEAT, 'IDR'] / pair_g:.2f}x; evidence only)")
+    for c in ("E1", "E2", "E3"):
+        tab.loc[c, "n0E_cost_gap_read"] = (f"IDR {tab.loc[c, 'IDR']:.4g} vs median pair bound G_a+G_b "
+                                           f"{pair_g:.4g} ({tab.loc[c, 'IDR'] / pair_g:.2f}x; evidence only)")
+    gcols = [f"waveD_gap_readable_sites_{l}" for l in ps.LEVELS if f"waveD_gap_readable_sites_{l}" in tab.columns]
+    tab["waveD_cost_gap_read"] = ["; ".join(f"{g.split('_')[-1]} {tab.loc[c, g]}" for g in gcols
+                                            if pd.notna(tab.loc[c, g]) and str(tab.loc[c, g]) != "")
+                                  if c in ("E1", "E2", "E3") else "" for c in tab.index]
+    tab["reason"] = reasons(tab, defs, seats, red_to, walk_log)
     comb_cols = (["family", "global_order", "waveD_label_57"] + [f"waveD_range_over_B_{l}" for l in ps.LEVELS]
                  + ["waveD_B_verdict", "IDR_over_B", "mantel_p", "signal_share", "eta2_T", "comp_rho", "cluster",
-                    "survivor", "tradeoffs", "n0E_cost_gap_read", "status"])
+                    "survivor", "tradeoffs", "waveD_cost_gap_read", "n0E_cost_gap_read", "status", "reason"])
     comb = tab.reindex(go)[comb_cols]
     comb.index.name = "id"
 
@@ -713,9 +831,9 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
         f"R-3 band computed exactly ([{border_band()[0]:.3f}, {border_band()[1]:.3f}]); prompt text says about 0.86-0.93.",
     ]
     info = {"read_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-            "sha_i": git_short(PLAN), "sha_ii": git_short(os.path.abspath(__file__)),
+            "sha_i": amendment_commit(plan), "sha_ii": git_short(os.path.abspath(__file__)),
             "git_head": git_short(), "amend_sha256": amend, "design_sha256": X.attrs["design_sha256"],
-            "d3": d3, "n1off_min": float(off.min()), "n1off_max": float(off.max()), "deviations": deviations}
+            "d3": d3, "landing": landing, "synthetic": synthetic, "n1off_min": float(off.min()), "n1off_max": float(off.max()), "deviations": deviations}
 
     os.makedirs(out_dir, exist_ok=True)
     std_cols = ["family", "dir", "global_order", "B_j", "IDR", "IDR_over_B", "range_over_B", "mantel_r", "mantel_p",
@@ -749,8 +867,16 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--no-figs", action="store_true")
+    ap.add_argument("--synthetic", action="store_true",
+                    help="planted Y at the real X; requires --out outside analysis/pool/")
+    ap.add_argument("--out", default=None, help="output dir (synthetic mode only)")
     a = ap.parse_args(argv)
-    run(make_figs=not a.no_figs)
+    if a.synthetic:
+        assert a.out, "--synthetic needs --out <scratch dir>"
+        run(out_dir=a.out, figs_dir=os.path.join(a.out, "figs"), make_figs=not a.no_figs, synthetic=True)
+    else:
+        assert a.out is None, "the real read writes analysis/pool/ only"
+        run(make_figs=not a.no_figs)
     return 0
 
 

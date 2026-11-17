@@ -102,7 +102,7 @@ def reader_for(wide):
 def _run(X, B, tmp_path, variant="base", figs=False):
     w = synth(X, B, variant)
     return pn.run(wide=w, out_dir=str(tmp_path), figs_dir=str(tmp_path / "figs"),
-                  line_reader=reader_for(w), make_figs=figs, verbose=False)
+                  line_reader=reader_for(w), make_figs=figs, verbose=False, synthetic=True)
 
 
 # --------------------------------------------------------------------------- guards
@@ -200,6 +200,8 @@ def test_E_seat_halts_never_passes(X, B, tmp_path):
     assert seats["E"] == "HALT FOR PI"
     assert out["tab"].loc["E4", "responds"] and "E4" not in seats.values()
     assert out["M"] == 3
+    assert out["tab"].loc["E1", "status"].startswith("HALT FOR PI")
+    assert "never passed to E3/E4" in out["tab"].loc["E1", "reason"]
 
 
 def test_empty_family_not_refilled(X, B, tmp_path):
@@ -213,3 +215,51 @@ def test_outputs_never_overwrite_57():
     assert "pool_ed1b_decision.csv" not in SRC and "ERCOT_POOL_STANDINGS.md" not in SRC
     assert "to_csv(os.path.join(out_dir, \"pool_standings" not in SRC
     assert '"figs", "n0E"' in SRC
+
+
+def test_synthetic_guards(X, B, tmp_path):
+    w = synth(X, B)
+    with pytest.raises(AssertionError, match="REFUSED: synthetic output under analysis/pool"):
+        pn.run(wide=w, out_dir=os.path.join(po.POOL, "x"), make_figs=False, verbose=False, synthetic=True)
+    with pytest.raises(AssertionError, match="REFUSED: an injected wide is synthetic"):
+        pn.run(wide=w, out_dir=str(tmp_path), make_figs=False, verbose=False)
+    out = pn.run(out_dir=str(tmp_path / "planted"), figs_dir=str(tmp_path / "planted" / "figs"),
+                 make_figs=False, verbose=False, synthetic=True)     # built-in planted Y
+    assert out["info"]["landing"] == {"skipped": "synthetic run"}
+    assert "SYNTHETIC DRY RUN" in (tmp_path / "planted" / "POOL_N0E_STANDINGS.md").read_text()
+    assert not any(os.path.getmtime(os.path.join(po.POOL, f)) > os.path.getmtime(tmp_path / "planted")
+                   for f in os.listdir(po.POOL) if f.startswith(("pool_n0E", "POOL_N0E", "pool_ed1b_combined")))
+
+
+def test_combined_table_columns(X, B, tmp_path):
+    out = _run(X, B, tmp_path)
+    t, comb = out["tab"], out["comb"]
+    for c in ("E5", "R1", "R3"):
+        assert t.loc[c, "waveD_B_readable"] is False or t.loc[c, "waveD_B_readable"] == False  # noqa: E712
+    assert {"waveD_cost_gap_read", "n0E_cost_gap_read", "reason"} <= set(comb.columns)
+    for c in ("E1", "E2", "E3"):
+        assert comb.loc[c, "n0E_cost_gap_read"].startswith("IDR ")
+    assert comb["reason"].fillna("").ne("").sum() >= len(t) - 1
+    assert comb.loc["R4", "reason"].startswith("NOT RESPONDS")
+    assert comb.loc["X1", "reason"].startswith("REDUNDANT->E1")
+    assert comb.loc["E4", "reason"] in ("E seat is E1 only (plan §1.2 final)",) or "REDUNDANT" in comb.loc["E4", "reason"]
+
+
+def test_amendment_cited_by_log_S():
+    sha = pn.amendment_commit()
+    msg = pn.subprocess.run(["git", "-C", pn.ERCOT, "log", "-1", "--format=%s", sha],
+                            capture_output=True, text=True).stdout
+    assert msg.startswith("plan(62 pre-registration)")
+
+
+def test_landing_crosscheck(X, B, tmp_path):
+    w = synth(X, B)
+    lr = pd.DataFrame({"key": w["key"], "wave": "n0_E", "index": w["index"], "suspect": False,
+                       "G_run_usd": w["G_run_usd"], "R1_shed_mwh": w["R1"], "R2_reserve_shortfall_mwh": w["R2"]})
+    other = lr.assign(wave="random_E", R2_reserve_shortfall_mwh=-1.0)
+    p = tmp_path / "landing_rows.csv"
+    pd.concat([lr, other]).to_csv(p, index=False)
+    assert pn.landing_crosscheck(w, p)["rows"] == 48
+    lr.assign(R2_reserve_shortfall_mwh=lr["R2_reserve_shortfall_mwh"] + 1).to_csv(p, index=False)
+    with pytest.raises(AssertionError):
+        pn.landing_crosscheck(w, p)
