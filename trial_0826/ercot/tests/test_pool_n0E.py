@@ -139,7 +139,8 @@ def test_bars_D2_excluded(B):
     assert B.loc[B["B_j"] > 0, "n_delta"].to_dict() == {c: (4 if c in ("D1", "D2") else 6) for c in B.index[B["B_j"] > 0]}  # D1/D2: nuclear design NaN
     assert B.loc["V1", "B_j"] == pytest.approx(16173.06, rel=1e-5)
     assert B.loc["E1", "B_j"] == pytest.approx(2.38324e6, rel=1e-5)
-    assert B.loc["N2", "B_j"] == 3.0 and B.loc["N2", "in_ruler_zero"]
+    assert B.loc["N2", "B_j"] == 3.0
+    assert B.loc["N1", "B_j"] == pytest.approx(114.9239, rel=1e-5) and B.loc["N4", "B_j"] == pytest.approx(36.9662, rel=1e-5)
     assert [e["key"] for e in B.attrs["excluded"]] == ["noise_v3/A:6", "noise_v3/B:6"]
 
 

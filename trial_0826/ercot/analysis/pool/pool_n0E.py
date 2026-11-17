@@ -194,12 +194,22 @@ def bars(noise_path=NOISE, data_dir=po.DATA, ids=None):
     for c in ids or list(j["per_candidate"]):
         v = j["per_candidate"][c]
         assert float(v["exact_pooled_sd"]) == 0.0, f"{c}: exact_pooled_sd > 0 -> STOP (61 §3 guard)"
-        sig = np.array([np.nan if x is None else x for x in v["perturbed_delta_signed"]], float)
+        # 63 A1 (d265580) re-emits the json with D2 already dropped from `perturbed_delta_signed`
+        # and the 8 values in `perturbed_delta_signed_all`; the 11-16 json had only the 8.
+        allv = v.get("perturbed_delta_signed_all", v["perturbed_delta_signed"])
+        sig = np.array([np.nan if x is None else x for x in allv], float)
         chk = np.array([np.nan if d.get(c) is None else d[c] for d in pdl], float)
         assert np.allclose(sig, chk, equal_nan=True), c
-        k = sig[(dn != STRUCTURAL_ZERO_DESIGN) & np.isfinite(sig)]
+        keep = dn != STRUCTURAL_ZERO_DESIGN
+        if "perturbed_delta_signed_all" in v:
+            assert v["structural_zero_keys_excluded"] == [e["key"] for e in excl], c
+            red = np.array([np.nan if x is None else x for x in v["perturbed_delta_signed"]], float)
+            assert np.allclose(red, sig[keep], equal_nan=True), (c, "json D2-excluded list != own exclusion")
+        k = sig[keep & np.isfinite(sig)]
         s = float(np.sqrt(np.mean(k ** 2)))
         B = float(max(3.0 * s, np.abs(k).max()))
+        if isinstance(v.get("bar"), dict) and v["bar"].get("B") is not None:
+            assert abs(B - float(v["bar"]["B"])) <= 1e-9 * max(1.0, B), (c, B, v["bar"]["B"])
         r = v.get("ruler")
         r = np.nan if r is None else float(r)
         rows.append({"id": c, "n_delta": len(k), "sigma_hat": s, "B_j": B, "ruler_57": r,
@@ -822,10 +832,11 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
 
     deviations = [
         "B_j with D2 excluded gives N2 3.0, N1 114.9, N4 37.0; prompt 62 v1.1 quotes 2.60 / 99.5 / 32, which are "
-        "the 8-value (D2-included) numbers. The pinned definition (61 §3 / contract addendum) is applied; "
-        "54's `ercot_gp_mechanism.readability_bar` uses all 8 values (not edited here; reported).",
+        "the 8-value (D2-included) numbers. The pinned definition (61 §3 / contract addendum) is applied and "
+        "equals 63's re-emitted `per_candidate.<j>.bar.B` (asserted).",
         f"B_j / ruler spans {np.nanmin(B['B_over_ruler']):.2f}-{np.nanmax(B['B_over_ruler']):.2f}x "
-        "(prompt text 3.5-11.5x); V3's tiny ruler sets the top.",
+        "(prompt text 3.5-11.5x). The ruler column is the current ercot_noise.json `ruler` (re-emitted by "
+        "63 A1 d265580 with the D2 pair excluded; ruler_zero now {E9} only, N2 left it).",
         "No input md5 exists for the noise runs; the D2 exclusion asserts the md5 of the effective PEM slice "
         "(RT + DA wind, site 206) plus equal overall.csv md5.",
         f"R-3 band computed exactly ([{border_band()[0]:.3f}, {border_band()[1]:.3f}]); prompt text says about 0.86-0.93.",
