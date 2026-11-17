@@ -691,3 +691,45 @@ numbering kept).**
      REDUNDANT the table shows both range/B_j and flags that the 57
      priority keeps the noisier member (bar 99.5 vs 32); a PI override
      is a recorded rule change.
+
+## AMENDMENT 2026-11-17c — location_contrast_E actuals (prompt 61; appendable, §10; analysis-only; what had been seen)
+
+**What changed.** Nothing in the plan's rules, bars, X, HV ledger,
+holdout or baseline. The 9 `location_contrast_E` rows (`tier =
+"contrast"`) are analysis-only and never enter `load()`, the GP, §6.3 R
+or the random baseline (55 `base_waves = ["n0_E"]` is unchanged). Source:
+`analysis/location_contrast/LOCATION_CONTRAST_E.md` and
+`location_contrast_E.csv` (landing commit 4b7bf85; wave commit 3b40c2d
+froze the reads, prompt 61 §3, before any Y).
+
+- **Budget actuals:** 9 / 9 runs, SUSPECT 0, R1 shed 0 on all. Wall-clock
+  4.8–5.4 h per run at 4 slots, about 19–21.4 core-h per run and about
+  182 core-h in total. This is inside the 170–355 core-h bracket.
+- **Bars used:** B_j from the 63-re-emitted `analysis/noise_v3/ercot_noise.json`
+  (D2 excluded, 6 δ): V1 16,173 MWh, E1 $2.383M, R4 146.7, N1 114.9,
+  N4 37.0. `exact_pooled_sd` = 0 for all ids.
+- **Interaction (V1):** g = 0.038 / 0.073 / 0.123 at 60 / 120 / 180
+  MW per site (predicted 0.07 / 0.12 / 0.18). The guard passes at all
+  three levels. The reads are WITHIN 10 % / WITHIN 10 % / SUB-ADDITIVE.
+- **Location at fixed total:** the V1 H_C residual is +3.0 / +6.7 /
+  +6.4 / +2.9 B_V1 (pairs 4–5, 7–8, 4–6, 5–6), so the §3 rule reads
+  LOCATION EFFECT on all four. "Location" here means "not explained by
+  H_C". The matched-u residual (6.7 rulers) is within the ≈ 9-ruler
+  profile-only difference the pool model predicted in advance, so no
+  network effect is claimed. N4 reads COMPOSITION for 4–5 and LOCATION
+  EFFECT for the other three pairs. N1 is chatter-limited. E1 / E3 are
+  NOT READABLE or WITHIN GAP BOUND (pair bounds $41.9–43.7M).
+- **Saturation (row 9, 1,500 MW):** relief is 4.03 TWh, which is 83 % of
+  the 4.87 TWh behind-cut pool. e = 0.730 is the lowest of the nine rows.
+- **Physics prediction:** "no residual location effect" is CONTRADICTED
+  under the H_C covariate. "E1 within gap bound at 800" HOLDS. "R4
+  unreadable" is CONTRADICTED on the 2 pairs against row 6. Per §3 a
+  contradiction is a finding.
+
+**What had been seen.** When this block was written: the 9 contrast
+runs, wave-D rows 1–18, base_v3:1 and `ercot_noise.json`. Before the
+landing: everything listed in prompt 61 §3 "Seen at freeze". Not read:
+`extracts/n0_E`, `extracts/random_E`, `extracts/methods_E_*`. No GP was
+fit. Holdout exposure is unchanged. E-D1b, E-D4, E-D5 and E-D7 are
+unaffected. This wave's Y landed before E-D1b was recorded. The E-D1b
+inputs (62 Part B: wave D + n0_E) did not include it.
