@@ -1,5 +1,9 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
 
+## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
+
+(pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)
+
 ## Prompt 55 — ERCOT BO machinery build (v3.1, 2026-11-13; executor writes here only)
 
 ### Part A — BUILD (2026-11-14, zero simulation, worktree `../RTS-GMLC-e55`, branch `ercot/55-machinery`, rebased on `ercot/tx123` 03eca72)
