@@ -194,6 +194,80 @@
    "note": "step differs from the nominal 0.001 relative (inward rule; PICK_RULE.md)"
   }
  ],
+ "determinism_conditions": {
+  "gurobi_version_from_job_logs": [],
+  "gurobi_env_record": "Gurobi Optimizer version 11.0.2 build v11.0.2rc0 (linux64 - \"Red Hat Enterprise Linux 9.8 (Plow)\")",
+  "pip_freeze": {
+   "gridx_egret": "e4a244d",
+   "gridx_prescient": "a4c0849",
+   "gurobipy": "13.0.2"
+  },
+  "data_dir": "data/ercot123_2019_v2",
+  "array_scripts": [
+   {
+    "script": "waves/noise_v3/A/noise_v3_A_array.sh",
+    "ruc_threads": [
+     "4"
+    ],
+    "pe_smp": [
+     "4"
+    ],
+    "module_load": [
+     "gurobi"
+    ]
+   },
+   {
+    "script": "waves/noise_v3/B/noise_v3_B_array.sh",
+    "ruc_threads": [
+     "4"
+    ],
+    "pe_smp": [
+     "4"
+    ],
+    "module_load": [
+     "gurobi"
+    ]
+   },
+   {
+    "script": "waves/base_v3/base_v3_array.sh",
+    "ruc_threads": [
+     "4"
+    ],
+    "pe_smp": [
+     "4"
+    ],
+    "module_load": [
+     "gurobi"
+    ]
+   }
+  ],
+  "noise_v3_solve": {
+   "max_solve_s": 860.7328832149506,
+   "max_solve_run": "noise_v3/B:1",
+   "n_days": 5840,
+   "n_optimal": 5840,
+   "n_days_gt_600s": 5
+  },
+  "base_v3_solve": {
+   "max_solve_s": 481.0653433799744,
+   "max_solve_run": "base_v3:1",
+   "n_days": 365,
+   "n_optimal": 365,
+   "n_days_gt_600s": 0
+  },
+  "noise_v3_time_limit_hits": 0,
+  "noise_v3_runs_with_tl_field": 16,
+  "run_start_utc": [
+   "2026-11-06T22:34Z",
+   "2026-11-13T23:27Z"
+  ],
+  "pcm_code_commit_before_first_start": "6094e82",
+  "pcm_code_latest_commit": "6094e82",
+  "collector_heads": {
+   "A": "304335c",
+   "B": "771aa5b"
+  }
+ },
  "daily_divergence": {
   "file": "ercot_noise_daily_divergence.csv",
   "source": "prompt 63 A2 (memo F2); ruc_quality.csv ruc_cost",
@@ -8629,6 +8703,6 @@
    ]
   }
  ],
- "generated_utc": "2026-11-17T07:45:22Z",
- "git_head": "3b313da"
+ "generated_utc": "2026-11-17T07:47:04Z",
+ "git_head": "a490f08"
 }

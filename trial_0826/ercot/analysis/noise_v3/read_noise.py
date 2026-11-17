@@ -693,6 +693,194 @@ def daily_divergence(S, extr):
 
 
 # --------------------------------------------------------------------------
+# prompt 63 A4: the conditions under which bit-identity was observed (memo F1, F7, F8)
+# --------------------------------------------------------------------------
+import re  # noqa: E402
+import subprocess  # noqa: E402
+
+GUROBI_LOG_RE = re.compile(r"Gurobi Optimizer version (\S+)")
+LOG_SKIP_EXT = (".csv", ".gz", ".json", ".py", ".png", ".pdf", ".diff", ".yml", ".pptx")
+SLOW_DAY_S = 600.0
+
+
+def find_gurobi_versions(roots):
+    """Scan text files (job logs: *.o<jid>, *.log, *.txt, extensionless; csv / gz / json skipped)
+    under `roots` for Gurobi's banner line. Returns [(path, version)]."""
+    hits = []
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        for dp, _, fs in os.walk(root):
+            for fn in fs:
+                if fn.lower().endswith(LOG_SKIP_EXT):
+                    continue
+                fp = os.path.join(dp, fn)
+                try:
+                    if os.path.getsize(fp) > 50_000_000:
+                        continue
+                    with open(fp, errors="ignore") as f:
+                        for line in f:
+                            m = GUROBI_LOG_RE.search(line)
+                            if m:
+                                hits.append((fp, m.group(1)))
+                                break
+                except OSError:
+                    continue
+    return hits
+
+
+def _solve_stats(run_dirs):
+    mx, n_slow, n_days, n_opt, worst = 0.0, 0, 0, 0, None
+    for k, d in run_dirs:
+        p = os.path.join(d, "ruc_quality.csv")
+        if not os.path.isfile(p):
+            continue
+        q = pd.read_csv(p, usecols=["solve_time_s", "status"])
+        t = q["solve_time_s"].to_numpy(float)
+        n_days += len(t)
+        n_opt += int((q["status"].astype(str) == "OPTIMAL").sum())
+        n_slow += int((t > SLOW_DAY_S).sum())
+        if len(t) and float(t.max()) > mx:
+            mx, worst = float(t.max()), k
+    return {"max_solve_s": mx, "max_solve_run": worst, "n_days": n_days, "n_optimal": n_opt, "n_days_gt_600s": n_slow}
+
+
+def _array_facts(paths):
+    out = []
+    for p in paths:
+        if not os.path.isfile(p):
+            continue
+        t = open(p).read()
+        th = re.findall(r"--ruc_threads\s+(\d+)", t)
+        smp = re.findall(r"#\$ -pe smp (\d+)", t)
+        mod = re.findall(r"^module load (gurobi\S*)", t, flags=re.M)
+        out.append({"script": os.path.relpath(p, ERCOT), "ruc_threads": sorted(set(th)), "pe_smp": sorted(set(smp)),
+                    "module_load": sorted(set(mod))})
+    return out
+
+
+def _pip_shas(path):
+    out = {}
+    if os.path.isfile(path):
+        for line in open(path):
+            m = re.search(r"@([0-9a-f]{40})#egg=(\S+)", line)
+            if m:
+                out[m.group(2)] = m.group(1)[:7]
+            m = re.match(r"gurobipy==(\S+)", line.strip())
+            if m:
+                out["gurobipy"] = m.group(1)
+    return out
+
+
+def _git(args, cwd=ERCOT):
+    try:
+        r = subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True, timeout=30)
+        return r.stdout.strip() if r.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def determinism_conditions(S, recs, extr, waves, ercot=ERCOT, base_wave="base_v3"):
+    """Facts read from the repo: code SHAs, data dir, Gurobi version (job logs, else the env
+    records), Threads, time-limit hits, max daily RUC solve seconds (noise_v3 and base_v3)."""
+    # any job log under extracts/ (whole tree) or waves/*/
+    roots = [extr] + ([os.path.join(waves, w) for w in sorted(os.listdir(waves))] if os.path.isdir(waves) else [])
+    logs = find_gurobi_versions(roots)
+    env = os.path.join(ercot, "env")
+    gv_file = os.path.join(env, "gurobi_version.txt")
+    gv_rec = open(gv_file).readline().strip() if os.path.isfile(gv_file) else None
+    shas = _pip_shas(os.path.join(env, "PCM_ERCOT_pip_freeze.txt"))
+    noise_runs = [(r["key"], po.run_dir(r["key"], extr)) for r in recs]
+    bdir = os.path.join(extr, base_wave)
+    base_runs = ([(f"{base_wave}:{d.split('_')[-1]}", os.path.join(bdir, d)) for d in sorted(os.listdir(bdir))
+                  if d.startswith("run_index_")] if os.path.isdir(bdir) else [])
+    tl = [r.get("n_ruc_time_limit") for r in recs]
+    scripts = ([os.path.join(waves, WAVE, b, f"{WAVE}_{b}_array.sh") for b in BATCHES]
+               + [os.path.join(waves, base_wave, f"{base_wave}_array.sh")])
+    starts = []
+    for b in BATCHES:
+        w = os.path.join(extr, WAVE, b, "wallclock.csv")
+        if os.path.isfile(w):
+            starts += [int(x) for x in pd.read_csv(w)["start_epoch"].dropna()]
+    t0 = (pd.Timestamp(min(starts), unit="s", tz="UTC") if starts else None)
+    t1 = (pd.Timestamp(max(starts), unit="s", tz="UTC") if starts else None)
+    pcm_paths = ["run_ercot_pcm.py", os.path.join("..", "multi_pem")]
+    pcm_before = _git(["log", "-1", "--format=%h", f"--before={t0.isoformat()}", "--"] + pcm_paths, ercot) if t0 is not None else None
+    pcm_latest = _git(["log", "-1", "--format=%h", "--"] + pcm_paths, ercot)
+    heads = {}
+    for b in BATCHES:
+        c = os.path.join(extr, WAVE, b, "COLLECTED")
+        if os.path.isfile(c):
+            for line in open(c):
+                if line.startswith("head="):
+                    heads[b] = line.strip().split("=", 1)[1]
+    return {"gurobi_version_from_job_logs": [{"file": os.path.relpath(f, ercot), "version": v} for f, v in logs],
+            "gurobi_env_record": gv_rec, "pip_freeze": shas,
+            "data_dir": os.path.relpath(po.DATA, ercot) if os.path.isdir(po.DATA) else po.DATA,
+            "array_scripts": _array_facts(scripts),
+            "noise_v3_solve": _solve_stats(noise_runs), "base_v3_solve": _solve_stats(base_runs),
+            "noise_v3_time_limit_hits": (int(sum(int(x) for x in tl if x is not None)) if any(x is not None for x in tl) else None),
+            "noise_v3_runs_with_tl_field": int(sum(1 for x in tl if x is not None)),
+            "run_start_utc": [t0.strftime("%Y-%m-%dT%H:%MZ") if t0 is not None else None,
+                              t1.strftime("%Y-%m-%dT%H:%MZ") if t1 is not None else None],
+            "pcm_code_commit_before_first_start": pcm_before, "pcm_code_latest_commit": pcm_latest,
+            "collector_heads": heads}
+
+
+def md_determinism_section(dc, S):
+    sv, bv = dc["noise_v3_solve"], dc["base_v3_solve"]
+    logs = dc["gurobi_version_from_job_logs"]
+    vers = sorted({h["version"] for h in logs})
+    arr = dc["array_scripts"]
+    threads = sorted({t for a in arr for t in a["ruc_threads"]})
+    smp = sorted({t for a in arr for t in a["pe_smp"]})
+    mods = sorted({m for a in arr for m in a["module_load"]})
+    pf = dc["pip_freeze"]
+    same_code = (dc["pcm_code_commit_before_first_start"] is not None
+                 and dc["pcm_code_commit_before_first_start"] == dc["pcm_code_latest_commit"])
+    L = ["## 12. 2026-11-17 — determinism conditions (prompt 63 A4; memo F1, F7, F8)", "",
+         f"Bit-identity of the {S['n_md5_equal']} of {S['n_exact_pairs']} exact cross-batch pairs (section 2; section 11: "
+         "0 divergent RUC days) was observed under the conditions below. Each line states its source; a condition that "
+         "is not recorded is stated as such.", "",
+         f"1. **Code.** Prescient `{pf.get('gridx_prescient', 'not recorded')}`, Egret `{pf.get('gridx_egret', 'not recorded')}` "
+         "(editable installs in `env/PCM_ERCOT_pip_freeze.txt`, the PCM_ERCOT env export). ERCOT PCM code path "
+         "(`run_ercot_pcm.py`, `trial_0826/multi_pem/`): last commit before the first noise_v3 task start "
+         f"({dc['run_start_utc'][0]}) = `{dc['pcm_code_commit_before_first_start']}`; latest commit on these paths = "
+         f"`{dc['pcm_code_latest_commit']}`" + (" (the same: the code path did not change across batches A, B and base_v3)."
+                                                  if same_code else " (they differ: read the log between them).")
+         + f" Collector heads: {', '.join(f'{b} `{h}`' for b, h in sorted(dc['collector_heads'].items())) or 'not recorded'}. "
+         "The run-time HEAD of the CRC clone is not written per run.",
+         f"2. **Data.** `{dc['data_dir']}` (the v2 data dir; every array script passes it).",
+         "3. **Gurobi version.** " + (f"From job logs: {', '.join(vers)} ({len(logs)} files: "
+                                      + ", ".join(f"`{h['file']}`" for h in logs[:4]) + (" …" if len(logs) > 4 else "") + ")."
+                                      if logs else
+                                      "NOT DISCOVERABLE from any job log under `extracts/` or `waves/*/`: the job `.o` files stay on "
+                                      "CRC and the collectors keep only the identity line.")
+         + f" Env records (not per-run): `env/gurobi_version.txt` = \"{dc['gurobi_env_record'] or 'absent'}\"; "
+         f"pip freeze gurobipy == {pf.get('gurobipy', 'not recorded')}"
+         + (". The two env records name different versions; which Gurobi library the RUC solves used is not "
+            "resolved by local evidence" if (dc["gurobi_env_record"] and pf.get("gurobipy")
+                                              and pf["gurobipy"] not in dc["gurobi_env_record"]) else "")
+         + f". The array scripts run `module load {', '.join(mods) or 'gurobi'}` with no version pin.",
+         f"4. **Threads.** `--ruc_threads` {', '.join(threads) or 'not found'} with `-pe smp` {', '.join(smp) or 'not found'} "
+         f"in {', '.join('`' + a['script'] + '`' for a in arr)}.",
+         f"5. **No time-limit hit.** noise_v3: {dc['noise_v3_time_limit_hits']} RUC time-limit hits over "
+         f"{dc['noise_v3_runs_with_tl_field']} runs (`pool_full_metrics.json` n_ruc_time_limit); "
+         f"{sv['n_optimal']} of {sv['n_days']} RUC days OPTIMAL. Maximum daily RUC solve: noise_v3 "
+         f"{_f(sv['max_solve_s'], 4)} s ({sv['max_solve_run']}), {sv['n_days_gt_600s']} days > 600 s; base_v3 "
+         f"{_f(bv['max_solve_s'], 4)} s, {bv['n_days_gt_600s']} days > 600 s; TimeLimit 1,200 s "
+         f"(margin {_f(1200.0 / sv['max_solve_s'], 3) if sv['max_solve_s'] > 0 else 'n/a'}× on noise_v3; from `ruc_quality.csv`).",
+         f"6. **Node class, hostname, CPU model.** Not recorded (memo F8). Runs started {dc['run_start_utc'][0]} – "
+         f"{dc['run_start_utc'][1]} (wall-clock stamps); A and B ran a week apart and matched.",
+         "",
+         "Statement: exact repeats are bit-identical under (code above, v2 data, the Gurobi build of the CRC module / env at "
+         "run time, Threads = 4, MIPGap 1e-3, no time-limit hit). A change of any of these is outside the evidence. "
+         "Prompt 63 Part B adds hostname, CPU model, the gurobipy version, Threads and the Prescient / Egret SHAs to the "
+         "task log of `noise_seed_E` and tests Threads 8 / 1.", ""]
+    return L
+
+
+# --------------------------------------------------------------------------
 # free data (prompt 52 section 2) — read if present, quoted as history only
 # --------------------------------------------------------------------------
 def free_data(ercot=ERCOT):
@@ -949,6 +1137,8 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
     L += md_structural_zero_section(S, gradable)
     if "daily_divergence" in S:
         L += md_daily_divergence_section(S["daily_divergence"])
+    if "determinism" in S:
+        L += md_determinism_section(S["determinism"], S)
     return "\n".join(L)
 
 
@@ -1083,6 +1273,7 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
                               "source": "prompt 63 A1; noise memo debug/noise-assessment-2026-11-17.md F6",
                               "previous_json": "ercot_noise_2026-11-16.json"},
           "step_flagged": S["step_flagged"],
+          "determinism_conditions": S.get("determinism"),
           "daily_divergence": {"file": "ercot_noise_daily_divergence.csv", "source": "prompt 63 A2 (memo F2); ruc_quality.csv ruc_cost",
                                "rows": (S["daily_divergence"].to_dict(orient="records") if "daily_divergence" in S else [])},
           "bar_rule": "B_j = max(3 sigma_hat_j, max_i |delta_ij|), sigma_hat_j = sqrt(mean delta_ij^2) over per_candidate.<j>.perturbed_delta_signed (prompt 61 section 3)",
@@ -1125,6 +1316,7 @@ def read_noise(extr=po.EXTR, waves=po.WAVES, data_dir=po.DATA, out_dir=HERE, def
         raise SystemExit(f"no noise_v3 extracts under {extr}/{WAVE} (missing: {missing})")
     S = summarize(recs, ids, gradable, defs, missing, data_dir)
     S["daily_divergence"] = daily_divergence(S, extr)
+    S["determinism"] = determinism_conditions(S, recs, extr, waves)
     fd = free_data(ercot)
     df, md = write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir)
     return S, df, md

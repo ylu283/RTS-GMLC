@@ -346,3 +346,16 @@ Per pair, day by day: the daily RUC objective `ruc_cost` of `ruc_quality.csv` (s
 
 Non-structural perturbed pairs (6): 350–365 of 365 days divergent; median relative change 1.140e-04–2.543e-04 (inside the 1e-3 gap); 19–32 days per pair above 1e-3. Control (exact pairs and structural-zero pairs, 6): max 0 divergent days. This is the day-level evidence that the perturbed ruler measures solver-path chatter (incumbent selection inside the gap), not a smooth slope.
 
+## 12. 2026-11-17 — determinism conditions (prompt 63 A4; memo F1, F7, F8)
+
+Bit-identity of the 4 of 4 exact cross-batch pairs (section 2; section 11: 0 divergent RUC days) was observed under the conditions below. Each line states its source; a condition that is not recorded is stated as such.
+
+1. **Code.** Prescient `a4c0849`, Egret `e4a244d` (editable installs in `env/PCM_ERCOT_pip_freeze.txt`, the PCM_ERCOT env export). ERCOT PCM code path (`run_ercot_pcm.py`, `trial_0826/multi_pem/`): last commit before the first noise_v3 task start (2026-11-06T22:34Z) = `6094e82`; latest commit on these paths = `6094e82` (the same: the code path did not change across batches A, B and base_v3). Collector heads: A `304335c`, B `771aa5b`. The run-time HEAD of the CRC clone is not written per run.
+2. **Data.** `data/ercot123_2019_v2` (the v2 data dir; every array script passes it).
+3. **Gurobi version.** NOT DISCOVERABLE from any job log under `extracts/` or `waves/*/`: the job `.o` files stay on CRC and the collectors keep only the identity line. Env records (not per-run): `env/gurobi_version.txt` = "Gurobi Optimizer version 11.0.2 build v11.0.2rc0 (linux64 - "Red Hat Enterprise Linux 9.8 (Plow)")"; pip freeze gurobipy == 13.0.2. The two env records name different versions; which Gurobi library the RUC solves used is not resolved by local evidence. The array scripts run `module load gurobi` with no version pin.
+4. **Threads.** `--ruc_threads` 4 with `-pe smp` 4 in `waves/noise_v3/A/noise_v3_A_array.sh`, `waves/noise_v3/B/noise_v3_B_array.sh`, `waves/base_v3/base_v3_array.sh`.
+5. **No time-limit hit.** noise_v3: 0 RUC time-limit hits over 16 runs (`pool_full_metrics.json` n_ruc_time_limit); 5840 of 5840 RUC days OPTIMAL. Maximum daily RUC solve: noise_v3 860.7 s (noise_v3/B:1), 5 days > 600 s; base_v3 481.1 s, 0 days > 600 s; TimeLimit 1,200 s (margin 1.39× on noise_v3; from `ruc_quality.csv`).
+6. **Node class, hostname, CPU model.** Not recorded (memo F8). Runs started 2026-11-06T22:34Z – 2026-11-13T23:27Z (wall-clock stamps); A and B ran a week apart and matched.
+
+Statement: exact repeats are bit-identical under (code above, v2 data, the Gurobi build of the CRC module / env at run time, Threads = 4, MIPGap 1e-3, no time-limit hit). A change of any of these is outside the evidence. Prompt 63 Part B adds hostname, CPU model, the gurobipy version, Threads and the Prescient / Egret SHAs to the task log of `noise_seed_E` and tests Threads 8 / 1.
+

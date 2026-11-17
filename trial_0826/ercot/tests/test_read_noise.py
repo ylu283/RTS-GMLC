@@ -538,3 +538,30 @@ def test_daily_divergence_counts_and_first_day(fx):
     # day 1 is labelled 'start_date' by the collector and reported as the calendar date
     c = rn._ruc_cost(str(p.parent))
     assert c.index[0] == (pd.Timestamp(c.index[1]) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+
+
+# --------------------------------------------------------------------------
+# Prompt 63 A4: determinism conditions (memo F1, F7, F8)
+# --------------------------------------------------------------------------
+def test_determinism_conditions_section(fx):
+    dc = fx["S"]["determinism"]
+    assert dc["gurobi_version_from_job_logs"] == []            # no job log in the fixture tree
+    assert "NOT DISCOVERABLE" in fx["md"] and "## 12. 2026-11-17" in fx["md"]
+    assert {a["ruc_threads"][0] for a in dc["array_scripts"] if a["ruc_threads"]} == {"4"}
+    assert all(a["pe_smp"] == ["4"] for a in dc["array_scripts"])
+    q = pd.read_csv(REF / "ruc_quality.csv")
+    assert dc["noise_v3_solve"]["max_solve_s"] == pytest.approx(float(q["solve_time_s"].max()))
+    assert dc["noise_v3_solve"]["n_days"] == N_RUNS * len(q)
+    assert dc["noise_v3_time_limit_hits"] == 0 and dc["noise_v3_runs_with_tl_field"] == N_RUNS
+    assert dc["base_v3_solve"]["n_days"] == 0                  # no base_v3 extract in the fixture
+
+
+def test_determinism_finds_a_gurobi_banner_in_a_job_log(fx, tmp_path):
+    root = fx["root"] / "gurobi_log"
+    shutil.copytree(fx["extr"], root / "extracts")
+    (root / "extracts" / "noise_v3" / "A" / "noise_v3_A_array.o4242.1").write_text(
+        "Extracting scenario to simulate\nGurobi Optimizer version 12.0.3 build v12.0.3rc0 (linux64)\n")
+    S, df, md = rn.read_noise(extr=str(root / "extracts"), waves=str(fx["waves"]), out_dir=str(root / "out"))
+    hits = S["determinism"]["gurobi_version_from_job_logs"]
+    assert [h["version"] for h in hits] == ["12.0.3"] and "From job logs: 12.0.3" in md
+    assert rn.find_gurobi_versions([str(tmp_path / "absent")]) == []
