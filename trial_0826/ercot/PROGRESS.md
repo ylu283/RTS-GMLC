@@ -149,11 +149,16 @@
   → 33 passed (generator tests also pass in bogp-botorch).
 - [x] **Budget (§2.6)**: README lines + plan AMENDMENT 2026-11-14 (wave-D
   actuals 21 / 44.6 core-h per run; 96 runs ≈ 2.0–4.3k core-h; 4.9 GB).
-- [ ] **STOP — Kay action K2/K3**: wave commit SHA reported → strategy FF
-  `ercot/tx123` → push → on CRC `cd trial_0826/ercot/waves/n0_E && bash
-  submit_this.sh` (`yes`), same in `waves/random_E`.
-- [ ] Landing report `waves/n0_E/LANDING.md` + `landing_R.json` (after the
-  collectors push).
+- [x] **K2/K3 done**: both waves submitted and collected (n0_E COLLECTED
+  2026-11-15T05:53Z, 3ad3c1d; random_E 07:02Z, 4254166).
+- [x] **Landing (§2.8)** `tools/land_ercot_n0.py` → `waves/n0_E/LANDING.md`,
+  `landing_R.json` (contract §6.4; R over the 48 grading rows for all 29
+  candidates), `landing_rows.csv` (96 rows). 96 / 96 landed, all v3, **0
+  SUSPECT, R1 shed 0 on every run**, R2 max 199.9 MWh (no flag), 35,040
+  RUCs OPTIMAL, 0 time limit. **3,006 core-h** (31.3 / run; 58 slow-node
+  runs). Disclosed: longest RUC solve 1,157 s vs 1,200 s limit (slow node).
+  Plan AMENDMENT 2026-11-16. Tests: 35 passed (`test_make_ercot_n0.py` +
+  `test_pool_objectives.py`, /opt/anaconda3).
 
 ## Prompt 57 Part B — wave-D standings (2026-11-07, zero simulation, local only)
 

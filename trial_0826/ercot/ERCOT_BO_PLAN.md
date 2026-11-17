@@ -542,3 +542,35 @@ extracts in $GROUP storage. Per plan §8 option (dual random_E, totals ×
 **What had been seen.** Wave-D wall-clock and the prompt-57 standings.
 No n0_E or random_E result exists at this amendment. Prompt 53's landing
 report appends the n0_E / random_E actuals as a further block.
+
+## AMENDMENT 2026-11-16 — n0_E / random_E landing actuals (prompt 53 §2.8; appendable, §10)
+
+**What changed.** Budget actuals and the §6.3 ref point are instantiated;
+no rule, bar or option changes. Source: `waves/n0_E/LANDING.md`,
+`landing_rows.csv`, `landing_R.json` (`tools/land_ercot_n0.py`).
+
+| wave | runs | SUSPECT | R1 shed | core-h (fast / slow runs) | calendar |
+|---|---|---|---|---|---|
+| n0_E | 48 / 48 | 0 | 0 on all | 1,566 (16 fast @ 19.1 / 32 slow @ 39.4) | 10.5 h |
+| random_E | 48 / 48 | 0 | 0 on all | 1,440 (22 fast @ 18.9 / 26 slow @ 39.4) | 12.3 h |
+
+- **Total 3,006 core-h for 96 runs (31.3 per run)**, inside the 2.0–4.3k
+  bracket of AMENDMENT 2026-11-14. Per-run actuals by node: fast ≈ 19,
+  slow ≈ 39.4 core-h (6-site rows; wave D 21.1 / 44.6). 58 of 96 runs
+  landed on slow nodes. For the §8 BO rows plan with **≈ 31 core-h/run**
+  (this mix), range 19–40: option C (160 BO runs) ≈ 3.0k–6.4k, mid ≈ 5.0k.
+- 35,040 RUCs, all OPTIMAL, 0 at the time limit, max final gap 0.1 %.
+  **Margin disclosed:** the longest RUC solve (incl. model build) is
+  1,157 s (random_E:22, slow node) against the 1,200 s limit: ≈ 4 %
+  headroom, not the ≈ 25× of the January smoke cited in AMENDMENT
+  2026-11-06b. A later limit hit is caught per run by S2 (SUSPECT).
+- **§6.3 R instantiated** over the 48 grading rows for all 29 pool
+  candidates (`waves/n0_E/landing_R.json`; dir `max` minimized as −x, dir
+  `-` computed as minimized and flagged). Seats (E-D1b provisional): V1
+  3.9775e6 MWh, E1 8.1637e9 $ (E3 4.5723e9 $ if the §1.2 verdict is not
+  READABLE), R4 15,279.1, N1 36,068.5. Prompt 55 asserts at init.
+- R2 reserve shortfall max 199.9 MWh (flag 891.8): no flag.
+
+**What had been seen.** The 96 landed runs' objective values (to compute
+R, the ledger and this table). No GP has been fit on them and no holdout
+scoring has been made: the exposure budget (§4) is untouched.
