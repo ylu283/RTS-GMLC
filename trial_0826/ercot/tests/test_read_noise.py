@@ -420,3 +420,85 @@ def test_verdict_not_readable_on_R2_and_s3b_failure(fx):
     assert [r["key"] for r in sus] == [f"noise_v3/B:{rb3['index']}"] and not sus[0]["S3a_ok"]
     assert not S2["readability"]["readable"] and not S2["readability"]["R1"]["ok"]
     assert S2["readability"]["R1"]["S3b_failed_designs"] == [3] and "| D3 |" in md2 and "FAIL |" in md2
+
+
+# --------------------------------------------------------------------------
+# Prompt 63 A1: structural-zero perturbed pairs (memo F6) leave the ruler, the
+# levels, the trigger and the 61 bar B_j
+# --------------------------------------------------------------------------
+def _bar(d):
+    d = np.asarray(d, float)
+    s = float(np.sqrt(np.mean(d ** 2)))
+    return s, max(3.0 * s, float(np.abs(d).max()))
+
+
+def test_no_structural_zero_on_the_base_fixture(fx):
+    S = fx["S"]
+    assert S["structural_zero_keys"] == [] and len(S["structural_zero"]) == 8
+    assert not S["structural_zero"]["structural_zero"].any()
+    e1 = S["per_candidate"]["E1"]
+    s, B = _bar(_pop(E1_OFF))
+    assert e1["bar"]["sigma_hat"] == pytest.approx(s) and e1["bar"]["B"] == pytest.approx(B) and e1["bar"]["n"] == 8
+    assert e1["with_structural_zeros"]["bar"] == e1["bar"] and e1["with_structural_zeros"]["ruler"] == e1["ruler"]
+    assert e1["perturbed_delta_signed"] == e1["perturbed_delta_signed_all"]
+    assert "## 10. 2026-11-17" in fx["md"] and "Excluded: none" in fx["md"]
+
+
+def test_structural_zero_pairs_excluded(fx):
+    """Design 2's perturbed copies get the exact copy's overall.csv + pool metrics (identical model
+    output at a different design MW = the D2 / site 206 artefact): both are EXCLUDED and listed;
+    ruler / levels / trigger / B_j use the 6 remaining copies; the old values are kept beside them."""
+    root = fx["root"] / "structural"
+    shutil.copytree(fx["extr"], root / "extracts")
+    d2 = {}
+    for b in mn.BATCHES:
+        ex = [r for r in fx["rows"][b] if r["design_no"] == 2 and r["copy_type"] == "exact"][0]
+        pt = [r for r in fx["rows"][b] if r["design_no"] == 2 and r["copy_type"] == "perturbed"][0]
+        src = root / "extracts" / "noise_v3" / b / f"run_index_{ex['index']}"
+        dst = root / "extracts" / "noise_v3" / b / f"run_index_{pt['index']}"
+        for f in ("overall.csv", "pool_full_metrics.json"):
+            shutil.copyfile(src / f, dst / f)
+        d2[b] = f"noise_v3/{b}:{pt['index']}"
+    S, df, md = rn.read_noise(extr=str(root / "extracts"), waves=str(fx["waves"]), out_dir=str(root / "out"))
+    assert S["structural_zero_keys"] == [d2["A"], d2["B"]]
+    sz = S["structural_zero"].set_index("key")
+    assert sz.loc[d2["A"], "overall_md5_equal"] and sz.loc[d2["A"], "pem_mw"] != sz.loc[d2["A"], "pem_mw_ref"]
+    if sz.loc[d2["A"], "site_max_availability_mw"] is not None:        # real v2 data dir: site 206 max wind 895.48 MW
+        assert bool(sz.loc[d2["A"], "capped_input_identical"]) and bool(sz.loc[d2["B"], "evidence_consistent"])
+    e1 = S["per_candidate"]["E1"]
+    eff = [E1_OFF[b][n] for b in ("A", "B") for n in (0, 2, 3)]          # designs 1, 3, 4
+    old = [0.0 if n == 1 else E1_OFF[b][n] for b in ("A", "B") for n in range(4)]
+    assert e1["n_perturbed"] == 6 and sorted(e1["perturbed_delta_signed"]) == pytest.approx(sorted(eff))
+    assert len(e1["perturbed_delta_signed_all"]) == 8 and e1["with_structural_zeros"]["n_perturbed"] == 8
+    assert e1["ruler"] == pytest.approx(np.median(np.abs(eff))) == pytest.approx(175.0)
+    assert e1["with_structural_zeros"]["ruler"] == pytest.approx(np.median(np.abs(old))) == pytest.approx(125.0)
+    s, B = _bar(eff)
+    so, Bo = _bar(old)
+    assert e1["bar"]["sigma_hat"] == pytest.approx(s) and e1["bar"]["B"] == pytest.approx(B) and e1["bar"]["n"] == 6
+    assert e1["with_structural_zeros"]["bar"]["B"] == pytest.approx(Bo) and s == pytest.approx(so * np.sqrt(8 / 6))
+    # levels: design 2 is gone; the trigger runs over designs 1, 3, 4 only
+    assert [lv["design_no"] for lv in e1["levels"]] == [1, 3, 4]
+    assert [lv["design_no"] for lv in e1["with_structural_zeros"]["levels"]] == [1, 2, 3, 4]
+    assert e1["trigger"]["n_levels"] == 3
+    exp = [float(np.std([0.0, E1_OFF["A"][n], E1_OFF["B"][n]], ddof=1)) for n in (0, 2, 3)]
+    assert [lv["sd"] for lv in e1["levels"]] == pytest.approx(exp)
+    assert e1["trigger"]["ratio"] == pytest.approx(max(exp) ** 2 / min(exp) ** 2)
+    # R4 is untouched on every copy: still all-zero (not a structural zero: its overall.csv differs)
+    assert S["per_candidate"]["R4"]["ruler_status"] == "RULER=0"
+    # outputs: md section 10 lists both, json carries the rule and the excluded keys
+    assert "## 10. 2026-11-17" in md and f"Excluded: {d2['A']}, {d2['B']}" in md and "**no — STRUCTURAL ZERO**" in md
+    js = json.loads((root / "out" / "ercot_noise.json").read_text())
+    assert js["structural_zero"]["keys_excluded"] == [d2["A"], d2["B"]]
+    assert len(js["per_candidate"]["E1"]["perturbed_delta_signed"]) == 6
+    assert js["per_candidate"]["E1"]["bar"]["B"] == pytest.approx(B)
+    # the rider covariance keeps every perturbed row (unchanged file by design)
+    cov = pd.read_csv(root / "out" / "ercot_noise_cov.csv", index_col=0)
+    assert float(cov.loc["E1", "E1"]) == pytest.approx(np.var(old, ddof=1))
+
+
+def test_bar_B_helper():
+    b = rn.bar_B([3.0, -4.0, np.nan])
+    assert b["n"] == 2 and b["sigma_hat"] == pytest.approx(np.sqrt(12.5)) and b["B"] == pytest.approx(3 * np.sqrt(12.5))
+    b = rn.bar_B([10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])      # one heavy value: max term binds
+    assert b["B"] == pytest.approx(10.0) and 3 * b["sigma_hat"] < 10.0
+    assert rn.bar_B([])["n"] == 0

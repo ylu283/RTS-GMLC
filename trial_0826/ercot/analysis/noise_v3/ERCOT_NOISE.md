@@ -71,49 +71,51 @@ The GP noise floor (ERCOT_BO_PLAN.md section 3): exact sd = 0, so the floor is 0
 
 8 perturbed runs (delta = 0.001 relative on pem_mw; sign and inward rule in `waves/noise_v3/PICK_RULE.md`), each read against the exact copy of the same design in the same batch. `ruler_j` = median |Δ_j| (prompt 57 section 3 A4). This population is never pooled with section 2.
 
-| perturbed key | design | ref key | PEM MW | ref PEM MW | sign | delta_rel |
-|---|---|---|---|---|---|---|
-| noise_v3/A:5 | D1 | noise_v3/A:1 | 520.0195 | 519.5000 | +1 | 0.001 |
-| noise_v3/A:6 | D2 | noise_v3/A:2 | 900.7999 | 899.9000 | +1 | 0.001 |
-| noise_v3/A:7 | D3 | noise_v3/A:3 | 133.8660 | 134.0000 | -1 | 0.001 |
-| noise_v3/A:8 | D4 | noise_v3/A:4 | 2427.5700 | 2430.0000 | -1 | 0.001 |
-| noise_v3/B:5 | D1 | noise_v3/B:1 | 518.9805 | 519.5000 | -1 | 0.001 |
-| noise_v3/B:6 | D2 | noise_v3/B:2 | 899.0001 | 899.9000 | -1 | 0.001 |
-| noise_v3/B:7 | D3 | noise_v3/B:3 | 134.1340 | 134.0000 | +1 | 0.001 |
-| noise_v3/B:8 | D4 | noise_v3/B:4 | 2425.1400 | 2430.0000 | -1 | 0.002 |
+| perturbed key | design | ref key | PEM MW | ref PEM MW | sign | delta_rel | in ruler (prompt 63 A1) |
+|---|---|---|---|---|---|---|---|
+| noise_v3/A:5 | D1 | noise_v3/A:1 | 520.0195 | 519.5000 | +1 | 0.001 | yes |
+| noise_v3/A:6 | D2 | noise_v3/A:2 | 900.7999 | 899.9000 | +1 | 0.001 | **no — STRUCTURAL ZERO** (section 10) |
+| noise_v3/A:7 | D3 | noise_v3/A:3 | 133.8660 | 134.0000 | -1 | 0.001 | yes |
+| noise_v3/A:8 | D4 | noise_v3/A:4 | 2427.5700 | 2430.0000 | -1 | 0.001 | yes |
+| noise_v3/B:5 | D1 | noise_v3/B:1 | 518.9805 | 519.5000 | -1 | 0.001 | yes |
+| noise_v3/B:6 | D2 | noise_v3/B:2 | 899.0001 | 899.9000 | -1 | 0.001 | **no — STRUCTURAL ZERO** (section 10) |
+| noise_v3/B:7 | D3 | noise_v3/B:3 | 134.1340 | 134.0000 | +1 | 0.001 | yes |
+| noise_v3/B:8 | D4 | noise_v3/B:4 | 2425.1400 | 2430.0000 | -1 | 0.002 | yes |
 
-| id | name | unit | n | ruler_j (median |Δ|) | min | max | status | |Δ| values |
+Since 2026-11-17 (prompt 63 A1) the ruler, the levels, the trigger and B_j use the 6 non-structural copies; the 2 structural-zero copies are listed in section 10.
+
+| id | name | unit | n | ruler_j (median |Δ|) | min | max | status | |Δ| values (structural zeros excluded) |
 |---|---|---|---|---|---|---|---|---|
-| V1 | true curtailment | MWh | 8 | 1949 | 0 | 1.227e+04 | RULER | 1.227e+04, 0, 3072, 2266, 149.4, 0, 2574, 1632 |
-| E1 | total cost | $ | 8 | 2.183e+05 | 0 | 1.862e+06 | RULER | 2.271e+05, 0, 3.911e+04, 4.085e+05, 2.367e+05, 0, 2.095e+05, 1.862e+06 |
-| X1 | CO2 (fuel-factor) | t | 8 | 4359 | 0 | 2.245e+04 | RULER | 6693, 0, 2.245e+04, 4417, 1.712e+04, 0, 4302, 2490 |
-| R4 | thermal starts | count | 8 | 20 | 0 | 90 | RULER | 10, 0, 37, 20, 90, 0, 20, 63 |
-| N1 | congested line-hours | line-h | 8 | 15 | 0 | 65 | RULER | 9, 0, 65, 15, 55, 0, 15, 32 |
-| E4 | total payments (consumer side) | $ | 8 | 1.237e+06 | 0 | 5.214e+06 | RULER | 1.310e+06, 0, 4.092e+05, 5.214e+06, 2.752e+06, 0, 1.165e+06, 3.198e+06 |
-| R2 | reserve shortfall | MWh | 8 | 23.06 | 0 | 58.87 | RULER | 34.71, 0, 21.87, 28.27, 20.99, 0, 24.24, 58.87 |
-| R7 | committed capacity-hours | MWh | 8 | 6.844e+04 | 0 | 1.235e+05 | RULER | 1.235e+05, 0, 6.791e+04, 1.032e+05, 1.018e+05, 0, 5.018e+04, 6.898e+04 |
-| N4 | pocket-120 congested line-hours | line-h | 8 | 8.5 | 0 | 17 | RULER | 1, 0, 5, 16, 17, 0, 12, 14 |
-| N5 | congestion spread | $/MWh | 8 | 0.0402 | 0 | 0.09934 | RULER | 0.0421, 0, 0.06172, 0.0285, 0.06711, 0, 0.0383, 0.09934 |
-| E6 | VRE energy payments | $ | 8 | 5.521e+05 | 0 | 1.555e+06 | RULER | 3.619e+05, 0, 1.555e+06, 7.857e+05, 5.590e+05, 0, 1.365e+06, 5.452e+05 |
-| R5 | start/stop ramping | MW | 8 | 2896 | 0 | 8808 | RULER | 5414, 0, 7655, 1945, 3847, 0, 297.1, 8808 |
-| N3 | flow violation | MWh | 8 | 2.577 | 0 | 7.038 | RULER | 6.042, 0, 5.003, 0.8888, 0.3435, 0, 7.038, 4.265 |
-| E2 | fixed (commitment) cost | $ | 8 | 6.558e+05 | 0 | 1.555e+06 | RULER | 5.780e+05, 0, 1.003e+06, 1.555e+06, 6.768e+05, 0, 9.974e+05, 6.348e+05 |
-| R6 | nominal ramping | MW | 8 | 9842 | 0 | 5.681e+04 | RULER | 1.132e+04, 0, 275.5, 2.393e+04, 8361, 0, 5.681e+04, 5.583e+04 |
-| N2 | congested lines | count | 8 | 0 | 0 | 2 | RULER=0 | 1, 0, 2, 0, 0, 0, 0, 1 |
-| E3 | variable cost | $ | 8 | 8.507e+05 | 0 | 1.964e+06 | RULER | 3.510e+05, 0, 1.043e+06, 1.964e+06, 9.135e+05, 0, 7.879e+05, 1.227e+06 |
-| R8 | committed unit-hours | unit-h | 8 | 299 | 0 | 740 | RULER | 520, 0, 740, 129, 424, 0, 174, 737 |
-| E7 | mean settlement price (energy) | $/MWh | 8 | 0.002055 | 0 | 0.01083 | RULER | 0.002143, 0, 0.01083, 0.005022, 0.001968, 0, 0.005562, 0.001399 |
-| E8 | LMP dispersion | $/MWh | 8 | 0.07325 | 0 | 0.1707 | RULER | 0.07843, 0, 0.1707, 0.07506, 0.06881, 0, 0.07144, 0.1009 |
-| E9 | scarcity bus-hours | count | 8 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0, 0, 0 |
-| V2 | renewables penetration | % | 8 | 4.715e-04 | 0 | 0.003165 | RULER | 0.003165, 0, 5.180e-04, 5.900e-04, 5.760e-04, 0, 3.320e-04, 4.250e-04 |
-| V3 | PEM-twin delivered share | fraction | 8 | 2.338e-06 | 0 | 2.318e-05 | RULER | 2.318e-05, 0, 4.676e-06, 0, 5.605e-06, 0, 7.145e-06, 0 |
-| E5 | uplift payments | $ | 8 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0, 0, 0 |
-| R1 | load shed | MWh | 8 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0, 0, 0 |
-| R3 | over generation | MWh | 8 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0, 0, 0 |
-| D1 | H2 electricity | MWh | 6 | 601.2 | 0 | 2360 | RULER | 120.7, 0, 1082, 2360, 0, 1300 |
-| D2 | PEM utilization | fraction | 6 | 2.821e-04 | 1.301e-04 | 6.744e-04 | RULER | 6.744e-04, 2.818e-04, 2.057e-04, 1.301e-04, 2.824e-04, 3.907e-04 |
+| V1 | true curtailment | MWh | 6 | 2420 | 149.4 | 1.227e+04 | RULER | 1.227e+04, 3072, 2266, 149.4, 2574, 1632 |
+| E1 | total cost | $ | 6 | 2.319e+05 | 3.911e+04 | 1.862e+06 | RULER | 2.271e+05, 3.911e+04, 4.085e+05, 2.367e+05, 2.095e+05, 1.862e+06 |
+| X1 | CO2 (fuel-factor) | t | 6 | 5555 | 2490 | 2.245e+04 | RULER | 6693, 2.245e+04, 4417, 1.712e+04, 4302, 2490 |
+| R4 | thermal starts | count | 6 | 28.5 | 10 | 90 | RULER | 10, 37, 20, 90, 20, 63 |
+| N1 | congested line-hours | line-h | 6 | 23.5 | 9 | 65 | RULER | 9, 65, 15, 55, 15, 32 |
+| E4 | total payments (consumer side) | $ | 6 | 2.031e+06 | 4.092e+05 | 5.214e+06 | RULER | 1.310e+06, 4.092e+05, 5.214e+06, 2.752e+06, 1.165e+06, 3.198e+06 |
+| R2 | reserve shortfall | MWh | 6 | 26.26 | 20.99 | 58.87 | RULER | 34.71, 21.87, 28.27, 20.99, 24.24, 58.87 |
+| R7 | committed capacity-hours | MWh | 6 | 8.54e+04 | 5.018e+04 | 1.235e+05 | RULER | 1.235e+05, 6.791e+04, 1.032e+05, 1.018e+05, 5.018e+04, 6.898e+04 |
+| N4 | pocket-120 congested line-hours | line-h | 6 | 13 | 1 | 17 | RULER | 1, 5, 16, 17, 12, 14 |
+| N5 | congestion spread | $/MWh | 6 | 0.05191 | 0.0285 | 0.09934 | RULER | 0.0421, 0.06172, 0.0285, 0.06711, 0.0383, 0.09934 |
+| E6 | VRE energy payments | $ | 6 | 6.724e+05 | 3.619e+05 | 1.555e+06 | RULER | 3.619e+05, 1.555e+06, 7.857e+05, 5.590e+05, 1.365e+06, 5.452e+05 |
+| R5 | start/stop ramping | MW | 6 | 4630 | 297.1 | 8808 | RULER | 5414, 7655, 1945, 3847, 297.1, 8808 |
+| N3 | flow violation | MWh | 6 | 4.634 | 0.3435 | 7.038 | RULER | 6.042, 5.003, 0.8888, 0.3435, 7.038, 4.265 |
+| E2 | fixed (commitment) cost | $ | 6 | 8.371e+05 | 5.780e+05 | 1.555e+06 | RULER | 5.780e+05, 1.003e+06, 1.555e+06, 6.768e+05, 9.974e+05, 6.348e+05 |
+| R6 | nominal ramping | MW | 6 | 1.762e+04 | 275.5 | 5.681e+04 | RULER | 1.132e+04, 275.5, 2.393e+04, 8361, 5.681e+04, 5.583e+04 |
+| N2 | congested lines | count | 6 | 0.5 | 0 | 2 | RULER | 1, 2, 0, 0, 0, 1 |
+| E3 | variable cost | $ | 6 | 9.780e+05 | 3.510e+05 | 1.964e+06 | RULER | 3.510e+05, 1.043e+06, 1.964e+06, 9.135e+05, 7.879e+05, 1.227e+06 |
+| R8 | committed unit-hours | unit-h | 6 | 472 | 129 | 740 | RULER | 520, 740, 129, 424, 174, 737 |
+| E7 | mean settlement price (energy) | $/MWh | 6 | 0.003582 | 0.001399 | 0.01083 | RULER | 0.002143, 0.01083, 0.005022, 0.001968, 0.005562, 0.001399 |
+| E8 | LMP dispersion | $/MWh | 6 | 0.07674 | 0.06881 | 0.1707 | RULER | 0.07843, 0.1707, 0.07506, 0.06881, 0.07144, 0.1009 |
+| E9 | scarcity bus-hours | count | 6 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0 |
+| V2 | renewables penetration | % | 6 | 5.470e-04 | 3.320e-04 | 0.003165 | RULER | 0.003165, 5.180e-04, 5.900e-04, 5.760e-04, 3.320e-04, 4.250e-04 |
+| V3 | PEM-twin delivered share | fraction | 6 | 5.141e-06 | 0 | 2.318e-05 | RULER | 2.318e-05, 4.676e-06, 0, 5.605e-06, 7.145e-06, 0 |
+| E5 | uplift payments | $ | 6 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0 |
+| R1 | load shed | MWh | 6 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0 |
+| R3 | over generation | MWh | 6 | 0 | 0 | 0 | RULER=0 | 0, 0, 0, 0, 0, 0 |
+| D1 | H2 electricity | MWh | 4 | 1191 | 120.7 | 2360 | RULER | 120.7, 1082, 2360, 1300 |
+| D2 | PEM utilization | fraction | 4 | 2.982e-04 | 1.301e-04 | 6.744e-04 | RULER | 6.744e-04, 2.057e-04, 1.301e-04, 3.907e-04 |
 
-`RULER=0` candidates (gradable): N2, E9 — readable iff |Δ| >= 1 natural unit (prompt 57 section 3 A4); continuous candidates report the raw Δ with the tag.
+`RULER=0` candidates (gradable): E9 — readable iff |Δ| >= 1 natural unit (prompt 57 section 3 A4); continuous candidates report the raw Δ with the tag.
 `RULER UNAVAILABLE` (gradable): none.
 Readable means, in exactly these words: "exceeds twice the median response to a 0.1 % input perturbation at the prompt-52 designs." An effect that fails reads "not readable above the perturbation response", never "zero".
 
@@ -125,34 +127,34 @@ Level = design. Per-level sd = sd of {exact, perturbed copies} of that design (d
 
 | id | per-level sd (df) [95 % CI] | pooled sd | Satterthwaite df | pooled 95 % CI | ratio | p | verdict |
 |---|---|---|---|---|---|---|---|
-| V1 | D1 7040 (2) [3665, 4.424e+04]; D2 0 (2) [0, 0]; D3 2826 (2) [1472, 1.776e+04]; D4 1958 (2) [1019, 1.231e+04] | 3917 | 2.97 | [2215, 1.475e+04] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E1 | D1 2.319e+05 (2) [1.207e+05, 1.458e+06]; D2 0 (2) [0, 0]; D3 1.337e+05 (2) [6.961e+04, 8.403e+05]; D4 9.786e+05 (2) [5.095e+05, 6.150e+06] | 5.073e+05 | 2.3 | [2.721e+05, 2.593e+06] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| X1 | D1 1.228e+04 (2) [6394, 7.718e+04]; D2 0 (2) [0, 0]; D3 1.191e+04 (2) [6203, 7.487e+04]; D4 2215 (2) [1153, 1.392e+04] | 8626 | 4.13 | [5199, 2.419e+04] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R4 | D1 49.33 (2) [25.68, 310]; D2 0 (2) [0, 0]; D3 28.92 (2) [15.06, 181.8]; D4 32.19 (2) [16.76, 202.3] | 32.81 | 4.82 | [20.35, 82.42] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| N1 | D1 34.65 (2) [18.04, 217.7]; D2 0 (2) [0, 0]; D3 34.03 (2) [17.72, 213.9]; D4 16.01 (2) [8.336, 100.6] | 25.57 | 4.8 | [15.84, 64.39] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E4 | D1 2.073e+06 (2) [1.079e+06, 1.303e+07]; D2 0 (2) [0, 0]; D3 8.166e+05 (2) [4.251e+05, 5.132e+06]; D4 2.629e+06 (2) [1.369e+06, 1.652e+07] | 1.723e+06 | 4.23 | [1.043e+06, 4.744e+06] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R2 | D1 28.13 (2) [14.64, 176.8]; D2 0 (2) [0, 0]; D3 13.36 (2) [6.958, 83.99]; D4 44.46 (2) [23.15, 279.4] | 27.14 | 3.8 | [16.11, 81.21] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R7 | D1 6.595e+04 (2) [3.434e+04, 4.145e+05]; D2 0 (2) [0, 0]; D3 3.522e+04 (2) [1.834e+04, 2.214e+05]; D4 8.664e+04 (2) [4.511e+04, 5.445e+05] | 5.722e+04 | 4.47 | [3.499e+04, 1.514e+05] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| N4 | D1 10.12 (2) [5.267, 63.58]; D2 0 (2) [0, 0]; D3 6.028 (2) [3.138, 37.88]; D4 15.01 (2) [7.816, 94.34] | 9.539 | 4.24 | [5.777, 26.24] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| N5 | D1 0.05508 (2) [0.02868, 0.3462]; D2 0 (2) [0, 0]; D3 0.05047 (2) [0.02628, 0.3172]; D4 0.05115 (2) [0.02663, 0.3215] | 0.04527 | 5.96 | [0.02914, 0.1] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E6 | D1 4.640e+05 (2) [2.416e+05, 2.916e+06]; D2 0 (2) [0, 0]; D3 8.482e+05 (2) [4.416e+05, 5.330e+06]; D4 4.026e+05 (2) [2.096e+05, 2.530e+06] | 5.236e+05 | 4.08 | [3.148e+05, 1.483e+06] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R5 | D1 2786 (2) [1450, 1.751e+04]; D2 0 (2) [0, 0]; D3 4336 (2) [2258, 2.725e+04]; D4 4627 (2) [2409, 2.908e+04] | 3463 | 5.28 | [2183, 8212] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| N3 | D1 3.394 (2) [1.767, 21.33]; D2 0 (2) [0, 0]; D3 3.622 (2) [1.886, 22.76]; D4 2.25 (2) [1.172, 14.14] | 2.725 | 5.34 | [1.721, 6.415] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E2 | D1 3.656e+05 (2) [1.903e+05, 2.298e+06]; D2 0 (2) [0, 0]; D3 5.776e+05 (2) [3.007e+05, 3.630e+06]; D4 1.127e+06 (2) [5.866e+05, 7.081e+06] | 6.589e+05 | 3.47 | [3.841e+05, 2.137e+06] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R6 | D1 9879 (2) [5143, 6.208e+04]; D2 0 (2) [0, 0]; D3 3.288e+04 (2) [1.712e+04, 2.067e+05]; D4 2.801e+04 (2) [1.458e+04, 1.760e+05] | 2.215e+04 | 4.3 | [1.345e+04, 6.029e+04] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| N2 | D1 0.5774 (2) [0.3006, 3.628]; D2 0 (2) [0, 0]; D3 1.155 (2) [0.6012, 7.257]; D4 0.5774 (2) [0.3006, 3.628] | 0.7071 | 4 | [0.4237, 2.032] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E3 | D1 4.608e+05 (2) [2.399e+05, 2.896e+06]; D2 0 (2) [0, 0]; D3 5.435e+05 (2) [2.830e+05, 3.416e+06]; D4 9.920e+05 (2) [5.165e+05, 6.234e+06] | 6.107e+05 | 4.04 | [3.666e+05, 1.740e+06] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| R8 | D1 472.8 (2) [246.2, 2972]; D2 0 (2) [0, 0]; D3 386.9 (2) [201.5, 2432]; D4 393.6 (2) [204.9, 2474] | 363.4 | 5.79 | [232.7, 816.2] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E7 | D1 0.00119 (2) [6.195e-04, 0.007477]; D2 0 (2) [0, 0]; D3 0.005417 (2) [0.002821, 0.03405]; D4 0.002592 (2) [0.001349, 0.01629] | 0.003061 | 3.09 | [0.001745, 0.01106] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E8 | D1 0.07367 (2) [0.03836, 0.463]; D2 0 (2) [0, 0]; D3 0.08575 (2) [0.04465, 0.5389]; D4 0.05242 (2) [0.02729, 0.3295] | 0.06231 | 5.3 | [0.03929, 0.1474] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E9 | D1 0 (2) [0, 0]; D2 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 8 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
-| V2 | D1 0.002014 (2) [0.001049, 0.01266]; D2 0 (2) [0, 0]; D3 4.284e-04 (2) [2.230e-04, 0.002692]; D4 5.097e-04 (2) [2.654e-04, 0.003204] | 0.001061 | 2.45 | [5.763e-04, 0.005006] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| V3 | D1 1.210e-05 (2) [6.298e-06, 7.602e-05]; D2 0 (2) [0, 0]; D3 5.953e-06 (2) [3.100e-06, 3.742e-05]; D4 0 (2) [0, 0] | 6.741e-06 | 2.92 | [3.797e-06, 2.591e-05] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| E5 | D1 0 (2) [0, 0]; D2 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 8 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
-| R1 | D1 0 (2) [0, 0]; D2 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 8 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
-| R3 | D1 0 (2) [0, 0]; D2 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 8 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
-| D1 | D1 1329 (2) [692, 8353]; D2 0 (2) [0, 0]; D3 1192 (2) [620.7, 7493]; D4 n/a (0) [n/a, n/a] | 1031 | 3.95 | [616.2, 2989] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
-| D2 | D1 4.318e-04 (2) [2.248e-04, 0.002714]; D2 2.821e-04 (2) [1.469e-04, 0.001773]; D3 3.030e-04 (2) [1.577e-04, 0.001904]; D4 n/a (0) [n/a, n/a] | 3.454e-04 | 5.17 | [2.169e-04, 8.293e-04] | 2.34 | 0.299 | not detectable at this df (ratio 2.34, p = 0.299; df 2/2) |
+| V1 | D1 7040 (2) [3665, 4.424e+04]; D3 2826 (2) [1472, 1.776e+04]; D4 1958 (2) [1019, 1.231e+04] | 4523 | 2.97 | [2558, 1.703e+04] | 12.9 | 0.0718 | not detectable at this df (ratio 12.93, p = 0.0718; df 2/2) |
+| E1 | D1 2.319e+05 (2) [1.207e+05, 1.458e+06]; D3 1.337e+05 (2) [6.961e+04, 8.403e+05]; D4 9.786e+05 (2) [5.095e+05, 6.150e+06] | 5.857e+05 | 2.3 | [3.142e+05, 2.994e+06] | 53.6 | 0.0183 | TRIGGER: scalar sd rejected (ratio 53.57 > 3, p = 0.0183 < 0.05) |
+| X1 | D1 1.228e+04 (2) [6394, 7.718e+04]; D3 1.191e+04 (2) [6203, 7.487e+04]; D4 2215 (2) [1153, 1.392e+04] | 9961 | 4.13 | [6004, 2.793e+04] | 30.8 | 0.0315 | TRIGGER: scalar sd rejected (ratio 30.75 > 3, p = 0.0315 < 0.05) |
+| R4 | D1 49.33 (2) [25.68, 310]; D3 28.92 (2) [15.06, 181.8]; D4 32.19 (2) [16.76, 202.3] | 37.89 | 4.82 | [23.49, 95.17] | 2.91 | 0.256 | not detectable at this df (ratio 2.91, p = 0.256; df 2/2) |
+| N1 | D1 34.65 (2) [18.04, 217.7]; D3 34.03 (2) [17.72, 213.9]; D4 16.01 (2) [8.336, 100.6] | 29.52 | 4.8 | [18.3, 74.35] | 4.68 | 0.176 | not detectable at this df (ratio 4.68, p = 0.176; df 2/2) |
+| E4 | D1 2.073e+06 (2) [1.079e+06, 1.303e+07]; D3 8.166e+05 (2) [4.251e+05, 5.132e+06]; D4 2.629e+06 (2) [1.369e+06, 1.652e+07] | 1.990e+06 | 4.23 | [1.205e+06, 5.478e+06] | 10.4 | 0.088 | not detectable at this df (ratio 10.37, p = 0.088; df 2/2) |
+| R2 | D1 28.13 (2) [14.64, 176.8]; D3 13.36 (2) [6.958, 83.99]; D4 44.46 (2) [23.15, 279.4] | 31.34 | 3.8 | [18.6, 93.78] | 11.1 | 0.0829 | not detectable at this df (ratio 11.07, p = 0.0829; df 2/2) |
+| R7 | D1 6.595e+04 (2) [3.434e+04, 4.145e+05]; D3 3.522e+04 (2) [1.834e+04, 2.214e+05]; D4 8.664e+04 (2) [4.511e+04, 5.445e+05] | 6.607e+04 | 4.47 | [4.041e+04, 1.749e+05] | 6.05 | 0.142 | not detectable at this df (ratio 6.05, p = 0.142; df 2/2) |
+| N4 | D1 10.12 (2) [5.267, 63.58]; D3 6.028 (2) [3.138, 37.88]; D4 15.01 (2) [7.816, 94.34] | 11.02 | 4.24 | [6.671, 30.3] | 6.2 | 0.139 | not detectable at this df (ratio 6.20, p = 0.139; df 2/2) |
+| N5 | D1 0.05508 (2) [0.02868, 0.3462]; D3 0.05047 (2) [0.02628, 0.3172]; D4 0.05115 (2) [0.02663, 0.3215] | 0.05227 | 5.96 | [0.03365, 0.1155] | 1.19 | 0.456 | not detectable at this df (ratio 1.19, p = 0.456; df 2/2) |
+| E6 | D1 4.640e+05 (2) [2.416e+05, 2.916e+06]; D3 8.482e+05 (2) [4.416e+05, 5.330e+06]; D4 4.026e+05 (2) [2.096e+05, 2.530e+06] | 6.046e+05 | 4.08 | [3.635e+05, 1.712e+06] | 4.44 | 0.184 | not detectable at this df (ratio 4.44, p = 0.184; df 2/2) |
+| R5 | D1 2786 (2) [1450, 1.751e+04]; D3 4336 (2) [2258, 2.725e+04]; D4 4627 (2) [2409, 2.908e+04] | 3999 | 5.28 | [2520, 9483] | 2.76 | 0.266 | not detectable at this df (ratio 2.76, p = 0.266; df 2/2) |
+| N3 | D1 3.394 (2) [1.767, 21.33]; D3 3.622 (2) [1.886, 22.76]; D4 2.25 (2) [1.172, 14.14] | 3.146 | 5.34 | [1.987, 7.408] | 2.59 | 0.279 | not detectable at this df (ratio 2.59, p = 0.279; df 2/2) |
+| E2 | D1 3.656e+05 (2) [1.903e+05, 2.298e+06]; D3 5.776e+05 (2) [3.007e+05, 3.630e+06]; D4 1.127e+06 (2) [5.866e+05, 7.081e+06] | 7.609e+05 | 3.47 | [4.435e+05, 2.467e+06] | 9.5 | 0.0953 | not detectable at this df (ratio 9.50, p = 0.0953; df 2/2) |
+| R6 | D1 9879 (2) [5143, 6.208e+04]; D3 3.288e+04 (2) [1.712e+04, 2.067e+05]; D4 2.801e+04 (2) [1.458e+04, 1.760e+05] | 2.558e+04 | 4.3 | [1.553e+04, 6.961e+04] | 11.1 | 0.0828 | not detectable at this df (ratio 11.08, p = 0.0828; df 2/2) |
+| N2 | D1 0.5774 (2) [0.3006, 3.628]; D3 1.155 (2) [0.6012, 7.257]; D4 0.5774 (2) [0.3006, 3.628] | 0.8165 | 4 | [0.4892, 2.346] | 4 | 0.2 | not detectable at this df (ratio 4.00, p = 0.2; df 2/2) |
+| E3 | D1 4.608e+05 (2) [2.399e+05, 2.896e+06]; D3 5.435e+05 (2) [2.830e+05, 3.416e+06]; D4 9.920e+05 (2) [5.165e+05, 6.234e+06] | 7.052e+05 | 4.04 | [4.234e+05, 2.009e+06] | 4.63 | 0.178 | not detectable at this df (ratio 4.63, p = 0.178; df 2/2) |
+| R8 | D1 472.8 (2) [246.2, 2972]; D3 386.9 (2) [201.5, 2432]; D4 393.6 (2) [204.9, 2474] | 419.6 | 5.79 | [268.7, 942.5] | 1.49 | 0.401 | not detectable at this df (ratio 1.49, p = 0.401; df 2/2) |
+| E7 | D1 0.00119 (2) [6.195e-04, 0.007477]; D3 0.005417 (2) [0.002821, 0.03405]; D4 0.002592 (2) [0.001349, 0.01629] | 0.003535 | 3.09 | [0.002014, 0.01277] | 20.7 | 0.046 | TRIGGER: scalar sd rejected (ratio 20.73 > 3, p = 0.046 < 0.05) |
+| E8 | D1 0.07367 (2) [0.03836, 0.463]; D3 0.08575 (2) [0.04465, 0.5389]; D4 0.05242 (2) [0.02729, 0.3295] | 0.07195 | 5.3 | [0.04537, 0.1703] | 2.68 | 0.272 | not detectable at this df (ratio 2.68, p = 0.272; df 2/2) |
+| E9 | D1 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 6 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
+| V2 | D1 0.002014 (2) [0.001049, 0.01266]; D3 4.284e-04 (2) [2.230e-04, 0.002692]; D4 5.097e-04 (2) [2.654e-04, 0.003204] | 0.001225 | 2.45 | [6.655e-04, 0.005781] | 22.1 | 0.0433 | TRIGGER: scalar sd rejected (ratio 22.11 > 3, p = 0.0433 < 0.05) |
+| V3 | D1 1.210e-05 (2) [6.298e-06, 7.602e-05]; D3 5.953e-06 (2) [3.100e-06, 3.742e-05]; D4 0 (2) [0, 0] | 7.784e-06 | 2.92 | [4.384e-06, 2.991e-05] | inf | 0 | TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective |
+| E5 | D1 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 6 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
+| R1 | D1 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 6 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
+| R3 | D1 0 (2) [0, 0]; D3 0 (2) [0, 0]; D4 0 (2) [0, 0] | 0 | 6 | [0, 0] | n/a | n/a | all levels sd 0 (exact zeros): not detectable at this df |
+| D1 | D1 1329 (2) [692, 8353]; D3 1192 (2) [620.7, 7493]; D4 n/a (0) [n/a, n/a] | 1262 | 3.95 | [754.7, 3661] | 1.24 | 0.446 | not detectable at this df (ratio 1.24, p = 0.446; df 2/2) |
+| D2 | D1 4.318e-04 (2) [2.248e-04, 0.002714]; D3 3.030e-04 (2) [1.577e-04, 0.001904]; D4 n/a (0) [n/a, n/a] | 3.730e-04 | 3.58 | [2.188e-04, 0.001174] | 2.03 | 0.33 | not detectable at this df (ratio 2.03, p = 0.33; df 2/2) |
 
 ## 5. Cross-objective covariance of the perturbed deltas
 
@@ -273,4 +275,53 @@ shed ≡ 0 on all 16 runs: **PASS**.
 - With df = 1 per level the F test rejects only at observed ratios > 161 (alpha 0.05, one-sided); the trigger is an order-of-magnitude detector. Pooled sd CIs are wide at these df; read the CI, not the point.
 - E8, E9, N5 use the CRC-computed `pool_full_metrics.json` (the gz tables are not in git).
 - Outputs: `analysis/noise_v3/ercot_noise.csv`, `ercot_noise.json`, `ercot_noise_cov.csv` (perturbed; rider only), `ercot_noise_exact_cov.csv` (exact; tau).
+
+## 10. 2026-11-17 — structural-zero perturbed pairs excluded (prompt 63 A1; memo F6)
+
+Rule (generic, applied in code): a perturbed copy whose design MW differs from its exact copy's but whose `overall.csv` is byte-identical (md5) to the exact copy's has an identical effective model input. It is EXCLUDED from the ruler, the per-level sd, the pooled sd, the trigger and the 61 bar B_j. Evidence column: the PEM slice is min(PEM capacity, availability_t) (`multi_pem/parameters.py:87-91`); when both capacities are at or above the site's maximum hourly availability (REAL_TIME and DAY_AHEAD series), the capped input series is identical. The exact cross-batch pairs (section 2) and the rider covariance `ercot_noise_cov.csv` (section 5; all perturbed rows) are unchanged. The previous outputs are kept as `ercot_noise_2026-11-16.json` (5ca9650).
+
+| perturbed key | ref key | site | PEM MW | ref PEM MW | overall md5 (pert / ref) | site max availability MW | capped input identical | evidence consistent | EXCLUDED |
+|---|---|---|---|---|---|---|---|---|---|
+| noise_v3/A:5 | noise_v3/A:1 | 275 | 520.0195 | 519.5000 | `ae41b4df` / `fbaa386b` | 1039.00 | no | yes | no |
+| noise_v3/A:6 | noise_v3/A:2 | 206 | 900.7999 | 899.9000 | `6dde2591` / `6dde2591` | 895.48 | yes | yes | **yes** |
+| noise_v3/A:7 | noise_v3/A:3 | 146 | 133.8660 | 134.0000 | `8c9944f6` / `bdb103fb` | 268.00 | no | yes | no |
+| noise_v3/A:8 | noise_v3/A:4 | 1 | 2427.5700 | 2430.0000 | `dbb4eec6` / `1f63f9b5` | n/a | n/a | n/a | no |
+| noise_v3/B:5 | noise_v3/B:1 | 275 | 518.9805 | 519.5000 | `ddc8b669` / `fbaa386b` | 1039.00 | no | yes | no |
+| noise_v3/B:6 | noise_v3/B:2 | 206 | 899.0001 | 899.9000 | `6dde2591` / `6dde2591` | 895.48 | yes | yes | **yes** |
+| noise_v3/B:7 | noise_v3/B:3 | 146 | 134.1340 | 134.0000 | `f39f6ff0` / `bdb103fb` | 268.00 | no | yes | no |
+| noise_v3/B:8 | noise_v3/B:4 | 1 | 2425.1400 | 2430.0000 | `c34c8770` / `1f63f9b5` | n/a | n/a | n/a | no |
+
+Excluded: noise_v3/A:6, noise_v3/B:6 (2 of 8 perturbed copies; 6 remain).
+
+Flag (kept in the population, memo F9): noise_v3/B:8 used delta_rel = 0.002 — step differs from the nominal 0.001 relative (inward rule; PICK_RULE.md).
+
+Old (all perturbed copies, 5ca9650) vs new (structural zeros excluded), gradable candidates. B_j = max(3·σ̂_j, max_i |δ_ij|), σ̂_j = sqrt(mean δ_ij²) over the signed deltas (`per_candidate.<j>.bar`; the old value is `per_candidate.<j>.with_structural_zeros.bar`). B_j is the two-run contrast bar of prompt 61 section 3 (contract addendum 2026-11-17).
+
+| id | unit | n old / new | ruler old | ruler new | pooled sd old | pooled sd new | trigger old | trigger new | σ̂ old | σ̂ new | B_j old | B_j new |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | MWh | 8 / 6 | 1949 | 2420 | 3917 | 4523 | FIRES (sd-0 level) | no (ratio 12.9, p 0.0718) | 4669 | 5391 | 1.401e+04 | 1.617e+04 |
+| E1 | $ | 8 / 6 | 2.183e+05 | 2.319e+05 | 5.073e+05 | 5.857e+05 | FIRES (sd-0 level) | FIRES (ratio 53.6) | 6.880e+05 | 7.944e+05 | 2.064e+06 | 2.383e+06 |
+| X1 | t | 8 / 6 | 4359 | 5555 | 8626 | 9961 | FIRES (sd-0 level) | FIRES (ratio 30.8) | 1.052e+04 | 1.215e+04 | 3.157e+04 | 3.645e+04 |
+| R4 | count | 8 / 6 | 20 | 28.5 | 32.81 | 37.89 | FIRES (sd-0 level) | no (ratio 2.91, p 0.256) | 42.33 | 48.88 | 127 | 146.7 |
+| N1 | line-h | 8 / 6 | 15 | 23.5 | 25.57 | 29.52 | FIRES (sd-0 level) | no (ratio 4.68, p 0.176) | 33.18 | 38.31 | 99.53 | 114.9 |
+| E4 | $ | 8 / 6 | 1.237e+06 | 2.031e+06 | 1.723e+06 | 1.990e+06 | FIRES (sd-0 level) | no (ratio 10.4, p 0.088) | 2.455e+06 | 2.835e+06 | 7.366e+06 | 8.505e+06 |
+| R2 | MWh | 8 / 6 | 23.06 | 26.26 | 27.14 | 31.34 | FIRES (sd-0 level) | no (ratio 11.1, p 0.0829) | 29.53 | 34.1 | 88.59 | 102.3 |
+| R7 | MWh | 8 / 6 | 6.844e+04 | 8.54e+04 | 5.722e+04 | 6.607e+04 | FIRES (sd-0 level) | no (ratio 6.05, p 0.142) | 7.759e+04 | 8.959e+04 | 2.328e+05 | 2.688e+05 |
+| N4 | line-h | 8 / 6 | 8.5 | 13 | 9.539 | 11.02 | FIRES (sd-0 level) | no (ratio 6.2, p 0.139) | 10.67 | 12.32 | 32.01 | 36.97 |
+| N5 | $/MWh | 8 / 6 | 0.0402 | 0.05191 | 0.04527 | 0.05227 | FIRES (sd-0 level) | no (ratio 1.19, p 0.456) | 0.05272 | 0.06087 | 0.1582 | 0.1826 |
+| E6 | $ | 8 / 6 | 5.521e+05 | 6.724e+05 | 5.236e+05 | 6.046e+05 | FIRES (sd-0 level) | no (ratio 4.44, p 0.184) | 8.395e+05 | 9.694e+05 | 2.519e+06 | 2.908e+06 |
+| R5 | MW | 8 / 6 | 2896 | 4630 | 3463 | 3999 | FIRES (sd-0 level) | no (ratio 2.76, p 0.266) | 4798 | 5540 | 1.439e+04 | 1.662e+04 |
+| N3 | MWh | 8 / 6 | 2.577 | 4.634 | 2.725 | 3.146 | FIRES (sd-0 level) | no (ratio 2.59, p 0.279) | 4.034 | 4.658 | 12.1 | 13.97 |
+| E2 | $ | 8 / 6 | 6.558e+05 | 8.371e+05 | 6.589e+05 | 7.609e+05 | FIRES (sd-0 level) | no (ratio 9.5, p 0.0953) | 8.378e+05 | 9.674e+05 | 2.513e+06 | 2.902e+06 |
+| R6 | MW | 8 / 6 | 9842 | 1.762e+04 | 2.215e+04 | 2.558e+04 | FIRES (sd-0 level) | no (ratio 11.1, p 0.0828) | 2.982e+04 | 3.444e+04 | 8.947e+04 | 1.033e+05 |
+| N2 | count | 8 / 6 | 0 | 0.5 | 0.7071 | 0.8165 | FIRES (sd-0 level) | no (ratio 4, p 0.2) | 0.866 | 1 | 2.598 | 3 |
+| E3 | $ | 8 / 6 | 8.507e+05 | 9.780e+05 | 6.107e+05 | 7.052e+05 | FIRES (sd-0 level) | no (ratio 4.63, p 0.178) | 1.002e+06 | 1.157e+06 | 3.005e+06 | 3.470e+06 |
+| R8 | unit-h | 8 / 6 | 299 | 472 | 363.4 | 419.6 | FIRES (sd-0 level) | no (ratio 1.49, p 0.401) | 445.5 | 514.4 | 1337 | 1543 |
+| E7 | $/MWh | 8 / 6 | 0.002055 | 0.003582 | 0.003061 | 0.003535 | FIRES (sd-0 level) | FIRES (ratio 20.7) | 0.004795 | 0.005537 | 0.01438 | 0.01661 |
+| E8 | $/MWh | 8 / 6 | 0.07325 | 0.07674 | 0.06231 | 0.07195 | FIRES (sd-0 level) | no (ratio 2.68, p 0.272) | 0.0873 | 0.1008 | 0.2619 | 0.3024 |
+| E9 | count | 8 / 6 | 0 | 0 | 0 | 0 | all levels 0 | all levels 0 | 0 | 0 | 0 | 0 |
+| V2 | % | 8 / 6 | 4.715e-04 | 5.470e-04 | 0.001061 | 0.001225 | FIRES (sd-0 level) | FIRES (ratio 22.1) | 0.001186 | 0.00137 | 0.003559 | 0.004109 |
+
+Trigger fires (gradable): old 21 (V1, E1, X1, R4, N1, E4, R2, R7, N4, N5, E6, R5, N3, E2, R6, N2, E3, R8, E7, E8, V2); new 4 (E1, X1, E7, V2). The old reading fired wherever a structural level had sd 0; the new reading is the order-of-magnitude detector of section 9 (df 2 per level).
+`RULER=0` (gradable, new): E9.
 

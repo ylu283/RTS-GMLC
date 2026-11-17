@@ -323,6 +323,65 @@ def perturbed_deltas(recs, ids):
     return pd.DataFrame(rows)
 
 
+def site_max_availability(site, data_dir=po.DATA):
+    """Max hourly available MW of renewable `site` over REAL_TIME and DAY_AHEAD
+    wind/solar series (the PEM slice is min(PEM capacity, availability_t),
+    multi_pem/parameters.py:87-91). None if the site has no series (thermal /
+    nuclear) or the files are absent."""
+    best = None
+    for kind in ("REAL_TIME", "DAY_AHEAD"):
+        for tech in ("wind", "pv", "solar"):
+            p = os.path.join(data_dir, f"{kind}_{tech}.csv")
+            if not os.path.isfile(p):
+                continue
+            head = pd.read_csv(p, nrows=0).columns
+            if str(site) not in [str(c) for c in head]:
+                continue
+            col = [c for c in head if str(c) == str(site)][0]
+            m = float(pd.read_csv(p, usecols=[col])[col].max())
+            best = m if best is None else max(best, m)
+    return best
+
+
+def structural_zero_pairs(pert, recs, data_dir=po.DATA):
+    """Prompt 63 A1 (memo F6): a perturbed copy whose effective model input equals
+    its exact copy's. Generic detector: the perturbed design MW differs from the
+    reference MW, yet overall.csv is byte-identical (md5) to the reference run's.
+    Evidence column (renewable sites): both capacities >= the site's max hourly
+    availability, so min(capacity, availability_t) is the same series (capped
+    input identical). Rows = every perturbed run, in read order; `structural_zero`
+    True -> EXCLUDED from the ruler, the levels, the trigger and B_j."""
+    byk = {r["key"]: r for r in recs}
+    rows = []
+    for _, p in pert.iterrows():
+        r, ref = byk[p["key"]], byk[p["ref_key"]]
+        md5_eq = bool(r["overall_md5"] == ref["overall_md5"])
+        mw_diff = bool(float(p["pem_mw"]) != float(p["pem_mw_ref"]))
+        avail = site_max_availability(r.get("site"), data_dir) if str(r.get("unit_type", "")).upper() in ("WIND", "PV", "SOLAR") else None
+        capped = (None if avail is None else bool(min(float(p["pem_mw"]), float(p["pem_mw_ref"])) >= avail))
+        sz = bool(md5_eq and mw_diff)
+        rows.append({"key": p["key"], "ref_key": p["ref_key"], "design_no": int(p["design_no"]), "batch": p["batch"],
+                     "site": r.get("site"), "unit_type": r.get("unit_type"), "pem_mw": float(p["pem_mw"]),
+                     "pem_mw_ref": float(p["pem_mw_ref"]), "overall_md5": r["overall_md5"],
+                     "ref_overall_md5": ref["overall_md5"], "overall_md5_equal": md5_eq,
+                     "site_max_availability_mw": avail, "capped_input_identical": capped,
+                     "evidence_consistent": (None if capped is None else bool(capped == sz)),
+                     "structural_zero": sz})
+    return pd.DataFrame(rows)
+
+
+def bar_B(deltas):
+    """61 section 3 bar on signed two-run deltas: sigma_hat = sqrt(mean delta^2),
+    B = max(3 sigma_hat, max |delta|) (finite values only)."""
+    d = np.asarray([float(x) for x in deltas], float)
+    d = d[np.isfinite(d)]
+    if len(d) == 0:
+        return {"sigma_hat": np.nan, "B": np.nan, "max_abs": np.nan, "n": 0}
+    sig = float(np.sqrt(np.mean(d ** 2)))
+    mx = float(np.abs(d).max())
+    return {"sigma_hat": sig, "B": float(max(3.0 * sig, mx)), "max_abs": mx, "n": int(len(d))}
+
+
 def level_sd(deltas):
     """sd of {0} U deltas (the exact copy and its perturbed copies), ddof = 1."""
     v = np.array([0.0] + [float(x) for x in deltas if np.isfinite(x)])
@@ -455,9 +514,45 @@ def readability_verdict(ex, runs, pairs, refs_path=REFS_PATH):
             "rule": "plan 1.2 FROZEN; recorded once in the prompt-52 deliverable; final; the cost objective is never switched mid-campaign"}
 
 
-def summarize(recs, ids, gradable, defs, missing):
+def perturbed_stats(pert, c):
+    """Ruler (median |delta|), per-level sd, pooled sd, trigger and the 61 bar B_j of
+    candidate `c` over the perturbed population `pert` (rows = perturbed runs)."""
+    if len(pert):
+        pv = pert[c].to_numpy(dtype=float)
+        pabs = np.abs(pv[np.isfinite(pv)])
+        levels = []
+        for n in sorted(pert["design_no"].unique()):
+            s, nu = level_sd(pert.loc[pert["design_no"] == n, c].to_numpy(dtype=float))
+            levels.append((n, s, nu))
+    else:
+        pv, pabs, levels = np.array([]), np.array([]), []
+    sp, df = pooled_sd([(s, nu) for _, s, nu in levels])
+    tr = trigger([(s, nu) for _, s, nu in levels])
+    available = len(pabs) > 0
+    ruler = float(np.median(pabs)) if available else np.nan
+    lo, hi = sd_ci(sp, df) if available and np.isfinite(sp) else (np.nan, np.nan)
+    return {
+        "n_perturbed": int(len(pabs)), "perturbed_abs_delta": [float(x) for x in pabs],
+        "perturbed_delta_signed": [float(x) for x in pv],
+        "perturbed_keys": (list(pert["key"]) if len(pert) else []),
+        "ruler": ruler, "ruler_min": (float(pabs.min()) if available else np.nan),
+        "ruler_max": (float(pabs.max()) if available else np.nan),
+        "ruler_status": ("RULER UNAVAILABLE" if not available else ("RULER=0" if ruler == 0.0 else "RULER")),
+        "levels": [{"design_no": int(n), "sd": s, "df": nu, "sd_ci95": list(sd_ci(s, nu)) if nu >= 1 and np.isfinite(s) else [np.nan, np.nan]}
+                   for n, s, nu in levels],
+        "pooled_sd": sp, "pooled_df_satterthwaite": df, "pooled_sd_ci95": [lo, hi],
+        "trigger": tr, "bar": bar_B(pv),
+    }
+
+
+def summarize(recs, ids, gradable, defs, missing, data_dir=po.DATA):
     ex = exact_pairs(recs, ids)
-    pert = perturbed_deltas(recs, ids)
+    pert_all = perturbed_deltas(recs, ids)
+    # prompt 63 A1: structural-zero perturbed pairs leave the ruler / levels / trigger / B_j
+    sz = structural_zero_pairs(pert_all, recs, data_dir) if len(pert_all) else pd.DataFrame(
+        columns=["key", "structural_zero"])
+    sz_keys = list(sz.loc[sz["structural_zero"], "key"]) if len(sz) else []
+    pert = pert_all[~pert_all["key"].isin(sz_keys)].reset_index(drop=True) if len(pert_all) else pert_all
     per_cand = {}
     for c in ids:
         cd = defs["candidates"].get(c, {})
@@ -466,46 +561,31 @@ def summarize(recs, ids, gradable, defs, missing):
         ed_f = [x for x in ed if np.isfinite(x)]
         ex_levels = [(abs(x) / math.sqrt(2.0), 1) for x in ed_f]
         ex_sp, ex_df = pooled_sd(ex_levels)
-        # perturbed population
-        if len(pert):
-            pv = pert[c].to_numpy(dtype=float)
-            pabs = np.abs(pv[np.isfinite(pv)])
-            levels = []
-            for n in sorted(pert["design_no"].unique()):
-                s, nu = level_sd(pert.loc[pert["design_no"] == n, c].to_numpy(dtype=float))
-                levels.append((n, s, nu))
-        else:
-            pabs, levels = np.array([]), []
-        sp, df = pooled_sd([(s, nu) for _, s, nu in levels])
-        tr = trigger([(s, nu) for _, s, nu in levels])
-        available = len(pabs) > 0
-        ruler = float(np.median(pabs)) if available else np.nan
-        lo, hi = sd_ci(sp, df) if available and np.isfinite(sp) else (np.nan, np.nan)
         exact_zero = bool(len(ed_f) > 0 and all(x == 0.0 for x in ed_f))
+        new = perturbed_stats(pert, c)
+        old = perturbed_stats(pert_all, c)
         per_cand[c] = {
             "id": c, "family": cd.get("family"), "name": cd.get("name"), "unit": cd.get("unit"),
             "dir": cd.get("dir"), "gradable": c in gradable, "needs_full": bool(cd.get("needs_full", False)),
             "n_exact_pairs": len(ed_f), "exact_delta": ed, "exact_abs_delta_max": (max(abs(x) for x in ed_f) if ed_f else np.nan),
             "exact_zero": exact_zero, "exact_pooled_sd": ex_sp, "exact_df": ex_df,
-            "n_perturbed": int(len(pabs)), "perturbed_abs_delta": [float(x) for x in pabs],
-            "perturbed_delta_signed": ([float(x) for x in pert[c].to_numpy(dtype=float)] if len(pert) else []),
-            "ruler": ruler, "ruler_min": (float(pabs.min()) if available else np.nan),
-            "ruler_max": (float(pabs.max()) if available else np.nan),
-            "ruler_status": ("RULER UNAVAILABLE" if not available else ("RULER=0" if ruler == 0.0 else "RULER")),
-            "levels": [{"design_no": int(n), "sd": s, "df": nu, "sd_ci95": list(sd_ci(s, nu)) if nu >= 1 and np.isfinite(s) else [np.nan, np.nan]}
-                       for n, s, nu in levels],
-            "pooled_sd": sp, "pooled_df_satterthwaite": df, "pooled_sd_ci95": [lo, hi],
-            "trigger": tr,
+            **new,
+            "structural_zero_keys_excluded": sz_keys,
+            "perturbed_delta_signed_all": old["perturbed_delta_signed"],
+            "perturbed_keys_all": old["perturbed_keys"],
+            "with_structural_zeros": {k: old[k] for k in ("n_perturbed", "ruler", "ruler_status", "pooled_sd",
+                                                          "pooled_df_satterthwaite", "levels", "trigger", "bar")},
         }
     ruler_zero = [c for c in gradable if per_cand[c]["ruler_status"] == "RULER=0"]
     ruler_unavail = [c for c in gradable if per_cand[c]["ruler_status"] == "RULER UNAVAILABLE"]
     all_exact_zero = all(per_cand[c]["exact_zero"] for c in gradable if per_cand[c]["n_exact_pairs"] > 0)
     n_pairs = sum(1 for n in ex if ex[n]["complete"])
     md5_equal = sum(1 for n in ex if ex[n]["complete"] and ex[n]["overall_md5_equal"])
-    # covariance of the perturbed deltas (rows = perturbed runs)
-    if len(pert):
-        cols = [c for c in ids if np.isfinite(pert[c].to_numpy(dtype=float)).all()]
-        M = pert[cols].to_numpy(dtype=float)
+    # covariance of the perturbed deltas (rows = ALL perturbed runs; the plan-7 rider file is
+    # unchanged by prompt 63 A1 — the structural zeros stay in it, disclosed in section 10)
+    if len(pert_all):
+        cols = [c for c in ids if np.isfinite(pert_all[c].to_numpy(dtype=float)).all()]
+        M = pert_all[cols].to_numpy(dtype=float)
         cov = pd.DataFrame(np.cov(M, rowvar=False, ddof=1) if len(M) > 1 else np.full((len(cols), len(cols)), np.nan),
                            index=cols, columns=cols)
     else:
@@ -540,7 +620,12 @@ def summarize(recs, ids, gradable, defs, missing):
     ident = {"n_runs": len(recs), "n_with_identity_line": len(idl),
              "ruc_mipgap_values": sorted({i.get("ruc_mipgap") for i in idl if "ruc_mipgap" in i}),
              "ruc_time_limit_values": sorted({i.get("ruc_time_limit") for i in idl if "ruc_time_limit" in i})}
-    return {"per_candidate": per_cand, "exact_pairs": ex, "perturbed": pert, "cov": cov, "exact_cov": excov,
+    flagged = ([{"key": r["key"], "delta_rel": float(r["delta_rel"]),
+                 "note": "step differs from the nominal 0.001 relative (inward rule; PICK_RULE.md)"}
+                for _, r in pert_all.iterrows() if abs(float(r["delta_rel"]) - 0.001) > 1e-12] if len(pert_all) else [])
+    return {"per_candidate": per_cand, "exact_pairs": ex, "perturbed": pert_all, "perturbed_effective": pert,
+            "structural_zero": sz, "structural_zero_keys": sz_keys, "step_flagged": flagged,
+            "cov": cov, "exact_cov": excov,
             "suspect_runs": runs_s, "suspect_pairs": pairs_s, "readability": verdict,
             "ruler_zero": ruler_zero, "ruler_unavailable": ruler_unavail,
             "all_exact_zero": all_exact_zero, "n_exact_pairs": n_pairs, "n_md5_equal": md5_equal,
@@ -674,12 +759,16 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
           "`waves/noise_v3/PICK_RULE.md`), each read against the exact copy of the same design in the same batch. "
           "`ruler_j` = median |Δ_j| (prompt 57 section 3 A4). This population is never pooled with section 2.", ""]
     if len(pert):
-        L += ["| perturbed key | design | ref key | PEM MW | ref PEM MW | sign | delta_rel |", "|---|---|---|---|---|---|---|"]
+        szk = set(S["structural_zero_keys"])
+        L += ["| perturbed key | design | ref key | PEM MW | ref PEM MW | sign | delta_rel | in ruler (prompt 63 A1) |",
+              "|---|---|---|---|---|---|---|---|"]
         for _, r in pert.iterrows():
             L.append(f"| {r['key']} | D{r['design_no']} | {r['ref_key']} | {r['pem_mw']:.4f} | {r['pem_mw_ref']:.4f} | "
-                     f"{int(r['perturb_sign']):+d} | {r['delta_rel']:.3f} |")
-        L += [""]
-    L += ["| id | name | unit | n | ruler_j (median |Δ|) | min | max | status | |Δ| values |", "|---|---|---|---|---|---|---|---|---|"]
+                     f"{int(r['perturb_sign']):+d} | {r['delta_rel']:.3f} | "
+                     f"{'**no — STRUCTURAL ZERO** (section 10)' if r['key'] in szk else 'yes'} |")
+        L += ["", f"Since 2026-11-17 (prompt 63 A1) the ruler, the levels, the trigger and B_j use the "
+              f"{len(pert) - len(szk)} non-structural copies; the {len(szk)} structural-zero copies are listed in section 10.", ""]
+    L += ["| id | name | unit | n | ruler_j (median |Δ|) | min | max | status | |Δ| values (structural zeros excluded) |", "|---|---|---|---|---|---|---|---|---|"]
     for c in ids:
         p = pc[c]
         L.append(f"| {c} | {p['name']} | {p['unit']} | {p['n_perturbed']} | {_f(p['ruler'])} | {_f(p['ruler_min'])} | "
@@ -798,7 +887,73 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
           "- E8, E9, N5 use the CRC-computed `pool_full_metrics.json` (the gz tables are not in git).",
           f"- Outputs: `{os.path.relpath(out_dir, ERCOT)}/ercot_noise.csv`, `ercot_noise.json`, `ercot_noise_cov.csv` "
           "(perturbed; rider only), `ercot_noise_exact_cov.csv` (exact; tau).", ""]
+    L += md_structural_zero_section(S, gradable)
     return "\n".join(L)
+
+
+def _trig_short(t):
+    if t.get("fires"):
+        return "FIRES (sd-0 level)" if t.get("ratio") == float("inf") else f"FIRES (ratio {_f(t['ratio'], 3)})"
+    if "exact zeros" in t.get("verdict", ""):
+        return "all levels 0"
+    if t.get("n_levels", 0) < 2:
+        return "n/a"
+    return f"no (ratio {_f(t['ratio'], 3)}, p {_f(t['p'], 3)})"
+
+
+def md_structural_zero_section(S, gradable):
+    """Prompt 63 A1 dated section: the excluded pairs with their evidence, then old vs new."""
+    pc, sz = S["per_candidate"], S["structural_zero"]
+    L = ["## 10. 2026-11-17 — structural-zero perturbed pairs excluded (prompt 63 A1; memo F6)", "",
+         "Rule (generic, applied in code): a perturbed copy whose design MW differs from its exact copy's but whose "
+         "`overall.csv` is byte-identical (md5) to the exact copy's has an identical effective model input. It is "
+         "EXCLUDED from the ruler, the per-level sd, the pooled sd, the trigger and the 61 bar B_j. Evidence column: "
+         "the PEM slice is min(PEM capacity, availability_t) (`multi_pem/parameters.py:87-91`); when both capacities "
+         "are at or above the site's maximum hourly availability (REAL_TIME and DAY_AHEAD series), the capped input "
+         "series is identical. The exact cross-batch pairs (section 2) and the rider covariance `ercot_noise_cov.csv` "
+         "(section 5; all perturbed rows) are unchanged. The previous outputs are kept as "
+         "`ercot_noise_2026-11-16.json` (5ca9650).", ""]
+    if len(sz):
+        L += ["| perturbed key | ref key | site | PEM MW | ref PEM MW | overall md5 (pert / ref) | site max availability MW | capped input identical | evidence consistent | EXCLUDED |",
+              "|---|---|---|---|---|---|---|---|---|---|"]
+        for _, r in sz.iterrows():
+            av = r["site_max_availability_mw"]
+            av_ok = av is not None and np.isfinite(float(av))
+            L.append(f"| {r['key']} | {r['ref_key']} | {r['site']} | {r['pem_mw']:.4f} | {r['pem_mw_ref']:.4f} | "
+                     f"`{r['overall_md5'][:8]}` / `{r['ref_overall_md5'][:8]}` | "
+                     f"{f'{float(av):.2f}' if av_ok else 'n/a'} | "
+                     f"{'n/a' if r['capped_input_identical'] is None else ('yes' if r['capped_input_identical'] else 'no')} | "
+                     f"{'n/a' if r['evidence_consistent'] is None else ('yes' if r['evidence_consistent'] else '**NO**')} | "
+                     f"{'**yes**' if r['structural_zero'] else 'no'} |")
+        L += [""]
+    keys = S["structural_zero_keys"]
+    n_all = len(S["perturbed"])
+    L += [f"Excluded: {', '.join(keys) if keys else 'none'} ({len(keys)} of {n_all} perturbed copies; "
+          f"{n_all - len(keys)} remain).", ""]
+    for fl in S["step_flagged"]:
+        L.append(f"Flag (kept in the population, memo F9): {fl['key']} used delta_rel = {fl['delta_rel']:.3f} — "
+                 f"{fl['note']}.")
+    if S["step_flagged"]:
+        L.append("")
+    L += ["Old (all perturbed copies, 5ca9650) vs new (structural zeros excluded), gradable candidates. "
+          "B_j = max(3·σ̂_j, max_i |δ_ij|), σ̂_j = sqrt(mean δ_ij²) over the signed deltas "
+          "(`per_candidate.<j>.bar`; the old value is `per_candidate.<j>.with_structural_zeros.bar`). "
+          "B_j is the two-run contrast bar of prompt 61 section 3 (contract addendum 2026-11-17).", "",
+          "| id | unit | n old / new | ruler old | ruler new | pooled sd old | pooled sd new | trigger old | trigger new | σ̂ old | σ̂ new | B_j old | B_j new |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for c in gradable:
+        p = pc[c]
+        o = p["with_structural_zeros"]
+        L.append(f"| {c} | {p['unit']} | {o['n_perturbed']} / {p['n_perturbed']} | {_f(o['ruler'])} | {_f(p['ruler'])} | "
+                 f"{_f(o['pooled_sd'])} | {_f(p['pooled_sd'])} | {_trig_short(o['trigger'])} | {_trig_short(p['trigger'])} | "
+                 f"{_f(o['bar']['sigma_hat'])} | {_f(p['bar']['sigma_hat'])} | {_f(o['bar']['B'])} | {_f(p['bar']['B'])} |")
+    fires_old = [c for c in gradable if pc[c]["with_structural_zeros"]["trigger"].get("fires")]
+    fires_new = [c for c in gradable if pc[c]["trigger"].get("fires")]
+    L += ["", f"Trigger fires (gradable): old {len(fires_old)} ({', '.join(fires_old) or 'none'}); "
+          f"new {len(fires_new)} ({', '.join(fires_new) or 'none'}). The old reading fired wherever a structural level "
+          "had sd 0; the new reading is the order-of-magnitude detector of section 9 (df 2 per level).",
+          f"`RULER=0` (gradable, new): {', '.join(S['ruler_zero']) or 'none'}.", ""]
+    return L
 
 
 def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
@@ -814,11 +969,24 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
                                           "delta_rel", "overall_md5", "full_extract", "n_ruc", "n_ruc_optimal",
                                           "n_ruc_time_limit", "max_gap_pct", "G_run_usd", "wall_s", "identity",
                                           "pool_full_metrics_present", "runtimes_present", "gz_verified")})
-    js = {"prompt": "52 v2.1", "wave": WAVE, "identity": {"gap_decision_used": gap_used, "task_logs": S["identity"],
+    js = {"prompt": "52 v2.1 (+ 63 A1 2026-11-17)", "wave": WAVE, "identity": {"gap_decision_used": gap_used, "task_logs": S["identity"],
                                                             "G1": "analysis/gap_smoke/GAP_SMOKE.md",
                                                             "amendment": "ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b"},
           "populations": {"exact": "A exact vs B exact per design (tau); never pooled with perturbed",
-                          "perturbed": "perturbed copy vs the exact copy of the same design in the same batch; delta 0.001 relative on pem_mw"},
+                          "perturbed": "perturbed copy vs the exact copy of the same design in the same batch; delta 0.001 relative on pem_mw",
+                          "perturbed_effective": ("since 2026-11-17 (prompt 63 A1): the perturbed population WITHOUT the structural-zero "
+                                                  "copies (identical effective model input, detected by overall.csv md5 equality at a "
+                                                  "different design MW); per_candidate.<j>.ruler / levels / pooled_sd / trigger / bar / "
+                                                  "perturbed_delta_signed use it; *_all and with_structural_zeros keep the old population")},
+          "structural_zero": {"keys_excluded": S["structural_zero_keys"],
+                              "pairs": S["structural_zero"].to_dict(orient="records"),
+                              "rule": ("perturbed copy EXCLUDED iff its design MW differs from the exact copy's and overall.csv is "
+                                       "byte-identical (md5) to the exact copy's; evidence: both capacities >= the site's max hourly "
+                                       "availability (min(capacity, availability_t) identical)"),
+                              "source": "prompt 63 A1; noise memo debug/noise-assessment-2026-11-17.md F6",
+                              "previous_json": "ercot_noise_2026-11-16.json"},
+          "step_flagged": S["step_flagged"],
+          "bar_rule": "B_j = max(3 sigma_hat_j, max_i |delta_ij|), sigma_hat_j = sqrt(mean delta_ij^2) over per_candidate.<j>.perturbed_delta_signed (prompt 61 section 3)",
           "noise_floor": {"definition": "exact sd if > 0, else inferred-only with the 1e-9 bound (D-1025 pattern)",
                           "all_exact_zero": S["all_exact_zero"],
                           "floor": {c: (0.0 if S["per_candidate"][c]["exact_zero"] else S["per_candidate"][c]["exact_pooled_sd"]) for c in gradable}},
@@ -856,7 +1024,7 @@ def read_noise(extr=po.EXTR, waves=po.WAVES, data_dir=po.DATA, out_dir=HERE, def
     recs, missing, gap_used = load_rows(extr, waves, data_dir, defs)
     if not recs:
         raise SystemExit(f"no noise_v3 extracts under {extr}/{WAVE} (missing: {missing})")
-    S = summarize(recs, ids, gradable, defs, missing)
+    S = summarize(recs, ids, gradable, defs, missing, data_dir)
     fd = free_data(ercot)
     df, md = write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir)
     return S, df, md
@@ -879,6 +1047,15 @@ def main(argv=None):
           f"R2 {rv['R2']['ok']} ({rv['R2']['max_abs_delta_total_usd']} <= {rv['R2']['threshold_usd']:.0f}), "
           f"R3 {rv['R3']['ok']} ({rv['R3']['max_abs_delta_fixed_usd']} <= {rv['R3']['threshold_usd']:.0f}); "
           f"exact cov all zero: {bool(len(S['exact_cov']) and np.all(S['exact_cov'].to_numpy() == 0.0))}")
+    print(f"structural-zero perturbed copies EXCLUDED: {S['structural_zero_keys']}")
+    print("B_j (61 bar) old (all perturbed) -> new (structural zeros excluded):")
+    for c in ("V1", "E1", "E3", "R4", "N1", "N4"):
+        if c in S["per_candidate"]:
+            p = S["per_candidate"][c]
+            o = p["with_structural_zeros"]
+            print(f"  {c:3s} n {o['bar']['n']} -> {p['bar']['n']}  sigma_hat {o['bar']['sigma_hat']:.6g} -> {p['bar']['sigma_hat']:.6g}"
+                  f"  B {o['bar']['B']:.6g} -> {p['bar']['B']:.6g}  ruler {o['ruler']:.6g} -> {p['ruler']:.6g}"
+                  f"  trigger {o['trigger']['fires']} -> {p['trigger']['fires']}")
     print(f"exact pairs {S['n_exact_pairs']} (md5 equal {S['n_md5_equal']}); all exact zero: {S['all_exact_zero']}; "
           f"RULER=0: {S['ruler_zero']}; shed ok: {S['shed_ok']}; core-h median {S['runtime']['core_h_median']}")
     if S["missing"]:

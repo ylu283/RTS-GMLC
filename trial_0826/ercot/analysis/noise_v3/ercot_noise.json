@@ -1,5 +1,5 @@
 {
- "prompt": "52 v2.1",
+ "prompt": "52 v2.1 (+ 63 A1 2026-11-17)",
  "wave": "noise_v3",
  "identity": {
   "gap_decision_used": {
@@ -37,8 +37,164 @@
  },
  "populations": {
   "exact": "A exact vs B exact per design (tau); never pooled with perturbed",
-  "perturbed": "perturbed copy vs the exact copy of the same design in the same batch; delta 0.001 relative on pem_mw"
+  "perturbed": "perturbed copy vs the exact copy of the same design in the same batch; delta 0.001 relative on pem_mw",
+  "perturbed_effective": "since 2026-11-17 (prompt 63 A1): the perturbed population WITHOUT the structural-zero copies (identical effective model input, detected by overall.csv md5 equality at a different design MW); per_candidate.<j>.ruler / levels / pooled_sd / trigger / bar / perturbed_delta_signed use it; *_all and with_structural_zeros keep the old population"
  },
+ "structural_zero": {
+  "keys_excluded": [
+   "noise_v3/A:6",
+   "noise_v3/B:6"
+  ],
+  "pairs": [
+   {
+    "key": "noise_v3/A:5",
+    "ref_key": "noise_v3/A:1",
+    "design_no": 1,
+    "batch": "A",
+    "site": "275",
+    "unit_type": "WIND",
+    "pem_mw": 520.0194938922408,
+    "pem_mw_ref": 519.4999938983425,
+    "overall_md5": "ae41b4df71fc7ecc7fdd147e3d2111c3",
+    "ref_overall_md5": "fbaa386b6febf74717b960c14c7a7e98",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": 1039.0,
+    "capped_input_identical": false,
+    "evidence_consistent": true,
+    "structural_zero": false
+   },
+   {
+    "key": "noise_v3/A:6",
+    "ref_key": "noise_v3/A:2",
+    "design_no": 2,
+    "batch": "A",
+    "site": "206",
+    "unit_type": "WIND",
+    "pem_mw": 900.799913264856,
+    "pem_mw_ref": 899.9000132516045,
+    "overall_md5": "6dde259155688495cce42cd7918dd24b",
+    "ref_overall_md5": "6dde259155688495cce42cd7918dd24b",
+    "overall_md5_equal": true,
+    "site_max_availability_mw": 895.48,
+    "capped_input_identical": true,
+    "evidence_consistent": true,
+    "structural_zero": true
+   },
+   {
+    "key": "noise_v3/A:7",
+    "ref_key": "noise_v3/A:3",
+    "design_no": 3,
+    "batch": "A",
+    "site": "146",
+    "unit_type": "WIND",
+    "pem_mw": 133.86599959596563,
+    "pem_mw_ref": 133.9999995955612,
+    "overall_md5": "8c9944f6880b5be4999e1d37f4786efe",
+    "ref_overall_md5": "bdb103fb54a5bc708bda94cf50395612",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": 268.0,
+    "capped_input_identical": false,
+    "evidence_consistent": true,
+    "structural_zero": false
+   },
+   {
+    "key": "noise_v3/A:8",
+    "ref_key": "noise_v3/A:4",
+    "design_no": 4,
+    "batch": "A",
+    "site": "1",
+    "unit_type": "NUC",
+    "pem_mw": 2427.57,
+    "pem_mw_ref": 2430.0,
+    "overall_md5": "dbb4eec67e0af33de4c7ed2df7ddc1df",
+    "ref_overall_md5": "1f63f9b5d2975f9bbda2f1eefd20805b",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": null,
+    "capped_input_identical": null,
+    "evidence_consistent": null,
+    "structural_zero": false
+   },
+   {
+    "key": "noise_v3/B:5",
+    "ref_key": "noise_v3/B:1",
+    "design_no": 1,
+    "batch": "B",
+    "site": "275",
+    "unit_type": "WIND",
+    "pem_mw": 518.9804939044442,
+    "pem_mw_ref": 519.4999938983425,
+    "overall_md5": "ddc8b669a8483b7c4ce40ada160b87a2",
+    "ref_overall_md5": "fbaa386b6febf74717b960c14c7a7e98",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": 1039.0,
+    "capped_input_identical": false,
+    "evidence_consistent": true,
+    "structural_zero": false
+   },
+   {
+    "key": "noise_v3/B:6",
+    "ref_key": "noise_v3/B:2",
+    "design_no": 2,
+    "batch": "B",
+    "site": "206",
+    "unit_type": "WIND",
+    "pem_mw": 899.0001132383529,
+    "pem_mw_ref": 899.9000132516045,
+    "overall_md5": "6dde259155688495cce42cd7918dd24b",
+    "ref_overall_md5": "6dde259155688495cce42cd7918dd24b",
+    "overall_md5_equal": true,
+    "site_max_availability_mw": 895.48,
+    "capped_input_identical": true,
+    "evidence_consistent": true,
+    "structural_zero": true
+   },
+   {
+    "key": "noise_v3/B:7",
+    "ref_key": "noise_v3/B:3",
+    "design_no": 3,
+    "batch": "B",
+    "site": "146",
+    "unit_type": "WIND",
+    "pem_mw": 134.13399959515675,
+    "pem_mw_ref": 133.9999995955612,
+    "overall_md5": "f39f6ff01b2fa3a1545c186f34cab5e3",
+    "ref_overall_md5": "bdb103fb54a5bc708bda94cf50395612",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": 268.0,
+    "capped_input_identical": false,
+    "evidence_consistent": true,
+    "structural_zero": false
+   },
+   {
+    "key": "noise_v3/B:8",
+    "ref_key": "noise_v3/B:4",
+    "design_no": 4,
+    "batch": "B",
+    "site": "1",
+    "unit_type": "NUC",
+    "pem_mw": 2425.14,
+    "pem_mw_ref": 2430.0,
+    "overall_md5": "c34c877086bc0c33b45934217b077e6e",
+    "ref_overall_md5": "1f63f9b5d2975f9bbda2f1eefd20805b",
+    "overall_md5_equal": false,
+    "site_max_availability_mw": null,
+    "capped_input_identical": null,
+    "evidence_consistent": null,
+    "structural_zero": false
+   }
+  ],
+  "rule": "perturbed copy EXCLUDED iff its design MW differs from the exact copy's and overall.csv is byte-identical (md5) to the exact copy's; evidence: both capacities >= the site's max hourly availability (min(capacity, availability_t) identical)",
+  "source": "prompt 63 A1; noise memo debug/noise-assessment-2026-11-17.md F6",
+  "previous_json": "ercot_noise_2026-11-16.json"
+ },
+ "step_flagged": [
+  {
+   "key": "noise_v3/B:8",
+   "delta_rel": 0.002,
+   "note": "step differs from the nominal 0.001 relative (inward rule; PICK_RULE.md)"
+  }
+ ],
+ "bar_rule": "B_j = max(3 sigma_hat_j, max_i |delta_ij|), sigma_hat_j = sqrt(mean delta_ij^2) over per_candidate.<j>.perturbed_delta_signed (prompt 61 section 3)",
  "noise_floor": {
   "definition": "exact sd if > 0, else inferred-only with the 1e-9 bound (D-1025 pattern)",
   "all_exact_zero": true,
@@ -74,7 +230,6 @@
   "family_wise": "no correction; conservative consequence"
  },
  "ruler_zero": [
-  "N2",
   "E9"
  ],
  "ruler_unavailable": [],
@@ -416,29 +571,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     12267.729179999325,
-    0.0,
     3071.570668000728,
     2266.415008000098,
     149.40897399978712,
-    0.0,
     2573.602440999821,
     1632.307381999679
    ],
    "perturbed_delta_signed": [
     12267.729179999325,
-    0.0,
     3071.570668000728,
     2266.415008000098,
     149.40897399978712,
-    0.0,
     -2573.602440999821,
     -1632.307381999679
    ],
-   "ruler": 1949.3611949998885,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 2420.0087244999595,
+   "ruler_min": 149.40897399978712,
    "ruler_max": 12267.729179999325,
    "ruler_status": "RULER",
    "levels": [
@@ -449,15 +608,6 @@
      "sd_ci95": [
       3665.4563038401443,
       44244.79910253766
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -479,20 +629,110 @@
      ]
     }
    ],
-   "pooled_sd": 3917.3771139308737,
+   "pooled_sd": 4523.397462490539,
    "pooled_df_satterthwaite": 2.972822369262338,
    "pooled_sd_ci95": [
-    2215.101477200226,
-    14745.54882099752
+    2557.7788682877767,
+    17026.693162303374
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 12.928650301925856,
+    "p": 0.07179446524418331,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 12.93, p = 0.0718; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 5391.019423479199,
+    "B": 16173.058270437596,
+    "max_abs": 12267.729179999325,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    12267.729179999325,
+    0.0,
+    3071.570668000728,
+    2266.415008000098,
+    149.40897399978712,
+    0.0,
+    -2573.602440999821,
+    -1632.307381999679
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 1949.3611949998885,
+    "ruler_status": "RULER",
+    "pooled_sd": 3917.3771139308737,
+    "pooled_df_satterthwaite": 2.972822369262338,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 7040.0424583290605,
+      "df": 2,
+      "sd_ci95": [
+       3665.4563038401443,
+       44244.79910253766
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 2826.244720573739,
+      "df": 2,
+      "sd_ci95": [
+       1471.5076774807887,
+       17762.19825612704
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 1957.9368670492715,
+      "df": 2,
+      "sd_ci95": [
+       1019.416015503713,
+       12305.11376185764
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 4668.759773028325,
+     "B": 14006.279319084975,
+     "max_abs": 12267.729179999325,
+     "n": 8
+    }
    }
   },
   "E1": {
@@ -514,29 +754,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     227067.07736682892,
-    0.0,
     39105.130210876465,
     408500.73561286926,
     236730.68231773376,
-    0.0,
     209536.05596256256,
     1861892.788925171
    ],
    "perturbed_delta_signed": [
     227067.07736682892,
-    0.0,
     39105.130210876465,
     -408500.73561286926,
     -236730.68231773376,
-    0.0,
     -209536.05596256256,
     -1861892.788925171
    ],
-   "ruler": 218301.56666469574,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 231898.87984228134,
+   "ruler_min": 39105.130210876465,
    "ruler_max": 1861892.788925171,
    "ruler_status": "RULER",
    "levels": [
@@ -547,15 +791,6 @@
      "sd_ci95": [
       120748.80468476824,
       1457528.384543013
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -577,20 +812,110 @@
      ]
     }
    ],
-   "pooled_sd": 507273.44343563024,
+   "pooled_sd": 585748.918240619,
    "pooled_df_satterthwaite": 2.3024562919056106,
    "pooled_sd_ci95": [
-    272146.19956062536,
-    2592897.131521397
+    314247.3631505213,
+    2994019.7137297736
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 53.571007621877364,
+    "p": 0.018324748682102432,
     "df_num": 2,
     "df_den": 2,
     "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "verdict": "TRIGGER: scalar sd rejected (ratio 53.57 > 3, p = 0.0183 < 0.05)"
+   },
+   "bar": {
+    "sigma_hat": 794413.1011821972,
+    "B": 2383239.3035465917,
+    "max_abs": 1861892.788925171,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    227067.07736682892,
+    0.0,
+    39105.130210876465,
+    -408500.73561286926,
+    -236730.68231773376,
+    0.0,
+    -209536.05596256256,
+    -1861892.788925171
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 218301.56666469574,
+    "ruler_status": "RULER",
+    "pooled_sd": 507273.44343563024,
+    "pooled_df_satterthwaite": 2.3024562919056106,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 231915.65832681235,
+      "df": 2,
+      "sd_ci95": [
+       120748.80468476824,
+       1457528.384543013
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 133701.78845655636,
+      "df": 2,
+      "sd_ci95": [
+       69612.94143233121,
+       840280.2688940576
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 978593.0435306219,
+      "df": 2,
+      "sd_ci95": [
+       509512.5578482371,
+       6150197.654408731
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 687981.9267229604,
+     "B": 2063945.7801688812,
+     "max_abs": 1861892.788925171,
+     "n": 8
+    }
    }
   },
   "X1": {
@@ -612,29 +937,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     6693.338593482971,
-    0.0,
     22446.037449866533,
     4417.210639387369,
     17120.091357648373,
-    0.0,
     4301.653144985437,
     2489.569310128689
    ],
    "perturbed_delta_signed": [
     6693.338593482971,
-    0.0,
     22446.037449866533,
     4417.210639387369,
     -17120.091357648373,
-    0.0,
     4301.653144985437,
     2489.569310128689
    ],
-   "ruler": 4359.431892186403,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 5555.27461643517,
+   "ruler_min": 2489.569310128689,
    "ruler_max": 22446.037449866533,
    "ruler_status": "RULER",
    "levels": [
@@ -645,15 +974,6 @@
      "sd_ci95": [
       6394.3454533302875,
       77184.53216272799
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -675,20 +995,110 @@
      ]
     }
    ],
-   "pooled_sd": 8626.390614270504,
+   "pooled_sd": 9960.897886567873,
    "pooled_df_satterthwaite": 4.129001534921551,
    "pooled_sd_ci95": [
-    5199.2863627884935,
-    24186.657356182932
+    6003.618762299774,
+    27928.34627077892
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 30.754874602397745,
+    "p": 0.03149122811917804,
     "df_num": 2,
     "df_den": 2,
     "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "verdict": "TRIGGER: scalar sd rejected (ratio 30.75 > 3, p = 0.0315 < 0.05)"
+   },
+   "bar": {
+    "sigma_hat": 12151.384226940709,
+    "B": 36454.152680822124,
+    "max_abs": 22446.037449866533,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    6693.338593482971,
+    0.0,
+    22446.037449866533,
+    4417.210639387369,
+    -17120.091357648373,
+    0.0,
+    4301.653144985437,
+    2489.569310128689
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 4359.431892186403,
+    "ruler_status": "RULER",
+    "pooled_sd": 8626.390614270504,
+    "pooled_df_satterthwaite": 4.129001534921551,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 12281.271348810447,
+      "df": 2,
+      "sd_ci95": [
+       6394.3454533302875,
+       77184.53216272799
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 11913.21044599782,
+      "df": 2,
+      "sd_ci95": [
+       6202.71150163224,
+       74871.36703640452
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 2214.55436739606,
+      "df": 2,
+      "sd_ci95": [
+       1153.0260384388716,
+       13917.886670010512
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 10523.407431676187,
+     "B": 31570.22229502856,
+     "max_abs": 22446.037449866533,
+     "n": 8
+    }
    }
   },
   "R4": {
@@ -710,29 +1120,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     10.0,
-    0.0,
     37.0,
     20.0,
     90.0,
-    0.0,
     20.0,
     63.0
    ],
    "perturbed_delta_signed": [
     -10.0,
-    0.0,
     37.0,
     20.0,
     -90.0,
-    0.0,
     -20.0,
     63.0
    ],
-   "ruler": 20.0,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 28.5,
+   "ruler_min": 10.0,
    "ruler_max": 90.0,
    "ruler_status": "RULER",
    "levels": [
@@ -743,15 +1157,6 @@
      "sd_ci95": [
       25.683462409221967,
       310.0186007845975
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -773,20 +1178,110 @@
      ]
     }
    ],
-   "pooled_sd": 32.810059433045836,
+   "pooled_sd": 37.88579329159327,
    "pooled_df_satterthwaite": 4.819419663801927,
    "pooled_sd_ci95": [
-    20.345469851274483,
-    82.41981974631652
+    23.492924990845477,
+    95.17021023419254
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 2.9095257074531684,
+    "p": 0.2557855031093893,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 2.91, p = 0.256; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 48.88421694848621,
+    "B": 146.65265084545865,
+    "max_abs": 90.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -10.0,
+    0.0,
+    37.0,
+    20.0,
+    -90.0,
+    0.0,
+    -20.0,
+    63.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 20.0,
+    "ruler_status": "RULER",
+    "pooled_sd": 32.810059433045836,
+    "pooled_df_satterthwaite": 4.819419663801927,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 49.32882862316247,
+      "df": 2,
+      "sd_ci95": [
+       25.683462409221967,
+       310.0186007845975
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 28.919428302325294,
+      "df": 2,
+      "sd_ci95": [
+       15.057139413811278,
+       181.75093445392648
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 32.19213154380016,
+      "df": 2,
+      "sd_ci95": [
+       16.761099410937394,
+       202.319006066899
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 42.33497372149887,
+     "B": 127.00492116449661,
+     "max_abs": 90.0,
+     "n": 8
+    }
    }
   },
   "N1": {
@@ -808,29 +1303,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     9.0,
-    0.0,
     65.0,
     15.0,
     55.0,
-    0.0,
     15.0,
     32.0
    ],
    "perturbed_delta_signed": [
     -9.0,
-    0.0,
     -65.0,
     15.0,
     55.0,
-    0.0,
     -15.0,
     32.0
    ],
-   "ruler": 15.0,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 23.5,
+   "ruler_min": 9.0,
    "ruler_max": 65.0,
    "ruler_status": "RULER",
    "levels": [
@@ -841,15 +1340,6 @@
      "sd_ci95": [
       18.038636270382383,
       217.73983147218684
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -871,20 +1361,110 @@
      ]
     }
    ],
-   "pooled_sd": 25.568535351091196,
+   "pooled_sd": 29.52400153547393,
    "pooled_df_satterthwaite": 4.801714600896061,
    "pooled_sd_ci95": [
-    15.8444830528273,
-    64.38574514138831
+    18.295633111440612,
+    74.34625457871036
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 4.6827048114434335,
+    "p": 0.17597254004576657,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 4.68, p = 0.176; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 38.30796261875591,
+    "B": 114.92388785626773,
+    "max_abs": 65.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -9.0,
+    0.0,
+    -65.0,
+    15.0,
+    55.0,
+    0.0,
+    -15.0,
+    32.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 15.0,
+    "ruler_status": "RULER",
+    "pooled_sd": 25.568535351091196,
+    "pooled_df_satterthwaite": 4.801714600896061,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 34.64582706955245,
+      "df": 2,
+      "sd_ci95": [
+       18.038636270382383,
+       217.73983147218684
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 34.03429642777023,
+      "df": 2,
+      "sd_ci95": [
+       17.720237786398798,
+       213.89652362981874
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 16.010413278030438,
+      "df": 2,
+      "sd_ci95": [
+       8.335954026472091,
+       100.62119983338711
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 33.17566879506727,
+     "B": 99.5270063852018,
+     "max_abs": 65.0,
+     "n": 8
+    }
    }
   },
   "E4": {
@@ -906,29 +1486,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     1309762.918460846,
-    0.0,
     409163.1261959076,
     5214049.577060699,
     2751596.440191269,
-    0.0,
     1164627.3098583221,
     3198307.522338867
    ],
    "perturbed_delta_signed": [
     -1309762.918460846,
-    0.0,
     409163.1261959076,
     -5214049.577060699,
     2751596.440191269,
-    0.0,
     -1164627.3098583221,
     -3198307.522338867
    ],
-   "ruler": 1237195.114159584,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 2030679.6793260574,
+   "ruler_min": 409163.1261959076,
    "ruler_max": 5214049.577060699,
    "ruler_status": "RULER",
    "levels": [
@@ -939,15 +1523,6 @@
      "sd_ci95": [
       1079270.7471727487,
       13027605.140423063
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -969,20 +1544,110 @@
      ]
     }
    ],
-   "pooled_sd": 1723135.3365589122,
+   "pooled_sd": 1989705.3008248887,
    "pooled_df_satterthwaite": 4.229679877980807,
    "pooled_sd_ci95": [
-    1043248.8749397146,
-    4744330.377579937
+    1204640.0375564368,
+    5478280.841240591
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 10.368152000473199,
+    "p": 0.08796504479869505,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 10.37, p = 0.088; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 2835078.397106825,
+    "B": 8505235.191320475,
+    "max_abs": 5214049.577060699,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -1309762.918460846,
+    0.0,
+    409163.1261959076,
+    -5214049.577060699,
+    2751596.440191269,
+    0.0,
+    -1164627.3098583221,
+    -3198307.522338867
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 1237195.114159584,
+    "ruler_status": "RULER",
+    "pooled_sd": 1723135.3365589122,
+    "pooled_df_satterthwaite": 4.229679877980807,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 2072896.593029484,
+      "df": 2,
+      "sd_ci95": [
+       1079270.7471727487,
+       13027605.140423063
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 816556.5474725764,
+      "df": 2,
+      "sd_ci95": [
+       425146.91666869493,
+       5131841.26553704
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 2629280.637698914,
+      "df": 2,
+      "sd_ci95": [
+       1368956.6994892475,
+       16524331.250523696
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 2455249.9136149767,
+     "B": 7365749.74084493,
+     "max_abs": 5214049.577060699,
+     "n": 8
+    }
    }
   },
   "R2": {
@@ -1004,29 +1669,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     34.705607999999984,
-    0.0,
     21.872152,
     28.269957000000005,
     20.987367000000006,
-    0.0,
     24.240893999999997,
     58.872862
    ],
    "perturbed_delta_signed": [
     34.705607999999984,
-    0.0,
     -21.872152,
     -28.269957000000005,
     -20.987367000000006,
-    0.0,
     -24.240893999999997,
     58.872862
    ],
-   "ruler": 23.056523,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 26.2554255,
+   "ruler_min": 20.987367000000006,
    "ruler_max": 58.872862,
    "ruler_status": "RULER",
    "levels": [
@@ -1037,15 +1706,6 @@
      "sd_ci95": [
       14.644381511485014,
       176.7686378576534
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1067,20 +1727,110 @@
      ]
     }
    ],
-   "pooled_sd": 27.139573220672258,
+   "pooled_sd": 31.338079809293372,
    "pooled_df_satterthwaite": 3.8034928139160047,
    "pooled_sd_ci95": [
-    16.10552658196931,
-    81.21406569620022
+    18.59706021508131,
+    93.77792538337029
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 11.0664629326115,
+    "p": 0.08287432743006595,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 11.07, p = 0.0829; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 34.09830182508015,
+    "B": 102.29490547524045,
+    "max_abs": 58.872862,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    34.705607999999984,
+    0.0,
+    -21.872152,
+    -28.269957000000005,
+    -20.987367000000006,
+    0.0,
+    -24.240893999999997,
+    58.872862
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 23.056523,
+    "ruler_status": "RULER",
+    "pooled_sd": 27.139573220672258,
+    "pooled_df_satterthwaite": 3.8034928139160047,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 28.126666660522766,
+      "df": 2,
+      "sd_ci95": [
+       14.644381511485014,
+       176.7686378576534
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 13.36427397761724,
+      "df": 2,
+      "sd_ci95": [
+       6.958219724875164,
+       83.99091636036673
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 44.45798625691387,
+      "df": 2,
+      "sd_ci95": [
+       23.14741806544749,
+       279.40664876436074
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 29.5299956064287,
+     "B": 88.5899868192861,
+     "max_abs": 58.872862,
+     "n": 8
+    }
    }
   },
   "R7": {
@@ -1102,29 +1852,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     123535.69999998808,
-    0.0,
     67905.79999995232,
     103175.0,
     101819.39999997616,
-    0.0,
     50178.60000002384,
     68979.0
    ],
    "perturbed_delta_signed": [
     123535.69999998808,
-    0.0,
     -67905.79999995232,
     103175.0,
     101819.39999997616,
-    0.0,
     -50178.60000002384,
     -68979.0
    ],
-   "ruler": 68442.39999997616,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 85399.19999998808,
+   "ruler_min": 50178.60000002384,
    "ruler_max": 123535.69999998808,
    "ruler_status": "RULER",
    "levels": [
@@ -1135,15 +1889,6 @@
      "sd_ci95": [
       34339.67713977682,
       414505.5868497652
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1165,20 +1910,110 @@
      ]
     }
    ],
-   "pooled_sd": 57221.56610126921,
+   "pooled_sd": 66073.77318403948,
    "pooled_df_satterthwaite": 4.466436119267273,
    "pooled_sd_ci95": [
-    34994.89565008324,
-    151430.27916752326
+    40408.624847676845,
+    174856.62488165946
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 6.051068938193957,
+    "p": 0.14182246816269783,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 6.05, p = 0.142; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 89592.16114188239,
+    "B": 268776.48342564714,
+    "max_abs": 123535.69999998808,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    123535.69999998808,
+    0.0,
+    -67905.79999995232,
+    103175.0,
+    101819.39999997616,
+    0.0,
+    -50178.60000002384,
+    -68979.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 68442.39999997616,
+    "ruler_status": "RULER",
+    "pooled_sd": 57221.56610126921,
+    "pooled_df_satterthwaite": 4.466436119267273,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 65954.3492077825,
+      "df": 2,
+      "sd_ci95": [
+       34339.67713977682,
+       414505.5868497652
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 35221.54452280919,
+      "df": 2,
+      "sd_ci95": [
+       18338.388321703333,
+       221358.0629260373
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 86641.19765061731,
+      "df": 2,
+      "sd_ci95": [
+       45110.45579348565,
+       544516.9410192273
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 77589.08752881917,
+     "B": 232767.26258645754,
+     "max_abs": 123535.69999998808,
+     "n": 8
+    }
    }
   },
   "N4": {
@@ -1200,29 +2035,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     1.0,
-    0.0,
     5.0,
     16.0,
     17.0,
-    0.0,
     12.0,
     14.0
    ],
    "perturbed_delta_signed": [
     1.0,
-    0.0,
     -5.0,
     -16.0,
     -17.0,
-    0.0,
     -12.0,
     14.0
    ],
-   "ruler": 8.5,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 13.0,
+   "ruler_min": 1.0,
    "ruler_max": 17.0,
    "ruler_status": "RULER",
    "levels": [
@@ -1233,15 +2072,6 @@
      "sd_ci95": [
       5.266975869172569,
       63.57633808519602
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1263,20 +2093,110 @@
      ]
     }
    ],
-   "pooled_sd": 9.539392014169456,
+   "pooled_sd": 11.015141094572204,
    "pooled_df_satterthwaite": 4.235309160264674,
    "pooled_sd_ci95": [
-    5.7769257142456265,
-    26.238905362192828
+    6.670619232416367,
+    30.29807814820629
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 6.201834862385323,
+    "p": 0.13885350318471334,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 6.20, p = 0.139; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 12.322066926183016,
+    "B": 36.96620077854905,
+    "max_abs": 17.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    1.0,
+    0.0,
+    -5.0,
+    -16.0,
+    -17.0,
+    0.0,
+    -12.0,
+    14.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 8.5,
+    "ruler_status": "RULER",
+    "pooled_sd": 9.539392014169456,
+    "pooled_df_satterthwaite": 4.235309160264674,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 10.115993936995679,
+      "df": 2,
+      "sd_ci95": [
+       5.266975869172569,
+       63.57633808519602
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 6.027713773341707,
+      "df": 2,
+      "sd_ci95": [
+       3.1383790053850706,
+       37.88258189175788
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 15.01110699893027,
+      "df": 2,
+      "sd_ci95": [
+       7.81565695129449,
+       94.34082498871813
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 10.671222985206523,
+     "B": 32.013668955619565,
+     "max_abs": 17.0,
+     "n": 8
+    }
    }
   },
   "N5": {
@@ -1298,29 +2218,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     0.04210326998121161,
-    0.0,
     0.06172441927897765,
     0.02850381870036145,
     0.06710617263377117,
-    0.0,
     0.03829950125317083,
     0.09933877929069723
    ],
    "perturbed_delta_signed": [
     -0.04210326998121161,
-    0.0,
     -0.06172441927897765,
     -0.02850381870036145,
     0.06710617263377117,
-    0.0,
     0.03829950125317083,
     -0.09933877929069723
    ],
-   "ruler": 0.04020138561719122,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.05191384463009463,
+   "ruler_min": 0.02850381870036145,
    "ruler_max": 0.09933877929069723,
    "ruler_status": "RULER",
    "levels": [
@@ -1331,15 +2255,6 @@
      "sd_ci95": [
       0.028677690098019838,
       0.3461611684696425
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1361,20 +2276,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.04526883535632483,
+   "pooled_sd": 0.052271948557749984,
    "pooled_df_satterthwaite": 5.963075685176516,
    "pooled_sd_ci95": [
-    0.029140252762750455,
-    0.10002194771948944
+    0.033648265553655424,
+    0.11549539688143581
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 1.1911512593849125,
+    "p": 0.4563810899484475,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 1.19, p = 0.456; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 0.060873284002784404,
+    "B": 0.1826198520083532,
+    "max_abs": 0.09933877929069723,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -0.04210326998121161,
+    0.0,
+    -0.06172441927897765,
+    -0.02850381870036145,
+    0.06710617263377117,
+    0.0,
+    0.03829950125317083,
+    -0.09933877929069723
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.04020138561719122,
+    "ruler_status": "RULER",
+    "pooled_sd": 0.04526883535632483,
+    "pooled_df_satterthwaite": 5.963075685176516,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.05507967880706929,
+      "df": 2,
+      "sd_ci95": [
+       0.028677690098019838,
+       0.3461611684696425
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.050467052635341896,
+      "df": 2,
+      "sd_ci95": [
+       0.026276088150518354,
+       0.3171720367263057
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.05115051709302549,
+      "df": 2,
+      "sd_ci95": [
+       0.026631939570406184,
+       0.32146742951731916
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 0.05271781035819617,
+     "B": 0.1581534310745885,
+     "max_abs": 0.09933877929069723,
+     "n": 8
+    }
    }
   },
   "E6": {
@@ -1396,29 +2401,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     361946.9003677368,
-    0.0,
     1554724.325170517,
     785698.4212908745,
     559020.1522622108,
-    0.0,
     1364964.8086709976,
     545212.2938055992
    ],
    "perturbed_delta_signed": [
     -361946.9003677368,
-    0.0,
     1554724.325170517,
     -785698.4212908745,
     559020.1522622108,
-    0.0,
     1364964.8086709976,
     -545212.2938055992
    ],
-   "ruler": 552116.223033905,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 672359.2867765427,
+   "ruler_min": 361946.9003677368,
    "ruler_max": 1554724.325170517,
    "ruler_status": "RULER",
    "levels": [
@@ -1429,15 +2438,6 @@
      "sd_ci95": [
       241577.33785708333,
       2916019.151562272
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1459,20 +2459,110 @@
      ]
     }
    ],
-   "pooled_sd": 523625.4531186419,
+   "pooled_sd": 604630.5926251754,
    "pooled_df_satterthwaite": 4.0765068568175264,
    "pooled_sd_ci95": [
-    314842.3173614483,
-    1482625.8319997138
+    363548.5933618355,
+    1711988.846425055
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 4.4387617471125465,
+    "p": 0.1838653808527102,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 4.44, p = 0.184; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 969397.0806678401,
+    "B": 2908191.24200352,
+    "max_abs": 1554724.325170517,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -361946.9003677368,
+    0.0,
+    1554724.325170517,
+    -785698.4212908745,
+    559020.1522622108,
+    0.0,
+    1364964.8086709976,
+    -545212.2938055992
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 552116.223033905,
+    "ruler_status": "RULER",
+    "pooled_sd": 523625.4531186419,
+    "pooled_df_satterthwaite": 4.0765068568175264,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 463984.4468210421,
+      "df": 2,
+      "sd_ci95": [
+       241577.33785708333,
+       2916019.151562272
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 848165.2089745747,
+      "df": 2,
+      "sd_ci95": [
+       441604.22757899703,
+       5330493.317187872
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 402577.5353992072,
+      "df": 2,
+      "sd_ci95": [
+       209605.321792859,
+       2530093.004745926
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 839522.4982128224,
+     "B": 2518567.494638467,
+     "max_abs": 1554724.325170517,
+     "n": 8
+    }
    }
   },
   "R5": {
@@ -1494,29 +2584,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     5414.100000000093,
-    0.0,
     7654.709999999963,
     1945.1999999999534,
     3846.5100000000093,
-    0.0,
     297.089999999851,
     8808.449999999953
    ],
    "perturbed_delta_signed": [
     -5414.100000000093,
-    0.0,
     7654.709999999963,
     1945.1999999999534,
     -3846.5100000000093,
-    0.0,
     297.089999999851,
     8808.449999999953
    ],
-   "ruler": 2895.8549999999814,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 4630.305000000051,
+   "ruler_min": 297.089999999851,
    "ruler_max": 8808.449999999953,
    "ruler_status": "RULER",
    "levels": [
@@ -1527,15 +2621,6 @@
      "sd_ci95": [
       1450.47108304063,
       17508.27082727425
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1557,20 +2642,110 @@
      ]
     }
    ],
-   "pooled_sd": 3463.2575652591963,
+   "pooled_sd": 3999.02537515081,
    "pooled_df_satterthwaite": 5.277507036879599,
    "pooled_sd_ci95": [
-    2182.6199627535484,
-    8212.145845783369
+    2520.272446068824,
+    9482.56922937499
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 2.759058000126497,
+    "p": 0.26602409432532004,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 2.76, p = 0.266; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 5540.209985262282,
+    "B": 16620.629955786848,
+    "max_abs": 8808.449999999953,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -5414.100000000093,
+    0.0,
+    7654.709999999963,
+    1945.1999999999534,
+    -3846.5100000000093,
+    0.0,
+    297.089999999851,
+    8808.449999999953
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 2895.8549999999814,
+    "ruler_status": "RULER",
+    "pooled_sd": 3463.2575652591963,
+    "pooled_df_satterthwaite": 5.277507036879599,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 2785.840878388467,
+      "df": 2,
+      "sd_ci95": [
+       1450.47108304063,
+       17508.27082727425
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 4336.231461315247,
+      "df": 2,
+      "sd_ci95": [
+       2257.6947566535564,
+       27252.064316886655
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 4627.396586364717,
+      "df": 2,
+      "sd_ci95": [
+       2409.292285984977,
+       29081.95988068937
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 4797.962589537347,
+     "B": 14393.887768612043,
+     "max_abs": 8808.449999999953,
+     "n": 8
+    }
    }
   },
   "N3": {
@@ -1592,29 +2767,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     6.04212600000028,
-    0.0,
     5.002896999998484,
     0.8888040000019828,
     0.34347799999522977,
-    0.0,
     7.038224000003538,
     4.265429000006407
    ],
    "perturbed_delta_signed": [
     6.04212600000028,
-    0.0,
     -5.002896999998484,
     -0.8888040000019828,
     0.34347799999522977,
-    0.0,
     -7.038224000003538,
     -4.265429000006407
    ],
-   "ruler": 2.5771165000041947,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 4.634163000002445,
+   "ruler_min": 0.34347799999522977,
    "ruler_max": 7.038224000003538,
    "ruler_status": "RULER",
    "levels": [
@@ -1625,15 +2804,6 @@
      "sd_ci95": [
       1.7669151888121197,
       21.32798786287865
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1655,20 +2825,110 @@
      ]
     }
    ],
-   "pooled_sd": 2.7248351458028686,
+   "pooled_sd": 3.1463686098532784,
    "pooled_df_satterthwaite": 5.339747203955677,
    "pooled_sd_ci95": [
-    1.7207973899455233,
-    6.415382573328916
+    1.9870056726117062,
+    7.407845711331767
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 2.590322750202833,
+    "p": 0.27852649178782196,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 2.59, p = 0.279; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 4.657873196851665,
+    "B": 13.973619590554996,
+    "max_abs": 7.038224000003538,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    6.04212600000028,
+    0.0,
+    -5.002896999998484,
+    -0.8888040000019828,
+    0.34347799999522977,
+    0.0,
+    -7.038224000003538,
+    -4.265429000006407
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 2.5771165000041947,
+    "ruler_status": "RULER",
+    "pooled_sd": 2.7248351458028686,
+    "pooled_df_satterthwaite": 5.339747203955677,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 3.3936178522908182,
+      "df": 2,
+      "sd_ci95": [
+       1.7669151888121197,
+       21.32798786287865
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 3.6218809906771097,
+      "df": 2,
+      "sd_ci95": [
+       1.8857622787955732,
+       22.762561128621897
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 2.2503871331828686,
+      "df": 2,
+      "sd_ci95": [
+       1.1716826641644584,
+       14.14308609642163
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 4.033836516080178,
+     "B": 12.101509548240532,
+     "max_abs": 7.038224000003538,
+     "n": 8
+    }
    }
   },
   "E2": {
@@ -1690,29 +2950,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     578025.896458149,
-    0.0,
     1003431.1755599976,
     1555090.745271206,
     676801.8945970535,
-    0.0,
     997402.768532753,
     634828.5046238899
    ],
    "perturbed_delta_signed": [
     578025.896458149,
-    0.0,
     -1003431.1755599976,
     1555090.745271206,
     676801.8945970535,
-    0.0,
     -997402.768532753,
     -634828.5046238899
    ],
-   "ruler": 655815.1996104717,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 837102.3315649033,
+   "ruler_min": 578025.896458149,
    "ruler_max": 1555090.745271206,
    "ruler_status": "RULER",
    "levels": [
@@ -1723,15 +2987,6 @@
      "sd_ci95": [
       190346.88020882866,
       2297629.2108055414
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1753,20 +3008,110 @@
      ]
     }
    ],
-   "pooled_sd": 658935.8518709291,
+   "pooled_sd": 760873.5829127526,
    "pooled_df_satterthwaite": 3.465517424468882,
    "pooled_sd_ci95": [
-    384080.53380622505,
-    2136565.665705456
+    443497.99916703836,
+    2467093.5244727144
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 9.49839400719977,
+    "p": 0.09525266429457713,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 9.50, p = 0.0953; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 967399.9176986463,
+    "B": 2902199.753095939,
+    "max_abs": 1555090.745271206,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    578025.896458149,
+    0.0,
+    -1003431.1755599976,
+    1555090.745271206,
+    676801.8945970535,
+    0.0,
+    -997402.768532753,
+    -634828.5046238899
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 655815.1996104717,
+    "ruler_status": "RULER",
+    "pooled_sd": 658935.8518709291,
+    "pooled_df_satterthwaite": 3.465517424468882,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 365588.8946423165,
+      "df": 2,
+      "sd_ci95": [
+       190346.88020882866,
+       2297629.2108055414
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 577598.872986811,
+      "df": 2,
+      "sd_ci95": [
+       300731.6280565407,
+       3630055.677706697
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 1126725.4011346523,
+      "df": 2,
+      "sd_ci95": [
+       586638.8944003705,
+       7081170.221913841
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 837792.9043460028,
+     "B": 2513378.7130380087,
+     "max_abs": 1555090.745271206,
+     "n": 8
+    }
    }
   },
   "R6": {
@@ -1788,29 +3133,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     11321.704507000744,
-    0.0,
     275.4773490000516,
     23925.880752999336,
     8361.395610999316,
-    0.0,
     56814.416704000905,
     55825.059775998816
    ],
    "perturbed_delta_signed": [
     11321.704507000744,
-    0.0,
     275.4773490000516,
     23925.880752999336,
     -8361.395610999316,
-    0.0,
     -56814.416704000905,
     55825.059775998816
    ],
-   "ruler": 9841.55005900003,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 17623.79263000004,
+   "ruler_min": 275.4773490000516,
    "ruler_max": 56814.416704000905,
    "ruler_status": "RULER",
    "levels": [
@@ -1821,15 +3170,6 @@
      "sd_ci95": [
       5143.365670470978,
       62084.27053473937
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1851,20 +3191,110 @@
      ]
     }
    ],
-   "pooled_sd": 22153.97903225023,
+   "pooled_sd": 25581.211515781994,
    "pooled_df_satterthwaite": 4.297138805614728,
    "pooled_sd_ci95": [
-    13452.332711244973,
-    60286.461070799945
+    15533.415824131389,
+    69612.80905543249
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 11.079430265513384,
+    "p": 0.08278536139696813,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 11.08, p = 0.0828; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 34435.768302482946,
+    "B": 103307.30490744884,
+    "max_abs": 56814.416704000905,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    11321.704507000744,
+    0.0,
+    275.4773490000516,
+    23925.880752999336,
+    -8361.395610999316,
+    0.0,
+    -56814.416704000905,
+    55825.059775998816
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 9841.55005900003,
+    "ruler_status": "RULER",
+    "pooled_sd": 22153.97903225023,
+    "pooled_df_satterthwaite": 4.297138805614728,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 9878.582554890265,
+      "df": 2,
+      "sd_ci95": [
+       5143.365670470978,
+       62084.27053473937
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 32881.630728439,
+      "df": 2,
+      "sd_ci95": [
+       17120.092861301742,
+       206652.3255157919
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 28007.268970578436,
+      "df": 2,
+      "sd_ci95": [
+       14582.216117190748,
+       176018.25505298097
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 29822.250148785166,
+     "B": 89466.7504463555,
+     "max_abs": 56814.416704000905,
+     "n": 8
+    }
    }
   },
   "N2": {
@@ -1886,12 +3316,10 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     1.0,
-    0.0,
     2.0,
-    0.0,
     0.0,
     0.0,
     0.0,
@@ -1899,18 +3327,24 @@
    ],
    "perturbed_delta_signed": [
     -1.0,
-    0.0,
     -2.0,
-    0.0,
     0.0,
     0.0,
     0.0,
     1.0
    ],
-   "ruler": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.5,
    "ruler_min": 0.0,
    "ruler_max": 2.0,
-   "ruler_status": "RULER=0",
+   "ruler_status": "RULER",
    "levels": [
     {
      "design_no": 1,
@@ -1919,15 +3353,6 @@
      "sd_ci95": [
       0.3006021904344035,
       3.6284932687968516
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -1949,20 +3374,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.7071067811865476,
+   "pooled_sd": 0.8164965809277261,
    "pooled_df_satterthwaite": 3.999999999999999,
    "pooled_sd_ci95": [
-    0.42365110551537305,
-    2.0319106749739255
+    0.4891901596235664,
+    2.3462483503309404
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 4.0,
+    "p": 0.19999999999999996,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 4.00, p = 0.2; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 1.0,
+    "B": 3.0,
+    "max_abs": 2.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -1.0,
+    0.0,
+    -2.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.0,
+    "ruler_status": "RULER=0",
+    "pooled_sd": 0.7071067811865476,
+    "pooled_df_satterthwaite": 3.999999999999999,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.5773502691896258,
+      "df": 2,
+      "sd_ci95": [
+       0.3006021904344035,
+       3.6284932687968516
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 1.1547005383792517,
+      "df": 2,
+      "sd_ci95": [
+       0.601204380868807,
+       7.256986537593703
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.5773502691896258,
+      "df": 2,
+      "sd_ci95": [
+       0.3006021904344035,
+       3.6284932687968516
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 0.8660254037844386,
+     "B": 2.598076211353316,
+     "max_abs": 2.0,
+     "n": 8
+    }
    }
   },
   "E3": {
@@ -1984,29 +3499,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     350958.8190908432,
-    0.0,
     1042536.305770874,
     1963591.4808835983,
     913532.5769138336,
-    0.0,
     787866.7125701904,
     1227064.2842998505
    ],
    "perturbed_delta_signed": [
     -350958.8190908432,
-    0.0,
     1042536.305770874,
     -1963591.4808835983,
     -913532.5769138336,
-    0.0,
     787866.7125701904,
     -1227064.2842998505
    ],
-   "ruler": 850699.644742012,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 978034.4413423538,
+   "ruler_min": 350958.8190908432,
    "ruler_max": 1963591.4808835983,
    "ruler_status": "RULER",
    "levels": [
@@ -2017,15 +3536,6 @@
      "sd_ci95": [
       239936.5836497556,
       2896214.0211058524
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2047,20 +3557,110 @@
      ]
     }
    ],
-   "pooled_sd": 610686.982524925,
+   "pooled_sd": 705160.5875027315,
    "pooled_df_satterthwaite": 4.043942228044839,
    "pooled_sd_ci95": [
-    366636.84021853865,
-    1739917.171337534
+    423355.7567900142,
+    2009083.2944787547
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 4.633367001803554,
+    "p": 0.17751373196169262,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 4.63, p = 0.178; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 1156626.4182966163,
+    "B": 3469879.2548898486,
+    "max_abs": 1963591.4808835983,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -350958.8190908432,
+    0.0,
+    1042536.305770874,
+    -1963591.4808835983,
+    -913532.5769138336,
+    0.0,
+    787866.7125701904,
+    -1227064.2842998505
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 850699.644742012,
+    "ruler_status": "RULER",
+    "pooled_sd": 610686.982524925,
+    "pooled_df_satterthwaite": 4.043942228044839,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 460833.13950054074,
+      "df": 2,
+      "sd_ci95": [
+       239936.5836497556,
+       2896214.0211058524
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 543518.2467540444,
+      "df": 2,
+      "sd_ci95": [
+       282987.268274176,
+       3415867.983543937
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 991955.1882444473,
+      "df": 2,
+      "sd_ci95": [
+       516469.6689543171,
+       6234175.188911067
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 1001667.8609330762,
+     "B": 3005003.582799229,
+     "max_abs": 1963591.4808835983,
+     "n": 8
+    }
    }
   },
   "R8": {
@@ -2082,29 +3682,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     520.0,
-    0.0,
     740.0,
     129.0,
     424.0,
-    0.0,
     174.0,
     737.0
    ],
    "perturbed_delta_signed": [
     520.0,
-    0.0,
     740.0,
     129.0,
     -424.0,
-    0.0,
     174.0,
     737.0
    ],
-   "ruler": 299.0,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 472.0,
+   "ruler_min": 129.0,
    "ruler_max": 740.0,
    "ruler_status": "RULER",
    "levels": [
@@ -2115,15 +3719,6 @@
      "sd_ci95": [
       246.17392384043552,
       2971.5033823189965
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2145,20 +3740,110 @@
      ]
     }
    ],
-   "pooled_sd": 363.37641181929604,
+   "pooled_sd": 419.59093836206176,
    "pooled_df_satterthwaite": 5.788518019853124,
    "pooled_sd_ci95": [
-    232.72340713556736,
-    816.2382915002876
+    268.7258435128934,
+    942.5107946411425
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 1.4932801325270086,
+    "p": 0.4010780766084524,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 1.49, p = 0.401; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 514.435289095399,
+    "B": 1543.3058672861969,
+    "max_abs": 740.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    520.0,
+    0.0,
+    740.0,
+    129.0,
+    -424.0,
+    0.0,
+    174.0,
+    737.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 299.0,
+    "ruler_status": "RULER",
+    "pooled_sd": 363.37641181929604,
+    "pooled_df_satterthwaite": 5.788518019853124,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 472.81285938519056,
+      "df": 2,
+      "sd_ci95": [
+       246.17392384043552,
+       2971.5033823189965
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 386.9177345810519,
+      "df": 2,
+      "sd_ci95": [
+       201.45191704202853,
+       2431.6753112041333
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 393.58904117535246,
+      "df": 2,
+      "sd_ci95": [
+       204.92538797003388,
+       2473.6027032281754
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 445.51402895980726,
+     "B": 1336.5420868794217,
+     "max_abs": 740.0,
+     "n": 8
+    }
    }
   },
   "E7": {
@@ -2180,29 +3865,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     0.0021426360306051606,
-    0.0,
     0.010833125876480665,
     0.005021747165230295,
     0.00196768722049967,
-    0.0,
     0.005562255235609825,
     0.001399326482236063
    ],
    "perturbed_delta_signed": [
     -0.0021426360306051606,
-    0.0,
     0.010833125876480665,
     -0.005021747165230295,
     -0.00196768722049967,
-    0.0,
     0.005562255235609825,
     -0.001399326482236063
    ],
-   "ruler": 0.002055161625552415,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.0035821915979177277,
+   "ruler_min": 0.001399326482236063,
    "ruler_max": 0.010833125876480665,
    "ruler_status": "RULER",
    "levels": [
@@ -2213,15 +3902,6 @@
      "sd_ci95": [
       0.0006194626132343,
       0.00747737705817701
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2243,20 +3923,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.003060968371542674,
+   "pooled_sd": 0.0035345018265821866,
    "pooled_df_satterthwaite": 3.0927819584548817,
    "pooled_sd_ci95": [
-    0.0017446033952705743,
-    0.011062638802623327
+    0.0020144944797772023,
+    0.012774034981284354
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 20.731352933591165,
+    "p": 0.046016463082436676,
     "df_num": 2,
     "df_den": 2,
     "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "verdict": "TRIGGER: scalar sd rejected (ratio 20.73 > 3, p = 0.046 < 0.05)"
+   },
+   "bar": {
+    "sigma_hat": 0.0055367565853800295,
+    "B": 0.01661026975614009,
+    "max_abs": 0.010833125876480665,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -0.0021426360306051606,
+    0.0,
+    0.010833125876480665,
+    -0.005021747165230295,
+    -0.00196768722049967,
+    0.0,
+    0.005562255235609825,
+    -0.001399326482236063
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.002055161625552415,
+    "ruler_status": "RULER",
+    "pooled_sd": 0.003060968371542674,
+    "pooled_df_satterthwaite": 3.0927819584548817,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0011897681317188434,
+      "df": 2,
+      "sd_ci95": [
+       0.0006194626132343,
+       0.00747737705817701
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.005417216026621948,
+      "df": 2,
+      "sd_ci95": [
+       0.0028205183067543877,
+       0.03404576552082668
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.002591588663348219,
+      "df": 2,
+      "sd_ci95": [
+       0.001349332061455356,
+       0.016287447191543132
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 0.004794971857509889,
+     "B": 0.014384915572529668,
+     "max_abs": 0.010833125876480665,
+     "n": 8
+    }
    }
   },
   "E8": {
@@ -2278,29 +4048,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     0.07842607252456091,
-    0.0,
     0.17074846657325793,
     0.07505656629915514,
     0.06880942367775233,
-    0.0,
     0.07144262012523761,
     0.10092676843296822
    ],
    "perturbed_delta_signed": [
     0.07842607252456091,
-    0.0,
     0.17074846657325793,
     0.07505656629915514,
     -0.06880942367775233,
-    0.0,
     0.07144262012523761,
     0.10092676843296822
    ],
-   "ruler": 0.07324959321219637,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.07674131941185802,
+   "ruler_min": 0.06880942367775233,
    "ruler_max": 0.17074846657325793,
    "ruler_status": "RULER",
    "levels": [
@@ -2311,15 +4085,6 @@
      "sd_ci95": [
       0.03835693195359386,
       0.462996857089387
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2341,20 +4106,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.062307497882162055,
+   "pooled_sd": 0.0719465013495966,
    "pooled_df_satterthwaite": 5.295208722781438,
    "pooled_sd_ci95": [
-    0.03929070968628605,
-    0.14744379976609148
+    0.045369003628057375,
+    0.1702534349705884
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 2.675773141597439,
+    "p": 0.27205160968269493,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 2.68, p = 0.272; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 0.10080027544349897,
+    "B": 0.3024008263304969,
+    "max_abs": 0.17074846657325793,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    0.07842607252456091,
+    0.0,
+    0.17074846657325793,
+    0.07505656629915514,
+    -0.06880942367775233,
+    0.0,
+    0.07144262012523761,
+    0.10092676843296822
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.07324959321219637,
+    "ruler_status": "RULER",
+    "pooled_sd": 0.062307497882162055,
+    "pooled_df_satterthwaite": 5.295208722781438,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0736700719202779,
+      "df": 2,
+      "sd_ci95": [
+       0.03835693195359386,
+       0.462996857089387
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.0857522963212801,
+      "df": 2,
+      "sd_ci95": [
+       0.044647641968086606,
+       0.5389304319929965
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.05242290862047782,
+      "df": 2,
+      "sd_ci95": [
+       0.027294420737651856,
+       0.32946407269740324
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 0.08729559924253882,
+     "B": 0.26188679772761647,
+     "max_abs": 0.17074846657325793,
+     "n": 8
+    }
    }
   },
   "E9": {
@@ -2376,10 +4231,8 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
-    0.0,
-    0.0,
     0.0,
     0.0,
     0.0,
@@ -2393,9 +4246,15 @@
     0.0,
     0.0,
     0.0,
-    0.0,
-    0.0,
     0.0
+   ],
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
    ],
    "ruler": 0.0,
    "ruler_min": 0.0,
@@ -2404,15 +4263,6 @@
    "levels": [
     {
      "design_no": 1,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
-     ]
-    },
-    {
-     "design_no": 2,
      "sd": 0.0,
      "df": 2,
      "sd_ci95": [
@@ -2440,19 +4290,109 @@
     }
    ],
    "pooled_sd": 0.0,
-   "pooled_df_satterthwaite": 8,
+   "pooled_df_satterthwaite": 6,
    "pooled_sd_ci95": [
     0.0,
     0.0
    ],
    "trigger": {
-    "n_levels": 4,
+    "n_levels": 3,
     "ratio": null,
     "p": null,
     "df_num": 2,
     "df_den": 2,
     "fires": false,
     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   },
+   "bar": {
+    "sigma_hat": 0.0,
+    "B": 0.0,
+    "max_abs": 0.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.0,
+    "ruler_status": "RULER=0",
+    "pooled_sd": 0.0,
+    "pooled_df_satterthwaite": 8,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": null,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": false,
+     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+    },
+    "bar": {
+     "sigma_hat": 0.0,
+     "B": 0.0,
+     "max_abs": 0.0,
+     "n": 8
+    }
    }
   },
   "V2": {
@@ -2474,29 +4414,33 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     0.0031649999999991962,
-    0.0,
     0.0005179999999995744,
     0.0005899999999989802,
     0.0005759999999987997,
-    0.0,
     0.000332000000000221,
     0.0004249999999998977
    ],
    "perturbed_delta_signed": [
     -0.0031649999999991962,
-    0.0,
     -0.0005179999999995744,
     -0.0005899999999989802,
     0.0005759999999987997,
-    0.0,
     0.000332000000000221,
     0.0004249999999998977
    ],
-   "ruler": 0.000471499999999736,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.000546999999999187,
+   "ruler_min": 0.000332000000000221,
    "ruler_max": 0.0031649999999991962,
    "ruler_status": "RULER",
    "levels": [
@@ -2507,15 +4451,6 @@
      "sd_ci95": [
       0.0010487545165485965,
       0.012659251412698143
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2537,20 +4472,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.0010607403075206156,
+   "pooled_sd": 0.0012248374041746277,
    "pooled_df_satterthwaite": 2.445911498485342,
    "pooled_sd_ci95": [
-    0.0005763203201151565,
-    0.005006192682173433
+    0.0006654773839158737,
+    0.005780653385335932
    ],
    "trigger": {
-    "n_levels": 4,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 3,
+    "ratio": 22.10991891361024,
+    "p": 0.04327146294793205,
     "df_num": 2,
     "df_den": 2,
     "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "verdict": "TRIGGER: scalar sd rejected (ratio 22.11 > 3, p = 0.0433 < 0.05)"
+   },
+   "bar": {
+    "sigma_hat": 0.0013696881640232292,
+    "B": 0.004109064492069688,
+    "max_abs": 0.0031649999999991962,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -0.0031649999999991962,
+    0.0,
+    -0.0005179999999995744,
+    -0.0005899999999989802,
+    0.0005759999999987997,
+    0.0,
+    0.000332000000000221,
+    0.0004249999999998977
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.000471499999999736,
+    "ruler_status": "RULER",
+    "pooled_sd": 0.0010607403075206156,
+    "pooled_df_satterthwaite": 2.445911498485342,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0020142857294823944,
+      "df": 2,
+      "sd_ci95": [
+       0.0010487545165485965,
+       0.012659251412698143
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.00042837833745404657,
+      "df": 2,
+      "sd_ci95": [
+       0.00022303872267017262,
+       0.002692244200616931
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0005097303208554552,
+      "df": 2,
+      "sd_ci95": [
+       0.00026539530534046627,
+       0.0032035198333270516
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 0.0011861847453069833,
+     "B": 0.0035585542359209497,
+     "max_abs": 0.0031649999999991962,
+     "n": 8
+    }
    }
   },
   "V3": {
@@ -2572,28 +4597,32 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
     2.3183937895834535e-05,
-    0.0,
     4.675888100195589e-06,
     0.0,
     5.605339950509472e-06,
-    0.0,
     7.145274129075952e-06,
     0.0
    ],
    "perturbed_delta_signed": [
     2.3183937895834535e-05,
-    0.0,
     4.675888100195589e-06,
     0.0,
     5.605339950509472e-06,
-    0.0,
     -7.145274129075952e-06,
     0.0
    ],
-   "ruler": 2.3379440500977946e-06,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 5.140614025352531e-06,
    "ruler_min": 0.0,
    "ruler_max": 2.3183937895834535e-05,
    "ruler_status": "RULER",
@@ -2605,15 +4634,6 @@
      "sd_ci95": [
       6.298035276824232e-06,
       7.602199629875492e-05
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -2635,20 +4655,110 @@
      ]
     }
    ],
-   "pooled_sd": 6.740983689337761e-06,
+   "pooled_sd": 7.783817495284066e-06,
    "pooled_df_satterthwaite": 2.915218110459863,
    "pooled_sd_ci95": [
-    3.7967350966691105e-06,
-    2.5905284937070354e-05
+    4.384092060207221e-06,
+    2.9912846463703052e-05
    ],
    "trigger": {
-    "n_levels": 4,
+    "n_levels": 3,
     "ratio": null,
     "p": 0.0,
     "df_num": 2,
     "df_den": 2,
     "fires": true,
     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   },
+   "bar": {
+    "sigma_hat": 1.03427404832559e-05,
+    "B": 3.10282214497677e-05,
+    "max_abs": 2.3183937895834535e-05,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    2.3183937895834535e-05,
+    0.0,
+    4.675888100195589e-06,
+    0.0,
+    5.605339950509472e-06,
+    0.0,
+    -7.145274129075952e-06,
+    0.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 2.3379440500977946e-06,
+    "ruler_status": "RULER",
+    "pooled_sd": 6.740983689337761e-06,
+    "pooled_df_satterthwaite": 2.915218110459863,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 1.2096293633740851e-05,
+      "df": 2,
+      "sd_ci95": [
+       6.298035276824232e-06,
+       7.602199629875492e-05
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 5.953412863727115e-06,
+      "df": 2,
+      "sd_ci95": [
+       3.0996936225709867e-06,
+       3.741562038712319e-05
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 8.957076003249351e-06,
+     "B": 2.6871228009748053e-05,
+     "max_abs": 2.3183937895834535e-05,
+     "n": 8
+    }
    }
   },
   "E5": {
@@ -2670,10 +4780,8 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
-    0.0,
-    0.0,
     0.0,
     0.0,
     0.0,
@@ -2687,9 +4795,15 @@
     0.0,
     0.0,
     0.0,
-    0.0,
-    0.0,
     0.0
+   ],
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
    ],
    "ruler": 0.0,
    "ruler_min": 0.0,
@@ -2698,15 +4812,6 @@
    "levels": [
     {
      "design_no": 1,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
-     ]
-    },
-    {
-     "design_no": 2,
      "sd": 0.0,
      "df": 2,
      "sd_ci95": [
@@ -2734,19 +4839,109 @@
     }
    ],
    "pooled_sd": 0.0,
-   "pooled_df_satterthwaite": 8,
+   "pooled_df_satterthwaite": 6,
    "pooled_sd_ci95": [
     0.0,
     0.0
    ],
    "trigger": {
-    "n_levels": 4,
+    "n_levels": 3,
     "ratio": null,
     "p": null,
     "df_num": 2,
     "df_den": 2,
     "fires": false,
     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   },
+   "bar": {
+    "sigma_hat": 0.0,
+    "B": 0.0,
+    "max_abs": 0.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.0,
+    "ruler_status": "RULER=0",
+    "pooled_sd": 0.0,
+    "pooled_df_satterthwaite": 8,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": null,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": false,
+     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+    },
+    "bar": {
+     "sigma_hat": 0.0,
+     "B": 0.0,
+     "max_abs": 0.0,
+     "n": 8
+    }
    }
   },
   "R1": {
@@ -2768,10 +4963,8 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
-    0.0,
-    0.0,
     0.0,
     0.0,
     0.0,
@@ -2785,9 +4978,15 @@
     0.0,
     0.0,
     0.0,
-    0.0,
-    0.0,
     0.0
+   ],
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
    ],
    "ruler": 0.0,
    "ruler_min": 0.0,
@@ -2796,15 +4995,6 @@
    "levels": [
     {
      "design_no": 1,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
-     ]
-    },
-    {
-     "design_no": 2,
      "sd": 0.0,
      "df": 2,
      "sd_ci95": [
@@ -2832,19 +5022,109 @@
     }
    ],
    "pooled_sd": 0.0,
-   "pooled_df_satterthwaite": 8,
+   "pooled_df_satterthwaite": 6,
    "pooled_sd_ci95": [
     0.0,
     0.0
    ],
    "trigger": {
-    "n_levels": 4,
+    "n_levels": 3,
     "ratio": null,
     "p": null,
     "df_num": 2,
     "df_den": 2,
     "fires": false,
     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   },
+   "bar": {
+    "sigma_hat": 0.0,
+    "B": 0.0,
+    "max_abs": 0.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.0,
+    "ruler_status": "RULER=0",
+    "pooled_sd": 0.0,
+    "pooled_df_satterthwaite": 8,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": null,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": false,
+     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+    },
+    "bar": {
+     "sigma_hat": 0.0,
+     "B": 0.0,
+     "max_abs": 0.0,
+     "n": 8
+    }
    }
   },
   "R3": {
@@ -2866,10 +5146,8 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 4,
-   "n_perturbed": 8,
+   "n_perturbed": 6,
    "perturbed_abs_delta": [
-    0.0,
-    0.0,
     0.0,
     0.0,
     0.0,
@@ -2883,9 +5161,15 @@
     0.0,
     0.0,
     0.0,
-    0.0,
-    0.0,
     0.0
+   ],
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
    ],
    "ruler": 0.0,
    "ruler_min": 0.0,
@@ -2894,15 +5178,6 @@
    "levels": [
     {
      "design_no": 1,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
-     ]
-    },
-    {
-     "design_no": 2,
      "sd": 0.0,
      "df": 2,
      "sd_ci95": [
@@ -2930,19 +5205,109 @@
     }
    ],
    "pooled_sd": 0.0,
-   "pooled_df_satterthwaite": 8,
+   "pooled_df_satterthwaite": 6,
    "pooled_sd_ci95": [
     0.0,
     0.0
    ],
    "trigger": {
-    "n_levels": 4,
+    "n_levels": 3,
     "ratio": null,
     "p": null,
     "df_num": 2,
     "df_den": 2,
     "fires": false,
     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   },
+   "bar": {
+    "sigma_hat": 0.0,
+    "B": 0.0,
+    "max_abs": 0.0,
+    "n": 6
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 8,
+    "ruler": 0.0,
+    "ruler_status": "RULER=0",
+    "pooled_sd": 0.0,
+    "pooled_df_satterthwaite": 8,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 4,
+     "ratio": null,
+     "p": null,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": false,
+     "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+    },
+    "bar": {
+     "sigma_hat": 0.0,
+     "B": 0.0,
+     "max_abs": 0.0,
+     "n": 8
+    }
    }
   },
   "D1": {
@@ -2964,27 +5329,31 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 3,
-   "n_perturbed": 6,
+   "n_perturbed": 4,
    "perturbed_abs_delta": [
     120.69833900034428,
-    0.0,
     1081.6027209999738,
     2359.939389000181,
-    0.0,
     1299.5283129998716
    ],
    "perturbed_delta_signed": [
     -120.69833900034428,
-    0.0,
     -1081.6027209999738,
     null,
     -2359.939389000181,
-    0.0,
     1299.5283129998716,
     null
    ],
-   "ruler": 601.150530000159,
-   "ruler_min": 0.0,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 1190.5655169999227,
+   "ruler_min": 120.69833900034428,
    "ruler_max": 2359.939389000181,
    "ruler_status": "RULER",
    "levels": [
@@ -2995,15 +5364,6 @@
      "sd_ci95": [
       691.9756157366264,
       8352.663233236855
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0,
-     "df": 2,
-     "sd_ci95": [
-      0.0,
-      0.0
      ]
     },
     {
@@ -3025,20 +5385,110 @@
      ]
     }
    ],
-   "pooled_sd": 1030.816983762458,
+   "pooled_sd": 1262.4878142064174,
    "pooled_df_satterthwaite": 3.9537053602739745,
    "pooled_sd_ci95": [
-    616.2398488789843,
-    2989.4829947063404
+    754.7365944616639,
+    3661.3539658789596
    ],
    "trigger": {
-    "n_levels": 3,
-    "ratio": null,
-    "p": 0.0,
+    "n_levels": 2,
+    "ratio": 1.2426778240914813,
+    "p": 0.4458955224231125,
     "df_num": 2,
     "df_den": 2,
-    "fires": true,
-    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 1.24, p = 0.446; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 1452.8007684430468,
+    "B": 4358.40230532914,
+    "max_abs": 2359.939389000181,
+    "n": 4
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -120.69833900034428,
+    0.0,
+    -1081.6027209999738,
+    null,
+    -2359.939389000181,
+    0.0,
+    1299.5283129998716,
+    null
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 6,
+    "ruler": 601.150530000159,
+    "ruler_status": "RULER",
+    "pooled_sd": 1030.816983762458,
+    "pooled_df_satterthwaite": 3.9537053602739745,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 1329.039909658871,
+      "df": 2,
+      "sd_ci95": [
+       691.9756157366264,
+       8352.663233236855
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0,
+      "df": 2,
+      "sd_ci95": [
+       0.0,
+       0.0
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 1192.2264384643277,
+      "df": 2,
+      "sd_ci95": [
+       620.742550963418,
+       7492.8268638749405
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": null,
+      "df": 0,
+      "sd_ci95": [
+       null,
+       null
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 3,
+     "ratio": null,
+     "p": 0.0,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": true,
+     "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+    },
+    "bar": {
+     "sigma_hat": 1186.2068602029208,
+     "B": 3558.6205806087623,
+     "max_abs": 2359.939389000181,
+     "n": 6
+    }
    }
   },
   "D2": {
@@ -3060,26 +5510,30 @@
    "exact_zero": true,
    "exact_pooled_sd": 0.0,
    "exact_df": 3,
-   "n_perturbed": 6,
+   "n_perturbed": 4,
    "perturbed_abs_delta": [
     0.0006743841471518186,
-    0.0002818405465250806,
     0.00020567931849213572,
     0.00013009174882794294,
-    0.00028240479186353307,
     0.0003907347757416968
    ],
    "perturbed_delta_signed": [
     -0.0006743841471518186,
-    -0.0002818405465250806,
     -0.00020567931849213572,
     null,
     0.00013009174882794294,
-    0.00028240479186353307,
     0.0003907347757416968,
     null
    ],
-   "ruler": 0.00028212266919430684,
+   "perturbed_keys": [
+    "noise_v3/A:5",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "ruler": 0.00029820704711691626,
    "ruler_min": 0.00013009174882794294,
    "ruler_max": 0.0006743841471518186,
    "ruler_status": "RULER",
@@ -3091,15 +5545,6 @@
      "sd_ci95": [
       0.00022483951806726135,
       0.0027139811479338295
-     ]
-    },
-    {
-     "design_no": 2,
-     "sd": 0.0002821227162147478,
-     "df": 2,
-     "sd_ci95": [
-      0.00014688952442075116,
-      0.0017730664232593917
      ]
     },
     {
@@ -3121,20 +5566,110 @@
      ]
     }
    ],
-   "pooled_sd": 0.00034537790004505916,
-   "pooled_df_satterthwaite": 5.1705849233343395,
+   "pooled_sd": 0.0003730043260568283,
+   "pooled_df_satterthwaite": 3.5847912155098447,
    "pooled_sd_ci95": [
-    0.00021687866545538125,
-    0.000829349465760704
+    0.00021884924670277132,
+    0.0011736908475880514
    ],
    "trigger": {
-    "n_levels": 3,
-    "ratio": 2.342953352453731,
-    "p": 0.2991366897973611,
+    "n_levels": 2,
+    "ratio": 2.0318228998809085,
+    "p": 0.32983456917595033,
     "df_num": 2,
     "df_den": 2,
     "fires": false,
-    "verdict": "not detectable at this df (ratio 2.34, p = 0.299; df 2/2)"
+    "verdict": "not detectable at this df (ratio 2.03, p = 0.33; df 2/2)"
+   },
+   "bar": {
+    "sigma_hat": 0.00040825711508561056,
+    "B": 0.0012247713452568317,
+    "max_abs": 0.0006743841471518186,
+    "n": 4
+   },
+   "structural_zero_keys_excluded": [
+    "noise_v3/A:6",
+    "noise_v3/B:6"
+   ],
+   "perturbed_delta_signed_all": [
+    -0.0006743841471518186,
+    -0.0002818405465250806,
+    -0.00020567931849213572,
+    null,
+    0.00013009174882794294,
+    0.00028240479186353307,
+    0.0003907347757416968,
+    null
+   ],
+   "perturbed_keys_all": [
+    "noise_v3/A:5",
+    "noise_v3/A:6",
+    "noise_v3/A:7",
+    "noise_v3/A:8",
+    "noise_v3/B:5",
+    "noise_v3/B:6",
+    "noise_v3/B:7",
+    "noise_v3/B:8"
+   ],
+   "with_structural_zeros": {
+    "n_perturbed": 6,
+    "ruler": 0.00028212266919430684,
+    "ruler_status": "RULER",
+    "pooled_sd": 0.00034537790004505916,
+    "pooled_df_satterthwaite": 5.1705849233343395,
+    "levels": [
+     {
+      "design_no": 1,
+      "sd": 0.0004318370271787028,
+      "df": 2,
+      "sd_ci95": [
+       0.00022483951806726135,
+       0.0027139811479338295
+      ]
+     },
+     {
+      "design_no": 2,
+      "sd": 0.0002821227162147478,
+      "df": 2,
+      "sd_ci95": [
+       0.00014688952442075116,
+       0.0017730664232593917
+      ]
+     },
+     {
+      "design_no": 3,
+      "sd": 0.00030295418213267453,
+      "df": 2,
+      "sd_ci95": [
+       0.0001577355993583757,
+       0.0019039866598922809
+      ]
+     },
+     {
+      "design_no": 4,
+      "sd": null,
+      "df": 0,
+      "sd_ci95": [
+       null,
+       null
+      ]
+     }
+    ],
+    "trigger": {
+     "n_levels": 3,
+     "ratio": 2.342953352453731,
+     "p": 0.2991366897973611,
+     "df_num": 2,
+     "df_den": 2,
+     "fires": false,
+     "verdict": "not detectable at this df (ratio 2.34, p = 0.299; df 2/2)"
+    },
+    "bar": {
+     "sigma_hat": 0.00037100809699276184,
+     "B": 0.0011130242909782855,
+     "max_abs": 0.0006743841471518186,
+     "n": 6
+    }
    }
   }
  },
@@ -5860,6 +8395,6 @@
    ]
   }
  ],
- "generated_utc": "2026-11-17T01:16:59Z",
- "git_head": "0d0933e"
+ "generated_utc": "2026-11-17T07:43:01Z",
+ "git_head": "849fdcf"
 }

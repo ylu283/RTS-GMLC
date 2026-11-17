@@ -1,0 +1,5865 @@
+{
+ "prompt": "52 v2.1",
+ "wave": "noise_v3",
+ "identity": {
+  "gap_decision_used": {
+   "A": {
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200,
+    "decided_by": "Kay",
+    "date": "2026-11-06",
+    "evidence": "extracts/smoke_gap",
+    "identity": "v3",
+    "note": "E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3."
+   },
+   "B": {
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200,
+    "decided_by": "Kay",
+    "date": "2026-11-06",
+    "evidence": "extracts/smoke_gap",
+    "identity": "v3",
+    "note": "E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3."
+   }
+  },
+  "task_logs": {
+   "n_runs": 16,
+   "n_with_identity_line": 16,
+   "ruc_mipgap_values": [
+    0.001
+   ],
+   "ruc_time_limit_values": [
+    1200.0
+   ]
+  },
+  "G1": "analysis/gap_smoke/GAP_SMOKE.md",
+  "amendment": "ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b"
+ },
+ "populations": {
+  "exact": "A exact vs B exact per design (tau); never pooled with perturbed",
+  "perturbed": "perturbed copy vs the exact copy of the same design in the same batch; delta 0.001 relative on pem_mw"
+ },
+ "noise_floor": {
+  "definition": "exact sd if > 0, else inferred-only with the 1e-9 bound (D-1025 pattern)",
+  "all_exact_zero": true,
+  "floor": {
+   "V1": 0.0,
+   "E1": 0.0,
+   "X1": 0.0,
+   "R4": 0.0,
+   "N1": 0.0,
+   "E4": 0.0,
+   "R2": 0.0,
+   "R7": 0.0,
+   "N4": 0.0,
+   "N5": 0.0,
+   "E6": 0.0,
+   "R5": 0.0,
+   "N3": 0.0,
+   "E2": 0.0,
+   "R6": 0.0,
+   "N2": 0.0,
+   "E3": 0.0,
+   "R8": 0.0,
+   "E7": 0.0,
+   "E8": 0.0,
+   "E9": 0.0,
+   "V2": 0.0
+  }
+ },
+ "exact_zero_finding": "If their sd is 0, \u03c4 collapses toward 0 and the stop rule becomes budget-cap-only \u2014 that is a FINDING about a deterministic instrument, stated in exactly those words, not a failure.",
+ "trigger_rule": {
+  "alpha": 0.05,
+  "point_ratio": 3.0,
+  "family_wise": "no correction; conservative consequence"
+ },
+ "ruler_zero": [
+  "N2",
+  "E9"
+ ],
+ "ruler_unavailable": [],
+ "n_exact_pairs": 4,
+ "n_md5_equal": 4,
+ "shed_ok": true,
+ "runtime": {
+  "slots": 4,
+  "n_with_wallclock": 16,
+  "core_h_median": 40.27055555555556,
+  "core_h_min": 36.5,
+  "core_h_max": 44.77333333333333,
+  "core_h_total": 654.6211111111111,
+  "replaces": "ERCOT_BO_PLAN.md section 8 'Per-run core-h on v2 is UNKNOWN'"
+ },
+ "runtime_table": [
+  {
+   "key": "noise_v3/A:1",
+   "batch": "A",
+   "index": 1,
+   "design_no": 1,
+   "copy_type": "exact",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw": 519.4999938983425,
+   "wall_s": 36267.0,
+   "wall_h": 10.074166666666667,
+   "core_h": 40.29666666666667,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 18872117.88488508,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:2",
+   "batch": "A",
+   "index": 2,
+   "design_no": 2,
+   "copy_type": "exact",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw": 899.9000132516045,
+   "wall_s": 35261.0,
+   "wall_h": 9.794722222222223,
+   "core_h": 39.17888888888889,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:3",
+   "batch": "A",
+   "index": 3,
+   "design_no": 3,
+   "copy_type": "exact",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw": 133.9999995955612,
+   "wall_s": 40296.0,
+   "wall_h": 11.193333333333333,
+   "core_h": 44.77333333333333,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20417874.89594034,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:4",
+   "batch": "A",
+   "index": 4,
+   "design_no": 4,
+   "copy_type": "exact",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw": 2430.0,
+   "wall_s": 35483.0,
+   "wall_h": 9.856388888888889,
+   "core_h": 39.425555555555555,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22016313.298449278,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:5",
+   "batch": "A",
+   "index": 5,
+   "design_no": 1,
+   "copy_type": "perturbed",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw": 520.0194938922408,
+   "wall_s": 39018.0,
+   "wall_h": 10.838333333333333,
+   "core_h": 43.35333333333333,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 17897768.52991258,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:6",
+   "batch": "A",
+   "index": 6,
+   "design_no": 2,
+   "copy_type": "perturbed",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw": 900.799913264856,
+   "wall_s": 33024.0,
+   "wall_h": 9.173333333333334,
+   "core_h": 36.693333333333335,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:7",
+   "batch": "A",
+   "index": 7,
+   "design_no": 3,
+   "copy_type": "perturbed",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw": 133.86599959596563,
+   "wall_s": 38972.0,
+   "wall_h": 10.825555555555555,
+   "core_h": 43.30222222222222,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21076562.92611472,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/A:8",
+   "batch": "A",
+   "index": 8,
+   "design_no": 4,
+   "copy_type": "perturbed",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw": 2427.57,
+   "wall_s": 39030.0,
+   "wall_h": 10.841666666666667,
+   "core_h": 43.36666666666667,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 23001656.39808965,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:1",
+   "batch": "B",
+   "index": 1,
+   "design_no": 1,
+   "copy_type": "exact",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw": 519.4999938983425,
+   "wall_s": 36220.0,
+   "wall_h": 10.061111111111112,
+   "core_h": 40.24444444444445,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 18872117.88488508,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:2",
+   "batch": "B",
+   "index": 2,
+   "design_no": 2,
+   "copy_type": "exact",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw": 899.9000132516045,
+   "wall_s": 35177.0,
+   "wall_h": 9.77138888888889,
+   "core_h": 39.08555555555556,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:3",
+   "batch": "B",
+   "index": 3,
+   "design_no": 3,
+   "copy_type": "exact",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw": 133.9999995955612,
+   "wall_s": 39527.0,
+   "wall_h": 10.979722222222222,
+   "core_h": 43.91888888888889,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20417874.89594034,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:4",
+   "batch": "B",
+   "index": 4,
+   "design_no": 4,
+   "copy_type": "exact",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw": 2430.0,
+   "wall_s": 35356.0,
+   "wall_h": 9.821111111111112,
+   "core_h": 39.284444444444446,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22016313.298449278,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:5",
+   "batch": "B",
+   "index": 5,
+   "design_no": 1,
+   "copy_type": "perturbed",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw": 518.9804939044442,
+   "wall_s": 38805.0,
+   "wall_h": 10.779166666666667,
+   "core_h": 43.11666666666667,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21491256.692562982,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:6",
+   "batch": "B",
+   "index": 6,
+   "design_no": 2,
+   "copy_type": "perturbed",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw": 899.0001132383529,
+   "wall_s": 32850.0,
+   "wall_h": 9.125,
+   "core_h": 36.5,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:7",
+   "batch": "B",
+   "index": 7,
+   "design_no": 3,
+   "copy_type": "perturbed",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw": 134.13399959515675,
+   "wall_s": 38047.0,
+   "wall_h": 10.56861111111111,
+   "core_h": 42.27444444444444,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20967145.55347449,
+   "runtimes_present": false
+  },
+  {
+   "key": "noise_v3/B:8",
+   "batch": "B",
+   "index": 8,
+   "design_no": 4,
+   "copy_type": "perturbed",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw": 2425.14,
+   "wall_s": 35826.0,
+   "wall_h": 9.951666666666666,
+   "core_h": 39.806666666666665,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22709859.198308133,
+   "runtimes_present": false
+  }
+ ],
+ "per_candidate": {
+  "V1": {
+   "id": "V1",
+   "family": "V",
+   "name": "true curtailment",
+   "unit": "MWh",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    12267.729179999325,
+    0.0,
+    3071.570668000728,
+    2266.415008000098,
+    149.40897399978712,
+    0.0,
+    2573.602440999821,
+    1632.307381999679
+   ],
+   "perturbed_delta_signed": [
+    12267.729179999325,
+    0.0,
+    3071.570668000728,
+    2266.415008000098,
+    149.40897399978712,
+    0.0,
+    -2573.602440999821,
+    -1632.307381999679
+   ],
+   "ruler": 1949.3611949998885,
+   "ruler_min": 0.0,
+   "ruler_max": 12267.729179999325,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 7040.0424583290605,
+     "df": 2,
+     "sd_ci95": [
+      3665.4563038401443,
+      44244.79910253766
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 2826.244720573739,
+     "df": 2,
+     "sd_ci95": [
+      1471.5076774807887,
+      17762.19825612704
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 1957.9368670492715,
+     "df": 2,
+     "sd_ci95": [
+      1019.416015503713,
+      12305.11376185764
+     ]
+    }
+   ],
+   "pooled_sd": 3917.3771139308737,
+   "pooled_df_satterthwaite": 2.972822369262338,
+   "pooled_sd_ci95": [
+    2215.101477200226,
+    14745.54882099752
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E1": {
+   "id": "E1",
+   "family": "E",
+   "name": "total cost",
+   "unit": "$",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    227067.07736682892,
+    0.0,
+    39105.130210876465,
+    408500.73561286926,
+    236730.68231773376,
+    0.0,
+    209536.05596256256,
+    1861892.788925171
+   ],
+   "perturbed_delta_signed": [
+    227067.07736682892,
+    0.0,
+    39105.130210876465,
+    -408500.73561286926,
+    -236730.68231773376,
+    0.0,
+    -209536.05596256256,
+    -1861892.788925171
+   ],
+   "ruler": 218301.56666469574,
+   "ruler_min": 0.0,
+   "ruler_max": 1861892.788925171,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 231915.65832681235,
+     "df": 2,
+     "sd_ci95": [
+      120748.80468476824,
+      1457528.384543013
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 133701.78845655636,
+     "df": 2,
+     "sd_ci95": [
+      69612.94143233121,
+      840280.2688940576
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 978593.0435306219,
+     "df": 2,
+     "sd_ci95": [
+      509512.5578482371,
+      6150197.654408731
+     ]
+    }
+   ],
+   "pooled_sd": 507273.44343563024,
+   "pooled_df_satterthwaite": 2.3024562919056106,
+   "pooled_sd_ci95": [
+    272146.19956062536,
+    2592897.131521397
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "X1": {
+   "id": "X1",
+   "family": "X",
+   "name": "CO2 (fuel-factor)",
+   "unit": "t",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    6693.338593482971,
+    0.0,
+    22446.037449866533,
+    4417.210639387369,
+    17120.091357648373,
+    0.0,
+    4301.653144985437,
+    2489.569310128689
+   ],
+   "perturbed_delta_signed": [
+    6693.338593482971,
+    0.0,
+    22446.037449866533,
+    4417.210639387369,
+    -17120.091357648373,
+    0.0,
+    4301.653144985437,
+    2489.569310128689
+   ],
+   "ruler": 4359.431892186403,
+   "ruler_min": 0.0,
+   "ruler_max": 22446.037449866533,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 12281.271348810447,
+     "df": 2,
+     "sd_ci95": [
+      6394.3454533302875,
+      77184.53216272799
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 11913.21044599782,
+     "df": 2,
+     "sd_ci95": [
+      6202.71150163224,
+      74871.36703640452
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 2214.55436739606,
+     "df": 2,
+     "sd_ci95": [
+      1153.0260384388716,
+      13917.886670010512
+     ]
+    }
+   ],
+   "pooled_sd": 8626.390614270504,
+   "pooled_df_satterthwaite": 4.129001534921551,
+   "pooled_sd_ci95": [
+    5199.2863627884935,
+    24186.657356182932
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R4": {
+   "id": "R4",
+   "family": "R",
+   "name": "thermal starts",
+   "unit": "count",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    10.0,
+    0.0,
+    37.0,
+    20.0,
+    90.0,
+    0.0,
+    20.0,
+    63.0
+   ],
+   "perturbed_delta_signed": [
+    -10.0,
+    0.0,
+    37.0,
+    20.0,
+    -90.0,
+    0.0,
+    -20.0,
+    63.0
+   ],
+   "ruler": 20.0,
+   "ruler_min": 0.0,
+   "ruler_max": 90.0,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 49.32882862316247,
+     "df": 2,
+     "sd_ci95": [
+      25.683462409221967,
+      310.0186007845975
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 28.919428302325294,
+     "df": 2,
+     "sd_ci95": [
+      15.057139413811278,
+      181.75093445392648
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 32.19213154380016,
+     "df": 2,
+     "sd_ci95": [
+      16.761099410937394,
+      202.319006066899
+     ]
+    }
+   ],
+   "pooled_sd": 32.810059433045836,
+   "pooled_df_satterthwaite": 4.819419663801927,
+   "pooled_sd_ci95": [
+    20.345469851274483,
+    82.41981974631652
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "N1": {
+   "id": "N1",
+   "family": "N",
+   "name": "congested line-hours",
+   "unit": "line-h",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    9.0,
+    0.0,
+    65.0,
+    15.0,
+    55.0,
+    0.0,
+    15.0,
+    32.0
+   ],
+   "perturbed_delta_signed": [
+    -9.0,
+    0.0,
+    -65.0,
+    15.0,
+    55.0,
+    0.0,
+    -15.0,
+    32.0
+   ],
+   "ruler": 15.0,
+   "ruler_min": 0.0,
+   "ruler_max": 65.0,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 34.64582706955245,
+     "df": 2,
+     "sd_ci95": [
+      18.038636270382383,
+      217.73983147218684
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 34.03429642777023,
+     "df": 2,
+     "sd_ci95": [
+      17.720237786398798,
+      213.89652362981874
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 16.010413278030438,
+     "df": 2,
+     "sd_ci95": [
+      8.335954026472091,
+      100.62119983338711
+     ]
+    }
+   ],
+   "pooled_sd": 25.568535351091196,
+   "pooled_df_satterthwaite": 4.801714600896061,
+   "pooled_sd_ci95": [
+    15.8444830528273,
+    64.38574514138831
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E4": {
+   "id": "E4",
+   "family": "E",
+   "name": "total payments (consumer side)",
+   "unit": "$",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    1309762.918460846,
+    0.0,
+    409163.1261959076,
+    5214049.577060699,
+    2751596.440191269,
+    0.0,
+    1164627.3098583221,
+    3198307.522338867
+   ],
+   "perturbed_delta_signed": [
+    -1309762.918460846,
+    0.0,
+    409163.1261959076,
+    -5214049.577060699,
+    2751596.440191269,
+    0.0,
+    -1164627.3098583221,
+    -3198307.522338867
+   ],
+   "ruler": 1237195.114159584,
+   "ruler_min": 0.0,
+   "ruler_max": 5214049.577060699,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 2072896.593029484,
+     "df": 2,
+     "sd_ci95": [
+      1079270.7471727487,
+      13027605.140423063
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 816556.5474725764,
+     "df": 2,
+     "sd_ci95": [
+      425146.91666869493,
+      5131841.26553704
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 2629280.637698914,
+     "df": 2,
+     "sd_ci95": [
+      1368956.6994892475,
+      16524331.250523696
+     ]
+    }
+   ],
+   "pooled_sd": 1723135.3365589122,
+   "pooled_df_satterthwaite": 4.229679877980807,
+   "pooled_sd_ci95": [
+    1043248.8749397146,
+    4744330.377579937
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R2": {
+   "id": "R2",
+   "family": "R",
+   "name": "reserve shortfall",
+   "unit": "MWh",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    34.705607999999984,
+    0.0,
+    21.872152,
+    28.269957000000005,
+    20.987367000000006,
+    0.0,
+    24.240893999999997,
+    58.872862
+   ],
+   "perturbed_delta_signed": [
+    34.705607999999984,
+    0.0,
+    -21.872152,
+    -28.269957000000005,
+    -20.987367000000006,
+    0.0,
+    -24.240893999999997,
+    58.872862
+   ],
+   "ruler": 23.056523,
+   "ruler_min": 0.0,
+   "ruler_max": 58.872862,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 28.126666660522766,
+     "df": 2,
+     "sd_ci95": [
+      14.644381511485014,
+      176.7686378576534
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 13.36427397761724,
+     "df": 2,
+     "sd_ci95": [
+      6.958219724875164,
+      83.99091636036673
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 44.45798625691387,
+     "df": 2,
+     "sd_ci95": [
+      23.14741806544749,
+      279.40664876436074
+     ]
+    }
+   ],
+   "pooled_sd": 27.139573220672258,
+   "pooled_df_satterthwaite": 3.8034928139160047,
+   "pooled_sd_ci95": [
+    16.10552658196931,
+    81.21406569620022
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R7": {
+   "id": "R7",
+   "family": "R",
+   "name": "committed capacity-hours",
+   "unit": "MWh",
+   "dir": "-",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    123535.69999998808,
+    0.0,
+    67905.79999995232,
+    103175.0,
+    101819.39999997616,
+    0.0,
+    50178.60000002384,
+    68979.0
+   ],
+   "perturbed_delta_signed": [
+    123535.69999998808,
+    0.0,
+    -67905.79999995232,
+    103175.0,
+    101819.39999997616,
+    0.0,
+    -50178.60000002384,
+    -68979.0
+   ],
+   "ruler": 68442.39999997616,
+   "ruler_min": 0.0,
+   "ruler_max": 123535.69999998808,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 65954.3492077825,
+     "df": 2,
+     "sd_ci95": [
+      34339.67713977682,
+      414505.5868497652
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 35221.54452280919,
+     "df": 2,
+     "sd_ci95": [
+      18338.388321703333,
+      221358.0629260373
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 86641.19765061731,
+     "df": 2,
+     "sd_ci95": [
+      45110.45579348565,
+      544516.9410192273
+     ]
+    }
+   ],
+   "pooled_sd": 57221.56610126921,
+   "pooled_df_satterthwaite": 4.466436119267273,
+   "pooled_sd_ci95": [
+    34994.89565008324,
+    151430.27916752326
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "N4": {
+   "id": "N4",
+   "family": "N",
+   "name": "pocket-120 congested line-hours",
+   "unit": "line-h",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    1.0,
+    0.0,
+    5.0,
+    16.0,
+    17.0,
+    0.0,
+    12.0,
+    14.0
+   ],
+   "perturbed_delta_signed": [
+    1.0,
+    0.0,
+    -5.0,
+    -16.0,
+    -17.0,
+    0.0,
+    -12.0,
+    14.0
+   ],
+   "ruler": 8.5,
+   "ruler_min": 0.0,
+   "ruler_max": 17.0,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 10.115993936995679,
+     "df": 2,
+     "sd_ci95": [
+      5.266975869172569,
+      63.57633808519602
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 6.027713773341707,
+     "df": 2,
+     "sd_ci95": [
+      3.1383790053850706,
+      37.88258189175788
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 15.01110699893027,
+     "df": 2,
+     "sd_ci95": [
+      7.81565695129449,
+      94.34082498871813
+     ]
+    }
+   ],
+   "pooled_sd": 9.539392014169456,
+   "pooled_df_satterthwaite": 4.235309160264674,
+   "pooled_sd_ci95": [
+    5.7769257142456265,
+    26.238905362192828
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "N5": {
+   "id": "N5",
+   "family": "N",
+   "name": "congestion spread",
+   "unit": "$/MWh",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": true,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.04210326998121161,
+    0.0,
+    0.06172441927897765,
+    0.02850381870036145,
+    0.06710617263377117,
+    0.0,
+    0.03829950125317083,
+    0.09933877929069723
+   ],
+   "perturbed_delta_signed": [
+    -0.04210326998121161,
+    0.0,
+    -0.06172441927897765,
+    -0.02850381870036145,
+    0.06710617263377117,
+    0.0,
+    0.03829950125317083,
+    -0.09933877929069723
+   ],
+   "ruler": 0.04020138561719122,
+   "ruler_min": 0.0,
+   "ruler_max": 0.09933877929069723,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.05507967880706929,
+     "df": 2,
+     "sd_ci95": [
+      0.028677690098019838,
+      0.3461611684696425
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.050467052635341896,
+     "df": 2,
+     "sd_ci95": [
+      0.026276088150518354,
+      0.3171720367263057
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.05115051709302549,
+     "df": 2,
+     "sd_ci95": [
+      0.026631939570406184,
+      0.32146742951731916
+     ]
+    }
+   ],
+   "pooled_sd": 0.04526883535632483,
+   "pooled_df_satterthwaite": 5.963075685176516,
+   "pooled_sd_ci95": [
+    0.029140252762750455,
+    0.10002194771948944
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E6": {
+   "id": "E6",
+   "family": "E",
+   "name": "VRE energy payments",
+   "unit": "$",
+   "dir": "max",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    361946.9003677368,
+    0.0,
+    1554724.325170517,
+    785698.4212908745,
+    559020.1522622108,
+    0.0,
+    1364964.8086709976,
+    545212.2938055992
+   ],
+   "perturbed_delta_signed": [
+    -361946.9003677368,
+    0.0,
+    1554724.325170517,
+    -785698.4212908745,
+    559020.1522622108,
+    0.0,
+    1364964.8086709976,
+    -545212.2938055992
+   ],
+   "ruler": 552116.223033905,
+   "ruler_min": 0.0,
+   "ruler_max": 1554724.325170517,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 463984.4468210421,
+     "df": 2,
+     "sd_ci95": [
+      241577.33785708333,
+      2916019.151562272
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 848165.2089745747,
+     "df": 2,
+     "sd_ci95": [
+      441604.22757899703,
+      5330493.317187872
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 402577.5353992072,
+     "df": 2,
+     "sd_ci95": [
+      209605.321792859,
+      2530093.004745926
+     ]
+    }
+   ],
+   "pooled_sd": 523625.4531186419,
+   "pooled_df_satterthwaite": 4.0765068568175264,
+   "pooled_sd_ci95": [
+    314842.3173614483,
+    1482625.8319997138
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R5": {
+   "id": "R5",
+   "family": "R",
+   "name": "start/stop ramping",
+   "unit": "MW",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    5414.100000000093,
+    0.0,
+    7654.709999999963,
+    1945.1999999999534,
+    3846.5100000000093,
+    0.0,
+    297.089999999851,
+    8808.449999999953
+   ],
+   "perturbed_delta_signed": [
+    -5414.100000000093,
+    0.0,
+    7654.709999999963,
+    1945.1999999999534,
+    -3846.5100000000093,
+    0.0,
+    297.089999999851,
+    8808.449999999953
+   ],
+   "ruler": 2895.8549999999814,
+   "ruler_min": 0.0,
+   "ruler_max": 8808.449999999953,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 2785.840878388467,
+     "df": 2,
+     "sd_ci95": [
+      1450.47108304063,
+      17508.27082727425
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 4336.231461315247,
+     "df": 2,
+     "sd_ci95": [
+      2257.6947566535564,
+      27252.064316886655
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 4627.396586364717,
+     "df": 2,
+     "sd_ci95": [
+      2409.292285984977,
+      29081.95988068937
+     ]
+    }
+   ],
+   "pooled_sd": 3463.2575652591963,
+   "pooled_df_satterthwaite": 5.277507036879599,
+   "pooled_sd_ci95": [
+    2182.6199627535484,
+    8212.145845783369
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "N3": {
+   "id": "N3",
+   "family": "N",
+   "name": "flow violation",
+   "unit": "MWh",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    6.04212600000028,
+    0.0,
+    5.002896999998484,
+    0.8888040000019828,
+    0.34347799999522977,
+    0.0,
+    7.038224000003538,
+    4.265429000006407
+   ],
+   "perturbed_delta_signed": [
+    6.04212600000028,
+    0.0,
+    -5.002896999998484,
+    -0.8888040000019828,
+    0.34347799999522977,
+    0.0,
+    -7.038224000003538,
+    -4.265429000006407
+   ],
+   "ruler": 2.5771165000041947,
+   "ruler_min": 0.0,
+   "ruler_max": 7.038224000003538,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 3.3936178522908182,
+     "df": 2,
+     "sd_ci95": [
+      1.7669151888121197,
+      21.32798786287865
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 3.6218809906771097,
+     "df": 2,
+     "sd_ci95": [
+      1.8857622787955732,
+      22.762561128621897
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 2.2503871331828686,
+     "df": 2,
+     "sd_ci95": [
+      1.1716826641644584,
+      14.14308609642163
+     ]
+    }
+   ],
+   "pooled_sd": 2.7248351458028686,
+   "pooled_df_satterthwaite": 5.339747203955677,
+   "pooled_sd_ci95": [
+    1.7207973899455233,
+    6.415382573328916
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E2": {
+   "id": "E2",
+   "family": "E",
+   "name": "fixed (commitment) cost",
+   "unit": "$",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    578025.896458149,
+    0.0,
+    1003431.1755599976,
+    1555090.745271206,
+    676801.8945970535,
+    0.0,
+    997402.768532753,
+    634828.5046238899
+   ],
+   "perturbed_delta_signed": [
+    578025.896458149,
+    0.0,
+    -1003431.1755599976,
+    1555090.745271206,
+    676801.8945970535,
+    0.0,
+    -997402.768532753,
+    -634828.5046238899
+   ],
+   "ruler": 655815.1996104717,
+   "ruler_min": 0.0,
+   "ruler_max": 1555090.745271206,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 365588.8946423165,
+     "df": 2,
+     "sd_ci95": [
+      190346.88020882866,
+      2297629.2108055414
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 577598.872986811,
+     "df": 2,
+     "sd_ci95": [
+      300731.6280565407,
+      3630055.677706697
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 1126725.4011346523,
+     "df": 2,
+     "sd_ci95": [
+      586638.8944003705,
+      7081170.221913841
+     ]
+    }
+   ],
+   "pooled_sd": 658935.8518709291,
+   "pooled_df_satterthwaite": 3.465517424468882,
+   "pooled_sd_ci95": [
+    384080.53380622505,
+    2136565.665705456
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R6": {
+   "id": "R6",
+   "family": "R",
+   "name": "nominal ramping",
+   "unit": "MW",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    11321.704507000744,
+    0.0,
+    275.4773490000516,
+    23925.880752999336,
+    8361.395610999316,
+    0.0,
+    56814.416704000905,
+    55825.059775998816
+   ],
+   "perturbed_delta_signed": [
+    11321.704507000744,
+    0.0,
+    275.4773490000516,
+    23925.880752999336,
+    -8361.395610999316,
+    0.0,
+    -56814.416704000905,
+    55825.059775998816
+   ],
+   "ruler": 9841.55005900003,
+   "ruler_min": 0.0,
+   "ruler_max": 56814.416704000905,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 9878.582554890265,
+     "df": 2,
+     "sd_ci95": [
+      5143.365670470978,
+      62084.27053473937
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 32881.630728439,
+     "df": 2,
+     "sd_ci95": [
+      17120.092861301742,
+      206652.3255157919
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 28007.268970578436,
+     "df": 2,
+     "sd_ci95": [
+      14582.216117190748,
+      176018.25505298097
+     ]
+    }
+   ],
+   "pooled_sd": 22153.97903225023,
+   "pooled_df_satterthwaite": 4.297138805614728,
+   "pooled_sd_ci95": [
+    13452.332711244973,
+    60286.461070799945
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "N2": {
+   "id": "N2",
+   "family": "N",
+   "name": "congested lines",
+   "unit": "count",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    1.0,
+    0.0,
+    2.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "perturbed_delta_signed": [
+    -1.0,
+    0.0,
+    -2.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   "ruler": 0.0,
+   "ruler_min": 0.0,
+   "ruler_max": 2.0,
+   "ruler_status": "RULER=0",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.5773502691896258,
+     "df": 2,
+     "sd_ci95": [
+      0.3006021904344035,
+      3.6284932687968516
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 1.1547005383792517,
+     "df": 2,
+     "sd_ci95": [
+      0.601204380868807,
+      7.256986537593703
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.5773502691896258,
+     "df": 2,
+     "sd_ci95": [
+      0.3006021904344035,
+      3.6284932687968516
+     ]
+    }
+   ],
+   "pooled_sd": 0.7071067811865476,
+   "pooled_df_satterthwaite": 3.999999999999999,
+   "pooled_sd_ci95": [
+    0.42365110551537305,
+    2.0319106749739255
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E3": {
+   "id": "E3",
+   "family": "E",
+   "name": "variable cost",
+   "unit": "$",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    350958.8190908432,
+    0.0,
+    1042536.305770874,
+    1963591.4808835983,
+    913532.5769138336,
+    0.0,
+    787866.7125701904,
+    1227064.2842998505
+   ],
+   "perturbed_delta_signed": [
+    -350958.8190908432,
+    0.0,
+    1042536.305770874,
+    -1963591.4808835983,
+    -913532.5769138336,
+    0.0,
+    787866.7125701904,
+    -1227064.2842998505
+   ],
+   "ruler": 850699.644742012,
+   "ruler_min": 0.0,
+   "ruler_max": 1963591.4808835983,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 460833.13950054074,
+     "df": 2,
+     "sd_ci95": [
+      239936.5836497556,
+      2896214.0211058524
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 543518.2467540444,
+     "df": 2,
+     "sd_ci95": [
+      282987.268274176,
+      3415867.983543937
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 991955.1882444473,
+     "df": 2,
+     "sd_ci95": [
+      516469.6689543171,
+      6234175.188911067
+     ]
+    }
+   ],
+   "pooled_sd": 610686.982524925,
+   "pooled_df_satterthwaite": 4.043942228044839,
+   "pooled_sd_ci95": [
+    366636.84021853865,
+    1739917.171337534
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "R8": {
+   "id": "R8",
+   "family": "R",
+   "name": "committed unit-hours",
+   "unit": "unit-h",
+   "dir": "-",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    520.0,
+    0.0,
+    740.0,
+    129.0,
+    424.0,
+    0.0,
+    174.0,
+    737.0
+   ],
+   "perturbed_delta_signed": [
+    520.0,
+    0.0,
+    740.0,
+    129.0,
+    -424.0,
+    0.0,
+    174.0,
+    737.0
+   ],
+   "ruler": 299.0,
+   "ruler_min": 0.0,
+   "ruler_max": 740.0,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 472.81285938519056,
+     "df": 2,
+     "sd_ci95": [
+      246.17392384043552,
+      2971.5033823189965
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 386.9177345810519,
+     "df": 2,
+     "sd_ci95": [
+      201.45191704202853,
+      2431.6753112041333
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 393.58904117535246,
+     "df": 2,
+     "sd_ci95": [
+      204.92538797003388,
+      2473.6027032281754
+     ]
+    }
+   ],
+   "pooled_sd": 363.37641181929604,
+   "pooled_df_satterthwaite": 5.788518019853124,
+   "pooled_sd_ci95": [
+    232.72340713556736,
+    816.2382915002876
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E7": {
+   "id": "E7",
+   "family": "E",
+   "name": "mean settlement price (energy)",
+   "unit": "$/MWh",
+   "dir": "-",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0021426360306051606,
+    0.0,
+    0.010833125876480665,
+    0.005021747165230295,
+    0.00196768722049967,
+    0.0,
+    0.005562255235609825,
+    0.001399326482236063
+   ],
+   "perturbed_delta_signed": [
+    -0.0021426360306051606,
+    0.0,
+    0.010833125876480665,
+    -0.005021747165230295,
+    -0.00196768722049967,
+    0.0,
+    0.005562255235609825,
+    -0.001399326482236063
+   ],
+   "ruler": 0.002055161625552415,
+   "ruler_min": 0.0,
+   "ruler_max": 0.010833125876480665,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0011897681317188434,
+     "df": 2,
+     "sd_ci95": [
+      0.0006194626132343,
+      0.00747737705817701
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.005417216026621948,
+     "df": 2,
+     "sd_ci95": [
+      0.0028205183067543877,
+      0.03404576552082668
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.002591588663348219,
+     "df": 2,
+     "sd_ci95": [
+      0.001349332061455356,
+      0.016287447191543132
+     ]
+    }
+   ],
+   "pooled_sd": 0.003060968371542674,
+   "pooled_df_satterthwaite": 3.0927819584548817,
+   "pooled_sd_ci95": [
+    0.0017446033952705743,
+    0.011062638802623327
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E8": {
+   "id": "E8",
+   "family": "E",
+   "name": "LMP dispersion",
+   "unit": "$/MWh",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": true,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.07842607252456091,
+    0.0,
+    0.17074846657325793,
+    0.07505656629915514,
+    0.06880942367775233,
+    0.0,
+    0.07144262012523761,
+    0.10092676843296822
+   ],
+   "perturbed_delta_signed": [
+    0.07842607252456091,
+    0.0,
+    0.17074846657325793,
+    0.07505656629915514,
+    -0.06880942367775233,
+    0.0,
+    0.07144262012523761,
+    0.10092676843296822
+   ],
+   "ruler": 0.07324959321219637,
+   "ruler_min": 0.0,
+   "ruler_max": 0.17074846657325793,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0736700719202779,
+     "df": 2,
+     "sd_ci95": [
+      0.03835693195359386,
+      0.462996857089387
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.0857522963212801,
+     "df": 2,
+     "sd_ci95": [
+      0.044647641968086606,
+      0.5389304319929965
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.05242290862047782,
+     "df": 2,
+     "sd_ci95": [
+      0.027294420737651856,
+      0.32946407269740324
+     ]
+    }
+   ],
+   "pooled_sd": 0.062307497882162055,
+   "pooled_df_satterthwaite": 5.295208722781438,
+   "pooled_sd_ci95": [
+    0.03929070968628605,
+    0.14744379976609148
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E9": {
+   "id": "E9",
+   "family": "E",
+   "name": "scarcity bus-hours",
+   "unit": "count",
+   "dir": "min",
+   "gradable": true,
+   "needs_full": true,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_delta_signed": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "ruler": 0.0,
+   "ruler_min": 0.0,
+   "ruler_max": 0.0,
+   "ruler_status": "RULER=0",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "pooled_sd": 0.0,
+   "pooled_df_satterthwaite": 8,
+   "pooled_sd_ci95": [
+    0.0,
+    0.0
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": null,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": false,
+    "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   }
+  },
+  "V2": {
+   "id": "V2",
+   "family": "V",
+   "name": "renewables penetration",
+   "unit": "%",
+   "dir": "max",
+   "gradable": true,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0031649999999991962,
+    0.0,
+    0.0005179999999995744,
+    0.0005899999999989802,
+    0.0005759999999987997,
+    0.0,
+    0.000332000000000221,
+    0.0004249999999998977
+   ],
+   "perturbed_delta_signed": [
+    -0.0031649999999991962,
+    0.0,
+    -0.0005179999999995744,
+    -0.0005899999999989802,
+    0.0005759999999987997,
+    0.0,
+    0.000332000000000221,
+    0.0004249999999998977
+   ],
+   "ruler": 0.000471499999999736,
+   "ruler_min": 0.0,
+   "ruler_max": 0.0031649999999991962,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0020142857294823944,
+     "df": 2,
+     "sd_ci95": [
+      0.0010487545165485965,
+      0.012659251412698143
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.00042837833745404657,
+     "df": 2,
+     "sd_ci95": [
+      0.00022303872267017262,
+      0.002692244200616931
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0005097303208554552,
+     "df": 2,
+     "sd_ci95": [
+      0.00026539530534046627,
+      0.0032035198333270516
+     ]
+    }
+   ],
+   "pooled_sd": 0.0010607403075206156,
+   "pooled_df_satterthwaite": 2.445911498485342,
+   "pooled_sd_ci95": [
+    0.0005763203201151565,
+    0.005006192682173433
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "V3": {
+   "id": "V3",
+   "family": "V",
+   "name": "PEM-twin delivered share",
+   "unit": "fraction",
+   "dir": "-",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    2.3183937895834535e-05,
+    0.0,
+    4.675888100195589e-06,
+    0.0,
+    5.605339950509472e-06,
+    0.0,
+    7.145274129075952e-06,
+    0.0
+   ],
+   "perturbed_delta_signed": [
+    2.3183937895834535e-05,
+    0.0,
+    4.675888100195589e-06,
+    0.0,
+    5.605339950509472e-06,
+    0.0,
+    -7.145274129075952e-06,
+    0.0
+   ],
+   "ruler": 2.3379440500977946e-06,
+   "ruler_min": 0.0,
+   "ruler_max": 2.3183937895834535e-05,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 1.2096293633740851e-05,
+     "df": 2,
+     "sd_ci95": [
+      6.298035276824232e-06,
+      7.602199629875492e-05
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 5.953412863727115e-06,
+     "df": 2,
+     "sd_ci95": [
+      3.0996936225709867e-06,
+      3.741562038712319e-05
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "pooled_sd": 6.740983689337761e-06,
+   "pooled_df_satterthwaite": 2.915218110459863,
+   "pooled_sd_ci95": [
+    3.7967350966691105e-06,
+    2.5905284937070354e-05
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "E5": {
+   "id": "E5",
+   "family": "E",
+   "name": "uplift payments",
+   "unit": "$",
+   "dir": "min",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_delta_signed": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "ruler": 0.0,
+   "ruler_min": 0.0,
+   "ruler_max": 0.0,
+   "ruler_status": "RULER=0",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "pooled_sd": 0.0,
+   "pooled_df_satterthwaite": 8,
+   "pooled_sd_ci95": [
+    0.0,
+    0.0
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": null,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": false,
+    "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   }
+  },
+  "R1": {
+   "id": "R1",
+   "family": "R",
+   "name": "load shed",
+   "unit": "MWh",
+   "dir": "min",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_delta_signed": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "ruler": 0.0,
+   "ruler_min": 0.0,
+   "ruler_max": 0.0,
+   "ruler_status": "RULER=0",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "pooled_sd": 0.0,
+   "pooled_df_satterthwaite": 8,
+   "pooled_sd_ci95": [
+    0.0,
+    0.0
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": null,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": false,
+    "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   }
+  },
+  "R3": {
+   "id": "R3",
+   "family": "R",
+   "name": "over generation",
+   "unit": "MWh",
+   "dir": "min",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 4,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 4,
+   "n_perturbed": 8,
+   "perturbed_abs_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "perturbed_delta_signed": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "ruler": 0.0,
+   "ruler_min": 0.0,
+   "ruler_max": 0.0,
+   "ruler_status": "RULER=0",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "pooled_sd": 0.0,
+   "pooled_df_satterthwaite": 8,
+   "pooled_sd_ci95": [
+    0.0,
+    0.0
+   ],
+   "trigger": {
+    "n_levels": 4,
+    "ratio": null,
+    "p": null,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": false,
+    "verdict": "all levels sd 0 (exact zeros): not detectable at this df"
+   }
+  },
+  "D1": {
+   "id": "D1",
+   "family": "D",
+   "name": "H2 electricity",
+   "unit": "MWh",
+   "dir": "-",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 3,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    null
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 3,
+   "n_perturbed": 6,
+   "perturbed_abs_delta": [
+    120.69833900034428,
+    0.0,
+    1081.6027209999738,
+    2359.939389000181,
+    0.0,
+    1299.5283129998716
+   ],
+   "perturbed_delta_signed": [
+    -120.69833900034428,
+    0.0,
+    -1081.6027209999738,
+    null,
+    -2359.939389000181,
+    0.0,
+    1299.5283129998716,
+    null
+   ],
+   "ruler": 601.150530000159,
+   "ruler_min": 0.0,
+   "ruler_max": 2359.939389000181,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 1329.039909658871,
+     "df": 2,
+     "sd_ci95": [
+      691.9756157366264,
+      8352.663233236855
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0,
+     "df": 2,
+     "sd_ci95": [
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 1192.2264384643277,
+     "df": 2,
+     "sd_ci95": [
+      620.742550963418,
+      7492.8268638749405
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": null,
+     "df": 0,
+     "sd_ci95": [
+      null,
+      null
+     ]
+    }
+   ],
+   "pooled_sd": 1030.816983762458,
+   "pooled_df_satterthwaite": 3.9537053602739745,
+   "pooled_sd_ci95": [
+    616.2398488789843,
+    2989.4829947063404
+   ],
+   "trigger": {
+    "n_levels": 3,
+    "ratio": null,
+    "p": 0.0,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": true,
+    "verdict": "TRIGGER: a level has sd 0 and another sd > 0 (ratio undefined); scalar sd rejected per objective"
+   }
+  },
+  "D2": {
+   "id": "D2",
+   "family": "D",
+   "name": "PEM utilization",
+   "unit": "fraction",
+   "dir": "-",
+   "gradable": false,
+   "needs_full": false,
+   "n_exact_pairs": 3,
+   "exact_delta": [
+    0.0,
+    0.0,
+    0.0,
+    null
+   ],
+   "exact_abs_delta_max": 0.0,
+   "exact_zero": true,
+   "exact_pooled_sd": 0.0,
+   "exact_df": 3,
+   "n_perturbed": 6,
+   "perturbed_abs_delta": [
+    0.0006743841471518186,
+    0.0002818405465250806,
+    0.00020567931849213572,
+    0.00013009174882794294,
+    0.00028240479186353307,
+    0.0003907347757416968
+   ],
+   "perturbed_delta_signed": [
+    -0.0006743841471518186,
+    -0.0002818405465250806,
+    -0.00020567931849213572,
+    null,
+    0.00013009174882794294,
+    0.00028240479186353307,
+    0.0003907347757416968,
+    null
+   ],
+   "ruler": 0.00028212266919430684,
+   "ruler_min": 0.00013009174882794294,
+   "ruler_max": 0.0006743841471518186,
+   "ruler_status": "RULER",
+   "levels": [
+    {
+     "design_no": 1,
+     "sd": 0.0004318370271787028,
+     "df": 2,
+     "sd_ci95": [
+      0.00022483951806726135,
+      0.0027139811479338295
+     ]
+    },
+    {
+     "design_no": 2,
+     "sd": 0.0002821227162147478,
+     "df": 2,
+     "sd_ci95": [
+      0.00014688952442075116,
+      0.0017730664232593917
+     ]
+    },
+    {
+     "design_no": 3,
+     "sd": 0.00030295418213267453,
+     "df": 2,
+     "sd_ci95": [
+      0.0001577355993583757,
+      0.0019039866598922809
+     ]
+    },
+    {
+     "design_no": 4,
+     "sd": null,
+     "df": 0,
+     "sd_ci95": [
+      null,
+      null
+     ]
+    }
+   ],
+   "pooled_sd": 0.00034537790004505916,
+   "pooled_df_satterthwaite": 5.1705849233343395,
+   "pooled_sd_ci95": [
+    0.00021687866545538125,
+    0.000829349465760704
+   ],
+   "trigger": {
+    "n_levels": 3,
+    "ratio": 2.342953352453731,
+    "p": 0.2991366897973611,
+    "df_num": 2,
+    "df_den": 2,
+    "fires": false,
+    "verdict": "not detectable at this df (ratio 2.34, p = 0.299; df 2/2)"
+   }
+  }
+ },
+ "exact_pairs": {
+  "1": {
+   "complete": true,
+   "key_A": "noise_v3/A:1",
+   "key_B": "noise_v3/B:1",
+   "overall_md5_equal": true,
+   "delta": {
+    "V1": 0.0,
+    "E1": 0.0,
+    "X1": 0.0,
+    "R4": 0.0,
+    "N1": 0.0,
+    "E4": 0.0,
+    "R2": 0.0,
+    "R7": 0.0,
+    "N4": 0.0,
+    "N5": 0.0,
+    "E6": 0.0,
+    "R5": 0.0,
+    "N3": 0.0,
+    "E2": 0.0,
+    "R6": 0.0,
+    "N2": 0.0,
+    "E3": 0.0,
+    "R8": 0.0,
+    "E7": 0.0,
+    "E8": 0.0,
+    "E9": 0.0,
+    "V2": 0.0,
+    "V3": 0.0,
+    "E5": 0.0,
+    "R1": 0.0,
+    "R3": 0.0,
+    "D1": 0.0,
+    "D2": 0.0
+   }
+  },
+  "2": {
+   "complete": true,
+   "key_A": "noise_v3/A:2",
+   "key_B": "noise_v3/B:2",
+   "overall_md5_equal": true,
+   "delta": {
+    "V1": 0.0,
+    "E1": 0.0,
+    "X1": 0.0,
+    "R4": 0.0,
+    "N1": 0.0,
+    "E4": 0.0,
+    "R2": 0.0,
+    "R7": 0.0,
+    "N4": 0.0,
+    "N5": 0.0,
+    "E6": 0.0,
+    "R5": 0.0,
+    "N3": 0.0,
+    "E2": 0.0,
+    "R6": 0.0,
+    "N2": 0.0,
+    "E3": 0.0,
+    "R8": 0.0,
+    "E7": 0.0,
+    "E8": 0.0,
+    "E9": 0.0,
+    "V2": 0.0,
+    "V3": 0.0,
+    "E5": 0.0,
+    "R1": 0.0,
+    "R3": 0.0,
+    "D1": 0.0,
+    "D2": 0.0
+   }
+  },
+  "3": {
+   "complete": true,
+   "key_A": "noise_v3/A:3",
+   "key_B": "noise_v3/B:3",
+   "overall_md5_equal": true,
+   "delta": {
+    "V1": 0.0,
+    "E1": 0.0,
+    "X1": 0.0,
+    "R4": 0.0,
+    "N1": 0.0,
+    "E4": 0.0,
+    "R2": 0.0,
+    "R7": 0.0,
+    "N4": 0.0,
+    "N5": 0.0,
+    "E6": 0.0,
+    "R5": 0.0,
+    "N3": 0.0,
+    "E2": 0.0,
+    "R6": 0.0,
+    "N2": 0.0,
+    "E3": 0.0,
+    "R8": 0.0,
+    "E7": 0.0,
+    "E8": 0.0,
+    "E9": 0.0,
+    "V2": 0.0,
+    "V3": 0.0,
+    "E5": 0.0,
+    "R1": 0.0,
+    "R3": 0.0,
+    "D1": 0.0,
+    "D2": 0.0
+   }
+  },
+  "4": {
+   "complete": true,
+   "key_A": "noise_v3/A:4",
+   "key_B": "noise_v3/B:4",
+   "overall_md5_equal": true,
+   "delta": {
+    "V1": 0.0,
+    "E1": 0.0,
+    "X1": 0.0,
+    "R4": 0.0,
+    "N1": 0.0,
+    "E4": 0.0,
+    "R2": 0.0,
+    "R7": 0.0,
+    "N4": 0.0,
+    "N5": 0.0,
+    "E6": 0.0,
+    "R5": 0.0,
+    "N3": 0.0,
+    "E2": 0.0,
+    "R6": 0.0,
+    "N2": 0.0,
+    "E3": 0.0,
+    "R8": 0.0,
+    "E7": 0.0,
+    "E8": 0.0,
+    "E9": 0.0,
+    "V2": 0.0,
+    "V3": 0.0,
+    "E5": 0.0,
+    "R1": 0.0,
+    "R3": 0.0,
+    "D1": null,
+    "D2": null
+   }
+  }
+ },
+ "perturbed_deltas": [
+  {
+   "key": "noise_v3/A:5",
+   "design_no": 1,
+   "batch": "A",
+   "ref_key": "noise_v3/A:1",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "pem_mw": 520.0194938922408,
+   "pem_mw_ref": 519.4999938983425,
+   "V1": 12267.729179999325,
+   "E1": 227067.07736682892,
+   "X1": 6693.338593482971,
+   "R4": -10.0,
+   "N1": -9.0,
+   "E4": -1309762.918460846,
+   "R2": 34.705607999999984,
+   "R7": 123535.69999998808,
+   "N4": 1.0,
+   "N5": -0.04210326998121161,
+   "E6": -361946.9003677368,
+   "R5": -5414.100000000093,
+   "N3": 6.04212600000028,
+   "E2": 578025.896458149,
+   "R6": 11321.704507000744,
+   "N2": -1.0,
+   "E3": -350958.8190908432,
+   "R8": 520.0,
+   "E7": -0.0021426360306051606,
+   "E8": 0.07842607252456091,
+   "E9": 0.0,
+   "V2": -0.0031649999999991962,
+   "V3": 2.3183937895834535e-05,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": -120.69833900034428,
+   "D2": -0.0006743841471518186
+  },
+  {
+   "key": "noise_v3/A:6",
+   "design_no": 2,
+   "batch": "A",
+   "ref_key": "noise_v3/A:2",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "pem_mw": 900.799913264856,
+   "pem_mw_ref": 899.9000132516045,
+   "V1": 0.0,
+   "E1": 0.0,
+   "X1": 0.0,
+   "R4": 0.0,
+   "N1": 0.0,
+   "E4": 0.0,
+   "R2": 0.0,
+   "R7": 0.0,
+   "N4": 0.0,
+   "N5": 0.0,
+   "E6": 0.0,
+   "R5": 0.0,
+   "N3": 0.0,
+   "E2": 0.0,
+   "R6": 0.0,
+   "N2": 0.0,
+   "E3": 0.0,
+   "R8": 0.0,
+   "E7": 0.0,
+   "E8": 0.0,
+   "E9": 0.0,
+   "V2": 0.0,
+   "V3": 0.0,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": 0.0,
+   "D2": -0.0002818405465250806
+  },
+  {
+   "key": "noise_v3/A:7",
+   "design_no": 3,
+   "batch": "A",
+   "ref_key": "noise_v3/A:3",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "pem_mw": 133.86599959596563,
+   "pem_mw_ref": 133.9999995955612,
+   "V1": 3071.570668000728,
+   "E1": 39105.130210876465,
+   "X1": 22446.037449866533,
+   "R4": 37.0,
+   "N1": -65.0,
+   "E4": 409163.1261959076,
+   "R2": -21.872152,
+   "R7": -67905.79999995232,
+   "N4": -5.0,
+   "N5": -0.06172441927897765,
+   "E6": 1554724.325170517,
+   "R5": 7654.709999999963,
+   "N3": -5.002896999998484,
+   "E2": -1003431.1755599976,
+   "R6": 275.4773490000516,
+   "N2": -2.0,
+   "E3": 1042536.305770874,
+   "R8": 740.0,
+   "E7": 0.010833125876480665,
+   "E8": 0.17074846657325793,
+   "E9": 0.0,
+   "V2": -0.0005179999999995744,
+   "V3": 4.675888100195589e-06,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": -1081.6027209999738,
+   "D2": -0.00020567931849213572
+  },
+  {
+   "key": "noise_v3/A:8",
+   "design_no": 4,
+   "batch": "A",
+   "ref_key": "noise_v3/A:4",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "pem_mw": 2427.57,
+   "pem_mw_ref": 2430.0,
+   "V1": 2266.415008000098,
+   "E1": -408500.73561286926,
+   "X1": 4417.210639387369,
+   "R4": 20.0,
+   "N1": 15.0,
+   "E4": -5214049.577060699,
+   "R2": -28.269957000000005,
+   "R7": 103175.0,
+   "N4": -16.0,
+   "N5": -0.02850381870036145,
+   "E6": -785698.4212908745,
+   "R5": 1945.1999999999534,
+   "N3": -0.8888040000019828,
+   "E2": 1555090.745271206,
+   "R6": 23925.880752999336,
+   "N2": 0.0,
+   "E3": -1963591.4808835983,
+   "R8": 129.0,
+   "E7": -0.005021747165230295,
+   "E8": 0.07505656629915514,
+   "E9": 0.0,
+   "V2": -0.0005899999999989802,
+   "V3": 0.0,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": null,
+   "D2": null
+  },
+  {
+   "key": "noise_v3/B:5",
+   "design_no": 1,
+   "batch": "B",
+   "ref_key": "noise_v3/B:1",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "pem_mw": 518.9804939044442,
+   "pem_mw_ref": 519.4999938983425,
+   "V1": 149.40897399978712,
+   "E1": -236730.68231773376,
+   "X1": -17120.091357648373,
+   "R4": -90.0,
+   "N1": 55.0,
+   "E4": 2751596.440191269,
+   "R2": -20.987367000000006,
+   "R7": 101819.39999997616,
+   "N4": -17.0,
+   "N5": 0.06710617263377117,
+   "E6": 559020.1522622108,
+   "R5": -3846.5100000000093,
+   "N3": 0.34347799999522977,
+   "E2": 676801.8945970535,
+   "R6": -8361.395610999316,
+   "N2": 0.0,
+   "E3": -913532.5769138336,
+   "R8": -424.0,
+   "E7": -0.00196768722049967,
+   "E8": -0.06880942367775233,
+   "E9": 0.0,
+   "V2": 0.0005759999999987997,
+   "V3": 5.605339950509472e-06,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": -2359.939389000181,
+   "D2": 0.00013009174882794294
+  },
+  {
+   "key": "noise_v3/B:6",
+   "design_no": 2,
+   "batch": "B",
+   "ref_key": "noise_v3/B:2",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "pem_mw": 899.0001132383529,
+   "pem_mw_ref": 899.9000132516045,
+   "V1": 0.0,
+   "E1": 0.0,
+   "X1": 0.0,
+   "R4": 0.0,
+   "N1": 0.0,
+   "E4": 0.0,
+   "R2": 0.0,
+   "R7": 0.0,
+   "N4": 0.0,
+   "N5": 0.0,
+   "E6": 0.0,
+   "R5": 0.0,
+   "N3": 0.0,
+   "E2": 0.0,
+   "R6": 0.0,
+   "N2": 0.0,
+   "E3": 0.0,
+   "R8": 0.0,
+   "E7": 0.0,
+   "E8": 0.0,
+   "E9": 0.0,
+   "V2": 0.0,
+   "V3": 0.0,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": 0.0,
+   "D2": 0.00028240479186353307
+  },
+  {
+   "key": "noise_v3/B:7",
+   "design_no": 3,
+   "batch": "B",
+   "ref_key": "noise_v3/B:3",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "pem_mw": 134.13399959515675,
+   "pem_mw_ref": 133.9999995955612,
+   "V1": -2573.602440999821,
+   "E1": -209536.05596256256,
+   "X1": 4301.653144985437,
+   "R4": -20.0,
+   "N1": -15.0,
+   "E4": -1164627.3098583221,
+   "R2": -24.240893999999997,
+   "R7": -50178.60000002384,
+   "N4": -12.0,
+   "N5": 0.03829950125317083,
+   "E6": 1364964.8086709976,
+   "R5": 297.089999999851,
+   "N3": -7.038224000003538,
+   "E2": -997402.768532753,
+   "R6": -56814.416704000905,
+   "N2": 0.0,
+   "E3": 787866.7125701904,
+   "R8": 174.0,
+   "E7": 0.005562255235609825,
+   "E8": 0.07144262012523761,
+   "E9": 0.0,
+   "V2": 0.000332000000000221,
+   "V3": -7.145274129075952e-06,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": 1299.5283129998716,
+   "D2": 0.0003907347757416968
+  },
+  {
+   "key": "noise_v3/B:8",
+   "design_no": 4,
+   "batch": "B",
+   "ref_key": "noise_v3/B:4",
+   "perturb_sign": -1,
+   "delta_rel": 0.002,
+   "pem_mw": 2425.14,
+   "pem_mw_ref": 2430.0,
+   "V1": -1632.307381999679,
+   "E1": -1861892.788925171,
+   "X1": 2489.569310128689,
+   "R4": 63.0,
+   "N1": 32.0,
+   "E4": -3198307.522338867,
+   "R2": 58.872862,
+   "R7": -68979.0,
+   "N4": 14.0,
+   "N5": -0.09933877929069723,
+   "E6": -545212.2938055992,
+   "R5": 8808.449999999953,
+   "N3": -4.265429000006407,
+   "E2": -634828.5046238899,
+   "R6": 55825.059775998816,
+   "N2": 1.0,
+   "E3": -1227064.2842998505,
+   "R8": 737.0,
+   "E7": -0.001399326482236063,
+   "E8": 0.10092676843296822,
+   "E9": 0.0,
+   "V2": 0.0004249999999998977,
+   "V3": 0.0,
+   "E5": 0.0,
+   "R1": 0.0,
+   "R3": 0.0,
+   "D1": null,
+   "D2": null
+  }
+ ],
+ "covariance": {
+  "ids": [
+   "V1",
+   "E1",
+   "X1",
+   "R4",
+   "N1",
+   "E4",
+   "R2",
+   "R7",
+   "N4",
+   "N5",
+   "E6",
+   "R5",
+   "N3",
+   "E2",
+   "R6",
+   "N2",
+   "E3",
+   "R8",
+   "E7",
+   "E8",
+   "E9",
+   "V2",
+   "V3",
+   "E5",
+   "R1",
+   "R3"
+  ],
+  "matrix": [
+   [
+    21632984.64572041,
+    1381889561.376685,
+    14862262.905193591,
+    -4073.000118561222,
+    -43356.458531488504,
+    -702012709.2007359,
+    37241.80785028322,
+    222587788.99081063,
+    3630.8600540895713,
+    -69.03509017504429,
+    -1001364357.7045656,
+    -10030251.685043905,
+    14311.0524935533,
+    1563225856.7716067,
+    29068820.87678373,
+    -2379.410628035764,
+    -181336295.39505243,
+    579013.0784381364,
+    -3.8069099965172803,
+    81.89526813523595,
+    0.0,
+    -5.46262746379952,
+    0.03906092061986785,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    1381889561.376685,
+    433705941195.69556,
+    889178886.2169962,
+    -14399508.406080246,
+    -10884088.719725404,
+    718504879951.8356,
+    -11648950.71823425,
+    20203303101.698406,
+    -3382996.6885085106,
+    17434.36035488406,
+    206196593213.17288,
+    -2054805182.7691274,
+    1080497.4353759142,
+    105840981632.31,
+    -12747360408.364717,
+    -397113.1629319872,
+    327864959563.1065,
+    -91334988.46085003,
+    812.9162596049346,
+    -8819.107764906956,
+    0.0,
+    -342.2414232131144,
+    1.9542099151116912,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    14862262.905193591,
+    889178886.2169962,
+    116927996.08926685,
+    351933.17690353305,
+    -345311.8524722877,
+    -8608833086.965328,
+    3325.6284364522116,
+    -397583441.49249136,
+    28526.390297762515,
+    -379.7151430810132,
+    2680399972.7267895,
+    29401275.537926506,
+    -13024.139893573749,
+    -4249822043.848073,
+    21341564.376212236,
+    -6184.1306768623845,
+    5139000930.062617,
+    3579391.871281579,
+    34.8202188319826,
+    740.5188988091971,
+    0.0,
+    -4.893769837349551,
+    0.008144829330038197,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -4073.000118561222,
+    -14399508.406080246,
+    351933.17690353305,
+    2048.285714285714,
+    -664.1428571428571,
+    -71698404.85925047,
+    622.9923388571428,
+    -2027174.6571422133,
+    305.2857142857143,
+    -2.2138194064191477,
+    -9504169.111086095,
+    181635.10285714277,
+    -60.310727999984266,
+    -13251958.355608871,
+    825897.9909801233,
+    -0.14285714285714285,
+    -1147550.0504700795,
+    15124.42857142857,
+    0.042786607311876015,
+    2.59384942910257,
+    0.0,
+    -0.0044315714285535325,
+    -6.005809031649171e-05,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -43356.458531488504,
+    -10884088.719725404,
+    -345311.8524722877,
+    -664.1428571428571,
+    1254.8392857142856,
+    -2000339.6195403165,
+    254.49167135714282,
+    1252173.6160708682,
+    -24.875,
+    0.5865922054190809,
+    -17094600.210621268,
+    -52734.73071428522,
+    37.5734109642113,
+    16419231.708977643,
+    339328.32056717784,
+    24.892857142857142,
+    -27303320.428689376,
+    -8034.214285714285,
+    -0.1437371018020576,
+    -1.8571854269994668,
+    0.0,
+    0.014054642857129412,
+    -1.9983597509206038e-05,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -702012709.2007359,
+    718504879951.8356,
+    -8608833086.965328,
+    -71698404.85925047,
+    -2000339.6195403165,
+    5823522320774.3125,
+    -18077948.34413318,
+    -4529146184.773384,
+    -4472842.6928558005,
+    73475.83396356695,
+    1231976240320.359,
+    -4271427315.937304,
+    1002598.48813974,
+    -579058806524.0468,
+    -35653738185.9408,
+    -662623.9709432465,
+    1297563686475.6196,
+    -423662708.0204913,
+    4524.124892601975,
+    -86628.61510955465,
+    0.0,
+    572.7749244872073,
+    2.958764133092375,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    37241.80785028322,
+    -11648950.71823425,
+    3325.6284364522116,
+    622.9923388571428,
+    254.49167135714282,
+    -18077948.34413318,
+    996.5376801320479,
+    -299139.5176101905,
+    294.34887892857137,
+    -1.0741154195123515,
+    -14410517.347690534,
+    26272.17770842714,
+    36.301587464589254,
+    -4187986.264580389,
+    650810.996848168,
+    9.637654714285716,
+    -7460964.453644144,
+    6672.132446142857,
+    -0.04913529242736778,
+    0.373615060310598,
+    0.0,
+    -0.011086922436285165,
+    0.00010911467972542018,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    222587788.99081063,
+    20203303101.698406,
+    -397583441.49249136,
+    -2027174.6571422133,
+    1252173.6160708682,
+    -4529146184.773384,
+    -299139.5176101905,
+    6522704089.618183,
+    -380473.0124999444,
+    1435.0388508924543,
+    -33842449008.02085,
+    -309872728.02270985,
+    266851.4386445689,
+    65665765957.341125,
+    219203706.2470971,
+    -3048.0607142980607,
+    -45462462855.63593,
+    -15516588.449994594,
+    -286.4383525814298,
+    -2754.293793186471,
+    0.0,
+    -50.28955994999775,
+    0.43005324965180913,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    3630.8600540895713,
+    -3382996.6885085106,
+    28526.390297762515,
+    305.2857142857143,
+    -24.875,
+    -4472842.6928558005,
+    294.34887892857137,
+    -380473.0124999444,
+    108.26785714285714,
+    -0.40299565967589995,
+    -3038169.3046151996,
+    21664.887857142927,
+    2.4126249642847273,
+    -3849756.831039965,
+    192443.09213846258,
+    2.0357142857142856,
+    466760.1425330639,
+    2628.785714285714,
+    -0.0004560472379007458,
+    0.23154116148800394,
+    0.0,
+    -0.0016890714285708874,
+    1.5058076355215775e-05,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -69.03509017504429,
+    17434.36035488406,
+    -379.7151430810132,
+    -2.2138194064191477,
+    0.5865922054190809,
+    73475.83396356695,
+    -1.0741154195123515,
+    1435.0388508924543,
+    -0.40299565967589995,
+    0.002891499451171025,
+    16258.318444737948,
+    -181.81072078314952,
+    0.012334625700384018,
+    9472.04909300271,
+    -1292.17746067276,
+    0.004949596558199027,
+    7962.3112618729065,
+    -19.519899393000212,
+    -1.7538672801022912e-05,
+    -0.003019449408999944,
+    0.0,
+    2.068495927904313e-05,
+    -1.0669067551566413e-07,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -1001364357.7045656,
+    206196593213.17288,
+    2680399972.7267895,
+    -9504169.111086095,
+    -17094600.210621268,
+    1231976240320.359,
+    -14410517.347690534,
+    -33842449008.02085,
+    -3038169.3046151996,
+    16258.318444737948,
+    748532275193.3203,
+    525231447.3506473,
+    -1991856.9857652585,
+    -523851828396.2446,
+    -20138707311.026924,
+    -406607.3037312882,
+    730048421609.1976,
+    5829167.276902841,
+    3929.9762431434697,
+    12376.68045036858,
+    0.0,
+    286.217999437231,
+    -1.9452307253007575,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -10030251.685043905,
+    -2054805182.7691274,
+    29401275.537926506,
+    181635.10285714277,
+    -52734.73071428522,
+    -4271427315.937304,
+    26272.17770842714,
+    -309872728.02270985,
+    21664.887857142927,
+    -181.81072078314952,
+    525231447.3506473,
+    24716133.536657188,
+    -14422.750331217841,
+    -2354675505.1628623,
+    66209823.78776143,
+    182.0485714285751,
+    299870322.3942113,
+    1294244.3957142786,
+    10.675550381295087,
+    242.61150989072536,
+    0.0,
+    2.445776112857631,
+    -0.020640681757941096,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    14311.0524935533,
+    1080497.4353759142,
+    -13024.139893573749,
+    -60.310727999984266,
+    37.5734109642113,
+    1002598.48813974,
+    36.301587464589254,
+    266851.4386445689,
+    2.4126249642847273,
+    0.012334625700384018,
+    -1991856.9857652585,
+    -14422.750331217841,
+    16.509765632120306,
+    2475154.558807758,
+    34287.26925697541,
+    -0.42917121428763494,
+    -1394657.123431673,
+    -379.13063171411545,
+    -0.012658820462478794,
+    -0.1180010988815958,
+    0.0,
+    -0.003418810182001536,
+    2.9209509933307864e-05,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    1563225856.7716067,
+    105840981632.31,
+    -4249822043.848073,
+    -13251958.355608871,
+    16419231.708977643,
+    -579058806524.0468,
+    -4187986.264580389,
+    65665765957.341125,
+    -3849756.831039965,
+    9472.04909300271,
+    -523851828396.2446,
+    -2354675505.1628623,
+    2475154.558807758,
+    801625708081.636,
+    8353307846.834561,
+    119653.13884862831,
+    -695784726449.2286,
+    -172943234.72890317,
+    -3719.5725896559725,
+    -28642.71667316277,
+    0.0,
+    -339.1772833132684,
+    2.722300759618825,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    29068820.87678373,
+    -12747360408.364717,
+    21341564.376212236,
+    825897.9909801233,
+    339328.32056717784,
+    -35653738185.9408,
+    650810.996848168,
+    219203706.2470971,
+    192443.09213846258,
+    -1292.17746067276,
+    -20138707311.026924,
+    66209823.78776143,
+    34287.26925697541,
+    8353307846.834561,
+    1004187014.9562448,
+    7213.639726928235,
+    -21100668255.18817,
+    5406109.110728759,
+    -76.89844952665347,
+    497.4040636158726,
+    0.0,
+    -5.775248219689613,
+    0.07667848088424459,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -2379.410628035764,
+    -397113.1629319872,
+    -6184.1306768623845,
+    -0.14285714285714285,
+    24.892857142857142,
+    -662623.9709432465,
+    9.637654714285716,
+    -3048.0607142980607,
+    2.0357142857142856,
+    0.004949596558199027,
+    -406607.3037312882,
+    182.0485714285751,
+    -0.42917121428763494,
+    119653.13884862831,
+    7213.639726928235,
+    0.7857142857142857,
+    -516766.30178036005,
+    -113.42857142857142,
+    -0.0027795637358874864,
+    -0.030292638524107383,
+    0.0,
+    0.0005558571428569335,
+    -3.707963020265686e-06,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -181336295.39505243,
+    327864959563.1065,
+    5139000930.062617,
+    -1147550.0504700795,
+    -27303320.428689376,
+    1297563686475.6196,
+    -7460964.453644144,
+    -45462462855.63593,
+    466760.1425330639,
+    7962.3112618729065,
+    730048421609.1976,
+    299870322.3942113,
+    -1394657.123431673,
+    -695784726449.2286,
+    -21100668255.18817,
+    -516766.30178036005,
+    1023649686011.9586,
+    81608246.26807839,
+    4532.488849259515,
+    19823.60890825203,
+    0.0,
+    -3.06413989976127,
+    -0.7680908445063596,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    579013.0784381364,
+    -91334988.46085003,
+    3579391.871281579,
+    15124.42857142857,
+    -8034.214285714285,
+    -423662708.0204913,
+    6672.132446142857,
+    -15516588.449994594,
+    2628.785714285714,
+    -19.519899393000212,
+    5829167.276902841,
+    1294244.3957142786,
+    -379.13063171411545,
+    -172943234.72890317,
+    5406109.110728759,
+    -113.42857142857142,
+    81608246.26807839,
+    163991.42857142855,
+    0.8071801293394307,
+    27.498564846538958,
+    0.0,
+    -0.18414728571413388,
+    0.000817692633044034,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -3.8069099965172803,
+    812.9162596049346,
+    34.8202188319826,
+    0.042786607311876015,
+    -0.1437371018020576,
+    4524.124892601975,
+    -0.04913529242736778,
+    -286.4383525814298,
+    -0.0004560472379007458,
+    -1.7538672801022912e-05,
+    3929.9762431434697,
+    10.675550381295087,
+    -0.012658820462478794,
+    -3719.5725896559725,
+    -76.89844952665347,
+    -0.0027795637358874864,
+    4532.488849259515,
+    0.8071801293394307,
+    2.566225029392061e-05,
+    0.0001975377150148204,
+    0.0,
+    9.151851432953625e-07,
+    -9.869439897079618e-09,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    81.89526813523595,
+    -8819.107764906956,
+    740.5188988091971,
+    2.59384942910257,
+    -1.8571854269994668,
+    -86628.61510955465,
+    0.373615060310598,
+    -2754.293793186471,
+    0.23154116148800394,
+    -0.003019449408999944,
+    12376.68045036858,
+    242.61150989072536,
+    -0.1180010988815958,
+    -28642.71667316277,
+    497.4040636158726,
+    -0.030292638524107383,
+    19823.60890825203,
+    27.498564846538958,
+    0.0001975377150148204,
+    0.005441217600110456,
+    0.0,
+    -2.81082546553267e-05,
+    4.4717394960159686e-08,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    -5.46262746379952,
+    -342.2414232131144,
+    -4.893769837349551,
+    -0.0044315714285535325,
+    0.014054642857129412,
+    572.7749244872073,
+    -0.011086922436285165,
+    -50.28955994999775,
+    -0.0016890714285708874,
+    2.068495927904313e-05,
+    286.217999437231,
+    2.445776112857631,
+    -0.003418810182001536,
+    -339.1772833132684,
+    -5.775248219689613,
+    0.0005558571428569335,
+    -3.06413989976127,
+    -0.18414728571413388,
+    9.151851432953625e-07,
+    -2.81082546553267e-05,
+    0.0,
+    1.453689142856115e-06,
+    -9.324324061807288e-09,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.03906092061986785,
+    1.9542099151116912,
+    0.008144829330038197,
+    -6.005809031649171e-05,
+    -1.9983597509206038e-05,
+    2.958764133092375,
+    0.00010911467972542018,
+    0.43005324965180913,
+    1.5058076355215775e-05,
+    -1.0669067551566413e-07,
+    -1.9452307253007575,
+    -0.020640681757941096,
+    2.9209509933307864e-05,
+    2.722300759618825,
+    0.07667848088424459,
+    -3.707963020265686e-06,
+    -0.7680908445063596,
+    0.000817692633044034,
+    -9.869439897079618e-09,
+    4.4717394960159686e-08,
+    0.0,
+    -9.324324061807288e-09,
+    7.932022800907276e-11,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "population": "PERTURBED deltas; feeds the plan-7 sensitivity-level rider ONLY, never tau"
+ },
+ "exact_covariance": {
+  "ids": [
+   "V1",
+   "E1",
+   "X1",
+   "R4",
+   "N1",
+   "E4",
+   "R2",
+   "R7",
+   "N4",
+   "N5",
+   "E6",
+   "R5",
+   "N3",
+   "E2",
+   "R6",
+   "N2",
+   "E3",
+   "R8",
+   "E7",
+   "E8",
+   "E9",
+   "V2"
+  ],
+  "matrix": [
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "file": "ercot_noise_exact_cov.csv",
+  "ddof": 1,
+  "n_pairs": 4,
+  "all_zero": true,
+  "population": "EXACT cross-batch pair deltas (B exact - A exact); the Sigma of prompt 55's tau (plan 3 / 6.2)"
+ },
+ "suspect": {
+  "runs": [
+   {
+    "key": "noise_v3/A:1",
+    "design_no": 1,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:2",
+    "design_no": 2,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:3",
+    "design_no": 3,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:4",
+    "design_no": 4,
+    "copy_type": "exact",
+    "nuclear": true,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": false,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:5",
+    "design_no": 1,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:6",
+    "design_no": 2,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:7",
+    "design_no": 3,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/A:8",
+    "design_no": 4,
+    "copy_type": "perturbed",
+    "nuclear": true,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": false,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:1",
+    "design_no": 1,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:2",
+    "design_no": 2,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:3",
+    "design_no": 3,
+    "copy_type": "exact",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:4",
+    "design_no": 4,
+    "copy_type": "exact",
+    "nuclear": true,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": false,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:5",
+    "design_no": 1,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:6",
+    "design_no": 2,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:7",
+    "design_no": 3,
+    "copy_type": "perturbed",
+    "nuclear": false,
+    "S1_ok": true,
+    "S1_resid_usd": 0.0,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": true,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   },
+   {
+    "key": "noise_v3/B:8",
+    "design_no": 4,
+    "copy_type": "perturbed",
+    "nuclear": true,
+    "S1_ok": true,
+    "S1_resid_usd": 9.5367431640625e-07,
+    "S2_ok": true,
+    "n_ruc": 365,
+    "n_ruc_optimal": 365,
+    "S3a_ok": true,
+    "S3a_applicable": false,
+    "gen1_starts": 0.0,
+    "gen93_starts": 0.0,
+    "suspect": false
+   }
+  ],
+  "exact_pairs_S3b": [
+   {
+    "design_no": 1,
+    "key_A": "noise_v3/A:1",
+    "key_B": "noise_v3/B:1",
+    "S3b_ok": true,
+    "gen1_starts": [
+     0.0,
+     0.0
+    ],
+    "gen93_starts": [
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "design_no": 2,
+    "key_A": "noise_v3/A:2",
+    "key_B": "noise_v3/B:2",
+    "S3b_ok": true,
+    "gen1_starts": [
+     0.0,
+     0.0
+    ],
+    "gen93_starts": [
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "design_no": 3,
+    "key_A": "noise_v3/A:3",
+    "key_B": "noise_v3/B:3",
+    "S3b_ok": true,
+    "gen1_starts": [
+     0.0,
+     0.0
+    ],
+    "gen93_starts": [
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "design_no": 4,
+    "key_A": "noise_v3/A:4",
+    "key_B": "noise_v3/B:4",
+    "S3b_ok": true,
+    "gen1_starts": [
+     0.0,
+     0.0
+    ],
+    "gen93_starts": [
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "n_suspect": 0
+ },
+ "readability": {
+  "readable": true,
+  "cost_objective": "E1",
+  "cost_objective_name": "total_cost (E1)",
+  "R1": {
+   "ok": true,
+   "n_runs": 16,
+   "suspect_keys": [],
+   "S3b_failed_designs": []
+  },
+  "R2": {
+   "ok": true,
+   "max_abs_delta_total_usd": 0.0,
+   "threshold_usd": 1132088.071398735,
+   "n_pairs": 4
+  },
+  "R3": {
+   "ok": true,
+   "max_abs_delta_fixed_usd": 0.0,
+   "threshold_usd": 1325081.877065301,
+   "n_pairs": 4
+  },
+  "thresholds_source": "analysis/bo_plan/plan51_refs.json",
+  "rule": "plan 1.2 FROZEN; recorded once in the prompt-52 deliverable; final; the cost objective is never switched mid-campaign"
+ },
+ "free_data": {
+  "v2_replicate_groups": {
+   "groups": [
+    "D01",
+    "D02",
+    "D09",
+    "D21"
+   ],
+   "max_abs_within_delta": 0.0
+  },
+  "v1_screening_ruler_history": {
+   "true_curt": 5479.082057999447,
+   "h2": 2914.1304620001465,
+   "var_cost": 285620.6372458935,
+   "reserve": 554.1793599999999,
+   "onoffs": 258.0,
+   "total_cost": 79451497.00707817,
+   "fixed_cost": 79504038.18062592
+  },
+  "v1_selection_ruler_history": {
+   "schema": "v2-list (per-pair reading lists; never a bare scalar)",
+   "provenance": "T0 2026-10-08 from the two screening replicate pairs; T1 adds design-group keys (base/wind-pocket/pv/nuclear)",
+   "replicate_definition": "identical inputs rerun under TL=120 (machine-load-dependent incumbents); conditional on CRC env"
+  }
+ },
+ "missing_extracts": [],
+ "runs": [
+  {
+   "key": "noise_v3/A:1",
+   "batch": "A",
+   "index": 1,
+   "design_no": 1,
+   "design_id": "D02",
+   "copy_type": "exact",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw_design": 519.4999938983425,
+   "omega": 0.5,
+   "origin_key": "screening_v2/ercot:1",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "fbaa386b6febf74717b960c14c7a7e98",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 18872117.88488508,
+   "wall_s": 36267.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:2",
+   "batch": "A",
+   "index": 2,
+   "design_no": 2,
+   "design_id": "D08",
+   "copy_type": "exact",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw_design": 899.9000132516045,
+   "omega": 0.5,
+   "origin_key": "screening_v2/ercot:7",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "6dde259155688495cce42cd7918dd24b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "wall_s": 35261.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:3",
+   "batch": "A",
+   "index": 3,
+   "design_no": 3,
+   "design_id": "D15",
+   "copy_type": "exact",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw_design": 133.9999995955612,
+   "omega": 0.5,
+   "origin_key": "screening_v2/topup:4",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "bdb103fb54a5bc708bda94cf50395612",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20417874.89594034,
+   "wall_s": 40296.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:4",
+   "batch": "A",
+   "index": 4,
+   "design_no": 4,
+   "design_id": "D23",
+   "copy_type": "exact",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw_design": 2430.0,
+   "omega": 1.0,
+   "origin_key": "selection_t1_v2:10",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "1f63f9b5d2975f9bbda2f1eefd20805b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22016313.298449278,
+   "wall_s": 35483.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:5",
+   "batch": "A",
+   "index": 5,
+   "design_no": 1,
+   "design_id": "D02",
+   "copy_type": "perturbed",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw_design": 520.0194938922408,
+   "omega": 0.5005,
+   "origin_key": "screening_v2/ercot:1",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "overall_md5": "ae41b4df71fc7ecc7fdd147e3d2111c3",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 17897768.52991258,
+   "wall_s": 39018.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:6",
+   "batch": "A",
+   "index": 6,
+   "design_no": 2,
+   "design_id": "D08",
+   "copy_type": "perturbed",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw_design": 900.799913264856,
+   "omega": 0.5005,
+   "origin_key": "screening_v2/ercot:7",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "overall_md5": "6dde259155688495cce42cd7918dd24b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "wall_s": 33024.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:7",
+   "batch": "A",
+   "index": 7,
+   "design_no": 3,
+   "design_id": "D15",
+   "copy_type": "perturbed",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw_design": 133.86599959596563,
+   "omega": 0.4994999999999999,
+   "origin_key": "screening_v2/topup:4",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "overall_md5": "8c9944f6880b5be4999e1d37f4786efe",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21076562.92611472,
+   "wall_s": 38972.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/A:8",
+   "batch": "A",
+   "index": 8,
+   "design_no": 4,
+   "design_id": "D23",
+   "copy_type": "perturbed",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw_design": 2427.57,
+   "omega": 0.999,
+   "origin_key": "selection_t1_v2:10",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "overall_md5": "dbb4eec67e0af33de4c7ed2df7ddc1df",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 23001656.39808965,
+   "wall_s": 39030.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:1",
+   "batch": "B",
+   "index": 1,
+   "design_no": 1,
+   "design_id": "D02",
+   "copy_type": "exact",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw_design": 519.4999938983425,
+   "omega": 0.5,
+   "origin_key": "screening_v2/ercot:1",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "fbaa386b6febf74717b960c14c7a7e98",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 18872117.88488508,
+   "wall_s": 36220.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:2",
+   "batch": "B",
+   "index": 2,
+   "design_no": 2,
+   "design_id": "D08",
+   "copy_type": "exact",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw_design": 899.9000132516045,
+   "omega": 0.5,
+   "origin_key": "screening_v2/ercot:7",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "6dde259155688495cce42cd7918dd24b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "wall_s": 35177.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:3",
+   "batch": "B",
+   "index": 3,
+   "design_no": 3,
+   "design_id": "D15",
+   "copy_type": "exact",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw_design": 133.9999995955612,
+   "omega": 0.5,
+   "origin_key": "screening_v2/topup:4",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "bdb103fb54a5bc708bda94cf50395612",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20417874.89594034,
+   "wall_s": 39527.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:4",
+   "batch": "B",
+   "index": 4,
+   "design_no": 4,
+   "design_id": "D23",
+   "copy_type": "exact",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw_design": 2430.0,
+   "omega": 1.0,
+   "origin_key": "selection_t1_v2:10",
+   "perturb_sign": 0,
+   "delta_rel": 0.0,
+   "overall_md5": "1f63f9b5d2975f9bbda2f1eefd20805b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22016313.298449278,
+   "wall_s": 35356.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:5",
+   "batch": "B",
+   "index": 5,
+   "design_no": 1,
+   "design_id": "D02",
+   "copy_type": "perturbed",
+   "site": "275",
+   "unit_type": "WIND",
+   "pem_mw_design": 518.9804939044442,
+   "omega": 0.4995,
+   "origin_key": "screening_v2/ercot:1",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "overall_md5": "ddc8b669a8483b7c4ce40ada160b87a2",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21491256.692562982,
+   "wall_s": 38805.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:6",
+   "batch": "B",
+   "index": 6,
+   "design_no": 2,
+   "design_id": "D08",
+   "copy_type": "perturbed",
+   "site": "206",
+   "unit_type": "WIND",
+   "pem_mw_design": 899.0001132383529,
+   "omega": 0.4995,
+   "origin_key": "screening_v2/ercot:7",
+   "perturb_sign": -1,
+   "delta_rel": 0.001,
+   "overall_md5": "6dde259155688495cce42cd7918dd24b",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 21001711.05340609,
+   "wall_s": 32850.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:7",
+   "batch": "B",
+   "index": 7,
+   "design_no": 3,
+   "design_id": "D15",
+   "copy_type": "perturbed",
+   "site": "146",
+   "unit_type": "WIND",
+   "pem_mw_design": 134.13399959515675,
+   "omega": 0.5005,
+   "origin_key": "screening_v2/topup:4",
+   "perturb_sign": 1,
+   "delta_rel": 0.001,
+   "overall_md5": "f39f6ff01b2fa3a1545c186f34cab5e3",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 20967145.55347449,
+   "wall_s": 38047.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  },
+  {
+   "key": "noise_v3/B:8",
+   "batch": "B",
+   "index": 8,
+   "design_no": 4,
+   "design_id": "D23",
+   "copy_type": "perturbed",
+   "site": "1",
+   "unit_type": "NUC",
+   "pem_mw_design": 2425.14,
+   "omega": 0.998,
+   "origin_key": "selection_t1_v2:10",
+   "perturb_sign": -1,
+   "delta_rel": 0.002,
+   "overall_md5": "c34c877086bc0c33b45934217b077e6e",
+   "full_extract": true,
+   "n_ruc": 365,
+   "n_ruc_optimal": 365,
+   "n_ruc_time_limit": 0,
+   "max_gap_pct": 0.1,
+   "G_run_usd": 22709859.198308133,
+   "wall_s": 35826.0,
+   "identity": {
+    "line": "IDENTITY from GAP_DECISION.json: ruc_mipgap=0.001 ruc_time_limit=1200.0 ({  \"ruc_mipgap\": 0.001,  \"ruc_time_limit\": 1200,  \"decided_by\": \"Kay\",  \"date\": \"2026-11-06\",  \"evidence\": \"extracts/smoke_gap\",  \"identity\": \"v3\",  \"note\": \"E-D6. Pre-registered rule (prompt 58 section 2) pointed to the tightest passing arm, 0.0001; Kay chose 0.001 on disclosed grounds (summer-day time-limit risk at 0.0001; 0.001 recovers 86 percent of the hidden cost at +18 percent wall time; G at 0.001 is already about 4x below the median single-site cost effect). Recorded in ERCOT_BO_PLAN.md AMENDMENT 2026-11-06b and CONFIG_ERCOT.md identity v3.\"})",
+    "ruc_mipgap": 0.001,
+    "ruc_time_limit": 1200.0
+   },
+   "pool_full_metrics_present": true,
+   "runtimes_present": false,
+   "gz_verified": [
+    "bus_lmps.csv.gz",
+    "line_flows.csv.gz",
+    "renewables.csv.gz",
+    "thermal.csv.gz"
+   ]
+  }
+ ],
+ "generated_utc": "2026-11-17T01:16:59Z",
+ "git_head": "0d0933e"
+}
