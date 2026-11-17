@@ -124,11 +124,21 @@ def test_flag_logic_and_suppression():
     sh = {"L": rng.uniform(0.6, 0.7, 50), "I": rng.uniform(0.3, 0.4, 50), "S_first": rng.random((50, 6)), "lengthscales_u": [1.0] * 6}
     null = {"thresholds": {"I_null95_additive": 0.1, "I_null_median_additive": 0.05,
                            "L_null95_total_only": 0.1, "L_null_median_total_only": 0.05}}
+    noise = {"per_candidate": {"V1": {"perturbed_delta_signed": [1000.0, -2000.0, 1500.0, -500.0, 800.0, -1200.0, 300.0, -900.0]},
+                               "R4": {"perturbed_delta_signed": [10, -20, 15, -5, 8, -12, 3, -9]},
+                               "N1": {"perturbed_delta_signed": [0.0] * 8}}}
+    bars = M.readability_bar(noise, ["V1", "R4", "N1"])
+    d = np.array([1000.0, -2000.0, 1500.0, -500.0, 800.0, -1200.0, 300.0, -900.0])
+    assert bars["V1"]["sigma_hat"] == pytest.approx(np.sqrt(np.mean(d ** 2))) and bars["V1"]["B"] == pytest.approx(max(3 * np.sqrt(np.mean(d ** 2)), 2000.0))
+    assert bars["N1"]["B"] == 0.0 and not M.chatter_readable(bars["N1"], 1e9)
+    assert M.chatter_readable(bars["R4"], 2 * bars["R4"]["B"]) and not M.chatter_readable(bars["R4"], 1.9 * bars["R4"]["B"])
     fl = M.mechanism_flags({"V1": sh, "R4": sh, "N1": sh}, null, holdout_pass={"V1": True, "R4": True, "N1": False},
-                           ruler_status={"V1": "RULER", "R4": "RULER=0", "N1": "RULER"})
+                           bars=bars, y_ranges={"V1": 1e6, "R4": 1.0, "N1": 1e3})
     assert fl["V1"]["flag_interaction"] == "INTERACTION" and fl["V1"]["flag_location"] == "LOCATION" and fl["V1"]["suppressed"] is None
-    assert fl["R4"]["suppressed"] and "RULER=0" in fl["R4"]["suppressed"]
+    assert fl["R4"]["suppressed"] and "chatter readable = False" in fl["R4"]["suppressed"]
     assert fl["N1"]["suppressed"] and "holdout pass = False" in fl["N1"]["suppressed"]
+    fl2 = M.mechanism_flags({"R4": sh}, null, holdout_pass={"R4": True}, bars=bars, y_ranges={"R4": 1000.0})
+    assert fl2["R4"]["suppressed"] is None
     md = M.mechanism_md({"text": "facts"}, {"objective": "V1", "cfg": ["m52", "std", "inferred", "none"], "arm": "m52+std",
                                            "n_paths": 50, "sobol_log2n": 9, "seed": 1, "base_v3": 1.0,
                                            "total_only_params": {"a": 1.0, "b": 2.0, "form": "f"},

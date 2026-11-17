@@ -282,6 +282,13 @@ def wave_d_site_curves(objective="V1", wide_csv=None, base_value=None, sites=Non
     return curves, float(base_value)
 
 
+def wave_d_site_curves_synthetic(base=1.0, sites=None):
+    """Synthetic per-site knots for the --synthetic smoke (no campaign data)."""
+    sites = sites or [f"s{i}" for i in range(6)]
+    return {s: {"mw": [0.0, *WAVE_D_LEVELS], "y": [base, base - 0.03 * (i + 1), base - 0.06 * (i + 1), base - 0.08 * (i + 1)]}
+            for i, s in enumerate(sites)}
+
+
 def base_v3_value(objective, run_dir=None):
     import pool_objectives as po
     run_dir = run_dir or os.path.join(ERCOT, "extracts", "base_v3", "run_index_1")
@@ -380,8 +387,36 @@ def flag(share_summary, null95, null_median, positive_label):
     return "UNRESOLVED"
 
 
-def mechanism_flags(obj_shares, null, holdout_pass=None, ruler_status=None):
-    """obj_shares[obj] = posterior_shares(...) output of the committed fit; returns per-objective flags."""
+def readability_bar(noise_json, objectives):
+    """Contract addendum 2026-11-17 (§6.3 bar, defined once in prompt 61 §3): over the 8
+    signed perturbed deltas delta_ij of `per_candidate.<j>.perturbed_delta_signed`,
+    sigma_hat_j = sqrt(mean delta^2), B_j = max(3 sigma_hat_j, max_i |delta_ij|)."""
+    out = {}
+    for o in objectives:
+        d = np.asarray(noise_json["per_candidate"][o].get("perturbed_delta_signed", []), float)
+        d = d[np.isfinite(d)]
+        if len(d) == 0:
+            out[o] = {"sigma_hat": np.nan, "B": np.nan, "n": 0}
+            continue
+        sig = float(np.sqrt(np.mean(d ** 2)))
+        out[o] = {"sigma_hat": sig, "B": float(max(3.0 * sig, np.abs(d).max())), "n": int(len(d))}
+    return out
+
+
+READABLE_RANGE_BARS = 2.0     # pinned before Y: chatter is readable iff the grading-tier range >= 2 B_j (one bar per end)
+
+
+def chatter_readable(bar_j, y_range_j):
+    """R4 / N1 flag gate (prompt 54 §3.5): the span of the 48 grading rows must exceed
+    READABLE_RANGE_BARS x B_j, and B_j must be > 0 (B_j = 0 -> no read)."""
+    B = bar_j.get("B", np.nan) if isinstance(bar_j, dict) else float(bar_j)
+    return bool(np.isfinite(B) and B > 0 and y_range_j >= READABLE_RANGE_BARS * B)
+
+
+def mechanism_flags(obj_shares, null, holdout_pass=None, bars=None, y_ranges=None):
+    """obj_shares[obj] = posterior_shares(...) output of the committed fit; returns per-objective
+    flags. R4 / N1: suppressed unless the config passed [43, 48] (`holdout_pass[obj]`) AND the
+    52 chatter is readable (`chatter_readable(bars[obj], y_ranges[obj])`)."""
     th = null["thresholds"]
     out = {}
     for obj, sh in obj_shares.items():
@@ -391,12 +426,16 @@ def mechanism_flags(obj_shares, null, holdout_pass=None, ruler_status=None):
         suppressed = None
         if obj in FLAG_SUPPRESS:
             ok_h = bool(holdout_pass and holdout_pass.get(obj))
-            ok_r = bool(ruler_status and ruler_status.get(obj) == "RULER")
+            b = (bars or {}).get(obj, {"B": np.nan})
+            yr = float((y_ranges or {}).get(obj, np.nan))
+            ok_r = chatter_readable(b, yr) if np.isfinite(yr) else False
             if not (ok_h and ok_r):
-                suppressed = (f"flags suppressed: holdout pass = {ok_h}, 52 ruler status = {ruler_status.get(obj) if ruler_status else None} "
+                suppressed = (f"flags suppressed: holdout pass = {ok_h}, chatter readable = {ok_r} "
+                              f"(B_j = {b.get('B', np.nan):.4g}, grading range = {yr:.4g}, need >= {READABLE_RANGE_BARS} B_j) "
                               "(prompt 54 §3.5: R4 / N1 need the [43, 48] pass AND readable chatter)")
         out[obj] = {"L": Ls, "I": Is, "S_first_median": np.median(sh["S_first"], axis=0).tolist(),
                     "flag_interaction": fi, "flag_location": fl, "suppressed": suppressed,
+                    "bar_B": (bars or {}).get(obj, {}).get("B"), "grading_range": (y_ranges or {}).get(obj),
                     "lengthscales_u_descriptive": sh["lengthscales_u"]}
     return out
 
@@ -421,7 +460,7 @@ def fig_null_truths(null, sites, gen_pmax, path):
         X[:, j] = mw
         y = f_add(X)
         assert np.isfinite(y).all()
-        ax.plot(mw, y / 1e6, lw=2, label=f"site {s} (bus {SITE_BUS[s]})")
+        ax.plot(mw, y / 1e6, lw=2, label=f"site {s}" + (f" (bus {SITE_BUS[s]})" if s in SITE_BUS else ""))
         ax.plot(curves[s]["mw"], np.asarray(curves[s]["y"]) / 1e6, "o", color=ax.lines[-1].get_color())
     ax.set_xlabel("PEM MW at one site (others 0)")
     ax.set_ylabel(f"{null['objective']} (1e6 MWh)")

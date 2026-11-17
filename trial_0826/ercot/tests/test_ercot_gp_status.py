@@ -198,3 +198,50 @@ def test_e2e_committed_schema_and_retirement(e2e):
     assert rec["criterion"] == S.SUFFICIENCY_CRITERION
     with pytest.raises(S.HoldoutRetired):
         S.run(*data, None, out, "synthetic")
+
+
+# --------------------------------------------------------------------------
+# Part B deliverables (prompt 54 §3.3-§3.6) on the synthetic e2e run
+# --------------------------------------------------------------------------
+@pytest.fixture(scope="module")
+def delivered(e2e):
+    from analysis.ercot_gp import ercot_gp_mechanism as M
+    _, res, _ = e2e
+    mech = {"curves": M.wave_d_site_curves_synthetic(), "base": 1.0, "sites": [f"s{i}" for i in range(6)],
+            "gen_pmax": np.array([338.6, 250.6, 268.0, 185.4, 579.0, 746.4])}
+    out = S.deliverables(res, None, mechanism=mech, extra={"synthetic": True}, n_paths=32)
+    return res, out
+
+
+def test_deliverables_files_and_sections(delivered):
+    res, out = delivered
+    d = res["out_dir"]
+    for f in ("ERCOT_GP_STATUS.md", "fig_parity_holdout.png", "fig_sufficiency_loo.png", "fig_null_truths.png",
+              "ercot_gp_noise_crosscheck.csv", "ercot_gp_mechanism.json", "pi_agenda_E-D7_draft.md"):
+        assert os.path.isfile(os.path.join(d, f)), f
+    md = out["md"]
+    for s in ("## 1. Arms and LOO selection", "## 2. Grading", "## 3. Noise cross-check", "## 4. Sufficiency",
+              S.SUFFICIENCY_CRITERION, "## 5. Committed configs", "Mechanism sanity", "Independence disclosure"):
+        assert s in md, s
+    assert out["pi_row"].startswith("| ") and "E-D7" in out["pi_row"] and f"n0 = {res['recommendation']}" in out["pi_row"]
+    # committed_configs.json is untouched by the deliverables (written once, LAST)
+    com = json.load(open(os.path.join(d, S.COMMITTED)))
+    assert com["E-D7_decided"] is None and set(com["objectives"]) == {"S1", "S2"}
+
+
+def test_noise_crosscheck_columns_and_mechanism_flags(delivered):
+    res, out = delivered
+    cross = out["cross"]
+    assert list(cross["objective"]) == ["S1", "S2"] and (cross["n0"] == 48).all()
+    assert np.isfinite(cross["inferred_noise_sd_raw"]).all() and (cross["exact_sd_floor"] == 0).all()
+    assert cross["perturbed_pooled_sd"].isna().all()                  # no noise json in the synthetic run
+    mech = json.load(open(os.path.join(res["out_dir"], "ercot_gp_mechanism.json")))
+    assert set(mech["flags"]) == {"S1", "S2"}
+    for obj, f in mech["flags"].items():
+        assert f["flag_interaction"] in ("INTERACTION", "ADDITIVE", "UNRESOLVED")
+        assert f["flag_location"] in ("LOCATION", "TOTAL-ONLY-COMPATIBLE", "UNRESOLVED")
+        assert f["suppressed"] is None                                 # S1 / S2 are not R4 / N1
+        assert 0 <= f["L"]["p05"] <= f["L"]["median"] <= f["L"]["p95"] <= 1.0 + 1e-9
+    th = mech["null"]["thresholds"]
+    assert 0 <= th["I_null95_additive"] <= 1 and 0 <= th["L_null95_total_only"] <= 1
+    assert mech["null"]["truths"]["additive"]["truth_I"] == pytest.approx(0.0, abs=0.02)

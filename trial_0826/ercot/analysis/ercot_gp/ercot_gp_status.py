@@ -385,7 +385,7 @@ def run(U, Y, sobol_index, Uh, Yh, noise, out_dir, design_space_version):
                                "noise_raw_is_delta_method": winner.transform == "log1p",
                                "median_95_halfwidth_raw": half, "latent_share_median": lat,
                                "holdout_pass": h["pass"] if scope == "holdout" else np.nan})
-            res[n0] = {"arm": winner, "loo": lm, "holdout": h}
+            res[n0] = {"arm": winner, "loo": lm, "holdout": h, "gp": gp, "loo_full": loos[winner.name]}
         curve = sufficiency_curve(Uv, y, sob, res[48]["arm"], sd_meas)
         for c in curve:
             suff_rows.append({"objective": obj, **c})
@@ -420,9 +420,246 @@ def run(U, Y, sobol_index, Uh, Yh, noise, out_dir, design_space_version):
         json.dump({"E-D7_recommendation": n0_rec, "criterion": SUFFICIENCY_CRITERION,
                    "reasons_for_48": reasons, "per_objective": per_obj}, f, indent=1)
     path = write_committed(out_dir, committed, n0_rec, design_space_version)   # LAST
-    return {"recommendation": n0_rec, "reasons": reasons, "committed": path,
+    return {"recommendation": n0_rec, "reasons": reasons, "committed": path, "committed_doc": committed,
             "status": pd.DataFrame(status), "selection": pd.DataFrame(sel_rows),
-            "sufficiency": pd.DataFrame(suff_rows)}
+            "sufficiency": pd.DataFrame(suff_rows), "per_obj": per_obj, "entries": entries,
+            "inputs": {"U": Uv, "Y": Y, "sob": sob, "Uh": Uhv, "Yh": Yh}, "out_dir": out_dir,
+            "design_space_version": design_space_version}
+
+
+# --------------------------------------------------------------------------
+# Part B deliverables (prompt 54 §3.3-§3.6): noise cross-check, figures, status page,
+# E-D7 pi-agenda draft, mechanism page. Written AFTER committed_configs.json; none of
+# them changes it.
+# --------------------------------------------------------------------------
+def noise_crosscheck(noise, entries, n0=48):
+    """Descriptive only (§3.3; adds no arm): inferred GP noise (committed config at n0)
+    vs the 52 measured values — exact pooled sd (the floor), perturbed pooled sd, and a
+    per-level standardized-residual table (perturbed signed deltas / inferred sd)."""
+    rows = []
+    for obj, (res, sd_meas, df_meas, use_meas) in entries.items():
+        gp = res[n0]["gp"]
+        s_t, s_raw = noise_sd(gp)
+        pc = (noise or {}).get("per_candidate", {}).get(obj, {})
+        pert_sd = float(pc.get("pooled_sd", np.nan)) if pc else np.nan
+        levels = pc.get("levels", []) if pc else []
+        deltas = np.asarray(pc.get("perturbed_delta_signed", []), float) if pc else np.array([])
+        z = deltas / s_raw if s_raw > 0 and len(deltas) else np.array([])
+        trig = pc.get("trigger", {}) if pc else {}
+        rows.append({"objective": obj, "arm": res[n0]["arm"].name, "n0": n0,
+                     "inferred_noise_sd_raw": s_raw, "inferred_is_delta_method": gp.transform == "log1p",
+                     "exact_sd_floor": float(sd_meas), "exact_df": int(df_meas), "measured_arm_included": bool(use_meas),
+                     "perturbed_pooled_sd": pert_sd,
+                     "ratio_inferred_over_perturbed": (s_raw / pert_sd if np.isfinite(pert_sd) and pert_sd > 0 else np.nan),
+                     "per_level_sd": [float(lv.get("sd", np.nan)) for lv in levels],
+                     "n_perturbed": int(len(deltas)), "z_mean_abs": (float(np.mean(np.abs(z))) if len(z) else np.nan),
+                     "z_max_abs": (float(np.max(np.abs(z))) if len(z) else np.nan),
+                     "trigger_fires": bool(trig.get("fires", False)), "trigger_verdict": trig.get("verdict", ""),
+                     "note": ("52 trigger fired: reported only; any model change needs a plan amendment (plan 5 / 10)"
+                              if trig.get("fires") else "")})
+    return pd.DataFrame(rows)
+
+
+def _fmt3(v):
+    return "" if not np.isfinite(v) else f"{v:.3f}"
+
+
+def _bold(ax):
+    for t in ax.get_xticklabels() + ax.get_yticklabels():
+        t.set_fontweight("bold")
+    ax.grid(alpha=0.3)
+
+
+def fig_parity(entries, Uh, Yh, out_dir, tiers=TIERS):
+    """Holdout parity per objective x tier: y vs predictive median with the TOTAL 95 %
+    band (noise included) and the LATENT band (dual band). Big figure, bold labels
+    and ticks, assert-before-draw."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({"font.size": 13, "font.weight": "bold", "axes.labelweight": "bold", "axes.titleweight": "bold"})
+    objs = list(entries)
+    fig, axes = plt.subplots(len(tiers), len(objs), figsize=(5.2 * len(objs), 4.6 * len(tiers)), squeeze=False)
+    for i, n0 in enumerate(tiers):
+        for j, obj in enumerate(objs):
+            res = entries[obj][0][n0]
+            gp, arm, h = res["gp"], res["arm"], res["holdout"]
+            yh = Yh[obj].to_numpy(float)
+            mu_t, sd_t = h["mu_t"], h["sd_t"]
+            lat = latent_sd_t(gp, Uh)
+            med = common.median_raw(mu_t, arm.transform)
+            lo_t, hi_t = mu_t - 1.96 * sd_t, mu_t + 1.96 * sd_t
+            lo_l, hi_l = mu_t - 1.96 * lat, mu_t + 1.96 * lat
+            if arm.transform == "log1p":
+                lo_t, hi_t, lo_l, hi_l = (np.expm1(v) for v in (lo_t, hi_t, lo_l, hi_l))
+            for v in (med, lo_t, hi_t, lo_l, hi_l):
+                assert np.isfinite(v).all(), (obj, n0)
+            o = np.argsort(med)
+            ax = axes[i, j]
+            ax.fill_between(np.arange(len(o)), lo_t[o], hi_t[o], color="C0", alpha=0.18, label="95 % total band")
+            ax.fill_between(np.arange(len(o)), lo_l[o], hi_l[o], color="C0", alpha=0.35, label="95 % latent band")
+            ax.plot(np.arange(len(o)), med[o], color="C0", lw=2, label="predictive median")
+            ax.plot(np.arange(len(o)), yh[o], "o", color="C3", ms=4, label="holdout y")
+            m = h["metrics"]
+            ax.set_title(f"{obj} n0={n0} {arm.name}: cov95 {m['cov95']}/{m['n']} {'PASS' if h['pass'] else 'FAIL'} "
+                         f"[{HOLDOUT_BAR[0]}, {HOLDOUT_BAR[1]}]; RMSE {m['rmse']:.3g}", fontsize=10)
+            ax.set_xlabel("holdout row (sorted by prediction)")
+            ax.set_ylabel(obj)
+            _bold(ax)
+            if i == 0 and j == 0:
+                ax.legend(fontsize=9)
+    fig.tight_layout()
+    path = os.path.join(out_dir, "fig_parity_holdout.png")
+    fig.savefig(path, dpi=120)
+    plt.close(fig)
+    return path
+
+
+def fig_sufficiency(suff, out_dir, prefixes=PREFIXES):
+    """LOO sufficiency curves per objective: LOO RMSE (relative to n = 48) and LOO cov95
+    with the per-n binomial 90 % bands."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({"font.size": 13, "font.weight": "bold", "axes.labelweight": "bold", "axes.titleweight": "bold"})
+    objs = list(suff["objective"].unique())
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.2))
+    for obj in objs:
+        d = suff[suff["objective"] == obj].sort_values("n")
+        r48 = float(d.loc[d["n"] == max(prefixes), "loo_rmse"].iloc[0])
+        assert np.isfinite(d["loo_rmse"]).all() and r48 > 0
+        axes[0].plot(d["n"], d["loo_rmse"] / r48, "o-", lw=2, label=obj)
+        axes[1].plot(d["n"], d["loo_cov95"] / d["n"], "o-", lw=2, label=obj)
+    axes[0].axhline(RMSE_RATIO_MAX, color="k", ls="--", lw=1.5, label=f"ratio {RMSE_RATIO_MAX} (criterion at 32)")
+    axes[0].set_xlabel("n (Sobol prefix)"); axes[0].set_ylabel("LOO RMSE / LOO RMSE at 48"); axes[0].set_title("LOO RMSE (nested prefixes)")
+    for n in prefixes:
+        lo, hi = binom_band(n, level=HOLDOUT_LEVEL)
+        axes[1].plot([n, n], [lo / n, hi / n], color="0.4", lw=6, alpha=0.4)
+    axes[1].axhline(0.95, color="k", ls=":", lw=1)
+    axes[1].set_xlabel("n (Sobol prefix)"); axes[1].set_ylabel("LOO cov95 / n"); axes[1].set_title("LOO coverage (grey = binom 90 % band per n)")
+    for ax in axes:
+        _bold(ax); ax.legend(fontsize=9)
+    fig.tight_layout()
+    path = os.path.join(out_dir, "fig_sufficiency_loo.png")
+    fig.savefig(path, dpi=120)
+    plt.close(fig)
+    return path
+
+
+def pi_agenda_row(n0_rec, reasons, date=None):
+    date = date or _dt.date.today().isoformat()
+    why = ("criterion met for every objective" if not reasons else "; ".join(reasons))
+    return (f"| {date} | E-D7 | **ERCOT navigation tier (prompt 54 Part B)** | Recommendation **n0 = {n0_rec}** under the "
+            f"pinned criterion: \"{SUFFICIENCY_CRITERION}\" — {why}. Kay decides; 55 Part B waits on it "
+            f"(`committed_configs.json[\"E-D7_decided\"]`). | analysis/ercot_gp/ERCOT_GP_STATUS.md |")
+
+
+def mechanism_shares(res_entries, n0, gen_pmax):
+    from analysis.ercot_gp import ercot_gp_mechanism as M
+    return {obj: M.posterior_shares(res[n0]["gp"], gen_pmax) for obj, (res, *_rest) in res_entries.items()}
+
+
+def status_md(res, noise, cross, figs, mech_md, pi_row, extra):
+    st, sel, suff = res["status"], res["selection"], res["sufficiency"]
+    com = res["committed_doc"]
+    L = ["# ERCOT_GP_STATUS — prompt 54 Part B (plan 4 / 5; contract 6.2)", "",
+         f"Design space {res['design_space_version']}; committed configs `committed_configs.json` (written LAST; the holdout is "
+         f"RETIRED); E-D7 recommendation **n0 = {res['recommendation']}**. "
+         + ("Synthetic smoke (no campaign data)." if extra.get("synthetic") else
+            f"Data: n0_E grading tier 48 rows (refused {extra.get('n_refused_n0')}), random_E holdout 48 rows (refused "
+            f"{extra.get('n_refused_random')}); max R1 shed {extra.get('r1_max')} MWh, max R2 {extra.get('r2_max')} MWh."), "",
+         "## 1. Arms and LOO selection (plan 5; LOO NLPD, > 2 paired se, tie order std < log1p, m52 < rbf)", "",
+         "| objective | n0 | arm | cfg | floor | LOO NLPD mean | diff vs default | paired se | beats default | LOO cov95 | LOO RMSE | selected |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for _, r in sel.iterrows():
+        L.append(f"| {r['objective']} | {r['n0']} | {r['arm']} | {r['cfg']} | {r['floor_mode']} | {r['loo_nlpd_mean']:.4f} | "
+                 f"{r['diff_vs_default']:+.4f} | {r['paired_se']:.4f} | {r['beats_default']} | {r['loo_cov95']} | {r['loo_rmse']:.4g} | "
+                 f"{'**yes**' if r['selected'] else ''} |")
+    L += ["", f"## 2. Grading (gp_status_47 column set; holdout ONCE per committed config per tier vs [{HOLDOUT_BAR[0]}, {HOLDOUT_BAR[1]}] = binom_band(48, level 0.90))", "",
+          "| objective | n0 | scope | arm | RMSE raw | cov95 / n | NLPD | inferred noise sd (raw) | median 95 % half-width | latent share | holdout pass |",
+          "|---|---|---|---|---|---|---|---|---|---|---|"]
+    for _, r in st.iterrows():
+        L.append(f"| {r['objective']} | {r['n0']} | {r['scope']} | {r['arm']} | {r['rmse_raw']:.4g} | {r['cov95']} / {r['n']} | {r['nlpd']:.3f} | "
+                 f"{r['inferred_noise_sd_raw']:.4g}{' (delta method)' if r['noise_raw_is_delta_method'] else ''} | {r['median_95_halfwidth_raw']:.4g} | "
+                 f"{_fmt3(r['latent_share_median'])} | "
+                 f"{'' if not isinstance(r['holdout_pass'], (bool, np.bool_)) else ('PASS' if r['holdout_pass'] else 'FAIL')} |")
+    L += ["", "Independence disclosure (plan 4): the 48 holdout residuals share one fitted model, so the binomial region treats them as independent; this is an approximation.", "",
+          "## 3. Noise cross-check (descriptive only; adds no arm — plan 5 / 10)", "",
+          "| objective | arm | inferred noise sd (raw) | exact sd (floor) | exact df | measured arm included | 52 perturbed pooled sd | inferred / perturbed | per-level sd | mean abs z (perturbed deltas / inferred sd) | max abs z | 52 trigger |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for _, r in cross.iterrows():
+        L.append(f"| {r['objective']} | {r['arm']} | {r['inferred_noise_sd_raw']:.4g}{' (delta)' if r['inferred_is_delta_method'] else ''} | {r['exact_sd_floor']:.4g} | "
+                 f"{r['exact_df']} | {r['measured_arm_included']} | {r['perturbed_pooled_sd']:.4g} | {r['ratio_inferred_over_perturbed']:.3g} | "
+                 f"{', '.join(f'{v:.3g}' for v in r['per_level_sd'])} | {r['z_mean_abs']:.3g} | {r['z_max_abs']:.3g} | "
+                 f"{'FIRES — ' + r['trigger_verdict'] if r['trigger_fires'] else 'no'} |")
+    L += ["", "Reading: the exact replicate sd is 0 on this deterministic instrument (ERCOT_NOISE.md), so the GP noise is inferred-only; "
+          "the perturbed-copy sd is a LOCAL INPUT SENSITIVITY (0.1 % MW moves), not noise — the ratio is descriptive. A firing 52 trigger is "
+          "reported; any model change needs a plan amendment.", "",
+          f"## 4. Sufficiency (LOO only; nested Sobol prefixes {list(PREFIXES)}; config committed at 48) and E-D7", "",
+          "| objective | n | arm | LOO RMSE | LOO cov95 | LOO NLPD |", "|---|---|---|---|---|---|"]
+    for _, r in suff.iterrows():
+        L.append(f"| {r['objective']} | {r['n']} | {r['arm']} | {r['loo_rmse']:.4g} | {r['loo_cov95']} | {r['loo_nlpd']:.3f} |")
+    L += ["", f"**Criterion (pinned in Part A, verbatim):** {SUFFICIENCY_CRITERION}", "",
+          "| objective | LOO cov95 at 32 (bar [28, 32]) | LOO RMSE 32 / 48 (<= 1.1) | committed config at 32 passes holdout |", "|---|---|---|---|"]
+    for obj, r in res["per_obj"].items():
+        L.append(f"| {obj} | {r['loo_cov95_32']} | {r['loo_rmse_32'] / r['loo_rmse_48']:.3f} | {r['holdout_pass_32']} |")
+    L += ["", f"**E-D7 recommendation: n0 = {res['recommendation']}.** " + ("Every objective meets the criterion at 32." if not res["reasons"]
+          else "Reasons for 48: " + "; ".join(res["reasons"]) + "."), "",
+          "Drafted pi-agenda row (Kay decides; 55 Part B waits on `E-D7_decided`):", "", "```", pi_row, "```", "",
+          "## 5. Committed configs (contract 6.2)", "", "| objective | arm | cfg | floor | exact sd / df | holdout cov95 (at the recommended tier) | holdout RMSE | exposure rows |", "|---|---|---|---|---|---|---|---|"]
+    for obj, c in com.items():
+        L.append(f"| {obj} | {c['arm']} | {'/'.join(c['cfg'])} | {c['floor']} | {c['exact_sd']} / {c['exact_df']} | {c['holdout_cov95'][0]} / {c['holdout_cov95'][1]} | "
+                 f"{c['holdout_rmse']:.4g} | {c['exposure_rows']} |")
+    L += ["", f"Exposure ledger: `exposure_ledger.csv` ({len(read_ledger(res['out_dir']))} of {EXPOSURE_CAP} scorings used; retired by committed_configs.json).", ""]
+    L += ["## 6. Figures", ""] + [f"- `{os.path.basename(f)}`" for f in figs] + [""]
+    if mech_md:
+        L += [mech_md, ""]
+    L += ["## 7. Deviations and limits", "",
+          "- Holdout touched only at the two plan tiers (32, 48), once per committed config; sufficiency curves are LOO-only (prompt 54 v3.1).",
+          "- The mechanism page is read-only (flags); R4 / N1 flags need the [43, 48] pass AND readable chatter (contract addendum 2026-11-17 bar).",
+          "- log1p arms: the inferred noise in raw units is a delta-method value at the training median (flagged).", ""]
+    return "\n".join(L)
+
+
+def deliverables(res, noise, mechanism=None, extra=None, n_paths=None):
+    """Write the figures, the noise cross-check CSV, the mechanism page and ERCOT_GP_STATUS.md
+    into res['out_dir']. Never touches committed_configs.json."""
+    from analysis.ercot_gp import ercot_gp_mechanism as M
+    extra = extra or {}
+    out = res["out_dir"]
+    entries = res["entries"]
+    inp = res["inputs"]
+    figs = [fig_parity(entries, inp["Uh"], inp["Yh"], out), fig_sufficiency(res["sufficiency"], out)]
+    cross = noise_crosscheck(noise, entries, n0=48)
+    cross.to_csv(os.path.join(out, "ercot_gp_noise_crosscheck.csv"), index=False)
+    pi_row = pi_agenda_row(res["recommendation"], res["reasons"])
+    with open(os.path.join(out, "pi_agenda_E-D7_draft.md"), "w") as f:
+        f.write(pi_row + "\n")
+    mech_md = None
+    if mechanism is not None:
+        facts = M.network_facts() if not extra.get("synthetic") else {"text": "(synthetic smoke: no network facts)"}
+        gen_pmax = np.asarray(mechanism["gen_pmax"], float)
+        sites = list(mechanism["sites"])
+        v1 = next(iter(entries))                                   # the null uses the FIRST objective's committed arm
+        arm_v1 = entries[v1][0][48]["arm"]
+        null = M.null_distributions(arm_v1, inp["U"] * gen_pmax[None, :], inp["U"], sites, gen_pmax, objective=v1,
+                                    n_paths=n_paths or M.N_PATHS, curves=mechanism["curves"], base=mechanism["base"],
+                                    meas_sd=entries[v1][1])
+        shares = {obj: M.posterior_shares(res_[48]["gp"], gen_pmax, n_paths=n_paths or M.N_PATHS)
+                  for obj, (res_, *_r) in entries.items()}
+        holdout_pass = {obj: bool(res_[res["recommendation"]]["holdout"]["pass"]) for obj, (res_, *_r) in entries.items()}
+        bars = M.readability_bar(noise, list(entries)) if noise else {}
+        y_ranges = {obj: float(inp["Y"][obj].max() - inp["Y"][obj].min()) for obj in entries}
+        flags = M.mechanism_flags(shares, null, holdout_pass=holdout_pass, bars=bars, y_ranges=y_ranges)
+        with open(os.path.join(out, "ercot_gp_mechanism.json"), "w") as f:
+            json.dump({"null": {k: v for k, v in null.items() if k != "curves"}, "flags": flags,
+                       "bars": bars, "y_ranges": y_ranges, "holdout_pass": holdout_pass}, f, indent=1, default=float)
+        figs.append(M.fig_null_truths(null, sites, gen_pmax, os.path.join(out, "fig_null_truths.png")))
+        mech_md = M.mechanism_md(facts, null, flags)
+    md = status_md(res, noise, cross, figs, mech_md, pi_row, extra)
+    with open(os.path.join(out, "ERCOT_GP_STATUS.md"), "w") as f:
+        f.write(md + "\n")
+    return {"figs": figs, "cross": cross, "pi_row": pi_row, "md": md}
 
 
 # --------------------------------------------------------------------------
@@ -473,7 +710,13 @@ def real_inputs(design_space, noise_path, objectives=None):
     assert (meta_h["tier"] == "holdout").all() and len(meta_h) == N_HOLDOUT
     for m, name in ((meta_g, "n0_E"), (meta_h, "random_E")):
         assert not m["suspect"].any(), f"{name}: SUSPECT rows {list(m.index[m['suspect']])}"
-    return (U[keep], Y[keep], sob[keep], Uh, Yh, noise, ds["contract_version"])
+    extra = {"sites": [s_["site"] for s_ in ds["sites"]],
+             "gen_pmax": np.asarray([float(s_["gen_pmax"]) for s_ in ds["sites"]], float),
+             "n_refused_n0": meta.attrs["n_refused"], "n_refused_random": meta_h.attrs["n_refused"],
+             "refused_n0": meta.attrs["refused"], "refused_random": meta_h.attrs["refused"],
+             "r2_max": float(max(meta_g["R2"].max(), meta_h["R2"].max())),
+             "r1_max": float(max(meta_g["R1"].max(), meta_h["R1"].max()))}
+    return (U[keep], Y[keep], sob[keep], Uh, Yh, noise, ds["contract_version"], extra)
 
 
 def main(argv=None):
@@ -484,18 +727,27 @@ def main(argv=None):
     ap.add_argument("--out-dir", default=OUT)
     ap.add_argument("--design-space", default=os.path.join(ERCOT, "waves", "design_space_E.json"))
     ap.add_argument("--noise", default=os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise.json"))
+    ap.add_argument("--mechanism", action="store_true", help="synthetic: also run the mechanism page on synthetic curves")
     a = ap.parse_args(argv)
     if a.synthetic:
         if os.path.abspath(a.out_dir) == os.path.abspath(OUT):
             raise SystemExit("--synthetic writes a ledger: pass a scratch --out-dir")
         U, Y, sob, Uh, Yh = synthetic_inputs()
         res = run(U, Y, sob, Uh, Yh, None, a.out_dir, "synthetic")
+        from analysis.ercot_gp import ercot_gp_mechanism as M
+        mech = {"curves": M.wave_d_site_curves_synthetic(), "base": 1.0, "sites": [f"s{i}" for i in range(6)],
+                "gen_pmax": np.array([338.6, 250.6, 268.0, 185.4, 579.0, 746.4])} if a.mechanism else None
+        deliverables(res, None, mechanism=mech, extra={"synthetic": True})
     else:
-        U, Y, sob, Uh, Yh, noise, ver = real_inputs(a.design_space, a.noise)
+        U, Y, sob, Uh, Yh, noise, ver, extra = real_inputs(a.design_space, a.noise)
         res = run(U, Y, sob, Uh, Yh, noise, a.out_dir, ver)
+        from analysis.ercot_gp import ercot_gp_mechanism as M
+        curves, base = M.wave_d_site_curves("V1")
+        mech = {"curves": curves, "base": base, "sites": extra["sites"], "gen_pmax": extra["gen_pmax"]}
+        deliverables(res, noise, mechanism=mech, extra=extra)
     print(res["status"].to_string(index=False))
     print(f"E-D7 recommendation: n0 = {res['recommendation']}; reasons for 48: {res['reasons']}")
-    print(f"wrote {res['committed']} (holdout RETIRED)")
+    print(f"wrote {res['committed']} (holdout RETIRED); ERCOT_GP_STATUS.md + figures in {res['out_dir']}")
 
 
 if __name__ == "__main__":
