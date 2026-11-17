@@ -182,9 +182,11 @@ def rulers_from_files(Y, ref, objectives, exact_cov_csv=None, noise_json=None, S
     if noise_json is not None:
         for j, o in enumerate(objectives):
             pc = noise_json.get("per_candidate", {}).get(o, {})
-            if pc.get("trigger", {}).get("fires"):
+            # plan 3 (immutable): an objective with exact sd = 0 contributes 0 to tau — the perturbed-level
+            # anchors never enter tau; the heteroscedastic branch applies only where the exact sd is > 0.
+            if pc.get("trigger", {}).get("fires") and float(Sigma[j, j]) > 0.0:
                 het[o] = level_anchors(noise_json, o)
-    all_zero = bool(np.all(Sigma == 0.0)) and not het
+    all_zero = bool(np.all(Sigma == 0.0))
     sd_diag = np.sqrt(np.clip(np.diag(Sigma), 0.0, None))
     if het:
         sd_matrix = np.tile(sd_diag, (n, 1))

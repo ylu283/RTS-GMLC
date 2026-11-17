@@ -25,7 +25,16 @@ matrix of the perturbed deltas; the shed == 0 assert; the runtime table
 quantiles are computed here from the incomplete gamma / beta functions).
 
 Outputs (--out-dir): ERCOT_NOISE.md (STE-100), ercot_noise.csv, ercot_noise.json,
-ercot_noise_cov.csv.
+ercot_noise_cov.csv (perturbed deltas; the plan-7 rider only),
+ercot_noise_exact_cov.csv (EXACT cross-batch pair deltas, ddof 1, over the gradable
+ids; the Sigma of prompt 55's tau, plan 3 / 6.2 — contract 6.3; Part B step 0).
+
+Plan 1.2 readability verdict (recorded ONCE here, final): SUSPECT per run =
+not (S1 and S2 and S3a) with S3b (nuclear units 1 / 93 starts equal across the
+exact cross-batch pair) evaluated per pair; R1 no SUSPECT run and every pair
+S3b-equal; R2 max exact-pair |Delta total_cost| <= 0.1 x the single-site median
+|Delta total| ($1.13M); R3 the same for fixed cost ($1.33M); thresholds from
+analysis/bo_plan/plan51_refs.json. READABLE -> cost objective E1, else E3.
 """
 import argparse
 import json
@@ -370,6 +379,82 @@ def trigger(levels, alpha=ALPHA, point=POINT_RATIO):
     return out
 
 
+REFS_PATH = os.path.join(ERCOT, "analysis", "bo_plan", "plan51_refs.json")
+
+
+def exact_cov(ex, ids):
+    """Covariance (ddof 1) of the EXACT cross-batch pair deltas over the ids that are
+    finite on every complete pair; rows = pairs. All-zero expected on a deterministic
+    instrument (then the matrix is exactly 0, not NaN). This is the Sigma of plan 6.2."""
+    pairs = [ex[n]["delta"] for n in sorted(ex) if ex[n]["complete"]]
+    if not pairs:
+        return pd.DataFrame()
+    cols = [c for c in ids if all(np.isfinite(d[c]) for d in pairs)]
+    M = np.asarray([[d[c] for c in cols] for d in pairs], float)
+    if len(M) > 1:
+        C = np.cov(M, rowvar=False, ddof=1)
+    else:
+        C = np.full((len(cols), len(cols)), np.nan)
+    return pd.DataFrame(C, index=cols, columns=cols)
+
+
+def suspect_table(recs, ex):
+    """Plan 1.2 SUSPECT per run (S1, S2, S3a) and S3b per exact cross-batch pair.
+    S3a: on a non-nuclear design the starts of nuclear units 1 and 93 are 0 (a
+    nuclear design: not applicable, True). S3b: the starts of units 1 and 93 are
+    equal across the exact replicates (A exact vs B exact) — cross-run, per pair."""
+    runs = []
+    for r in recs:
+        g1, g93 = r.get("D3_gen1_starts"), r.get("D3_gen93_starts")
+        nuc = bool(r.get("is_nuclear_design"))
+        s3a = True if nuc else bool(np.isfinite(g1) and np.isfinite(g93) and g1 == 0 and g93 == 0)
+        s1, s2 = bool(r.get("S1_ok")), bool(r.get("S2_ok"))
+        runs.append({"key": r["key"], "design_no": r["design_no"], "copy_type": r["copy_type"], "nuclear": nuc,
+                     "S1_ok": s1, "S1_resid_usd": r.get("S1_resid_usd"), "S2_ok": s2,
+                     "n_ruc": r.get("n_ruc"), "n_ruc_optimal": r.get("n_ruc_optimal"),
+                     "S3a_ok": s3a, "S3a_applicable": not nuc, "gen1_starts": g1, "gen93_starts": g93,
+                     "suspect": not (s1 and s2 and s3a)})
+    byk = {r["key"]: r for r in recs}
+    pairs = []
+    for n in sorted(ex):
+        if not ex[n]["complete"]:
+            continue
+        a, b = byk[ex[n]["key_A"]], byk[ex[n]["key_B"]]
+        eq = (a.get("D3_gen1_starts") == b.get("D3_gen1_starts")
+              and a.get("D3_gen93_starts") == b.get("D3_gen93_starts"))
+        pairs.append({"design_no": n, "key_A": a["key"], "key_B": b["key"], "S3b_ok": bool(eq),
+                      "gen1_starts": [a.get("D3_gen1_starts"), b.get("D3_gen1_starts")],
+                      "gen93_starts": [a.get("D3_gen93_starts"), b.get("D3_gen93_starts")]})
+    return runs, pairs
+
+
+def readability_verdict(ex, runs, pairs, refs_path=REFS_PATH):
+    """Plan 1.2 (FROZEN): R1 no SUSPECT run (+ every exact pair S3b-equal); R2 max
+    exact-pair |Delta total_cost| <= 0.1 x single-site median |Delta total|; R3 the
+    same for fixed cost. READABLE -> E1 total_cost; else E3 var_cost."""
+    with open(refs_path) as f:
+        rd = json.load(f)["readability"]["single_site_median_abs_delta_usd"]
+    thr_total, thr_fixed = 0.1 * float(rd["total"]), 0.1 * float(rd["fixed"])
+    comp = [ex[n] for n in sorted(ex) if ex[n]["complete"]]
+    d_total = [abs(float(p["delta"]["E1"])) for p in comp if np.isfinite(p["delta"].get("E1", np.nan))]
+    d_fixed = [abs(float(p["delta"]["E2"])) for p in comp if np.isfinite(p["delta"].get("E2", np.nan))]
+    suspects = [r["key"] for r in runs if r["suspect"]]
+    s3b_bad = [p["design_no"] for p in pairs if not p["S3b_ok"]]
+    r1 = len(runs) > 0 and not suspects and not s3b_bad
+    r2 = len(d_total) > 0 and max(d_total) <= thr_total
+    r3 = len(d_fixed) > 0 and max(d_fixed) <= thr_fixed
+    readable = bool(r1 and r2 and r3)
+    return {"readable": readable, "cost_objective": "E1" if readable else "E3",
+            "cost_objective_name": "total_cost (E1)" if readable else "var_cost (E3; plan 1.1 D5 caveats)",
+            "R1": {"ok": bool(r1), "n_runs": len(runs), "suspect_keys": suspects, "S3b_failed_designs": s3b_bad},
+            "R2": {"ok": bool(r2), "max_abs_delta_total_usd": (max(d_total) if d_total else np.nan),
+                   "threshold_usd": thr_total, "n_pairs": len(d_total)},
+            "R3": {"ok": bool(r3), "max_abs_delta_fixed_usd": (max(d_fixed) if d_fixed else np.nan),
+                   "threshold_usd": thr_fixed, "n_pairs": len(d_fixed)},
+            "thresholds_source": os.path.relpath(refs_path, ERCOT),
+            "rule": "plan 1.2 FROZEN; recorded once in the prompt-52 deliverable; final; the cost objective is never switched mid-campaign"}
+
+
 def summarize(recs, ids, gradable, defs, missing):
     ex = exact_pairs(recs, ids)
     pert = perturbed_deltas(recs, ids)
@@ -425,6 +510,9 @@ def summarize(recs, ids, gradable, defs, missing):
                            index=cols, columns=cols)
     else:
         cov = pd.DataFrame()
+    excov = exact_cov(ex, [c for c in ids if per_cand[c]["gradable"]])
+    runs_s, pairs_s = suspect_table(recs, ex)
+    verdict = readability_verdict(ex, runs_s, pairs_s)
     # shed assert
     shed = [(_val(r, "R1"), r["key"]) for r in recs]
     shed_ok = bool(recs) and all(np.isfinite(v) and v == 0.0 for v, _ in shed)
@@ -452,7 +540,8 @@ def summarize(recs, ids, gradable, defs, missing):
     ident = {"n_runs": len(recs), "n_with_identity_line": len(idl),
              "ruc_mipgap_values": sorted({i.get("ruc_mipgap") for i in idl if "ruc_mipgap" in i}),
              "ruc_time_limit_values": sorted({i.get("ruc_time_limit") for i in idl if "ruc_time_limit" in i})}
-    return {"per_candidate": per_cand, "exact_pairs": ex, "perturbed": pert, "cov": cov,
+    return {"per_candidate": per_cand, "exact_pairs": ex, "perturbed": pert, "cov": cov, "exact_cov": excov,
+            "suspect_runs": runs_s, "suspect_pairs": pairs_s, "readability": verdict,
             "ruler_zero": ruler_zero, "ruler_unavailable": ruler_unavail,
             "all_exact_zero": all_exact_zero, "n_exact_pairs": n_pairs, "n_md5_equal": md5_equal,
             "shed_ok": shed_ok, "shed_values": shed, "runtime_table": rt, "runtime": runtime,
@@ -484,6 +573,14 @@ def free_data(ercot=ERCOT):
 # --------------------------------------------------------------------------
 # outputs
 # --------------------------------------------------------------------------
+def _i(v):
+    """Integer-like value (starts) or '—'."""
+    try:
+        return "—" if v is None or not np.isfinite(float(v)) else f"{float(v):.0f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
 def _f(v, nd=4):
     if v is None or (isinstance(v, float) and not np.isfinite(v)):
         return "n/a" if not (isinstance(v, float) and v == float("inf")) else "inf"
@@ -622,6 +719,46 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
         L += [f"| {c} | {_f(v)} | {_f(math.sqrt(v) if v >= 0 else np.nan)} |" for c, v in diag]
         L += [""]
     # 6 shed
+    # 5b exact-delta covariance (the tau Sigma)
+    exc = S["exact_cov"]
+    L += ["## 5b. Covariance of the EXACT cross-batch pair deltas (the Sigma of tau; plan 3 / 6.2, contract 6.3)", "",
+          f"`ercot_noise_exact_cov.csv` ({exc.shape[0]} x {exc.shape[1]}; rows = the {S['n_exact_pairs']} exact pairs, ddof 1; "
+          "gradable candidates finite on every pair). THIS matrix — never the perturbed one of section 5 — feeds prompt 55's "
+          "tau_joint / tau_marginal. The perturbed matrix feeds the plan-7 sensitivity-level rider only.", ""]
+    if len(exc):
+        allz = bool(np.all(exc.to_numpy() == 0.0))
+        L.append("**Identically zero: every exact pair delta is 0, so Sigma_exact = 0 and tau_joint = tau_marginal = 0 — "
+                 "the stop rule is budget-cap-only and the cap governs (plan 3).**" if allz else
+                 "**Not identically zero** — diagonal (variance) per candidate: "
+                 + ", ".join(f"{c} {_f(float(exc.loc[c, c]))}" for c in exc.columns if float(exc.loc[c, c]) != 0.0) + ".")
+        L.append("")
+    # 5c SUSPECT + plan 1.2 verdict
+    rv = S["readability"]
+    L += ["## 5c. SUSPECT check (plan 1.2, S1-S3) and the READABILITY verdict (FINAL)", "",
+          "| key | design | copy | nuclear | S1 (|total-fixed-var| <= $1) | S2 (all RUC OPTIMAL) | S3a (units 1 / 93 starts = 0; n/a nuclear) | SUSPECT |",
+          "|---|---|---|---|---|---|---|---|"]
+    for r in S["suspect_runs"]:
+        L.append(f"| {r['key']} | D{r['design_no']} | {r['copy_type']} | {'yes' if r['nuclear'] else 'no'} | "
+                 f"{'ok' if r['S1_ok'] else 'FAIL'} ({_f(r['S1_resid_usd'], 3)}) | {'ok' if r['S2_ok'] else 'FAIL'} "
+                 f"({r['n_ruc_optimal']} / {r['n_ruc']}) | {('ok' if r['S3a_ok'] else 'FAIL') if r['S3a_applicable'] else 'n/a'} "
+                 f"({_i(r['gen1_starts'])} / {_i(r['gen93_starts'])}) | {'**SUSPECT**' if r['suspect'] else 'no'} |")
+    L += ["", "S3b (cross-run: units 1 / 93 starts equal across the exact cross-batch pair):", "",
+          "| design | A exact | B exact | gen-1 starts A / B | gen-93 starts A / B | S3b |", "|---|---|---|---|---|---|"]
+    for p_ in S["suspect_pairs"]:
+        L.append(f"| D{p_['design_no']} | {p_['key_A']} | {p_['key_B']} | {_i(p_['gen1_starts'][0])} / {_i(p_['gen1_starts'][1])} | "
+                 f"{_i(p_['gen93_starts'][0])} / {_i(p_['gen93_starts'][1])} | {'ok' if p_['S3b_ok'] else 'FAIL'} |")
+    L += ["", f"**Plan 1.2 verdict: total_cost is {'READABLE' if rv['readable'] else 'NOT READABLE'} -> the campaign cost "
+          f"objective is {rv['cost_objective_name']}.** Recorded once here; final (plan 1.2, 10: immutable). "
+          "The cost objective is never switched mid-campaign.", "",
+          "| rule | test | value | threshold | result |", "|---|---|---|---|---|",
+          f"| R1 | no prompt-52 run SUSPECT (S1 ∧ S2 ∧ S3a per run; S3b per exact pair) | {len(rv['R1']['suspect_keys'])} SUSPECT, "
+          f"{len(rv['R1']['S3b_failed_designs'])} S3b failures over {rv['R1']['n_runs']} runs | 0 | {'PASS' if rv['R1']['ok'] else 'FAIL'} |",
+          f"| R2 | max exact-pair \\|Δ total_cost\\| ({rv['R2']['n_pairs']} pairs) | ${_f(rv['R2']['max_abs_delta_total_usd'], 2)} | "
+          f"${rv['R2']['threshold_usd']:,.0f} (0.1 x single-site median \\|Δ total\\|) | {'PASS' if rv['R2']['ok'] else 'FAIL'} |",
+          f"| R3 | max exact-pair \\|Δ fixed_cost\\| ({rv['R3']['n_pairs']} pairs) | ${_f(rv['R3']['max_abs_delta_fixed_usd'], 2)} | "
+          f"${rv['R3']['threshold_usd']:,.0f} (0.1 x single-site median \\|Δ fixed\\|) | {'PASS' if rv['R3']['ok'] else 'FAIL'} |",
+          "", f"Thresholds from `{rv['thresholds_source']}` (plan 1.2: $11.32M and $13.25M single-site medians). "
+          "The gap bound of prompt 57 (G_run) is an evidence column, never a verdict label (plan AMENDMENT 2026-11-06).", ""]
     L += ["## 6. Load shed assert (protects E-D1)", "",
           (f"shed ≡ 0 on all {len(recs)} runs: **PASS**." if S["shed_ok"] else
            "**FAIL: load shed is not 0 on every run: " + ", ".join(f"{k} = {_f(v)}" for v, k in S["shed_values"] if not (np.isfinite(v) and v == 0.0)) + ". STOP. Re-read E-D1 before any use.**"), ""]
@@ -659,7 +796,8 @@ def fmt_md(S, ids, gradable, recs, gap_used, fd, out_dir):
           "- With df = 1 per level the F test rejects only at observed ratios > 161 (alpha 0.05, one-sided); the trigger is an "
           "order-of-magnitude detector. Pooled sd CIs are wide at these df; read the CI, not the point.",
           "- E8, E9, N5 use the CRC-computed `pool_full_metrics.json` (the gz tables are not in git).",
-          f"- Outputs: `{os.path.relpath(out_dir, ERCOT)}/ercot_noise.csv`, `ercot_noise.json`, `ercot_noise_cov.csv`.", ""]
+          f"- Outputs: `{os.path.relpath(out_dir, ERCOT)}/ercot_noise.csv`, `ercot_noise.json`, `ercot_noise_cov.csv` "
+          "(perturbed; rider only), `ercot_noise_exact_cov.csv` (exact; tau).", ""]
     return "\n".join(L)
 
 
@@ -668,6 +806,7 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
     df = to_frame(S, ids)
     df.to_csv(os.path.join(out_dir, "ercot_noise.csv"), index=False)
     S["cov"].to_csv(os.path.join(out_dir, "ercot_noise_cov.csv"))
+    S["exact_cov"].to_csv(os.path.join(out_dir, "ercot_noise_exact_cov.csv"))
     runs = []
     for r in recs:
         runs.append({k: r.get(k) for k in ("key", "batch", "index", "design_no", "design_id", "copy_type", "site",
@@ -691,7 +830,15 @@ def write_outputs(S, ids, gradable, recs, gap_used, fd, out_dir):
           "per_candidate": S["per_candidate"],
           "exact_pairs": {str(k): v for k, v in S["exact_pairs"].items()},
           "perturbed_deltas": S["perturbed"].to_dict(orient="records"),
-          "covariance": {"ids": list(S["cov"].columns), "matrix": S["cov"].to_numpy().tolist()},
+          "covariance": {"ids": list(S["cov"].columns), "matrix": S["cov"].to_numpy().tolist(),
+                         "population": "PERTURBED deltas; feeds the plan-7 sensitivity-level rider ONLY, never tau"},
+          "exact_covariance": {"ids": list(S["exact_cov"].columns), "matrix": S["exact_cov"].to_numpy().tolist(),
+                               "file": "ercot_noise_exact_cov.csv", "ddof": 1, "n_pairs": S["n_exact_pairs"],
+                               "all_zero": bool(len(S["exact_cov"]) and np.all(S["exact_cov"].to_numpy() == 0.0)),
+                               "population": "EXACT cross-batch pair deltas (B exact - A exact); the Sigma of prompt 55's tau (plan 3 / 6.2)"},
+          "suspect": {"runs": S["suspect_runs"], "exact_pairs_S3b": S["suspect_pairs"],
+                      "n_suspect": sum(1 for r in S["suspect_runs"] if r["suspect"])},
+          "readability": S["readability"],
           "free_data": fd, "missing_extracts": S["missing"], "runs": runs,
           "generated_utc": pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%M:%SZ"), "git_head": po.git_head()}
     with open(os.path.join(out_dir, "ercot_noise.json"), "w") as f:
@@ -726,6 +873,12 @@ def main(argv=None):
     S, df, md = read_noise(args.extr, args.waves, args.data_dir, args.out_dir)
     print(df[["id", "n_exact_pairs", "exact_zero", "n_perturbed", "ruler", "ruler_status", "pooled_sd",
               "trigger_fires"]].to_string(index=False))
+    rv = S["readability"]
+    print(f"plan 1.2 verdict: {'READABLE' if rv['readable'] else 'NOT READABLE'} -> cost objective {rv['cost_objective']}; "
+          f"R1 {rv['R1']['ok']} (suspect {rv['R1']['suspect_keys']}, S3b fail {rv['R1']['S3b_failed_designs']}), "
+          f"R2 {rv['R2']['ok']} ({rv['R2']['max_abs_delta_total_usd']} <= {rv['R2']['threshold_usd']:.0f}), "
+          f"R3 {rv['R3']['ok']} ({rv['R3']['max_abs_delta_fixed_usd']} <= {rv['R3']['threshold_usd']:.0f}); "
+          f"exact cov all zero: {bool(len(S['exact_cov']) and np.all(S['exact_cov'].to_numpy() == 0.0))}")
     print(f"exact pairs {S['n_exact_pairs']} (md5 equal {S['n_md5_equal']}); all exact zero: {S['all_exact_zero']}; "
           f"RULER=0: {S['ruler_zero']}; shed ok: {S['shed_ok']}; core-h median {S['runtime']['core_h_median']}")
     if S["missing"]:

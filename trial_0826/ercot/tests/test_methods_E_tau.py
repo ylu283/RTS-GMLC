@@ -104,9 +104,17 @@ def test_heteroscedastic_DCD_branch_and_correlation_helper():
     noise = {"per_candidate": {"V1": {"trigger": {"fires": True},
                                       "levels": [{"y": 1e4, "sd": 100.0}, {"y": 5e4, "sd": 500.0}, {"y": 9e4, "sd": 2000.0}]},
                                "E1": {"trigger": {"fires": False}}, "R4": {}, "N1": {}}}
+    # plan 3: V1 has exact sd 0 here -> its trigger is IGNORED (perturbed anchors never enter tau)
+    out0 = tau_E.rulers_from_files(Y, ref, ["V1", "E1", "R4", "N1"], Sigma=S, noise_json=noise, n_draws=50)
+    assert out0["heteroscedastic_objectives"] == [] and out0["form"].startswith("homoscedastic")
+    # with exact sd_V1 > 0 the heteroscedastic D C D branch applies to V1
+    S[0, 0] = (0.01 * Y[:, 0].std()) ** 2
     out = tau_E.rulers_from_files(Y, ref, ["V1", "E1", "R4", "N1"], Sigma=S, noise_json=noise, n_draws=50)
     assert out["heteroscedastic_objectives"] == ["V1"] and out["form"].startswith("heteroscedastic")
     assert out["tau_joint"] > 0 and out["tau_marginal"] > 0 and not out["budget_cap_only"]
+    # all exact zero + a firing trigger -> still tau = 0 (cap-only)
+    outz = tau_E.rulers_from_files(Y, ref, ["V1", "E1", "R4", "N1"], Sigma=np.zeros((4, 4)), noise_json=noise, n_draws=5)
+    assert outz["budget_cap_only"] and outz["tau_joint"] == 0.0
 
 
 def test_read_cov_csv_restricts_and_orders(tmp_path):
