@@ -797,3 +797,73 @@ RUC days > 600 s and the maximum daily RUC solve time of the round,
 written to the round record (the strategy session edits 55's spec
 text). Nothing else changes. Update 2026-11-18: noise_seed_E max
 821.3 s, 3 days > 600 s over 18 runs, 0 hits.
+
+## AMENDMENT 2026-11-18 — screening_v3 actuals + reads (prompt 62 Part C; appendable, §10; disclosure only; E-D3 not reopened)
+
+**What changed.** Nothing in the plan's rules, bars, X, HV ledger,
+holdout, baseline, seats or site slate. The 11 `screening_v3` rows are
+analysis-only and never enter `load()`, the GP, §6.3 R or the random
+baseline. Source: `analysis/pool/SCREENING_V3.md` and
+`screening_v3_{sites,locational,covariate_rho,ranking,dominance}.csv`
+(landing commit e58f4bd). The reads were frozen as prompt 62 §4.5,
+verbatim in `waves/screening_v3/README.md`, in wave commit c986da0
+before any Y.
+
+- **Budget actuals:** 11 / 11 runs, SUSPECT 0, identity v3 on all.
+  Wall-clock was 4.8–5.5 h per run at 4 slots, except tasks 9 and 10
+  (sites 204 and 20), which took 8.9 and 9.5 h. That is about 259
+  core-h in total.
+- **Replicate:** `screening_v3:11` overall.csv md5 equals
+  `location_oat_v2:3` (dc5b00da…), so there has been no code or data
+  drift since 11-06.
+- **Bars:** B_j from `ercot_noise.json` (61 §3, D2 excluded). 23
+  graded ids have B_j > 0. D2 is not graded because it is 0/0 at
+  base_v3. Holm is applied over the 23. `ercot_noise_seed.json` B_seed
+  is reported beside B_j (N1 binding at 242.1). No verdict changes
+  under B_seed.
+- **LOCATIONAL** (pocket_120 ∪ wind_near, 8 sites, vs far, 5 sites;
+  Holm ≤ 0.05, |HL| ≥ 2 B_j, Moses 95 % interval excludes 0):
+
+  | id | HL / B_j | Holm p |
+  |---|---|---|
+  | V1 | −33.1 | 0.036 |
+  | E1 | −8.7 | 0.036 |
+  | N4 | −2.7 | 0.047 |
+  | N5 | +4.3 | 0.036 |
+  | E6 | +10.3 | 0.036 |
+  | E3 | −4.6 | 0.036 |
+  | V3 | −60.8 | 0.036 |
+
+  Of the seated ids, N1 is NOT LOCATIONAL: −3.0 B_pert and −1.43
+  B_seed, exact p 0.093, Holm p 0.65, and the interval contains 0. The
+  other 15 ids are NOT LOCATIONAL as well. Among them, X1 (−6.1 B, Holm
+  p 0.30) and V2 (+32.6 B, Holm p 0.087) fail on p. E2 and E8 are
+  separated but fall below 2 B.
+- **Confounds (disclosed):** the C tier holds one PV site (116); the
+  WIND-only sensitivity agrees in sign and size. ω spans 0.10–0.97. 81
+  % of 163's relief is own-site, which is accounting reclassification
+  at saturation. E1 has ρ = −0.90 with ω.
+- **Matched-MW ranking vs E-D3 slate:** the v3 top 6 are 270, 275,
+  274, 110, 140 and 146, all on buses {120, 2, 75}, so the **SLATE
+  BUS-SET HOLDS**. 275 enters and 163 leaves, which matches the stated
+  prediction on all three counts. No site is TIED (band B_V1/180 =
+  89.9 MWh/MW; 146 and 163 sit ±1.01 bands from the boundary). Kendall
+  τ_b(v2, v3) = 0.667, exact p 1.3e-4. E-D3 stands.
+- **Dominance:** two non-slate sites are not dominated on V1/E1/N1:
+  116 (by 0.72 B, on E1) and 91 (by 0.44 B, on N1). On V1/E1/N4 only
+  116 is not dominated. Both are within one bar. They are disclosed
+  and flagged for the PI. E-D3 is not reopened in this campaign.
+- **E1 per site:** WITHIN GAP BOUND (G_site + G_base) at 16 / 16 sites.
+
+**What had been seen.** When this block was written:
+
+- screening_v3 rows 1–11;
+- wave D L180 rows 3/6/9/12/15/18;
+- base_v3:1;
+- `ercot_noise.json` and `ercot_noise_seed.json`;
+- the committed 62 Part B outputs.
+
+Not read: `extracts/random_E` and `extracts/methods_E_*`. No GP was
+fit. Holdout exposure is unchanged. These Y landed after 62 Part B (the
+E-D1b input). They change no seat: the Part C block is appended to §E
+of `POOL_N0E_STANDINGS.md`.
