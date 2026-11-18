@@ -22,11 +22,11 @@
 - N1 IDR: 738.8 ≈ 738.8 (± 0.05)
 - N1 B_seed: 242.083 ≈ 242.1 (± 0.05)
 - pool_n0E_standings B_j == ercot_noise_seed B_pert for V1, E1, R4, N1, N4
-- text in project_bogp_multipem.md: 'overlap 0.988, τ 0.86–0.91 vs shed'
-- text in project_bogp_multipem.md: 'M = 3 FINAL (Kay 10-06)'
-- text in pi-agenda.md: '| 2026-10-06 | — | **Objective vector M** | **APPROVED (Kay): M = {load_shed, true_curtailment, cost_less_synthetic}**'
-- text in INDEX.md: 'M = 3 APPROVED (Kay 10-06): shed + curtailment + cost-less-synthetic'
-- text in pi-agenda.md: 'Strategy recommendation shifts to A′: V1 · E1 · N4 (M = 3), a recorded rule change'
+- text in project_bogp_multipem.md (external; frozen in external_snippets.json): 'overlap 0.988, τ 0.86–0.91 vs shed'
+- text in project_bogp_multipem.md (external; frozen in external_snippets.json): 'M = 3 FINAL (Kay 10-06)'
+- text in pi-agenda.md (external; frozen in external_snippets.json): '| 2026-10-06 | — | **Objective vector M** | **APPROVED (Kay): M = {load_shed, true_curtailment, cost_less_synthetic}**'
+- text in INDEX.md (external; frozen in external_snippets.json): 'M = 3 APPROVED (Kay 10-06): shed + curtailment + cost-less-synthetic'
+- text in pi-agenda.md (external; frozen in external_snippets.json): 'Strategy recommendation shifts to A′: V1 · E1 · N4 (M = 3), a recorded rule change'
 - wave D WIND rows: 18 ≈ 18 (± 0)
 - wave D nuclear rows: 3 ≈ 3 (± 0)
 - wave D WIND sites: 6 ≈ 6 (± 0)
@@ -111,7 +111,7 @@
 margin is ≈ 1.4×, not 25×'
 - 1,200 / 860.7: 1.39421 ≈ 1.4 (± 0.05)
 - (1,200 - 1,157) / 1,200: 0.0358333 ≈ 0.04 (± 0.005)
-- text in pi-agenda.md: 'M ≠ 4 reopens plan §6.4 gate numbers (C2/C3 false-alarm rates were set for M = 4)'
+- text in pi-agenda.md (external; frozen in external_snippets.json): 'M ≠ 4 reopens plan §6.4 gate numbers (C2/C3 false-alarm rates were set for M = 4)'
 - text in NOISE_SEED_E.md: 'nav = the first 32 or all 48 Sobol rows'
 - text in ERCOT_BO_PLAN.md: 'C2 coverage'
 - text in ERCOT_BO_PLAN.md: 'C3 outlier'
@@ -203,3 +203,19 @@ R, the ledger and this table)'
 - text in ERCOT_BO_PLAN.md: 'AMENDMENT 2026-11-18 — screening_v3 actuals + reads'
 - text in ERCOT_BO_PLAN.md: 'That is about 259
   core-h in total.'
+- pool_standings.csv ruler_j == ercot_noise_2026-11-16.json ruler (R4 20, N1 15, V1), != ercot_noise.json ruler
+- R4 11-16 median ruler: 20 ≈ 20 (± 0)
+- N1 11-16 median ruler: 15 ≈ 15 (± 0)
+- R4 median ruler: 28.5 ≈ 28.5 (± 1e-09)
+- N1 median ruler: 23.5 ≈ 23.5 (± 1e-09)
+- commit d6a8933 exists in git
+- share of N1 IDR within its Seed bar (≈ one third): 0.327671 ≈ 0.3333333333333333 (± 0.02)
+- text in ERCOT_BO_PLAN.md: '**Total 3,006 core-h for 96 runs'
+- C sites: 8 ≈ 8 (± 0)
+- far sites: 5 ≈ 5 (± 0)
+- sites in neither class (pv_pocket): 3 ≈ 3 (± 0)
+- V3 A3 ratio: 6.20226 ≈ 6.2 (± 0.005)
+- D1 A3 ratio: 3.64472 ≈ 3.64 (± 0.005)
+- text in ERCOT_BO_PLAN.md: '116 (by 0.72 B, on E1) and 91 (by 0.44 B, on N1)'
+- R8 global order: 18 ≈ 18 (± 0)
+- R8 IDR/B: 1.16186 ≈ 1.16 (± 0.005)

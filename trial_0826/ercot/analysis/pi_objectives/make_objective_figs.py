@@ -39,7 +39,7 @@ plt.rcParams.update({
     "legend.fontsize": LEGEND,
     "mathtext.fontset": "cm",
 })
-FAMILY_COLORS = {"V": "#009E73", "E": "#0072B2", "X": "#6B6B6B", "R": "#D55E00", "N": "#CC79A7", "D": "#999999"}
+FAMILY_COLORS = {"V": "#009E73", "E": "#0072B2", "X": "#E69F00", "R": "#D55E00", "N": "#CC79A7", "D": "#999999"}
 GREY = "#BBBBBB"
 
 
@@ -99,7 +99,7 @@ def fig_envelope():
 # slide 7: hero, IDR / bar on a log axis
 # =============================================================================
 NAMED = ["V1", "E1", "R4", "N1", "N4"]
-SO = {"V1": (10, -14, "left"), "N1": (10, -14, "left")}   # Seed-label offsets (render overlap fixes)
+SO = {"V1": (10, -14, "left"), "N1": (10, -14, "left"), "N4": (0, -20, "center")}   # Seed-label offsets (render overlap fixes)
 
 
 def fig_hero():
@@ -132,10 +132,10 @@ def fig_hero():
             ax.plot([i, i], [vp, vs], color=col, lw=1.5, zorder=3)
         if j in NAMED:
             po = {"R4": (-10, 2, "right")}.get(j, (8, 4, "left"))
-            ax.annotate(f"{vp:.1f}", (i, vp), xytext=po[:2], textcoords="offset points", ha=po[2], fontsize=11, fontweight="bold")
+            ax.annotate(f"{vp:.2f}", (i, vp), xytext=po[:2], textcoords="offset points", ha=po[2], fontsize=11, fontweight="bold")
             if seed.loc[j, "B_seed"] > 0:
                 vs = r["IDR"] / seed.loc[j, "B_seed"]
-                ax.annotate(f"{vs:.2f}" if j == "N1" else f"{vs:.1f}", (i, vs), xytext=SO.get(j, (-10, -5, "right"))[:2],
+                ax.annotate(f"{vs:.2f}", (i, vs), xytext=SO.get(j, (-10, -5, "right"))[:2],
                             textcoords="offset points", ha=SO.get(j, (-10, -5, "right"))[2], fontsize=11, fontweight="bold", color="#444444")
     for y, ls, lab in [(2, "--", "2 = RESPONDS bar"), (3, ":", "3 = top of BORDERLINE [2, 3)"), (10, "-.", "10 = STRONG")]:
         ax.axhline(y, color="k", ls=ls, lw=1.3, zorder=2)
@@ -156,9 +156,10 @@ def fig_hero():
     from matplotlib.lines import Line2D
     h = [Line2D([], [], marker="o", ls="", ms=10, color=c, markeredgecolor="k", label=f"family {f}")
          for f, c in FAMILY_COLORS.items() if f != "D"]
-    h += [Line2D([], [], marker="o", ls="", ms=10, color="#444444", markeredgecolor="k", label="filled = perturbed bar B_j"),
+    h += [Line2D([], [], marker="o", ls="", ms=10, markerfacecolor="#000000", markeredgecolor="k",
+                 label=r"filled = perturbed bar $B_j$"),
           Line2D([], [], marker="o", ls="", ms=10, markerfacecolor="white", markeredgecolor="k", markeredgewidth=2,
-                 label="open = Seed bar B^seed")]
+                 label=r"open = Seed bar $B^{\mathrm{seed}}$")]
     ax.legend(handles=h, loc="upper center", ncol=7, fontsize=10, frameon=True, bbox_to_anchor=(0.5, 1.13))
     bold_ticks(ax)
     fig.tight_layout()
@@ -187,7 +188,7 @@ def fig_relief():
         assert abs(g - F.G[m]) < 1e-9, m
     assert abs(p3[1] - F.R9_TWH) < 1e-12
 
-    fig, ax = plt.subplots(figsize=(9.5, 6.0))
+    fig, ax = plt.subplots(figsize=(8.6, 6.6))
     ax.plot([v[0] for v in soat.values()], [v[1] for v in soat.values()], "s--", color="#0072B2", ms=10, mec="k",
             label="Σ of six single-site OAT runs (wave D)")
     ax.plot([v[0] for v in p1.values()], [v[1] for v in p1.values()], "o-", color="#D55E00", ms=11, mec="k",
@@ -195,24 +196,31 @@ def fig_relief():
     for m in (60, 120, 180):
         ax.annotate(f"g = {F.G[m]:.3f}", (p1[m][0], p1[m][1]), xytext=(10, -22), textcoords="offset points",
                     fontsize=12, fontweight="bold")
-    mk = {"P2_800_b120": ("^", "#009E73", "P2 800 MW, bus-120 sites"), "P2_800_b275": ("v", "#CC79A7", "P2 800 MW, bus-2/75 sites"),
-          "P2_800_all": ("P", "#E69F00", "P2 800 MW, all six pro-rata"), "P2_500_270": ("^", "#009E73", None),
-          "P2_500_110_140": ("v", "#CC79A7", None)}
+    # site sets per row asserted from waves/location_contrast_E/design_matrix.csv
+    mwc = [c for c in F.dmLC.columns if c.startswith("mw_")]
+    sites = {r.level_id: {c[3:] for c in mwc if getattr(r, c) > 0} for r in F.dmLC.itertuples()}
+    assert sites["P2_800_b120"] == {"163", "270", "274"} and sites["P2_800_b275"] == {"110", "140", "146"}
+    assert sites["P2_500_270"] == {"270"} and sites["P2_500_110_140"] == {"110", "140"}
+    mk = {"P2_800_b120": ("^", "#009E73", "P2 800 MW: bus-120 sites (163, 270, 274)", -18),
+          "P2_800_b275": ("v", "#CC79A7", "P2 800 MW: bus-2/75 sites (110, 140, 146)", 0),
+          "P2_800_all": ("P", "#E69F00", "P2 800 MW: all six pro-rata", 18),
+          "P2_500_270": ("D", "#56B4E9", "P2 500 MW matched-u: site 270 alone", 0),
+          "P2_500_110_140": ("s", "#999999", "P2 500 MW matched-u: sites 110 + 140", 0)}
     for it, (xv, yv) in p2.items():
-        m, c, lab = mk[it]
-        ax.scatter(xv, yv, marker=m, s=130, color=c, edgecolor="k", zorder=5, label=lab)
+        m, c, lab, dx = mk[it]   # dx: small horizontal offset so the three 800 MW markers do not hide each other
+        ax.scatter(xv + dx, yv, marker=m, s=150, color=c, edgecolor="k", zorder=5, label=lab)
     ax.scatter(*p3, marker="*", s=380, color="#F0E442", edgecolor="k", zorder=6, label="P3 1,500 MW, all six")
     ax.axhline(F.POOL_TWH, color="k", ls=":", lw=1.5)
-    ax.text(150, F.POOL_TWH + 0.06, f"behind-cut curtailment pool {F.POOL_TWH:.2f} TWh (base_v3)", fontsize=11,
-            fontweight="bold")
-    ax.annotate(f"{F.R9_TWH:.2f} TWh = {100 * F.R9_SHARE:.0f} % of the pool", p3, xytext=(900, 4.45),
+    ax.text(60, F.POOL_TWH + 0.06, f"behind-cut curtailment pool {F.POOL_TWH:.2f} TWh (base_v3)", fontsize=12,
+            fontweight="bold", ha="left")
+    ax.annotate(f"{F.R9_TWH:.2f} TWh = {100 * F.R9_SHARE:.0f} % of the pool", p3, xytext=(980, 4.45),
                 textcoords="data", fontsize=11, fontweight="bold", arrowprops=dict(arrowstyle="->"))
     ax.set_xlim(0, 1650)
     ax.set_ylim(0, 5.4)
     ax.set_xlabel("total PEM MW (six slate sites)")
     ax.set_ylabel("V1 curtailment relief vs base_v3 (TWh)")
     ax.grid(alpha=0.3)
-    ax.legend(loc="lower right", fontsize=10, frameon=True)
+    ax.legend(loc="lower right", fontsize=10.5, frameon=True)
     bold_ticks(ax)
     fig.tight_layout()
     out = FIGS / "fig_relief_vs_total_mw.png"
@@ -244,6 +252,77 @@ def fig_equations():
     return out
 
 
+# =============================================================================
+# slide 8: 5 x 5 raw and T-residual oriented rho (replaces the 25 x 25 clustermap on the slide)
+# =============================================================================
+IDS5 = ["V1", "E1", "X1", "N1", "N4"]
+
+
+def fig_rho5():
+    """One 5 x 5 matrix: upper triangle = raw oriented ρ, lower triangle = T-residual ρ (cells large enough for a projector)."""
+    Rw = F.raw.loc[IDS5, IDS5].to_numpy(float)
+    Rs = F.resid.loc[IDS5, IDS5].to_numpy(float)
+    assert np.allclose(Rw, Rw.T) and np.allclose(Rs, Rs.T) and np.allclose(np.diag(Rw), 1)
+    assert abs(F.raw.loc["N1", "N4"] - F.RHO["N4N1_raw"]) < 1e-12 and abs(F.resid.loc["N1", "N4"] - F.RHO["N4N1_res"]) < 1e-12
+    M = np.where(np.triu(np.ones((5, 5)), 1) > 0, Rw, Rs)
+    np.fill_diagonal(M, np.nan)
+    fig, ax = plt.subplots(figsize=(7.2, 6.4))
+    im = ax.imshow(M, cmap="RdBu_r", vmin=-1, vmax=1)
+    for a_ in range(5):
+        for b_ in range(5):
+            if a_ == b_:
+                ax.text(b_, a_, IDS5[a_], ha="center", va="center", fontsize=18, fontweight="bold", color="#444444")
+                continue
+            v = M[a_, b_]
+            ax.text(b_, a_, f"{v:.2f}", ha="center", va="center", fontsize=18, fontweight="bold",
+                    color="white" if abs(v) > 0.6 else "black")
+    i, j = IDS5.index("N1"), IDS5.index("N4")
+    for (aa, bb) in [(i, j), (j, i)]:
+        ax.add_patch(plt.Rectangle((bb - 0.5, aa - 0.5), 1, 1, fill=False, ec="#F0E442", lw=5))
+    ax.set_xticks(range(5)); ax.set_xticklabels(IDS5)
+    ax.set_yticks(range(5)); ax.set_yticklabels(IDS5)
+    ax.set_title("upper right: raw ρ   ·   lower left: residual ρ", fontsize=15)
+    bold_ticks(ax)
+    cb = fig.colorbar(im, ax=ax, shrink=0.85)
+    cb.set_label("oriented Spearman ρ (48 designs)", fontweight="bold", fontsize=14)
+    for lab in cb.ax.get_yticklabels():
+        lab.set_fontweight("bold"); lab.set_fontsize(13)
+    out = FIGS / "fig_rho5_raw_resid.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    return out
+
+
+# =============================================================================
+# slide 20: screening_v3 HL / B_j per graded id (rebuilt from screening_v3_locational.csv)
+# =============================================================================
+def fig_sv3():
+    t = F.sv3loc.sort_values("global_order")
+    ids = t.index.tolist()
+    v = t["HL_over_B"].to_numpy(float)
+    assert all(abs(F.SV3[j][0] - x) < 1e-12 for j, x in zip(ids, v))
+    fig, ax = plt.subplots(figsize=(9.5, 5.0))
+    cols = ["#B2182B" if t.loc[j, "verdict"] == "LOCATIONAL" else "#9E9E9E" for j in ids]
+    ax.bar(range(len(ids)), v, color=cols, edgecolor="k")
+    for y in (2, -2):
+        ax.axhline(y, color="k", ls="--", lw=1.2)
+    ax.axhline(0, color="k", lw=0.8)
+    for j in ["N1", "N4"]:
+        i = ids.index(j)
+        ax.annotate(f"{j}: {F.SV3[j][0]:+.1f} B, Holm p {F.SV3[j][1]:.3f}\n{t.loc[j, 'verdict']}", (i, v[i]),
+                    xytext=((1.0, -50) if j == "N1" else (10.5, -38)), fontsize=13, fontweight="bold",
+                    arrowprops=dict(arrowstyle="->", lw=1.5))
+    ax.set_xticks(range(len(ids))); ax.set_xticklabels(ids, rotation=90)
+    ax.set_ylabel("HL shift, C − far  (bars $B_j$)")
+    ax.set_xlabel("graded candidate (red = consistent shift; dashed = ±2 $B_j$)")
+    bold_ticks(ax)
+    fig.tight_layout()
+    out = FIGS / "fig_sv3_hl_over_B.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    return out
+
+
 if __name__ == "__main__":
-    for f in (fig_envelope, fig_hero, fig_relief, fig_equations):
+    for f in (fig_envelope, fig_hero, fig_relief, fig_equations, fig_rho5, fig_sv3):
         print("wrote", f())

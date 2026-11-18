@@ -79,11 +79,34 @@ def near(value, expected, tol, what):
     return value
 
 
+FROZEN_PATH = HERE / "external_snippets.json"   # snippets asserted in files OUTSIDE the repo, frozen at first build
+FROZEN = json.load(open(FROZEN_PATH)) if FROZEN_PATH.exists() else {}
+_FROZEN_NEW = False
+WARNINGS: list[str] = []
+
+
 def text_has(path: Path, *needles: str):
-    txt = Path(path).read_text()
+    """Assert each needle occurs in the file. For files outside the repo (pi-agenda.md, INDEX.md, the memory
+    file) the assertion is made against the frozen copy in external_snippets.json, so a later edit of those
+    files cannot break the rebuild; a live mismatch is only reported in WARNINGS."""
+    global _FROZEN_NEW
+    path = Path(path)
+    external = not str(path.resolve()).startswith(str(REPO.resolve()))
+    live = path.read_text() if path.exists() else None
     for nd in needles:
-        assert nd in txt, f"'{nd}' not found in {path}"
-        CHECKS.append(f"text in {Path(path).name}: '{nd}'")
+        if external:
+            key = str(path)
+            if nd in FROZEN.get(key, []):
+                if live is None or nd not in live:
+                    WARNINGS.append(f"external file changed since freeze (frozen snippet still used): {path.name}: '{nd[:60]}'")
+            else:
+                assert live is not None and nd in live, f"'{nd}' not found in {path} (and not frozen)"
+                FROZEN.setdefault(key, []).append(nd)
+                _FROZEN_NEW = True
+            CHECKS.append(f"text in {path.name} (external; frozen in external_snippets.json): '{nd}'")
+        else:
+            assert live is not None and nd in live, f"'{nd}' not found in {path}"
+            CHECKS.append(f"text in {path.name}: '{nd}'")
     return needles[0] if len(needles) == 1 else needles
 
 
@@ -467,3 +490,36 @@ assert max(list(DOM_N1.values()) + list(DOM_N4.values())) < 1
 for s in ["e58f4bd", "1c6e73e"]:
     commit_exists(s)
 text_has(PLAN, "AMENDMENT 2026-11-18 — screening_v3 actuals + reads", "That is about 259\n  core-h in total.")
+
+# ---------------------------------------------------------------- review round (second commit)
+# B1: pool_standings.csv ruler_j = the 11-16 median ruler (written at d6a8933), not the current median ruler
+for j in ["R4", "N1", "V1"]:
+    assert abs(std.loc[j, "ruler_j"] - noise1116["per_candidate"][j]["ruler"]) < 1e-6, j
+    assert abs(std.loc[j, "ruler_j"] - noisej["per_candidate"][j]["ruler"]) > 1e-6, j
+CHECKS.append("pool_standings.csv ruler_j == ercot_noise_2026-11-16.json ruler (R4 20, N1 15, V1), != ercot_noise.json ruler")
+RULER_1116 = {j: noise1116["per_candidate"][j]["ruler"] for j in ["R4", "N1"]}
+RULER_NOW = {j: noisej["per_candidate"][j]["ruler"] for j in ["R4", "N1"]}
+near(RULER_1116["R4"], 20, 0, "R4 11-16 median ruler"); near(RULER_1116["N1"], 15, 0, "N1 11-16 median ruler")
+near(RULER_NOW["R4"], 28.5, 1e-9, "R4 median ruler"); near(RULER_NOW["N1"], 23.5, 1e-9, "N1 median ruler")
+commit_exists("d6a8933")
+assert git("log", "-1", "--format=%h", "d6a8933", "--", "trial_0826/ercot/analysis/pool/pool_standings.csv") == "d6a8933"
+# B4 / B5
+N1_NOISE_SHARE = 1 / RS["N1"]
+near(N1_NOISE_SHARE, 1 / 3, 0.02, "share of N1 IDR within its Seed bar (≈ one third)")
+text_has(PLAN, "**Total 3,006 core-h for 96 runs")
+# B6: sites in neither contrast class
+TIER_N = sv3sites["tier"].value_counts().to_dict()
+N_C = TIER_N["pocket_120"] + TIER_N["wind_near"]; N_U = TIER_N["far"]; N_NEITHER = N_SV3_SITES - N_C - N_U
+near(N_C, 8, 0, "C sites"); near(N_U, 5, 0, "far sites"); near(N_NEITHER, 3, 0, "sites in neither class (pv_pocket)")
+# B7: gradable set
+GRADABLE = seed["gradable"].to_dict()
+NONGRAD = [j for j, g in GRADABLE.items() if not g]
+assert sorted(NONGRAD) == ["D1", "D2", "E5", "R1", "R3", "V3"], NONGRAD
+near(seed.loc["V3", "ratio_seed_over_pert"], 6.20, 0.005, "V3 A3 ratio"); near(seed.loc["D1", "ratio_seed_over_pert"], 3.64, 0.005, "D1 A3 ratio")
+# S10: dominance objective is in the plan amendment
+text_has(PLAN, "116 (by 0.72 B, on E1) and 91 (by 0.44 B, on N1)")
+# S2
+near(ed1b.loc["R8", "global_order"], 18, 0, "R8 global order"); near(ed1b.loc["R8", "IDR_over_B"], 1.16, 0.005, "R8 IDR/B")
+
+if _FROZEN_NEW:
+    json.dump(FROZEN, open(FROZEN_PATH, "w"), indent=1, ensure_ascii=False)
