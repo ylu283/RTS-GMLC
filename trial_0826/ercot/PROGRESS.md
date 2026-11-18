@@ -125,6 +125,18 @@ Read: the 18 noise_seed_E runs + ONLY the 4 n0_E anchors (n0_E:25 / 29 / 46 / 4,
   newlines (sha 8dd06917… reproduced on both the d706199 and the current plan).
 - Seen: screening_v3 1–11, wave D L180 rows, base_v3:1, ercot_noise.json, ercot_noise_seed.json. random_E not read.
 
+### 2026-11-18 — Part C amendment + RE-GRADE addendum (B^seed for 63-A3-DISAGREE ids)
+
+- Plan AMENDMENT 2026-11-18 — screening_v3 actuals + reads: 1c6e73e (after a fresh rebase on tx123 11e9ddf).
+- RE-GRADE (strategy request after 63 A3): `pool_n0E.py --bars seed-adjusted` substitutes the binding bar B^seed
+  for N1 (114.9 → 242.1) and E9 (0 → 1.342 = json `bars.E9.B_seed`; the request quoted 0.32, which is E9's sigma_c)
+  and nothing else (sigma_hat / signal share unchanged). Writes only POOL_N0E_STANDINGS_seedbar.md +
+  pool_ed1b_combined_seedbar.csv; pre-registered outputs untouched.
+- Result: **seats unchanged, V1 / E1 / R EMPTY / N1 (M = 3) under both bars.** N1 IDR/B 6.43 → 3.05, RESPONDS IN BOX
+  (0.05 above the [2, 3) BORDERLINE band — fragile). E9 → NOT RESPONDS (was READABLE (RULER=0)), still DIAGNOSTIC.
+  Sensitivity (A3 AGREE, bar not binding): R4 IDR/B_seed 1.12 (B_j 2.11), N4 14.43 (B_j 17.38).
+  Descriptive: raw rho with V1 N1 0.950 / N4 0.966; composition rho N1 −0.027 / N4 0.268; N4 residual rho with E1 −0.805.
+
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)

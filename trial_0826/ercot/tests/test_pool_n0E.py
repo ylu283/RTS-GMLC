@@ -280,3 +280,14 @@ def test_survivor_family_is_not_absorbed():
     seats, M, log = pn.seat_walk(tab, defs, red_to, clusters)
     assert [(s["family"], s["seat"]) for s in seats] == [("V", "V1"), ("E", "E1"), ("R", "R4"), ("N", "N1")]
     assert M == 4 and any("family X" in x for x in log)
+
+
+def test_seed_adjust_substitutes_only_a3_disagree_ids():
+    B = pn.bars()
+    S = pn.seed_adjust(B)
+    changed = sorted(c for c in B.index if S.loc[c, "B_j"] != B.loc[c, "B_j"])
+    assert changed == sorted(pn.SEED_DISAGREE_EXPECTED)
+    assert S.loc["N1", "B_j"] == pytest.approx(242.083, abs=1e-3) and S.loc["E9", "B_j"] > 0
+    assert (S["sigma_hat"] == B["sigma_hat"]).all() and (S["B_pert"] == B["B_j"]).all()
+    for f in ("POOL_N0E_STANDINGS.md", "pool_ed1b_combined.csv"):          # never the seedbar target
+        assert "seedbar" not in f and pn.SEEDBAR_MD != f and pn.SEEDBAR_CSV != f

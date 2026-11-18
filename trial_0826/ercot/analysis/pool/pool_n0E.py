@@ -71,6 +71,8 @@ AMEND_TITLE = ("## AMENDMENT 2026-11-17 — E-D1b input widened to n0_E (pool le
                "new n0_E rules; Part C disclosure")
 AMEND_SHA256 = "8dd06917415c8cf6e8f7081adcee862e3d2ae6d08cf4eaa8dc0a9fa2cc8a1d1e"
 NOISE = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise.json")
+NOISE_SEED = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise_seed.json")
+SEED_DISAGREE_EXPECTED = ("N1", "E9")   # 63 A3: perturbed ruler DISAGREES with Seed chatter -> B^seed binds
 FIGS = os.path.join(po.POOL, "figs", "n0E")
 
 STRUCTURAL_ZERO_DESIGN = 2          # noise_v3 design D2 = site 206 (noise memo F6)
@@ -228,6 +230,26 @@ def bars(noise_path=NOISE, data_dir=po.DATA, ids=None):
                      "in_ruler_zero": c in j.get("ruler_zero", [])})
     out = pd.DataFrame(rows).set_index("id")
     out.attrs["excluded"] = excl
+    return out
+
+
+def seed_adjust(B, seed_path=NOISE_SEED):
+    """RE-GRADE 2026-11-18 (63 §3): for the A3-DISAGREE ids the binding bar is B^seed; every
+    other id keeps B_j. Only `B_j` is substituted (sigma_hat, hence the signal share, is unchanged)."""
+    j = json.load(open(seed_path))
+    dis = list(j["A3"]["disagree_gradable"])
+    assert sorted(dis) == sorted(SEED_DISAGREE_EXPECTED), dis
+    out = B.copy()
+    out["B_pert"] = B["B_j"]
+    out["B_seed"] = [float(j["bars"][c]["B_seed"]) if c in j["bars"] else np.nan for c in B.index]
+    for c in B.index:
+        if c in j["bars"]:
+            assert abs(float(j["bars"][c]["B_pert"]) - float(B.loc[c, "B_j"])) <= 1e-9 * max(1.0, float(B.loc[c, "B_j"])), c
+    out["bar_source"] = ["seed (A3 DISAGREE)" if c in dis else "perturbed (B_j)" for c in B.index]
+    for c in dis:
+        out.loc[c, "B_j"] = out.loc[c, "B_seed"]
+    out.attrs = dict(B.attrs)
+    out.attrs["seed_substituted"] = dis
     return out
 
 
@@ -755,7 +777,7 @@ def synthetic_reader(wide, data_dir=po.DATA):
 
 def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_reader, make_figs=True,
         noise=NOISE, waves=po.WAVES, data_dir=po.DATA, wave_d_dir=po.POOL, plan=PLAN, verbose=True,
-        synthetic=False, landing_rows=LANDING_ROWS):
+        synthetic=False, landing_rows=LANDING_ROWS, bars_mode="pert", write=True):
     """synthetic=True: `wide` is synthetic (injected, or planted here); outputs must lie
     OUTSIDE analysis/pool/ and the landing_rows cross-check is skipped. synthetic=False:
     the real read (`wide` must be None) — only after the strategy fast-forward."""
@@ -773,6 +795,9 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
     B = bars(noise, data_dir, ids)
     zero = set(B.index[B["B_j"] == 0])
     assert zero == ZERO_BAR_EXPECTED, f"zero-bar set {sorted(zero)} != {sorted(ZERO_BAR_EXPECTED)}"
+    assert bars_mode in ("pert", "seed-adjusted"), bars_mode
+    if bars_mode == "seed-adjusted":
+        B = seed_adjust(B)
     if wide is None:
         wide = synthetic_wide(X, B) if synthetic else load_wide()
         if synthetic:
@@ -872,6 +897,10 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
             "git_head": git_short(), "amend_sha256": amend, "design_sha256": X.attrs["design_sha256"],
             "d3": d3, "landing": landing, "synthetic": synthetic, "n1off_min": float(off.min()), "n1off_max": float(off.max()), "deviations": deviations}
 
+    res = {"B": B, "tab": tab, "pairs": pairs, "clusters": clusters, "seats": seats, "M": M,
+           "conflicts": conf, "comb": comb, "info": info, "raw": raw, "resid": resid, "walk_log": walk_log, "nfam": nfam}
+    if not write:
+        return res
     os.makedirs(out_dir, exist_ok=True)
     std_cols = ["family", "dir", "global_order", "B_j", "IDR", "IDR_over_B", "range_over_B", "mantel_r", "mantel_p",
                 "signal_share", "respond_label", "eta2_T", "eta2_T_adj", "iso_loo_R2", "comp_rho", "comp_ci_lo",
@@ -901,13 +930,98 @@ def run(wide=None, out_dir=po.POOL, figs_dir=FIGS, line_reader=line_summary_read
             "conflicts": conf, "comb": comb, "info": info}
 
 
+SEEDBAR_MD = "POOL_N0E_STANDINGS_seedbar.md"
+SEEDBAR_CSV = "pool_ed1b_combined_seedbar.csv"
+
+
+def regrade_seed(out_dir=po.POOL, verbose=True):
+    """RE-GRADE addendum (2026-11-18, strategy request after 63 A3): the same pre-registered read with the
+    binding bar B^seed for the A3-DISAGREE ids (N1, E9) and B_j for every other id. No other rule changes.
+    Writes only POOL_N0E_STANDINGS_seedbar.md + pool_ed1b_combined_seedbar.csv (the pre-registered outputs
+    are never overwritten)."""
+    a = run(write=False, verbose=False)
+    b = run(write=False, verbose=False, bars_mode="seed-adjusted")
+    Bs = b["B"]
+    go = list(a["comb"].index)
+    ta, tb = a["tab"].reindex(go), b["tab"].reindex(go)
+    seat_a = {s["seat"]: s["family"] for s in a["seats"]}
+    seat_b = {s["seat"]: s["family"] for s in b["seats"]}
+    side = pd.DataFrame({
+        "family": ta["family"], "bar_source": Bs.loc[go, "bar_source"],
+        "B_pert": Bs.loc[go, "B_pert"], "B_seed": Bs.loc[go, "B_seed"],
+        "IDR_over_B_pert": ta["IDR_over_B"], "IDR_over_B_binding": tb["IDR_over_B"],
+        "IDR_over_B_seed_sensitivity": ta["IDR"] / Bs.loc[go, "B_seed"].replace(0, np.nan),
+        "respond_pert": ta["respond_label"], "respond_binding": tb["respond_label"],
+        "status_pert": ta["status"], "status_binding": tb["status"],
+        "seat_pert": [seat_a.get(c, "") for c in go], "seat_binding": [seat_b.get(c, "") for c in go]}, index=go)
+    side.index.name = "id"
+    raw, resid = b["raw"], b["resid"]
+    side["rho_raw_with_V1"] = [raw.loc[c, "V1"] if c in raw.index else np.nan for c in go]
+    side["comp_rho"] = tb["comp_rho"]
+    side["rho_resid_with_E1"] = [resid.loc[c, "E1"] if c in resid.index else np.nan for c in go]
+    side["changed"] = [", ".join(k for k, x, y in (("B", side.loc[c, "B_pert"], Bs.loc[c, "B_j"]),
+                                                    ("respond", side.loc[c, "respond_pert"], side.loc[c, "respond_binding"]),
+                                                    ("status", side.loc[c, "status_pert"], side.loc[c, "status_binding"]),
+                                                    ("seat", side.loc[c, "seat_pert"], side.loc[c, "seat_binding"]))
+                                 if not (x == y or (pd.isna(x) and pd.isna(y)))) for c in go]
+    comb = b["comb"].join(side[["bar_source", "B_pert", "B_seed", "IDR_over_B_pert", "IDR_over_B_seed_sensitivity",
+                                "rho_raw_with_V1", "rho_resid_with_E1", "changed"]])
+    os.makedirs(out_dir, exist_ok=True)
+    comb.to_csv(os.path.join(out_dir, SEEDBAR_CSV))
+    path = os.path.join(out_dir, SEEDBAR_MD)
+    write_md(path, b["info"], Bs, tb, b["pairs"], b["clusters"], b["seats"], b["M"], b["walk_log"],
+             b["conflicts"], b["nfam"], b["comb"])
+    body = open(path).read().split("\n", 1)[1]
+    sa = " / ".join(s["seat"] for s in a["seats"])
+    sb = " / ".join(s["seat"] for s in b["seats"])
+    n1, n4, r4 = side.loc["N1"], side.loc["N4"], side.loc["R4"]
+    head = ["# POOL_N0E_STANDINGS_seedbar — RE-GRADE addendum 2026-11-18 (B^seed for the 63-A3-DISAGREE ids)", "",
+            "**Not the pre-registered read** (that stays `POOL_N0E_STANDINGS.md` / `pool_ed1b_combined.csv`). Same rules, "
+            "same 48 rows; the ONLY change is the bar: prompt 63 A3 (`analysis/noise_v3/NOISE_SEED_E.md`, "
+            "`ercot_noise_seed.json`) found the perturbed ruler DISAGREES with Gurobi-Seed chatter for "
+            f"{', '.join(Bs.attrs['seed_substituted'])}, so their binding bar is B^seed; every other id keeps B_j. "
+            "sigma_hat (signal share) is not substituted.", "",
+            "## RE-GRADE summary", "",
+            f"- Seats: pre-registered bars **{sa}** (M = {a['M']}); seed-adjusted bars **{sb}** (M = {b['M']}) → "
+            + ("**no seat changes**." if sa == sb else "**SEATS CHANGE**."),
+            f"- N1: B {n1['B_pert']:.1f} → {n1['B_seed']:.1f}; IDR/B {n1['IDR_over_B_pert']:.2f} → {n1['IDR_over_B_binding']:.2f} "
+            f"({n1['respond_binding']}; BORDERLINE band is [2, 3), so N1 clears it by "
+            f"{n1['IDR_over_B_binding'] - BORDER_BARS:.2f}); status {n1['status_binding']}.",
+            f"- E9: B 0 → {Bs.loc['E9', 'B_j']:.3f} (the json `bars.E9.B_seed`; sigma_c = 0.316); IDR/B "
+            f"{side.loc['E9', 'IDR_over_B_binding']:.2f}, {side.loc['E9', 'respond_binding']} (was "
+            f"{side.loc['E9', 'respond_pert']}); status {side.loc['E9', 'status_binding']}.",
+            f"- Sensitivity (bar not binding, A3 AGREE): R4 IDR/B_seed {r4['IDR_over_B_seed_sensitivity']:.2f} "
+            f"(binding B_j {r4['IDR_over_B_pert']:.2f}); N4 IDR/B_seed {n4['IDR_over_B_seed_sensitivity']:.2f} "
+            f"(binding B_j {n4['IDR_over_B_pert']:.2f}).",
+            f"- Descriptive (n0_E, oriented Spearman): N1 raw rho with V1 {n1['rho_raw_with_V1']:.3f}, composition rho "
+            f"{n1['comp_rho']:.3f}; N4 raw rho with V1 {n4['rho_raw_with_V1']:.3f}, composition rho {n4['comp_rho']:.3f}; "
+            f"N4 T-residual rho with E1 {n4['rho_resid_with_E1']:.3f}.", "",
+            "## Two-bar table (pre-registered vs seed-adjusted)", "",
+            _md_table(side.reset_index(), ["id", "family", "bar_source", "B_pert", "B_seed", "IDR_over_B_pert",
+                                           "IDR_over_B_binding", "IDR_over_B_seed_sensitivity", "respond_pert",
+                                           "respond_binding", "status_pert", "status_binding", "seat_pert",
+                                           "seat_binding", "changed"]), "",
+            "## Seed-adjusted read (full standings below; section numbers as in the pre-registered file)", ""]
+    open(path, "w").write("\n".join(head) + "\n" + body)
+    if verbose:
+        print(side[["B_pert", "B_seed", "IDR_over_B_pert", "IDR_over_B_binding", "IDR_over_B_seed_sensitivity",
+                    "status_pert", "status_binding", "seat_pert", "seat_binding", "changed"]].to_string())
+    return side, a, b
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--no-figs", action="store_true")
     ap.add_argument("--synthetic", action="store_true",
                     help="planted Y at the real X; requires --out outside analysis/pool/")
     ap.add_argument("--out", default=None, help="output dir (synthetic mode only)")
+    ap.add_argument("--bars", choices=("pert", "seed-adjusted"), default="pert",
+                    help="seed-adjusted = RE-GRADE addendum: writes only the *_seedbar outputs")
     a = ap.parse_args(argv)
+    if a.bars == "seed-adjusted":
+        assert not a.synthetic and a.out is None
+        regrade_seed()
+        return 0
     if a.synthetic:
         assert a.out, "--synthetic needs --out <scratch dir>"
         run(out_dir=a.out, figs_dir=os.path.join(a.out, "figs"), make_figs=not a.no_figs, synthetic=True)
