@@ -83,10 +83,20 @@ arm's JIDs from methods_C/PROGRESS.md.
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - botorch: 0.16.1
 - predictions: waves/methods_C_V1_r3/predictions.csv
+- graded_at: 2026-11-18T15:33:31+00:00
+- cumulative_hv: 7.80157587392882e+17
+- gain: 1.3782001690233088e+16
+- gain_tau: 0.26186605402994256
 - threshold: 5.262996664950399e+16
+- would_stop: True
+- gain_tau_het: 4.5615002294347
+- would_stop_het: False
+- gain_tau_285: 2.1174836785902262
+- would_stop_285: False
 - gp_floor: 1e-09
 - loo_rms_z: {'load_shed_mwh': 0.8574, 'true_curtailment_mwh': 0.7955, 'total_cost_less_synthetic_usd': 0.5725}
-- decision: proposed
+- n_outside_ref: 2
+- decision: graded (record_only) -> r4
 - designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
     - [0.05000, 1.00000, 1.00000, 0.76250, 1.00000, 0.40625]
     - [0.52500, 1.00000, 1.00000, 0.88125, 1.00000, 0.28750]
@@ -96,4 +106,28 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.05000, 0.05000, 0.05000, 0.76250, 0.76250, 1.00000]
     - [0.05000, 1.00000, 1.00000, 0.64375, 0.76250, 0.05000]
     - [0.16875, 1.00000, 1.00000, 0.52500, 1.00000, 0.64375]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": 0.082, "rms_z": 0.369, "cov95": 8}, "true_curtailment_mwh": {"mean_z": 0.132, "rms_z": 0.652, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.235, "rms_z": 0.599, "cov95": 8}}
 <!-- END r3 -->
+
+<!-- BEGIN r4 -->
+## Round 4 (methods_C_V1_r4)
+- proposed_at: 2026-11-18T15:44:53+00:00
+- acq: qnehvi
+- acq_seed: 20261510
+- bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
+- botorch: 0.16.1
+- predictions: waves/methods_C_V1_r4/predictions.csv
+- threshold: 5.262996664950399e+16
+- gp_floor: 1e-09
+- loo_rms_z: {'load_shed_mwh': 0.8165, 'true_curtailment_mwh': 0.7555, 'total_cost_less_synthetic_usd': 0.5583}
+- decision: proposed
+- designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
+    - [0.05000, 0.88125, 0.40625, 0.88125, 1.00000, 0.28750]
+    - [0.05000, 0.05000, 0.05000, 1.00000, 1.00000, 0.05000]
+    - [0.28750, 0.88125, 0.64375, 0.88125, 1.00000, 0.88125]
+    - [0.05000, 1.00000, 0.52500, 0.40625, 1.00000, 1.00000]
+    - [0.40625, 0.16875, 0.76250, 1.00000, 0.40625, 0.88125]
+    - [0.05000, 0.05000, 0.05000, 0.76250, 0.76250, 0.05000]
+    - [0.05000, 1.00000, 0.05000, 0.76250, 1.00000, 0.05000]
+    - [0.28750, 1.00000, 0.52500, 0.52500, 1.00000, 1.00000]
+<!-- END r4 -->
