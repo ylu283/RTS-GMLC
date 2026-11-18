@@ -733,3 +733,67 @@ landing: everything listed in prompt 61 §3 "Seen at freeze". Not read:
 fit. Holdout exposure is unchanged. E-D1b, E-D4, E-D5 and E-D7 are
 unaffected. This wave's Y landed before E-D1b was recorded. The E-D1b
 inputs (62 Part B: wave D + n0_E) did not include it.
+
+## AMENDMENT 2026-11-18 — noise_seed_E actuals + chatter rulers (prompt 63; appendable, §10; what had been seen)
+
+**What changed.** Nothing in the plan's rules, X, HV ledger, holdout
+or baseline. τ_exact = 0 stays the frozen stop-rule ruler (§3, §6.2).
+The 18 `noise_seed_E` rows (`tier = "contrast"`) are analysis-only and
+never enter `load()`, the GP, §6.3 R or the random baseline. Source:
+`analysis/noise_v3/NOISE_SEED_E.md` and `ercot_noise_seed.json` (landing
+commit 14378fd; wave commit 6fd3352 froze the reads, prompt 63 §3).
+
+- **Budget actuals:** 18 / 18 runs, SUSPECT 0, time-limit hits 0, every
+  run v3. About 589.5 core-h in total (Threads-4 median 38.2 core-h,
+  range 19.1–42.4; Threads 8 36.6; Threads 1 6.3). This is inside the
+  380–800 core-h bracket. Gurobi 13.0.2 is logged on every run.
+- **Chatter sd (per run, df 16) and bars:** σ̂_c / B_j^seed vs B_j
+  (perturbed, D2 excluded): V1 4,376 MWh / 18,567 vs 16,173; E1 $312.4k
+  / $1.326M vs $2.383M; R4 65.1 / 276.1 vs 146.7; N1 57.1 / 242.1 vs
+  114.9; N4 10.5 / 44.5 vs 37.0.
+- **A3 verdict (recorded once):** σ̂_c·√2 / σ̂_pert is within 2× on 20
+  of 22 gradable ids (V1 1.15, E1 0.56, R4 1.88, N4 1.20). It fails on
+  N1 (2.11) and on E9 (the perturbed ruler is 0). For N1 and E9 the
+  perturbed ruler is "perturbation response, not chatter" and the bar
+  is B_j^seed. For the other ids both bars measure the same chatter;
+  both are reported. 61 has already read; its N1 reads are reported
+  against both bars.
+- **Thread check:** Threads 8 and Threads 1 are NOT bit-identical to
+  the Threads-4 run (304 / 364 of 365 RUC days differ). The thread rows
+  ran on another node class than the anchor, so the two causes are
+  confounded. Bit-identity holds only at fixed Threads on a fixed
+  platform. Threads = 4 stays pinned.
+- **τ_res (REPORT-ONLY):** E-D7 is not recorded, so τ_res is computed
+  on the 4 anchor designs only and labelled PROVISIONAL: 1.958e18
+  (0.128 × HV_0 of those 4 points). τ_exact = 0 is unchanged. 55
+  Part B carries the τ_res column at the real nav starts with Σ_c from
+  `ercot_noise_seed_sigma_c.csv`.
+- **54 input:** σ̂_c,j with df 16 makes the measured-floor arm input
+  live (54 records it as a §10-amended arm input, not a new arm). The
+  54 cross-check compares the inferred noise sd against σ̂_c,j, not
+  against 0.
+
+**What had been seen.** When this block was written: the 18 noise_seed_E
+runs, the 4 anchor runs n0_E:25 / 29 / 46 / 4 (Seed 0), the `R` key of
+`waves/n0_E/landing_R.json`, noise_v3 and base_v3. Not read: any other
+n0_E row, `extracts/random_E`, `extracts/methods_E_*`. No GP was fit.
+Holdout exposure is unchanged. E-D1b, E-D4, E-D5 and E-D7 are unaffected.
+
+## AMENDMENT 2026-11-17b — time-limit margin erratum (≈ 1.4×; per-round monitor) (prompt 63 A3; appendable, §10)
+
+AMENDMENT 2026-11-06b states that ruc_mipgap 0.001 "keeps a 25× margin"
+to the RUC TimeLimit; that figure came from January smoke days (max
+46 s). Full-year v3 actuals: maximum daily RUC solve 860.7 s on
+noise_v3 (`noise_v3/B:1`; 5 of 5,840 RUC days > 600 s;
+`ERCOT_NOISE.md` §12), 481.1 s on base_v3, 824 s on n0_E with 11 of 48
+runs having at least one day > 600 s (14 days; noise memo 2026-11-17
+F7, `solve_time_s` / `status` only). Against TimeLimit = 1,200 s the
+margin is ≈ 1.4×, not 25×. No time-limit hit has occurred (0 on
+noise_v3 and base_v3). The identity (0.001 / 1,200 s) is unchanged. A
+hit makes the incumbent depend on wall-clock speed and node load; the
+S2 SUSPECT gate (every RUC OPTIMAL) catches it per run and stays the
+guard. Added: a per-round monitor in 55's `grade_round` — the count of
+RUC days > 600 s and the maximum daily RUC solve time of the round,
+written to the round record (the strategy session edits 55's spec
+text). Nothing else changes. Update 2026-11-18: noise_seed_E max
+821.3 s, 3 days > 600 s over 18 runs, 0 hits.
