@@ -1,0 +1,205 @@
+# Build-time assertions (objective_facts.py; every one passed at build)
+
+- wave D rows: 21 ≈ 21 (± 0)
+- n0_E rows: 48 ≈ 48 (± 0)
+- location_contrast_E rows: 9 ≈ 9 (± 0)
+- noise_seed_E rows: 18 ≈ 18 (± 0)
+- screening_v3 rows: 11 ≈ 11 (± 0)
+- screening_v3 replicate rows: 1 ≈ 1 (± 0)
+- screening_v3 wall-clock rows (landed): 11 ≈ 11 (± 0)
+- pool candidates graded on n0_E: 28 ≈ 28 (± 0)
+- text in POOL_N0E_STANDINGS.md: 'D3 check (no bar)'
+- text in ERCOT_BO_PLAN.md: '≤ 4 objectives, one per family'
+- text in ERCOT_BO_PLAN.md: 'V < E < X < R < N'
+- V1 IDR/B_j: 93.2752 ≈ 93.3 (± 0.05)
+- E1 IDR/B_j: 14.055 ≈ 14.05 (± 0.01)
+- R4 IDR/B_j: 2.11452 ≈ 2.1 (± 0.05)
+- R4 IDR/B_seed: 1.12298 ≈ 1.1 (± 0.05)
+- N1 IDR/B_j: 6.4286 ≈ 6.4 (± 0.05)
+- N1 IDR/B_seed: 3.05184 ≈ 3.05 (± 0.005)
+- N4 IDR/B_j: 17.3807 ≈ 17.4 (± 0.05)
+- N4 IDR/B_seed: 14.4342 ≈ 14.4 (± 0.05)
+- N1 IDR: 738.8 ≈ 738.8 (± 0.05)
+- N1 B_seed: 242.083 ≈ 242.1 (± 0.05)
+- pool_n0E_standings B_j == ercot_noise_seed B_pert for V1, E1, R4, N1, N4
+- text in project_bogp_multipem.md: 'overlap 0.988, τ 0.86–0.91 vs shed'
+- text in project_bogp_multipem.md: 'M = 3 FINAL (Kay 10-06)'
+- text in pi-agenda.md: '| 2026-10-06 | — | **Objective vector M** | **APPROVED (Kay): M = {load_shed, true_curtailment, cost_less_synthetic}**'
+- text in INDEX.md: 'M = 3 APPROVED (Kay 10-06): shed + curtailment + cost-less-synthetic'
+- text in pi-agenda.md: 'Strategy recommendation shifts to A′: V1 · E1 · N4 (M = 3), a recorded rule change'
+- wave D WIND rows: 18 ≈ 18 (± 0)
+- wave D nuclear rows: 3 ≈ 3 (± 0)
+- wave D WIND sites: 6 ≈ 6 (± 0)
+- n0_E sites per row (min): 6 ≈ 6 (± 0)
+- n0_E total MW min: 678.793 ≈ 678.8 (± 0.05)
+- n0_E total MW max: 1862.63 ≈ 1862.6 (± 0.05)
+- wave_d_selection.json: chosen 6 rows at pem_mw / gen_pmax = 0.5
+- text in ERCOT_BO_PLAN.md: 'The 31 v2-identity runs (base, screening, selection'
+- text in ERCOT_BO_PLAN.md: 'remain slate evidence (site ranking by curtailment)'
+- text in POOL_N0E_STANDINGS.md: 'block sha256 `8dd06917415c8cf6e8f7081adcee862e3d2ae6d08cf4eaa8dc0a9fa2cc8a1d1e`'
+- text in ERCOT_BO_PLAN.md: '9,999'
+- text in ERCOT_BO_PLAN.md: 'permutations; `default_rng(6262)`'
+- text in ERCOT_BO_PLAN.md: '≥ 0.5'
+- text in ERCOT_BO_PLAN.md: 'residual `ρ_or ≥ 0.50`'
+- noise_v3/B:8 delta_rel: 0.002 ≈ 0.002 (± 1e-12)
+- text in ERCOT_NOISE.md: 'noise_v3/B:8 used delta_rel = 0.002'
+- divergent days per non-structural perturbed pair 350/357/365/354/358/365; 4 exact pairs 0
+- B_j / current ruler min: 2.84355 ≈ 2.84 (± 0.005)
+- B_j / current ruler max: 10.2771 ≈ 10.28 (± 0.005)
+- B_j / 11-16 ruler min: 3.92705 ≈ 3.93 (± 0.005)
+- B_j / 11-16 ruler max: 13.2716 ≈ 13.27 (± 0.005)
+- text in POOL_N0E_STANDINGS.md: 'B_j / ruler range over ids with both > 0: 2.84-10.28x.'
+- text in PROGRESS.md: 'B_j / 57-ruler spans 3.93–13.27×'
+- text in ERCOT_NOISE.md: '| noise_v3/A:6 | noise_v3/A:2 | 206 | 900.7999 | 899.9000 |'
+- text in ERCOT_NOISE.md: '| 895.48 |'
+- text in ERCOT_NOISE.md: '| noise_v3/B:6 | noise_v3/B:2 | 206 | 899.0001 | 899.9000 |'
+- V1 sigma_c: 4376.24 ≈ 4376 (± 0.5)
+- E1 sigma_c: 312423 ≈ 312400.0 (± 50)
+- R4 sigma_c: 65.0869 ≈ 65.1 (± 0.05)
+- R4 A3 ratio: 1.88295 ≈ 1.88 (± 0.005)
+- N1 sigma_c: 57.0596 ≈ 57.1 (± 0.05)
+- N1 A3 ratio: 2.10647 ≈ 2.11 (± 0.005)
+- N4 sigma_c: 10.4917 ≈ 10.5 (± 0.05)
+- A3 AGREE count: 20 ≈ 20 (± 0)
+- A3 gradable count: 22 ≈ 22 (± 0)
+- tau_exact: 0 ≈ 0 (± 0)
+- tau_res / 1e18: 1.95839 ≈ 1.96 (± 0.005)
+- tau_res / HV0: 0.127526 ≈ 0.128 (± 0.0005)
+- Threads 8 divergent days: 304 ≈ 304 (± 0)
+- Threads 1 divergent days: 364 ≈ 364 (± 0)
+- rho raw X1-E1: 0.981654 ≈ 0.982 (± 0.0005)
+- rho resid X1-E1: 0.967651 ≈ 0.968 (± 0.0005)
+- rho raw N4-N1: 0.949522 ≈ 0.95 (± 0.0005)
+- rho resid N4-N1: 0.394051 ≈ 0.394 (± 0.0005)
+- rho raw V1-N1: 0.950499 ≈ 0.95 (± 0.005)
+- rho resid E1-N4: -0.805037 ≈ -0.81 (± 0.005)
+- composition rho N1: -0.0267043 ≈ -0.03 (± 0.005)
+- composition rho N4: 0.267694 ≈ 0.27 (± 0.005)
+- statuses X1/E2 → E1, V2/N5 → E4, E6 → V1, N4 SIZE-CO-MONOTONE (pool_n0E_standings.csv)
+- text in POOL_N0E_STANDINGS.md: '- n0E-C1: E6, V1 -> survivor V1'
+- text in POOL_N0E_STANDINGS.md: '- n0E-C2: E1, E2, X1 -> survivor E1'
+- text in POOL_N0E_STANDINGS.md: '- n0E-C3: E4, N5, V2 -> survivor E4'
+- text in POOL_N0E_STANDINGS.md: 'Seat walk (R-4): M = 3'
+- text in POOL_N0E_STANDINGS.md: '- R: **EMPTY**'
+- commit 82bb71d exists in git
+- text in POOL_N0E_STANDINGS.md: '82bb71d'
+- text in POOL_N0E_STANDINGS.md: 'the first run reported M = 2'
+- E-D1b reasons R4 BORDERLINE-only, R5/R6 NOT RESPONDS, R2 guardrail, R7/R8 dir '-'
+- g 60: 0.0383047 ≈ 0.038 (± 0.0005)
+- g 120: 0.0733893 ≈ 0.073 (± 0.0005)
+- g 180: 0.123284 ≈ 0.123 (± 0.0005)
+- raw loc V1 800: -23.0078 ≈ -23.0 (± 0.05)
+- raw loc V1 500: -2.82667 ≈ -2.8 (± 0.05)
+- H_C residual P2_800_b120 vs P2_800_b275: 3.04341 ≈ 3.0 (± 0.05)
+- H_C residual P2_500_270 vs P2_500_110_140: 6.66237 ≈ 6.7 (± 0.05)
+- H_C residual P2_800_b120 vs P2_800_all: 6.37469 ≈ 6.4 (± 0.05)
+- H_C residual P2_800_b275 vs P2_800_all: 2.89898 ≈ 2.9 (± 0.05)
+- LOCATION EFFECT reads: 7 ≈ 7 (± 0)
+- residual reads: 8 ≈ 8 (± 0)
+- pocket pool TWh: 4.86542 ≈ 4.87 (± 0.005)
+- row 9 relief TWh: 4.0347 ≈ 4.03 (± 0.005)
+- row 9 share: 0.82926 ≈ 0.83 (± 0.005)
+- e row 6: 0.787031 ≈ 0.79 (± 0.005)
+- e row 9: 0.729665 ≈ 0.73 (± 0.0005)
+- last 700 MW TWh: 1.50958 ≈ 1.51 (± 0.005)
+- text in LOCATION_CONTRAST_E.md: 'All six sites share one PTDF on L252'
+- text in LOCATION_CONTRAST_E.md: 'it means "not explained by H_C", not "network"'
+- text in ERCOT_NOISE.md: 'noise_v3 860.7 s (noise_v3/B:1'
+- noise_v3 max RUC solve s: 860.733 ≈ 860.7 (± 0.05)
+- text in ERCOT_BO_PLAN.md: '1,157 s (random_E:22, slow node) against the 1,200 s limit: ≈ 4 %'
+- text in ERCOT_BO_PLAN.md: 'the
+margin is ≈ 1.4×, not 25×'
+- 1,200 / 860.7: 1.39421 ≈ 1.4 (± 0.05)
+- (1,200 - 1,157) / 1,200: 0.0358333 ≈ 0.04 (± 0.005)
+- text in pi-agenda.md: 'M ≠ 4 reopens plan §6.4 gate numbers (C2/C3 false-alarm rates were set for M = 4)'
+- text in NOISE_SEED_E.md: 'nav = the first 32 or all 48 Sobol rows'
+- text in ERCOT_BO_PLAN.md: 'C2 coverage'
+- text in ERCOT_BO_PLAN.md: 'C3 outlier'
+- text in ERCOT_BO_PLAN.md: 'IMMUTABLE after freeze'
+- text in ERCOT_BO_PLAN.md: 'R = nadir + 0.1 × (nadir − ideal)'
+- text in POOL_N0E_STANDINGS.md: 'random_E not read; holdout exposure 0 of 24'
+- text in ERCOT_BO_PLAN.md: 'The 96 landed runs' objective values (to compute
+R, the ledger and this table)'
+- text in ERCOT_BO_PLAN.md: '2 × 156 = 312
+  MWh'
+- text in ERCOT_BO_PLAN.md: 'the strategy
+  session's dated `design_space_E.json` carries it'
+- text in ERCOT_NOISE.md: '11.0.2'
+- text in ERCOT_NOISE.md: 'gurobipy == 13.0.2'
+- text in ERCOT_NOISE.md: 'NOT DISCOVERABLE'
+- text in NOISE_SEED_E.md: '(13, 0, 2)'
+- text in ERCOT_BO_PLAN.md: 'Gurobi 13.0.2 is logged on every run'
+- text in LOCATION_CONTRAST_E.md: '## 8. Scope sentence for the paper'
+- text in POOL_N0E_STANDINGS.md: 'B_j is transferred from single-site off-slate designs'
+- commit bac38e7 exists in git
+- commit 6aa29dd exists in git
+- commit 6b5e85a exists in git
+- commit 82bb71d exists in git
+- commit d706199 exists in git
+- commit 3b40c2d exists in git
+- commit 4b7bf85 exists in git
+- commit d265580 exists in git
+- commit 6fd3352 exists in git
+- commit 14378fd exists in git
+- commit c986da0 exists in git
+- commit 1a2cde6 exists in git
+- R4 wave D range/ruler_57: 7.65 ≈ 7.7 (± 0.05)
+- R4 wave D range/ruler_57: 6.9 ≈ 6.9 (± 0.05)
+- R4 wave D range/ruler_57: 13.5 ≈ 13.5 (± 0.05)
+- N1 wave D range/ruler_57: 4.86667 ≈ 4.9 (± 0.05)
+- N1 wave D range/ruler_57: 9.4 ≈ 9.4 (± 0.05)
+- N1 wave D range/ruler_57: 8.86667 ≈ 8.9 (± 0.05)
+- R4 wave D range/B_j: 1.04328 ≈ 1.04 (± 0.005)
+- R4 wave D range/B_j: 0.940999 ≈ 0.94 (± 0.005)
+- R4 wave D range/B_j: 1.84109 ≈ 1.84 (± 0.005)
+- N1 wave D range/B_j: 0.635203 ≈ 0.64 (± 0.005)
+- N1 wave D range/B_j: 1.2269 ≈ 1.23 (± 0.005)
+- N1 wave D range/B_j: 1.15729 ≈ 1.16 (± 0.005)
+- base_v3 core-h: 44.0989 ≈ 44.1 (± 0.05)
+- wave D core-h: 583.957 ≈ 584.0 (± 0.05)
+- noise_v3 core-h: 654.621 ≈ 654.6 (± 0.05)
+- location_contrast core-h: 182.424 ≈ 182 (± 0.5)
+- screening_v3 core-h: 259.332 ≈ 259 (± 0.5)
+- text in screening_v3_array.sh: '-pe smp 4'
+- text in location_contrast_E_array.sh: '-pe smp 4'
+- text in ERCOT_BO_PLAN.md: '**Total 3,006 core-h for 96 runs (31.3 per run)**'
+- noise_seed_E core-h (json; mixed 4 / 8 / 1 slots): 589.509 ≈ 590 (± 0.5)
+- seedbar rows: 28 ≈ 28 (± 0)
+- seedbar N1 IDR/B (binding): 3.05184 ≈ 3.05 (± 0.005)
+- seedbar IDR_over_B_seed_sensitivity == IDR / B_seed (ercot_noise_seed.csv) for V1, E1, R4, N1, N4
+- text in POOL_N0E_STANDINGS_seedbar.md: '→ **no seat changes**'
+- text in POOL_N0E_STANDINGS_seedbar.md: 'E9: B 0 → 1.342'
+- text in POOL_N0E_STANDINGS_seedbar.md: 'NOT RESPONDS (was READABLE (RULER=0))'
+- commit baf77c3 exists in git
+- screening_v3 graded ids (Holm family): 23 ≈ 23 (± 0)
+- screening_v3 V1 HL/B: -33.1169 ≈ -33.1 (± 0.05)
+- screening_v3 V1 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 E1 HL/B: -8.72552 ≈ -8.7 (± 0.05)
+- screening_v3 E1 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 N4 HL/B: -2.69165 ≈ -2.7 (± 0.05)
+- screening_v3 N4 Holm p: 0.04662 ≈ 0.047 (± 0.0005)
+- screening_v3 N5 HL/B: 4.3297 ≈ 4.3 (± 0.05)
+- screening_v3 N5 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 E6 HL/B: 10.3052 ≈ 10.3 (± 0.05)
+- screening_v3 E6 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 E3 HL/B: -4.58742 ≈ -4.6 (± 0.05)
+- screening_v3 E3 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 V3 HL/B: -60.816 ≈ -60.8 (± 0.05)
+- screening_v3 V3 Holm p: 0.035742 ≈ 0.036 (± 0.0005)
+- screening_v3 N1 HL/B_pert: -3.00199 ≈ -3.0 (± 0.005)
+- screening_v3 N1 HL/B_seed: -1.42513 ≈ -1.43 (± 0.005)
+- screening_v3 N1 Holm p: 0.652681 ≈ 0.65 (± 0.005)
+- screening_v3 sites: 16 ≈ 16 (± 0)
+- E1 WITHIN GAP BOUND sites: 16 ≈ 16 (± 0)
+- text in SCREENING_V3.md: '**SLATE BUS-SET HOLDS**'
+- text in SCREENING_V3.md: 'entered ['275'], left ['163']'
+- text in SCREENING_V3.md: 'Kendall τ_b(v2, v3) = 0.667 (exact p 0.000135)'
+- text in SCREENING_V3.md: '`screening_v3:11` overall.csv md5 = `location_oat_v2:3`'
+- site 163 own-site share of relief: 0.814056 ≈ 0.81 (± 0.005)
+- 116 margin (V1/E1/N1): 0.724584 ≈ 0.72 (± 0.005)
+- 91 margin (V1/E1/N1): 0.435071 ≈ 0.44 (± 0.005)
+- commit e58f4bd exists in git
+- commit 1c6e73e exists in git
+- text in ERCOT_BO_PLAN.md: 'AMENDMENT 2026-11-18 — screening_v3 actuals + reads'
+- text in ERCOT_BO_PLAN.md: 'That is about 259
+  core-h in total.'

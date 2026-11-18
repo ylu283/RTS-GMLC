@@ -1,5 +1,14 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
 
+## Prompt 64 — ERCOT objective-selection deck (v1.1, 2026-11-18; executor writes here only)
+
+### 2026-11-18 — deck build (executor; worktree `RTS-GMLC-e64`, branch `ercot/64-objective-deck`)
+
+- Worktree from `ercot/tx123` 11e9ddf, at baf77c3 by build time (the 62 session's screening_v3 landing e58f4bd / 1c6e73e and the Seed-bar re-grade baf77c3 landed during the build; both optional sources used). Zero simulation; nothing pushed, nothing submitted; `extracts/n0_E` and `extracts/random_E` never opened.
+- `analysis/pi_objectives/`: `ercot_objectives.pptx` (20 slides = 12 main + A, B, C×2, D×2, E, F), `objective_facts.py` (every printed number read from its source and asserted; 198 assertions → `ASSERTIONS.md`), `make_objective_figs.py` (envelope, hero IDR/bar, relief vs total MW, equations; bold labels and ticks; assert-before-draw), `make_objective_deck.py`, `deck_lib.py` (copy of pi_location @ 771aa5b), `OUTLINE.md`, `SLIDE_TEXT.md` (source line per slide), `FIGURES_USED.md`, `README.md` (not-printed list, deviations).
+- Validator: All validations PASSED. Render check (Codex runtime): 20 / 20 slides looked at; overlap and footer fixes applied.
+- Not printed (not in files): the "< 1 day" re-derivation estimate; a paper sentence in `waves/screening_v3/README.md` (none there); the "via E1 / via N1" objective of the non-dominated sites 116 / 91; "voids the HV ledger" (reworded to plan §6.3 / §10).
+
 ## Prompt 63 — ERCOT noise follow-up: zero-run corrections + wave `noise_seed_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 16 Gurobi-Seed replicates at 4 n0_E designs + 2 thread checks; analysis-only, never in GP X / HV / holdout / baseline)
