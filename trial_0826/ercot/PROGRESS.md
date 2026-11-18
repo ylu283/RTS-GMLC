@@ -97,6 +97,34 @@ Read: the 18 noise_seed_E runs + ONLY the 4 n0_E anchors (n0_E:25 / 29 / 46 / 4,
 - Outputs: POOL_N0E_STANDINGS.md, pool_n0E_standings.csv, pool_spearman_n0E_{raw,resid}.csv,
   pool_ed1b_combined.csv, figs/n0E/ (3 PNG; tick-label fix = plotting only). **STOP for E-D1b (PI).**
 
+### 2026-11-18 — Part C landing (§4.5; screening_v3 COLLECTED, ercot-bot 1a2cde6; rebased on tx123 11e9ddf)
+
+- Script `analysis/pool/screening_v3_landing.py` + `tests/test_screening_v3_landing.py` (10 green; with
+  test_pool_n0E / test_make_screening_v3 / test_make_wave_d: 46 green). Rules = §4.5 verbatim in
+  `waves/screening_v3/README.md` (wave commit c986da0, before any Y; asserted). Reader `ps.build_wave`; suspect_flag
+  cross-check on 17 runs + base: SUSPECT 0; identity v3 everywhere. **Replicate:** screening_v3:11 overall.csv md5 ==
+  location_oat_v2:3 (dc5b00da…) → no drift since 11-06.
+- Pinned: graded = 23 ids (B_j > 0; **D2 dropped: 0/0 at base_v3, Δ undefined**, disclosed); Holm over 23. Moses
+  exact k = 8 (coverage 0.955). TIED = within B_V1/180 = 89.9 MWh/MW of the 6th/7th value.
+- **LOCATIONAL (C 8 vs far 5):** V1 −33.1 B, E1 −8.7 B, N4 −2.7 B (Holm 0.047), N5 +4.3 B, E6 +10.3 B, E3 −4.6 B,
+  V3 −60.8 B (Holm 0.036 each, complete separation). Not: N1 −3.0 B_pert / −1.43 B_seed (exact p 0.093, Holm 0.65,
+  interval contains 0) — NOT LOCATIONAL under both bars (63's B_N1^seed = 242.1 binding); X1 −6.1 B (Holm 0.30);
+  V2 +32.6 B (Holm 0.087); E2 −1.6 B, E8 +1.0 B (separated but < 2 B). Seed-bar sensitivity: no verdict changes.
+- **Bus set:** v3 top 6 = 270, 275, 274, 110, 140, 146 → SLATE BUS-SET HOLDS; 275 in, 163 out (ω 0.97 saturation;
+  81 % of its relief is own-site) — prediction 3/3. No TIED site (146 / 163 at ±1.01 bands). Kendall τ_b(v2, v3)
+  0.667, exact p 1.3e-4. E-D3 stands.
+- **Dominance:** V1/E1/N1 — 116 (margin 0.72 B, via lower E1) and 91 (0.44 B, via lower N1) not dominated → PI flag,
+  both within one bar; V1/E1/N4 — 116 only (0.72 B). E-D3 not reopened.
+- E1 per site: WITHIN GAP BOUND 16/16. Covariates (descriptive): V1 ρ −0.88 with base own curtailment, +0.88 with
+  pocket PTDF L252; E1 ρ −0.90 with ω (confound disclosed).
+- Appended (no seat change): Part C block in §E of POOL_N0E_STANDINGS.md; C_HL_over_B / C_holm_p / C_locational columns
+  in pool_ed1b_combined.csv (existing cells byte-identical). Outputs: SCREENING_V3.md, screening_v3_{sites,locational,
+  covariate_rho,ranking,dominance}.csv, figs/screening_v3/ (3 PNG, bold labels + ticks, assert-before-draw).
+- Code fix found at this landing (no output change): `pool_n0E.amendment_block` included the blank line before the
+  next appended plan block once 61/63 appended after it, so the pinned sha no longer matched; it now strips trailing
+  newlines (sha 8dd06917… reproduced on both the d706199 and the current plan).
+- Seen: screening_v3 1–11, wave D L180 rows, base_v3:1, ercot_noise.json, ercot_noise_seed.json. random_E not read.
+
 ## Prompt 61 — ERCOT location-contrast wave `location_contrast_E` (v1, 2026-11-17; executor writes here only)
 
 (pre-seeded by the strategy session; 8 analysis-only runs: P1 all-six at 60/120/180, P2 matched-total 800/1,500 MW reallocations; never in GP X / HV / holdout / baseline)

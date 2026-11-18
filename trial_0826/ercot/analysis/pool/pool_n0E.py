@@ -117,7 +117,10 @@ def amendment_block(plan_path=PLAN):
     assert text.count(AMEND_TITLE) == 1, "plan must carry exactly one AMENDMENT 2026-11-17 block"
     blk = text[text.index(AMEND_TITLE):]
     nxt = blk.find("\n## AMENDMENT ", len(AMEND_TITLE))
-    return blk if nxt < 0 else blk[:nxt + 1]
+    blk = blk if nxt < 0 else blk[:nxt + 1]
+    # independent of what follows: the sha was pinned with the block at EOF (one trailing newline);
+    # later appended blocks are separated by a blank line
+    return blk.rstrip("\n") + "\n"
 
 
 def assert_amendment(plan_path=PLAN, expect=AMEND_SHA256):

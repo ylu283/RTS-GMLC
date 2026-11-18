@@ -248,6 +248,21 @@ Seat walk (R-4): M = 3 — M != 4 reopens plan §6.4 gate numbers for the PI.
 | D1 | D | 27 | DIAGNOSTIC | 14.894 | 59.003 | 116.647 | READABLE (2 of 3) | 650.623 | 0.0001 | 1.000 | 0.899 | -0.421 | n/a | n/a |  |  |  | DIAGNOSTIC | dir '-': shown, never clustered or seated |
 | D2 | D | 28 | DIAGNOSTIC | 100.837 | 199.739 | 263.249 | READABLE (2 of 3) | 108.682 | 0.0001 | 1.000 | 0.696 | -0.450 | n/a | n/a |  |  |  | DIAGNOSTIC | dir '-': shown, never clustered or seated |
 
+<!-- PART C screening_v3 BEGIN -->
+
+### Part C — screening_v3 (landed 2026-11-18; `SCREENING_V3.md`). Changes no seat.
+
+Seats stay V1 / E1 / R EMPTY / N1 (M = 3). Per id, columns `C_HL_over_B`, `C_holm_p`, `C_locational` in `pool_ed1b_combined.csv`.
+
+- LOCATIONAL (C vs far): V1 (-33.12 B, Holm p 0.0357), E1 (-8.73 B, Holm p 0.0357), N4 (-2.69 B, Holm p 0.0466), N5 (+4.33 B, Holm p 0.0357), E6 (+10.31 B, Holm p 0.0357), E3 (-4.59 B, Holm p 0.0357), V3 (-60.82 B, Holm p 0.0357).
+- Seated: V1 -33.12 B, Holm p 0.0357 → LOCATIONAL; E1 -8.73 B, Holm p 0.0357 → LOCATIONAL; N1 -3.00 B, Holm p 0.653 → NOT LOCATIONAL; N4 -2.69 B, Holm p 0.0466 → LOCATIONAL.
+- N1 vs B_seed 242.1 (binding, 63): -1.43 B_seed → NOT LOCATIONAL.
+- Bus set: top 6 = 270, 275, 274, 110, 140, 146 → SLATE BUS-SET HOLDS (entered ['275'], left ['163']; TIED none).
+- Dominance V1/E1/N1: not dominated: 116, 91 (PI flag).
+- Dominance V1/E1/N4: not dominated: 116 (PI flag).
+
+<!-- PART C screening_v3 END -->
+
 ## Deviations
 
 - B_j with D2 excluded gives N2 3.0, N1 114.9, N4 37.0; prompt 62 v1.1 quotes 2.60 / 99.5 / 32, which are the 8-value (D2-included) numbers. The pinned definition (61 §3 / contract addendum) is applied and equals 63's re-emitted `per_candidate.<j>.bar.B` (asserted).
