@@ -252,14 +252,16 @@ def read_ledger(out_dir):
     return pd.read_csv(p)
 
 
-def score_holdout(gp, arm, objective, n0, Uh, yh, out_dir, meas_sd=0.0):
+def score_holdout(gp, arm, objective, n0, Uh, yh, out_dir, meas_sd=0.0, tiers=TIERS):
     """ONE holdout scoring, appended to the ledger. Refuses after retirement
     (committed_configs.json exists), at the 25th scoring, on a repeat
-    (objective, n0) scoring, and at a non-plan tier."""
+    (objective, n0) scoring, and at a tier not in `tiers` (default: the plan
+    tiers 32 / 48; prompt 54 v3.3 §5.3 adds n* as a third tier, disclosed as a
+    plan §10 amendment)."""
     if os.path.isfile(os.path.join(out_dir, COMMITTED)):
         raise HoldoutRetired(f"{COMMITTED} exists: holdout RETIRED (plan §4)")
-    if n0 not in TIERS:
-        raise HoldoutRetired(f"n0 = {n0} is not a plan tier {TIERS}")
+    if n0 not in tiers:
+        raise HoldoutRetired(f"n0 = {n0} is not a plan tier (admitted {tuple(tiers)})")
     led = read_ledger(out_dir)
     if len(led) >= EXPOSURE_CAP:
         raise HoldoutRetired(f"exposure budget spent ({len(led)} >= {EXPOSURE_CAP})")
@@ -501,8 +503,8 @@ def fig_parity(entries, Uh, Yh, out_dir, tiers=TIERS):
             ax.plot(np.arange(len(o)), med[o], color="C0", lw=2, label="predictive median")
             ax.plot(np.arange(len(o)), yh[o], "o", color="C3", ms=4, label="holdout y")
             m = h["metrics"]
-            ax.set_title(f"{obj} n0={n0} {arm.name}: cov95 {m['cov95']}/{m['n']} {'PASS' if h['pass'] else 'FAIL'} "
-                         f"[{HOLDOUT_BAR[0]}, {HOLDOUT_BAR[1]}]; RMSE {m['rmse']:.3g}", fontsize=10)
+            ax.set_title(f"{obj} n0={n0} {arm.name}\ncov95 {m['cov95']}/{m['n']} {'PASS' if h['pass'] else 'FAIL'} "
+                         f"[{HOLDOUT_BAR[0]}, {HOLDOUT_BAR[1]}]; RMSE {m['rmse']:.3g}", fontsize=11)
             ax.set_xlabel("holdout row (sorted by prediction)")
             ax.set_ylabel(obj)
             _bold(ax)
