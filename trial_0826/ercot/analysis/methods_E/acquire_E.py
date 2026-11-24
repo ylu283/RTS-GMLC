@@ -148,6 +148,9 @@ class Lane:
         self.dir = lane_dir(root, cfg, arm, seed)
         self.ds = ce.load_design_space(root, cfg)
         self.configs, self.configs_source = ce.committed_configs(root, cfg)
+        if self.configs.get("E-D7_decided") is None and cfg.get("n0_tier_provisional") is not None:
+            assert cfg.get("part") != "B", ("Part B: a provisional n0 tier is REFUSED — E-D7 must be decided in "
+                                            "committed_configs.json (a real lane never runs on a provisional tier)")
         self.n0_tier = ce.n0_tier(self.configs, cfg.get("n0_tier_provisional"))
         self.n0_source = (f"committed_configs ({self.configs_source}) E-D7_decided"
                           if self.configs.get("E-D7_decided") is not None
@@ -619,6 +622,8 @@ def propose_round(lane: Lane, k: int) -> str:
     assert ub.shape == (lane.cfg["q"], lane.ds.d), ub.shape
     keys = {tuple(r) for r in ub.round(10).tolist()}
     assert len(keys) == lane.cfg["q"], "duplicate designs in batch"
+    # RISK (prompt 66 F6): qNEHVI proposes box vertices; a later round can re-propose an evaluated vertex and this assert
+    # then stops the lane. The replacement (declared re-proposal rule) is a 55 Part B decision — unchanged here.
     assert not (keys & {tuple(r) for r in acc["U"].to_numpy(float).round(10).tolist()}), "re-proposed an evaluated design"
     overlap = {}
     if k == 1:
@@ -632,6 +637,10 @@ def propose_round(lane: Lane, k: int) -> str:
                 # fails legitimately when the acquisition optimum sits on a box vertex (prompt 66 emulator, real n0_E):
                 # assert the sets differ, RECORD the shared designs.
                 assert keys != okeys, f"r1 proposals of s{lane.seed} identical to s{s} (the seed does not reach the sampler)"
+                ob = np.asarray(other["designs_u"], float)
+                dmin = np.abs(ub[:, None, :] - ob[None, :, :]).max(-1).min(1)     # per design: nearest design of seed s
+                assert (dmin > 1e-6).any(), (f"r1 proposals of s{lane.seed} and s{s} differ only by round-off "
+                                             "(< 1e-6 in u): the seed does not reach the sampler")
                 overlap[str(s)] = len(keys & okeys)
     _step(lane.dir, f"propose r{k}: writing wave {lane.wave(k)}")
     extra = {"methods_arm": lane.arm, "seed_id": lane.seed, "methods_round": k, "acq": lane.a["acq"],
