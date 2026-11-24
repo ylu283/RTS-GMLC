@@ -178,7 +178,7 @@
     0.33826068752916355
    ],
    "flag_interaction": "INTERACTION",
-   "flag_location": "LOCATION",
+   "flag_location": "COMPOSITION-OR-LOCATION",
    "suppressed": null,
    "bar_B": 2383239.3035465917,
    "grading_range": 50995021.00174427,
@@ -216,7 +216,7 @@
     0.4397992434567521
    ],
    "flag_interaction": "INTERACTION",
-   "flag_location": "LOCATION",
+   "flag_location": "COMPOSITION-OR-LOCATION",
    "suppressed": "co-reported id: shares descriptive, flags not issued (v3.3 \u00a75.4: flags for the seated ids)",
    "bar_B": 36.96620077854905,
    "grading_range": 1159.0,
@@ -254,7 +254,7 @@
     0.4628382918181899
    ],
    "flag_interaction": "INTERACTION",
-   "flag_location": "LOCATION",
+   "flag_location": "COMPOSITION-OR-LOCATION",
    "suppressed": "flags suppressed: holdout pass = False, chatter readable = True (B_j = 114.9, grading range = 1275, need >= 2.0 B_j) (prompt 54 \u00a73.5: R4 / N1 need the [43, 48] pass AND readable chatter); co-reported id: shares descriptive, flags not issued (v3.3 \u00a75.4: flags for the seated ids)",
    "bar_B": 114.92388785626773,
    "grading_range": 1275.0,

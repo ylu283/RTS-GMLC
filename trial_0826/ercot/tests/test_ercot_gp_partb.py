@@ -17,7 +17,7 @@ sys.path.insert(0, str(ERCOT))
 from analysis.ercot_gp import ercot_gp_partb as P  # noqa: E402
 from analysis.ercot_gp import ercot_gp_status as S  # noqa: E402
 
-GRID = (24, 32, 40, 48)
+GRID = (24, 32, 40, 44, 48)
 SITES = [f"s{i}" for i in range(6)]
 
 
@@ -41,6 +41,7 @@ def _checks(rows):
 
 
 def test_n_star_rule_and_fallback():
+    G4 = (24, 32, 40, 48)
     def row(obj, n, c1, c2, c3, ch=0.05):
         return {"objective": obj, "role": "seated", "n": n, "arm": "m52+std", "loo_cov95": 0, "bar_lo": 0,
                 "bar_hi": 0, "c1_cov_in_bar": c1, "rmse_ratio_vs_48": 1.0, "c2_rmse_ok": c2,
@@ -51,17 +52,17 @@ def test_n_star_rule_and_fallback():
         rows += [row(obj, 24, True, True, False, np.nan), row(obj, 32, True, True, True),
                  row(obj, 40, True, True, True), row(obj, 48, True, True, True)]
     c = _checks(rows)
-    ns, reason, alt = P.n_star(c, ["A", "B"], [], GRID)
+    ns, reason, alt = P.n_star(c, ["A", "B"], [], G4)
     assert ns == 32 and "n* = 32" in reason
     c.loc[(c.objective == "B") & (c.n == 32), "c2_rmse_ok"] = False
-    assert P.n_star(c, ["A", "B"], [], GRID)[0] == 40
+    assert P.n_star(c, ["A", "B"], [], G4)[0] == 40
     c.loc[(c.objective == "B") & (c.n == 40), "c1_cov_in_bar"] = False
-    ns, reason, _ = P.n_star(c, ["A", "B"], [], GRID)
+    ns, reason, _ = P.n_star(c, ["A", "B"], [], G4)
     assert ns == 48 and "no n < 48" in reason
     # co-reported ids never bind the choice
     c2 = c.copy()
     c2.loc[c2.objective == "B", "role"] = "co-reported"
-    assert P.n_star(c2, ["A"], ["B"], GRID)[0] == 32
+    assert P.n_star(c2, ["A"], ["B"], G4)[0] == 32
 
 
 @pytest.fixture(scope="module")

@@ -1,20 +1,49 @@
-# ERCOT_GP_STATUS — prompt 54 Part B (v3.3 addendum, 2026-11-24)
+# ERCOT_GP_STATUS — prompt 54 Part B (v3.3 addendum; plan AMENDMENT 2026-11-24b)
 
-Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**; co-reported (fitted and graded identically, never seated): N4 · N1. Data: n0_E grading tier 48 rows (Sobol 0–47, loader refusals 0, max R1 0.0 MWh, max R2 170.2 MWh); random_E 48 rows, read only by the holdout grader (refusals 0, max R1 0.0, max R2 199.9). Environment bogp-botorch; wall 22.3 min.
+Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 4.2 min.
 
-> Disclosure (AMENDMENT 2026-11-24, with the erratum of aa98045; the fit inputs are unchanged by it): This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test. [ERRATUM 2026-11-24, strategy session, after the read: this verbatim disclosure predates the real walk; the walk itself gives v2 = V1 · E1 (M = 2) — N4 is suppressed by a failed composition-resolvability test (residual Mantel p 0.025 > 0.01), not by a borderline pair; the vectors reported are v1 V1 · E1 · N1, v2 V1 · E1, and the pre-read prediction V1 · E1 · N4 as a conditional reading.]
+## 0. Answers for the PI
 
-**E-D7 recommendation: n\* = 48** (Kay decides). Holdout tiers [32, 48]; exposure 8 / 24; `committed_configs.json` written after the last scoring — the holdout is RETIRED.
+**Q1 — Are the GP's 95 % bands honest (calibration)?** Yes for V1, E1, N4 (holdout inside [43, 48] at n = 32 and 48). Not for N1: it fails at n = 48.
 
-## 0. Reading (executor, 2026-11-24 night)
+| objective | role | n | LOO cov95 / n [bar] | holdout cov95 / 48 [43, 48] | holdout rms z |
+|---|---|---|---|---|---|
+| V1 | seated | 32 | 31 / 32 [28, 32] | 48 / 48 PASS | 0.67 |
+| V1 | seated | 48 | 47 / 48 [43, 48] | 45 / 48 PASS | 0.98 |
+| E1 | seated | 32 | 32 / 32 [28, 32] | 48 / 48 PASS | 0.56 |
+| E1 | seated | 48 | 47 / 48 [43, 48] | 48 / 48 PASS | 0.65 |
+| N4 | co-reported | 32 | 30 / 32 [28, 32] | 48 / 48 PASS | 0.59 |
+| N4 | co-reported | 48 | 46 / 48 [43, 48] | 48 / 48 PASS | 0.70 |
+| N1 | co-reported | 32 | 32 / 32 [28, 32] | 44 / 48 PASS | 1.03 |
+| N1 | co-reported | 48 | 47 / 48 [43, 48] | 41 / 48 FAIL | 1.31 |
 
-- **n\* = 48.** The binding condition is (2): LOO RMSE_n / RMSE_48 > 1.1 at every n < 48 for both seated ids (n = 44: V1 1.120, E1 1.116; n = 40: 1.271 / 1.259). Coverage (1) is inside its bar at every n for V1 and E1; lengthscale stability (3) holds for V1 at every n ≥ 16 except n = 20 and fails for E1 at n = 16 / 20 / 24 / 32. What would change the choice: a ratio bar of ≈ 1.12 (instead of 1.1) would give n = 44; dropping condition (3) does not change it; the co-reported ids alone would give 44. The longer exploratory fit gives the same n\* = 48.
-- **Holdout: 8 scorings (4 objectives × tiers 32, 48), no third tier (n\* is a plan tier).** Seated V1 48/48 and 45/48, E1 48/48 and 48/48 — all PASS. Co-reported N4 48/48, 48/48 PASS; **N1 44/48 PASS at 32, 41/48 FAIL at 48** (recorded; no re-selection, no extra scoring). Coverage at 48/48 for E1 / N4 means the house-fit bands are wide (conservative), not sharp.
-- **Committed (arm selected at n\* = 48):** V1 rbf+std; E1, N4, N1 m52+std (the default). The measured-floor arm (σ_c) was in every arm set and never selected: the house-fit inferred noise sits above σ_c for V1 (3.97×), E1 (2.65×), N4 (1.37×) and below it for N1 (0.43×), so a σ_c lower bound is inactive for three ids and loses on LOO for N1.
-- **House-fit caveat (exploratory, flagged for Kay / 55):** the campaign fit definition (bogp `train_gp`, Adam 700 epochs, lr 0.01) stops at its step budget — raw lengthscales 3.3–6.8 against a reach of ≈ 7. A 10,000-epoch fit of the same arms lowers LOO NLPD by 0.4–0.8 nats at n = 48 (V1 11.73 → 10.97, E1 16.25 → 15.80, N4 5.17 → 4.39) and cuts LOO RMSE by ≈ 40–55 % for V1 / E1 / N4, but its inferred noise jumps between ≈ 0.01× and ≈ 4× σ_c across n (a multimodal likelihood). Plan §5 freezes the fit definition; nothing here is committed. Any change is a plan amendment.
-- **Mechanism (flags for the seated ids only):** V1 INTERACTION / location UNRESOLVED; E1 INTERACTION / LOCATION (L 0.20 vs the total-only null's 95th 0.016). The null was refitted with the committed V1 config; its thresholds are tighter than the 11-17 default-config null. The prompt-61 row: V1 has |z| > 1.96 on 3 of 9 contrast designs (the single-site / two-site corners P2_500_270 +3.54, P2_500_110_140 +2.65, and P3_1500_all +2.05); E1 on 2; N4 and N1 on none. Descriptive only.
+rms z < 1 means the bands are wider than the errors (conservative). The house fit gives rms z 0.56–0.98 for V1, E1, N4.
 
-## 1. Per-objective summary (selected arm by the plan-§5 rule at each n)
+**Q2 — How accurate is it?** LOO RMSE (holdout RMSE in brackets), in natural units, in units of the rule-v2 noise bar B_j (`pool_ed1b_v2.csv`) and in % of the grading-tier range.
+
+| objective | B_j | n = 32: RMSE | in B_j | % range | n = 48: RMSE | in B_j | % range |
+|---|---|---|---|---|---|---|---|
+| V1 | 18,739 MWh | 57,324 MWh [38,392 MWh] | 3.06 [2.05] | 2.5 [1.6] | 30,633 MWh [37,361 MWh] | 1.63 [1.99] | 1.3 [1.6] |
+| E1 | $1.86M | $4.83M [$1.98M] | 2.59 [1.07] | 9.5 [3.9] | $3.30M [$1.76M] | 1.77 [0.94] | 6.5 [3.4] |
+| N4 | 45.1 h | 76.3 h [36.2 h] | 1.69 [0.80] | 6.6 [3.1] | 54.5 h [31.9 h] | 1.21 [0.71] | 4.7 [2.8] |
+| N1 | 217 line-h | 109 line-h [76.2 line-h] | 0.50 [0.35] | 8.6 [6.0] | 88.6 line-h [79.8 line-h] | 0.41 [0.37] | 6.9 [6.3] |
+
+The % range denominator here is the 48-row grading-tier range of y for every cell (one denominator).
+
+**Q3 — How many starting runs (n\*, the navigation tier)?** **n\* = 48.** No tier below 48 meets the rule. The ratio LOO RMSE_n / RMSE_48 is above 1.1 at every n < 48 for the seated ids (n = 44: V1 1.120, E1 1.116; n = 40: V1 1.271, E1 1.259). Whether 48 itself suffices is untested: LOO RMSE still falls by ≈ 1.3× from n = 40 to 48.
+
+**Read this before the BO.** A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13). The committed fit definition per objective is in §13 and `committed_configs.json` (`fit_definition`).
+
+**N1 (co-reported) FAILS the holdout at n = 48** (n = 32: 44 / 48, n = 48: 41 / 48; bar [43, 48]). It is not seated. We recorded the failure. We did not re-select and did not score again.
+
+**Notes.**
+
+- Mechanism (descriptive): V1 has |z| > 1.96 on 3 of 9 designs: P2_500_270 +3.54, P2_500_110_140 +2.65, P3_1500_all +2.05; 7 of 9 V1 z are positive (mean +1.17).
+- Provenance: the long-fit diagnostic (65179e1) was coded 7 minutes after the holdout was scored. It was never scored or committed. It motivates the fit change (AMENDMENT 2026-11-24b).
+- House-fit lengthscales at n = 48: raw parameter 3.3–6.8; Adam can move it by at most ≈ 7 from 0 in 700 steps at lr 0.01 (`ls_raw_*` in `ercot_gp_status.csv`).
+- The rule-v2 disclosure is in §12.
+
+## 1. Per-objective summary, house fit (selected arm by the plan-§5 rule at each n)
 
 | objective | role | n | selected arm | LOO NLPD | LOO RMSE | LOO cov95 / n [bar] | holdout cov95 / 48 [43, 48] | holdout RMSE | lengthscales u (110, 140, 146, 163, 270, 274) | outputscale sd (t) | noise sd | noise / σ_c |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -27,13 +56,13 @@ Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, obje
 | N1 | co-reported | 32 | m52+std | 6.026 | 109.1 | 32 / 32 [28, 32] in | 44 / 48 **PASS** | 76.16 | 1.58, 1.7, 1.74, 1.73, 0.91, 0.984 | 399.5 | 30.22 | 0.53 |
 | N1 | co-reported | 48 (n*) | m52+std | 5.742 | 88.56 | 47 / 48 [43, 48] in | 41 / 48 **FAIL** | 79.84 | 1.62, 1.65, 1.6, 1.46, 1.02, 1.06 | 378.3 | 24.56 | 0.43 |
 
-σ_c = prompt-63 chatter sd (`ercot_noise_seed.json`, df 16): V1 4376 (measured arm included); E1 3.124e+05 (measured arm included); N4 10.49 (measured arm included); N1 57.06 (measured arm included). Arm sets: V1: m52+std, m52+std+meas, rbf+std; E1: m52+std, m52+std+meas, rbf+std; N4: m52+std, m52+std+meas, rbf+std; N1: m52+std, m52+std+meas, rbf+std (log1p arms enter iff min y ≥ 0 and max / max(min, 1) > 10 on the 48 grading rows).
+σ_c = prompt-63 chatter sd (`ercot_noise_seed.json`, df 16): V1 4376 (measured arm included); E1 3.124e+05 (measured arm included); N4 10.49 (measured arm included); N1 57.06 (measured arm included). Arm sets: V1: m52+std, m52+std+meas, rbf+std; E1: m52+std, m52+std+meas, rbf+std; N4: m52+std, m52+std+meas, rbf+std; N1: m52+std, m52+std+meas, rbf+std.
 
 ## 2. Navigation tier n* (E-D7 recommendation)
 
 **Rule (pinned in code before the fit):** n* = the smallest n in {12, 16, ..., 44} at which, for every SEATED objective and the arm selected at that n: (1) LOO cov95 lies in binom.interval(0.90, n, 0.95); (2) LOO RMSE_n / LOO RMSE_48 <= 1.1; (3) the ARD lengthscales (u units) changed by < 10 % (max over the 6 sites, relative to the previous grid n's selected arm); if no n < 48 meets all three, n* = 48.
 
-**Reason:** n* = 48. n* = the smallest n in {12, 16, ..., 44} at which, for every SEATED objective and the arm selected at that n: (1) LOO cov95 lies in binom.interval(0.90, n, 0.95); (2) LOO RMSE_n / LOO RMSE_48 <= 1.1; (3) the ARD lengthscales (u units) changed by < 10 % (max over the 6 sites, relative to the previous grid n's selected arm); if no n < 48 meets all three, n* = 48. Per n (seated V1, E1): n = 12: V1 (rbf+std): RMSE ratio 4.195 > 1.1, no previous n; E1 (rbf+std): RMSE ratio 2.294 > 1.1, no previous n | n = 16: V1 (rbf+std): RMSE ratio 4.610 > 1.1; E1 (m52+std): RMSE ratio 2.314 > 1.1, lengthscale change 64 % >= 10 % | n = 20: V1 (rbf+std): RMSE ratio 3.416 > 1.1, lengthscale change 11 % >= 10 %; E1 (m52+std): RMSE ratio 2.085 > 1.1, lengthscale change 21 % >= 10 % | n = 24: V1 (rbf+std): RMSE ratio 2.760 > 1.1; E1 (m52+std): RMSE ratio 1.564 > 1.1, lengthscale change 11 % >= 10 % | n = 28: V1 (rbf+std): RMSE ratio 2.211 > 1.1; E1 (m52+std): RMSE ratio 1.483 > 1.1 | n = 32: V1 (rbf+std): RMSE ratio 1.871 > 1.1; E1 (m52+std): RMSE ratio 1.463 > 1.1, lengthscale change 11 % >= 10 % | n = 36: V1 (rbf+std): RMSE ratio 1.655 > 1.1; E1 (m52+std): RMSE ratio 1.358 > 1.1 | n = 40: V1 (rbf+std): RMSE ratio 1.271 > 1.1; E1 (m52+std): RMSE ratio 1.259 > 1.1 | n = 44: V1 (rbf+std): RMSE ratio 1.120 > 1.1; E1 (m52+std): RMSE ratio 1.116 > 1.1 -> no n < 48 meets all three; n* = 48.
+**Result: n\* = 48.** Per-n checks for every objective (seated ids decide):
 
 | objective | role | n | arm | cov95 [bar] (1) | RMSE_n / RMSE_48 (2) | max ls change (3) | median ls change (descr.) | all met |
 |---|---|---|---|---|---|---|---|---|
@@ -78,11 +107,9 @@ Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, obje
 | N1 | co-reported | 44 | m52+std | 43 [39, 44] ok | 1.040 ok | 5.0% ok | 1.8% | **yes** |
 | N1 | co-reported | 48 | m52+std | 47 [43, 48] ok | 1.000 ok | 8.8% ok | 2.1% | **yes** |
 
-**What would change the choice (descriptive, never binding):** with the co-reported ids included n would be 48; each seated id alone: V1 48, E1 48; each co-reported id alone: N4 44, N1 44; without the lengthscale condition 48; with the median (not max) lengthscale change 48; coverage alone 12; the same rule on the exploratory long fit (Adam 10000 epochs) 48.
+**What would change the choice (descriptive, never binding):** with the co-reported ids included: 48; each seated id alone: V1 48, E1 48; each co-reported id alone: N4 44, N1 44; without the lengthscale condition: 48; with the median (not max) lengthscale change: 48; coverage alone: 12; the same rule on the exploratory long fit: 48. n\* = 48 means that no tier below 48 suffices. Whether 48 suffices is untested.
 
-Part A criterion (pinned 11-14, verbatim, evaluated for continuity; v3.3 replaces it): "32 is sufficient iff, for every objective, LOO cov95 at 32 is inside [28, 32] (binom.interval(0.90, 32, 0.95)) and LOO RMSE_32 / LOO RMSE_48 <= 1.1 and the committed config at 32 passes the holdout bar [43, 48]; otherwise the recommendation is 48." → seated: V1 cov95@32 31, ratio 1.871, holdout@32 PASS; E1 cov95@32 32, ratio 1.463, holdout@32 PASS → it would recommend **48**.
-
-## 3. Training-size study (plan-§5 arms at every n; LOO only)
+## 3. Training-size study, house fit (plan-§5 arms at every n; LOO only)
 
 | objective | n | arm | LOO NLPD | Δ vs default (paired se) | beats default | LOO cov95 [bar] | LOO RMSE | RMSE % range | outputscale sd (t) | noise sd | noise / σ_c | selected |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -377,9 +404,11 @@ ARD lengthscales (u units) of the SELECTED arm vs n (descriptive; in u-space the
 | N1 | 48 | m52+std+gamma | 7.099 | +1.357 (0.079) vs m52+std | 46 [43, 48] | 293 | 197.9 | 0.0968, 0.0978, 0.0996, 0.0972, 0.0979, 0.0964 |
 | N1 | 48 | m52+std+fixed_sigma_c | 5.872 | +0.130 (0.037) vs m52+std | 47 [43, 48] | 93.19 | 57.06 | 1.38, 1.44, 1.42, 1.39, 1.07, 1.05 |
 
-### Exploratory: the same arms and selection rule with a longer fit (Adam 10000 epochs; reported, NEVER committed, never holdout-scored)
+### Exploratory: the same arms and selection rule with a longer fit (Adam 10,000 steps; NEVER committed, never holdout-scored)
 
-The house fit (plan §5 'campaign fit definition' = bogp `train_gp` defaults: Adam, 700 epochs, lr 0.01, from gpytorch's default init raw lengthscale 0) moves each raw lengthscale by at most ≈ 7 (700 × 0.01), and the fitted raw lengthscales sit at 3.3–6.8 — the optimizer budget, not the likelihood, bounds them. This table re-runs every plan arm and the selection rule with the longer fit.
+A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13).
+
+Provenance: this diagnostic (65179e1) was coded 7 minutes after the holdout was scored.
 
 | objective | n | house arm | house LOO NLPD | long arm | long LOO NLPD | house / long LOO RMSE | house / long cov95 [bar] | house / long noise / σ_c | long lengthscales u |
 |---|---|---|---|---|---|---|---|---|---|
@@ -424,11 +453,9 @@ The house fit (plan §5 'campaign fit definition' = bogp `train_gp` defaults: Ad
 | N1 | 44 | m52+std | 5.777 | m52+std | 5.573 | 92.09 / 75.93 | 43 / 42 [39, 44] | 0.429 / 0.0207 | 3.6, 3.61, 2.95, 1.73, 1.54, 1.26 |
 | N1 | 48 | m52+std | 5.742 | m52+std | 5.559 | 88.56 / 74.2 | 47 / 44 [43, 48] | 0.43 / 0.0329 | 3.91, 3.09, 3.67, 1.61, 1.1, 1.64 |
 
-n* rule on the long fit (descriptive only): **48** (co-reported included: 48; without the lengthscale condition: 48). Reason: n* = 48. n* = the smallest n in {12, 16, ..., 44} at which, for every SEATED objective and the arm selected at that n: (1) LOO cov95 lies in binom.interval(0.90, n, 0.95); (2) LOO RMSE_n / LOO RMSE_48 <= 1.1; (3) the ARD lengthscales (u units) changed by < 10 % (max over the 6 sites, relative to the previous grid n's selected arm); if no n < 48 meets all three, n* = 48. Per n (seated V1, E1): n = 12: V1 (rbf+std): RMSE ratio 5.580 > 1.1, no previous n; E1 (rbf+std): RMSE ratio 2.133 > 1.1, no previous n | n = 16: V1 (m52+std): RMSE ratio 6.742 > 1.1, lengthscale change 138 % >= 10 %; E1 (m52+std): RMSE ratio 2.965 > 1.1, lengthscale change 245 % >= 10 % | n = 20: V1 (m52+std): RMSE ratio 4.105 > 1.1, lengthscale change 26 % >= 10 %; E1 (m52+std): RMSE ratio 2.263 > 1.1, lengthscale change 30 % >= 10 % | n = 24: V1 (m52+std): RMSE ratio 3.408 > 1.1, lengthscale change 64 % >= 10 %; E1 (m52+std): RMSE ratio 1.561 > 1.1, lengthscale change 41 % >= 10 % | n = 28: V1 (m52+std): RMSE ratio 2.473 > 1.1, lengthscale change 12 % >= 10 %; E1 (m52+std): RMSE ratio 1.863 > 1.1, lengthscale change 24 % >= 10 % | n = 32: V1 (m52+std): RMSE ratio 2.224 > 1.1, lengthscale change 13 % >= 10 %; E1 (m52+std): RMSE ratio 1.756 > 1.1, lengthscale change 48 % >= 10 % | n = 36: V1 (m52+std): RMSE ratio 1.745 > 1.1; E1 (m52+std): RMSE ratio 1.750 > 1.1, lengthscale change 19 % >= 10 % | n = 40: V1 (m52+std): RMSE ratio 1.171 > 1.1; E1 (m52+std): cov95 35 outside [36, 40], RMSE ratio 1.518 > 1.1, lengthscale change 62 % >= 10 % | n = 44: V1 (m52+std+meas): RMSE ratio 1.216 > 1.1; E1 (m52+std): RMSE ratio 1.257 > 1.1, lengthscale change 11 % >= 10 % -> no n < 48 meets all three; n* = 48.
+The n\* rule on the long fit (descriptive only): **48** (co-reported included: 48; without the lengthscale condition: 48). Figure: `figs/fig_house_vs_longfit.png`.
 
-Figure: `figs/fig_house_vs_longfit.png`.
-
-## 4. Holdout (random_E, i.i.d. 48; bar [43, 48] = binom.interval(0.90, 48, 0.95); once per objective per tier)
+## 4. Holdout, house fit (random_E, i.i.d. 48; bar [43, 48] = binom.interval(0.90, 48, 0.95); once per objective per tier)
 
 | objective | role | n | arm | cov95 / 48 | pass | RMSE | RMSE % range | NLPD | rms z | mean z | Spearman | median 95 % half-width | latent share | exposure row |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -441,11 +468,13 @@ Figure: `figs/fig_house_vs_longfit.png`.
 | N1 | co-reported | 32 | m52+std | 44 / 48 | **PASS** | 76.16 | 6.75 | 5.786 | 1.027 | +0.044 | 0.951 | 146.6 | 0.915 | 7 |
 | N1 | co-reported | 48 | m52+std | 41 / 48 | **FAIL** | 79.84 | 7.08 | 5.904 | 1.310 | -0.099 | 0.952 | 119.3 | 0.915 | 8 |
 
-Independence disclosure (plan §4): the 48 residuals share one fitted model, so the binomial region treats them as independent. This is an approximation. A failing objective is recorded; no re-selection and no extra scoring followed.
+RMSE % range denominators: the LOO column (§3) divides by the range of the n training rows; the holdout column divides by the range of the 48 holdout rows. §0 uses one denominator (the 48-row grading range).
 
-Parity: `figs/fig_parity_holdout.png` (dual band: total 95 % incl. noise, latent 95 %).
+Independence disclosure (plan §4): the 48 residuals share one fitted model, so the binomial region treats them as independent. This is an approximation. We recorded a failing objective. We did not re-select and did not score again.
 
-## 5. Noise cross-check vs σ_c (descriptive only; adds no arm)
+Parity: `figs/fig_parity_holdout.png` (observed vs predicted, 1:1 line; wide light bar = 95 % total band with noise, narrow dark bar = 95 % latent band).
+
+## 5. Noise cross-check vs σ_c, house fit (descriptive only; adds no arm)
 
 | objective | n | arm | inferred noise sd | σ_c [95 % CI] | inferred / σ_c | inside CI | inferred / per-level sd (4 seed designs) | seed Δ: mean abs z / max abs z / frac abs z > 1.96 | 63 trigger |
 |---|---|---|---|---|---|---|---|---|---|
@@ -458,7 +487,7 @@ Parity: `figs/fig_parity_holdout.png` (dual band: total 95 % incl. noise, latent
 | N1 | 32 | m52+std | 30.22 | 57.06 [42.5, 86.84] | 0.53 | no | 0.915, 1.21, 0.39, 0.415 | 1.84 / 5.86 / 0.31 | FIRES — TRIGGER: scalar sd rejected (ratio 9.59 > 3, p = 0.0251 < 0.05) |
 | N1 | 48 | m52+std | 24.56 | 57.06 [42.5, 86.84] | 0.43 | no | 0.743, 0.982, 0.317, 0.337 | 2.27 / 7.21 / 0.50 | FIRES — TRIGGER: scalar sd rejected (ratio 9.59 > 3, p = 0.0251 < 0.05) |
 
-Seed Δ = the 16 solver-seed deltas of prompt 63 (two-run scale, sd ≈ √2·σ_c), standardized by the inferred sd. A firing 63 trigger (level-dependent chatter) is reported; any model change needs a plan amendment.
+Seed Δ = the 16 solver-seed deltas of prompt 63 (two-run scale, sd ≈ √2·σ_c), standardized by the inferred sd. A firing 63 trigger (level-dependent chatter) is reported. A model change needs a plan amendment.
 
 ## 6. Mechanism sanity (prompt 54 §3.5 v3.2; read-only flags — nothing here changes committed_configs.json, E-D7 or 55)
 
@@ -466,7 +495,7 @@ Seed Δ = the 16 solver-seed deltas of prompt 63 (two-run scale, sd ≈ √2·σ
 
 Buses [2, 75, 121] (sites 110 / 140 on bus 2, 146 on bus 75) drain only through bus 120 (sites 163 / 270 / 274) via ['L240', 'L4', 'L5']; every MW injected at any of the six sites therefore reaches the binding line L252 (700 MW, 5,426 h/yr >= 99 % of rating in base_v3) with the same PTDF — the six sites are one electrical location; location effects can come only from resource profiles and nameplate caps.
 
-### (c) No-simulation null (machinery pinned before any n0_E Y was read; refitted here with the committed V1 config)
+### (c) No-simulation null (machinery pinned before any n0_E Y was read; refitted here with the committed house-fit V1 config)
 
 Objective V1; GP config ['rbf', 'std', 'inferred', 'none'] (rbf+std); 256 posterior paths on a Sobol base of 2^13 points (seed 5454); base_v3 = 5.82873e+06; total-only fit a = 2.524e+06, b = 689.1 MW.
 
@@ -475,43 +504,47 @@ Objective V1; GP config ['rbf', 'std', 'inferred', 'none'] (rbf+std); 256 poster
 | additive | 0.0183 | -0.0000 | 0.0185 [0.0162, 0.0209] | 0.0020 [0.0012, 0.0031] |
 | total_only | 0.0117 | 0.0610 | 0.0126 [0.0101, 0.0155] | 0.0482 [0.0389, 0.0599] |
 
-Thresholds: INTERACTION if I_p05 > 0.0031 (additive null 95th); ADDITIVE if I_p95 < 0.0020 (its median); LOCATION if L_p05 > 0.0155 (total-only null 95th); TOTAL-ONLY-COMPATIBLE if L_p95 < 0.0126; otherwise UNRESOLVED. L and I are scale-free shares, so the V1-built null thresholds are applied to every objective.
+Thresholds: INTERACTION if I_p05 > 0.0031 (additive null 95th); ADDITIVE if I_p95 < 0.0020 (its median); COMPOSITION-OR-LOCATION if L_p05 > 0.0155 (total-only null 95th); TOTAL-ONLY-COMPATIBLE if L_p95 < 0.0126; otherwise UNRESOLVED. L and I are scale-free shares, so the V1-built null thresholds are applied to every objective.
 
 ### (b) Shares from the COMMITTED config on the grading tier
 
-| objective | L median [5, 95] | I median [5, 95] | first-order S_s median (sites in JSON order) | interaction flag | location flag | note |
+| objective | L median [5, 95] | I median [5, 95] | first-order S_s median (sites in JSON order) | interaction flag | composition-or-location flag | note |
 |---|---|---|---|---|---|---|
 | V1 | 0.0109 [0.0093, 0.0126] | 0.0094 [0.0069, 0.0123] | 0.088, 0.050, 0.047, 0.031, 0.285, 0.488 | INTERACTION | UNRESOLVED |  |
-| E1 | 0.2048 [0.1816, 0.2323] | 0.0391 [0.0279, 0.0540] | 0.170, 0.085, 0.158, 0.015, 0.193, 0.338 | INTERACTION | LOCATION |  |
-| N4 | 0.0782 [0.0661, 0.0911] | 0.0334 [0.0229, 0.0477] | 0.111, 0.059, 0.084, 0.022, 0.249, 0.440 | (suppressed) INTERACTION | (suppressed) LOCATION | co-reported id: shares descriptive, flags not issued (v3.3 §5.4: flags for the seated ids) |
-| N1 | 0.0871 [0.0697, 0.1092] | 0.0743 [0.0555, 0.0990] | 0.099, 0.060, 0.034, 0.039, 0.228, 0.463 | (suppressed) INTERACTION | (suppressed) LOCATION | flags suppressed: holdout pass = False, chatter readable = True (B_j = 114.9, grading range = 1275, need >= 2.0 B_j) (prompt 54 §3.5: R4 / N1 need the [43, 48] pass AND readable chatter); co-reported id: shares descriptive, flags not issued (v3.3 §5.4: flags for the seated ids) |
+| E1 | 0.2048 [0.1816, 0.2323] | 0.0391 [0.0279, 0.0540] | 0.170, 0.085, 0.158, 0.015, 0.193, 0.338 | INTERACTION | COMPOSITION-OR-LOCATION |  |
+| N4 | 0.0782 [0.0661, 0.0911] | 0.0334 [0.0229, 0.0477] | 0.111, 0.059, 0.084, 0.022, 0.249, 0.440 | (suppressed) INTERACTION | (suppressed) COMPOSITION-OR-LOCATION | co-reported id: shares descriptive, flags not issued (v3.3 §5.4: flags for the seated ids) |
+| N1 | 0.0871 [0.0697, 0.1092] | 0.0743 [0.0555, 0.0990] | 0.099, 0.060, 0.034, 0.039, 0.228, 0.463 | (suppressed) INTERACTION | (suppressed) COMPOSITION-OR-LOCATION | flags suppressed: holdout pass = False, chatter readable = True (B_j = 114.9, grading range = 1275, need >= 2.0 B_j) (prompt 54 §3.5: R4 / N1 need the [43, 48] pass AND readable chatter); co-reported id: shares descriptive, flags not issued (v3.3 §5.4: flags for the seated ids) |
 
 ARD lengthscales (u units, DESCRIPTIVE only — they scale with 1 / gen_pmax): V1 ['1.85', '1.91', '1.85', '1.95', '1.48', '1.20']; E1 ['1.61', '1.85', '1.75', '1.90', '1.29', '0.96']; N4 ['1.77', '1.93', '1.75', '1.94', '1.30', '1.13']; N1 ['1.62', '1.65', '1.60', '1.46', '1.02', '1.06']
 
-The direct 8-run check is prompt 61 (`location_contrast_E`, landed 4b7bf85); its standardized residuals under the committed config are the descriptive row below.
+The direct 8-run check is prompt 61 (`location_contrast_E`, landed 4b7bf85). Its standardized residuals under the committed config are the descriptive row below.
 
+
+The L flag is COMPOSITION-OR-LOCATION (54 v3.2 header): the total-only null has no host-availability term, so a high L can come from the site mix (composition) as well as from location. Truth curves: `figs/fig_null_truth_curves.png` (config-independent: no GP enters it).
 
 ### Direction and scale (descriptive)
 
-| objective | Spearman(y, total MW T) on 48 rows | grading range | B_j (contract addendum bar) | range / B_j | committed arm | refit on 48 |
-|---|---|---|---|---|---|---|
-| V1 | -0.993 | 2.335e+06 | 1.617e+04 | 144.4 | rbf+std | False |
-| E1 | +0.808 | 5.1e+07 | 2.383e+06 | 21.4 | m52+std | False |
-| N4 | -0.953 | 1159 | 36.97 | 31.4 | m52+std | False |
-| N1 | -0.936 | 1275 | 114.9 | 11.1 | m52+std | False |
+| objective | Spearman(y, total MW T) on 48 rows | grading range | B_pert (v1 perturbation bar) | range / B_pert | B_j (rule v2, `pool_ed1b_v2.csv`) | range / B_j | committed arm | refit on 48 |
+|---|---|---|---|---|---|---|---|---|
+| V1 | -0.993 | 2.335e+06 | 1.617e+04 | 144.4 | 1.874e+04 | 124.6 | rbf+std | False |
+| E1 | +0.808 | 5.1e+07 | 2.383e+06 | 21.4 | 1.862e+06 | 27.4 | m52+std | False |
+| N4 | -0.953 | 1159 | 36.97 | 31.4 | 45.13 | 25.7 | m52+std | False |
+| N1 | -0.936 | 1275 | 114.9 | 11.1 | 216.6 | 5.9 | m52+std | False |
+
+N1 has the smallest range in bar units (5.9 B_j). N1 is a PROXY under rule v2 and is co-reported only.
 
 ### Prompt-61 residual row (descriptive; no bar, no pass/fail, no exposure, no input to any decision)
 
-Standardized residuals z = (y − μ) / sd (predictive sd incl. noise) of the 9 `location_contrast_E` designs under the committed config fitted on the 48 grading rows.
+Standardized residuals z = (y − μ) / sd (predictive sd with noise) of the 9 `location_contrast_E` designs under the committed house-fit config, fitted on the 48 grading rows. V1 has |z| > 1.96 on 3 of 9 designs: P2_500_270 +3.54, P2_500_110_140 +2.65, P3_1500_all +2.05; 7 of 9 V1 z are positive (mean +1.17).
 
-| objective | P1_60 | P1_120 | P1_180 | P2_800_b120 | P2_800_b275 | P2_800_all | P2_500_270 | P2_500_110_140 | P3_1500_all | mean abs z | n abs z > 1.96 |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| V1 | +1.95 | -1.29 | +0.25 | +1.05 | +1.95 | -1.58 | +3.54 | +2.65 | +2.05 | 1.81 | 3 |
-| E1 | -0.65 | +1.21 | +1.17 | -1.40 | -1.30 | +1.48 | -2.52 | -2.21 | -1.36 | 1.48 | 2 |
-| N4 | -1.00 | -1.05 | -0.83 | +1.37 | +1.76 | -0.41 | +0.34 | +1.10 | +0.46 | 0.92 | 0 |
-| N1 | -0.75 | -0.50 | +0.38 | +0.87 | +0.08 | +0.66 | +0.69 | +1.34 | +0.98 | 0.69 | 0 |
+| objective | P1_60 | P1_120 | P1_180 | P2_800_b120 | P2_800_b275 | P2_800_all | P2_500_270 | P2_500_110_140 | P3_1500_all | mean z | mean abs z | n abs z > 1.96 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | +1.95 | -1.29 | +0.25 | +1.05 | +1.95 | -1.58 | +3.54 | +2.65 | +2.05 | +1.17 | 1.81 | 3 |
+| E1 | -0.65 | +1.21 | +1.17 | -1.40 | -1.30 | +1.48 | -2.52 | -2.21 | -1.36 | -0.62 | 1.48 | 2 |
+| N4 | -1.00 | -1.05 | -0.83 | +1.37 | +1.76 | -0.41 | +0.34 | +1.10 | +0.46 | +0.20 | 0.92 | 0 |
+| N1 | -0.75 | -0.50 | +0.38 | +0.87 | +0.08 | +0.66 | +0.69 | +1.34 | +0.98 | +0.42 | 0.69 | 0 |
 
-## 7. Committed configs (`committed_configs.json`, contract §6.2 + v3.3 keys)
+## 7. Committed configs, house round (`committed_configs_housefit.json` after the v2 round; contract §6.2 + v3.3 keys)
 
 | objective | seated | arm | cfg | floor | measured floor used | LOO NLPD at n* | holdout cov95 by tier | exposure rows |
 |---|---|---|---|---|---|---|---|---|
@@ -520,38 +553,39 @@ Standardized residuals z = (y − μ) / sd (predictive sd incl. noise) of the 9 
 | N4 | False | m52+std | m52/std/inferred/none | 0 | False | 5.165 | 32: 48/48, 48: 48/48 | [5, 6] |
 | N1 | False | m52+std | m52/std/inferred/none | 0 | False | 5.742 | 32: 44/48, 48: 41/48 | [7, 8] |
 
-Exposure ledger `exposure_ledger.csv`: 8 of 24 scorings; retired.
+Floor: `floor` 0 in the json means the inferred-noise arm; the ledger shows the same arm's floor as 1e-09 (the house jitter bound in raw units). They are the same setting.
 
-## 8. Drafted pi-agenda row E-D7 (Kay decides; 55 Part B waits on it)
+Exposure ledger `exposure_ledger.csv`: 8 of 24 scorings in total; retired.
 
-```
-| 2026-11-24 | E-D7 | **ERCOT navigation tier (prompt 54 Part B v3.3)** | Recommendation **n0 = 48** (n*, training-size study, seated V1 · E1; rule: n* = the smallest n in {12, 16, ..., 44} at which, for every SEATED objective and the arm selected at that n: (1) LOO cov95 lies in binom.interval(0.90, n, 0.95); (2) LOO RMSE_n / LOO RMSE_48 <= 1.1; (3) the ARD lengthscales (u units) changed by < 10 % (max over the 6 sites, relative to the previous grid n's selected arm); if no n < 48 meets all three, n* = 48.) Holdout [43, 48]: V1 n=32: 48/48 PASS, n=48: 45/48 PASS; E1 n=32: 48/48 PASS, n=48: 48/48 PASS; N4 n=32: 48/48 PASS, n=48: 48/48 PASS; N1 n=32: 44/48 PASS, n=48: 41/48 FAIL. Committed configs: V1 rbf+std; E1 m52+std; N4 m52+std; N1 m52+std. Exposure 8 / 24; holdout RETIRED. Kay decides; 55 Part B waits on `committed_configs.json["E-D7_decided"]`. | analysis/ercot_gp/ERCOT_GP_STATUS.md |
-```
-
-## 9. What changed vs plan (draft §10 amendment text — NOT appended to the plan; the strategy session places it)
+## 8. E-D7 decision rows (Kay decides; 55 Part B waits on `E-D7_decided`)
 
 ```
-## AMENDMENT 2026-11-24b — prompt 54 Part B v3.3: training-size study and a holdout at a third tier n* (appendable, §10; DRAFT — the strategy session places it)
-
-**What changed.** (1) The LOO sufficiency curve at 16 / 24 / 32 / 40 / 48 (prompt 54 v3.1 §2.2) is replaced by a training-size study at nested Sobol prefixes n ∈ {12, 16, 20, 24, 28, 32, 36, 40, 44, 48}, with the full plan-§5 arm set and selection rule at every n (LOO only). (2) The navigation-tier recommendation E-D7 is n*, the smallest n at which every seated objective has LOO cov95 inside binom.interval(0.90, n, 0.95), LOO RMSE_n / RMSE_48 ≤ 1.1 and ARD lengthscales stable to < 10 % between consecutive n (else 48); it replaces the Part A criterion (which also required the holdout pass at 32). (3) n* = 48 is a plan tier, so **no third-tier holdout was scored**; the admission of a third tier was not used. Scorings 8 of 24 (4 objectives × 2 tiers; co-reported N4 / N1 graded like the seated V1 / E1). (4) The measured-floor arm is live with σ_c from prompt 63 (`ercot_noise_seed.json`, df 16) instead of the prompt-52 exact sd (identically 0). (5) n* was fixed before random_E was loaded; the holdout was never consulted for selection or for n*. committed_configs.json was written after the last scoring and retires the holdout.
-
-**What had been seen.** The n0_E objective values (E-D1b, rule v2, prompt 65) and the noise_seed_E chatter; no GP had been fitted on n0_E and random_E had not been read by any model before this run.
+| 2026-11-24 | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Options: **(a) n0 = 48 — recommended**; (b) n0 = 32; (c) n0 = 44, only if the RMSE-ratio bar is relaxed to ≈ 1.12. Numbers (house fit): LOO RMSE_n / RMSE_48 at n = 32: V1 1.871 / E1 1.463; n = 40: V1 1.271 / E1 1.259; n = 44: V1 1.120 / E1 1.116 (bar 1.1). Holdout [43, 48] (n = 32 / 48): V1 48 / 45 PASS, E1 48 / 48 PASS. **Cost: no new simulations** (the 48 n0_E runs are landed; option (b) or (c) only uses fewer of them as the starting set). **What changes it:** a bar change on the RMSE ratio (1.12 → 44); a fit-definition change that moves the ratios; a decision to start the BO earlier and accept a less accurate start. Note: n0 = 48 means no tier below 48 meets the rule; whether 48 itself suffices is untested (LOO RMSE still falls by ≈ 1.3× from n = 40 to 48). | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2 |
+| 2026-11-24 | E-D7 (fit item) | **GP fit definition for 55 (separate from the tier)** | Fit definition v2 (plan AMENDMENT 2026-11-24b: float64 MAP, L-BFGS-B, 16 restarts) is adopted by the amendment; its results replace the house fit where the v2 config passes the holdout. 55 fits its acquisition GP with the same definition as the committed (graded) one. Kay notes it; no decision needed unless a v2 config failed. | analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |
 ```
+
+## 9. What changed vs plan
+
+The strategy session appended plan AMENDMENT 2026-11-24b. It records: the training-size study at n ∈ {12, …, 48}; the n\* rule (replaces the Part A criterion); no third-tier holdout (n\* = 48 is a plan tier; 8 house-round scorings); the measured-floor arm live with σ_c (prompt 63, df 16); fit definition v2; one holdout re-open round (2 scorings, V1 and E1 at n = 48).
 
 ## 10. Deviations and limits
 
-- Hyperparameters are the house fit (bogp `train_gp`: Adam, 700 epochs, lr 0.01, from gpytorch's default init), i.e. the MLE as the house computes it; it is not a converged multi-start optimum. The lengthscale-stability condition therefore also measures optimizer path-dependence.
-- Lengthscale stability compares the SELECTED arm at consecutive n; an arm switch between n − 4 and n counts as a change.
-- The holdout at each tier scores the arm selected at that n (the Part A semantics); committed_configs.json carries the arm selected at n* and lists every tier.
-- Co-reported N4 / N1: fitted, graded and exposed like the seated ids (4 objectives × tiers); never binding for n*; mechanism flags issued for the seated ids only (their shares are printed).
-- The mechanism null is built on V1 (wave D) and its scale-free thresholds are applied to every objective (pinned 11-17).
-- log1p arms: none or some may be absent by the plan inclusion rule (see §1).
+- House fit: bogp `train_gp` (Adam, 700 steps, lr 0.01, from gpytorch's default init). It stops before convergence (§0, §3). The lengthscale-stability condition therefore also measures the optimizer's path.
+- Lengthscale stability compares the SELECTED arm at consecutive n. An arm switch between n − 4 and n counts as a change.
+- The holdout at each tier scores the arm selected at that n (the Part A semantics).
+- Co-reported N4 / N1: fitted, graded and exposed like the seated ids in the house round; never binding for n\*; no mechanism flags (shares are printed). In the v2 round they are LOO-only.
+- The mechanism null is built on V1 (wave D). Its scale-free thresholds apply to every objective (pinned 11-17).
+- log1p arms: excluded for all four ids by the inclusion rule (§1).
 
-## 11. Figures
+## 12. Rule-v2 disclosure (AMENDMENT 2026-11-24, with the erratum of aa98045; the fit inputs are unchanged by it)
+
+> This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test. [ERRATUM 2026-11-24, strategy session, after the read: this verbatim disclosure predates the real walk; the walk itself gives v2 = V1 · E1 (M = 2) — N4 is suppressed by a failed composition-resolvability test (residual Mantel p 0.025 > 0.01), not by a borderline pair; the vectors reported are v1 V1 · E1 · N1, v2 V1 · E1, and the pre-read prediction V1 · E1 · N4 as a conditional reading.]
+
+## 14. Figures
 
 - `figs/fig_training_size_curves.png`
 - `figs/fig_lengthscales_vs_n.png`
 - `figs/fig_parity_holdout.png`
 - `figs/fig_house_vs_longfit.png`
-- `figs/fig_null_truths_committed.png`
+- `figs/fig_null_truth_curves.png`
 

@@ -18,7 +18,7 @@ Pinned here BEFORE any n0_E Y is read by this module (prompt 54 v3.3 §5):
   ercot_noise_seed.json (prompt 63, df 16), included iff sigma_c > 0 AND df >= 3.
   log1p arms iff the plan-§5 rule holds on the grading tier (48 rows).
 - Training-size study: nested Sobol prefixes N_GRID (sobol_index < n). At each n:
-  every arm fitted (house fit: FlexGP / bogp.train_gp, Adam 700 epochs, lr 0.01 —
+  every arm fitted (house fit: FlexGP / bogp.train_gp, Adam 700 steps, lr 0.01 —
   the MLE as the house computes it), closed-form LOO NLPD / RMSE / cov95, bar
   binom.interval(0.90, n, 0.95), selection by `ercot_gp_status.select` (> 2 paired
   se, tie order), hyperparameters of every arm (ARD lengthscales in u units,
@@ -72,6 +72,8 @@ NOISE_JSON = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise.json")
 LC_CSV = os.path.join(ERCOT, "analysis", "location_contrast", "location_contrast_E.csv")
 LC_DM = os.path.join(ERCOT, "waves", "location_contrast_E", "design_matrix.csv")
 CO_REPORTED_DEFAULT = ("N4", "N1")
+V2_TAG = "|fit-v2"                 # ledger arm suffix of the AMENDMENT 2026-11-24b re-open round
+COMMITTED_HOUSE = "committed_configs_housefit.json"
 FLOOR_RULE = ("measured iff sigma_c > 0 AND df >= 3 (sigma_c = prompt-63 chatter sd, "
               "analysis/noise_v3/ercot_noise_seed.json, df 16); else inferred-only 1e-9")
 N_STAR_RULE = (
@@ -128,8 +130,12 @@ def _arm_row(obj, role, n, a, gp, lo_, sel_r, sigma_c, sites):
          "outputscale_sd_t": h["outputscale_sd_t"], "noise_sd_raw": h["noise_sd_raw"],
          "noise_at_floor": h["noise_at_floor"], "sigma_c": sigma_c,
          "noise_over_sigma_c": h["noise_sd_raw"] / sigma_c if sigma_c > 0 else np.nan}
-    for s, v in zip(sites, h["ls_u"]):
+    sx = np.asarray(gp.sx, float)
+    for s, v, x in zip(sites, h["ls_u"], sx):
+        ls_std = v / x
         r[f"ls_u_{s}"] = v
+        r[f"ls_std_{s}"] = ls_std                                   # = ls_u / sx (the kernel's own units)
+        r[f"ls_raw_{s}"] = float(np.log(np.expm1(ls_std)))          # softplus^-1: the parameter Adam moves
     if sel_r is not None:
         r.update({"diff_vs_default": sel_r["diff_vs_default"], "paired_se": sel_r["paired_se"],
                   "beats_default": sel_r["beats_default"], "selected": sel_r["selected"]})
@@ -165,8 +171,8 @@ LONG_EPOCHS = 10000
 
 
 class long_fit:
-    """Context manager: the house fit with more Adam epochs (EXPLORATORY ONLY; plan §5 freezes
-    the campaign fit definition = bogp.train_gp defaults, 700 epochs)."""
+    """Context manager: the house fit with more Adam steps (EXPLORATORY ONLY; the house fit =
+    bogp.train_gp defaults, 700 steps)."""
 
     def __init__(self, epochs=LONG_EPOCHS):
         self.epochs = epochs
@@ -183,7 +189,7 @@ class long_fit:
 
 
 def study_long(U, y, sob, arms, sigma_c, obj, role, sites, grid=N_GRID, epochs=LONG_EPOCHS):
-    """EXPLORATORY: the plan-§5 arms and selection rule re-run with `epochs` Adam epochs.
+    """EXPLORATORY: the plan-§5 arms and selection rule re-run with `epochs` Adam steps.
     Reported, never committed, never holdout-scored."""
     with long_fit(epochs):
         rows, _, winners = study(U, y, sob, arms, sigma_c, obj, role, sites, grid, explore=False)
@@ -300,7 +306,8 @@ def holdout(winners, tiers, Uh, Yh, out_dir, sigmas, allow_new=True):
         res[obj] = {}
         for n in tiers:
             w = winners[obj][n]
-            rec = led[(led["objective"].astype(str) == obj) & (led["n0"].astype(int) == int(n))]
+            rec = led[(led["objective"].astype(str) == obj) & (led["n0"].astype(int) == int(n))
+                      & ~led["arm"].astype(str).str.contains(V2_TAG, regex=False)]
             if len(rec):
                 assert len(rec) == 1
                 row = rec.iloc[0].to_dict()
@@ -497,14 +504,12 @@ def fig_lengthscales(df, objs, roles, sites, ns, out_path, grid=N_GRID):
             v = sel[f"ls_u_{s}"].to_numpy(float)
             assert np.isfinite(v).all() and (v > 0).all(), (obj, s)
             ax.plot(sel["n"], v, "o-", lw=2, label=f"site {s}")
-        ax.set_yscale("log")
         ax.axvline(ns, color="C3", ls="--", lw=1.5)
         ax.set_xlabel("n (nested Sobol prefix)")
         ax.set_ylabel("ARD lengthscale (u units)")
         ax.set_title(f"{obj} ({'seated' if roles[obj] == 'seated' else 'co-reported'}), selected arm")
         _bold(ax)
-        if j == 0:
-            ax.legend(fontsize=9)
+        ax.legend(fontsize=9, ncol=2)
     fig.tight_layout()
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
@@ -512,11 +517,11 @@ def fig_lengthscales(df, objs, roles, sites, ns, out_path, grid=N_GRID):
 
 
 def fig_house_vs_long(df, ldf, objs, roles, sites, ns, out_path, grid=N_GRID, epochs=LONG_EPOCHS):
-    """EXPLORATORY: selected arm under the house fit (700 epochs) vs the long fit."""
+    """EXPLORATORY: selected arm under the house fit (700 steps) vs the long fit."""
     plt = _plt()
     fig, axes = plt.subplots(3, len(objs), figsize=(5.4 * len(objs), 12.6), squeeze=False)
     for j, obj in enumerate(objs):
-        for lab, d, sty in (("house fit (700 ep)", df, "s-"), (f"long fit ({epochs} ep)", ldf, "o--")):
+        for lab, d, sty in (("house fit (700 steps)", df, "s-"), (f"long fit ({epochs} steps)", ldf, "o--")):
             sel = d[(d["objective"] == obj) & d["selected"]].sort_values("n")
             nlpd = sel["loo_nlpd"].to_numpy(float)
             rm = sel["loo_rmse"].to_numpy(float)
@@ -537,18 +542,105 @@ def fig_house_vs_long(df, ldf, objs, roles, sites, ns, out_path, grid=N_GRID, ep
             _bold(axes[i, j])
         if j == 0:
             axes[0, j].legend(fontsize=10)
-    fig.suptitle("EXPLORATORY: house fit vs longer Adam fit (never committed)", fontweight="bold")
+    fig.suptitle("EXPLORATORY: house fit vs a longer Adam fit (never committed, never holdout-scored)", fontweight="bold")
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
     return out_path
 
 
-def fig_parity(winners, hres, Uh, Yh, tiers, out_path):
-    entries = {obj: ({n: {"gp": winners[obj][n]["gp"], "arm": winners[obj][n]["arm"], "holdout": hres[obj][n]}
-                      for n in tiers},) for obj in winners}
-    p = S.fig_parity(entries, np.asarray(Uh, float), Yh, os.path.dirname(out_path), tiers=tuple(tiers))
-    os.replace(p, out_path)
+UNITS = {"V1": ("GWh", 1e-3), "E1": ("$M", 1e-6), "N4": ("h", 1.0), "N1": ("line-h", 1.0)}
+
+
+def fig_parity(winners, hres, Uh, Yh, tiers, out_path, label=""):
+    """True parity plot per objective x tier: observed (x) vs predictive median (y), 1:1 line,
+    95 % TOTAL band (noise incl.; wide light bar) and 95 % LATENT band (narrow dark bar)."""
+    plt = _plt()
+    from matplotlib.ticker import ScalarFormatter
+    objs = list(winners)
+    fig, axes = plt.subplots(len(tiers), len(objs), figsize=(5.0 * len(objs), 4.9 * len(tiers)), squeeze=False)
+    Uh = np.asarray(Uh, float)
+    for i, n in enumerate(tiers):
+        for j, obj in enumerate(objs):
+            w, h = winners[obj][n], hres[obj][n]
+            gp, arm = w["gp"], w["arm"]
+            unit, k = UNITS.get(obj, ("", 1.0))
+            y = Yh[obj].to_numpy(float)
+            mu, sd = h["mu_t"], h["sd_t"]
+            lat = S.latent_sd_t(gp, Uh)
+            med = S.common.median_raw(mu, arm.transform)
+            f = (np.expm1 if arm.transform == "log1p" else (lambda v: v))
+            lo_t, hi_t = f(mu - 1.96 * sd), f(mu + 1.96 * sd)
+            lo_l, hi_l = f(mu - 1.96 * lat), f(mu + 1.96 * lat)
+            for v in (y, med, lo_t, hi_t, lo_l, hi_l):
+                assert np.isfinite(v).all(), (obj, n)
+            ax = axes[i, j]
+            ax.vlines(y * k, lo_t * k, hi_t * k, color="C0", alpha=0.25, lw=6, label="95 % total band (noise incl.)")
+            ax.vlines(y * k, lo_l * k, hi_l * k, color="C1", alpha=0.95, lw=1.6, label="95 % latent band")
+            inside = (lo_t <= y) & (y <= hi_t)
+            ax.plot(y[inside] * k, med[inside] * k, "o", color="k", ms=4, label="inside total band")
+            ax.plot(y[~inside] * k, med[~inside] * k, "o", color="C3", ms=6, label="outside total band")
+            lim = np.array([min(y.min(), lo_t.min()), max(y.max(), hi_t.max())]) * k
+            ax.plot(lim, lim, color="0.3", ls="--", lw=1.4, label="1:1")
+            m = h["metrics"]
+            ax.set_title(f"{obj} n={n} {arm.name}{label}\ncov95 {m['cov95']}/48 {'PASS' if h['pass'] else 'FAIL'} "
+                         f"[{S.HOLDOUT_BAR[0]}, {S.HOLDOUT_BAR[1]}]; rms z {m['rms_z']:.2f}", fontsize=11)
+            ax.set_xlabel(f"observed {obj} ({unit})")
+            ax.set_ylabel(f"predicted {obj} ({unit})")
+            for axis in (ax.xaxis, ax.yaxis):
+                fm = ScalarFormatter(useOffset=False)
+                fm.set_scientific(False)
+                axis.set_major_formatter(fm)
+            from matplotlib.ticker import MaxNLocator
+            ax.xaxis.set_major_locator(MaxNLocator(5))
+            _bold(ax)
+            if i == 0 and j == 0:
+                ax.legend(fontsize=8, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=110)
+    plt.close(fig)
+    return out_path
+
+
+def fig_null_curves(null, sites, gen_pmax, out_path):
+    """The two null TRUTHS (config-independent: wave-D knots + base_v3 only; no GP)."""
+    from analysis.ercot_gp import ercot_gp_mechanism as M
+    plt = _plt()
+    curves, base = null["curves"], null["base_v3"]
+    f_add = M.additive_truth(curves, base, sites, gen_pmax)
+    g_tot, _ = M.total_only_truth(curves, base, sites)
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6.0))
+    ax = axes[0]
+    for j, s in enumerate(sites):
+        mw = np.linspace(0, gen_pmax[j], 200)
+        X = np.zeros((200, len(sites)))
+        X[:, j] = mw
+        yv = f_add(X)
+        assert np.isfinite(yv).all()
+        ax.plot(mw, yv / 1e6, lw=2, label=f"site {s} (bus {M.SITE_BUS.get(s, '?')})")
+        ax.plot(curves[s]["mw"], np.asarray(curves[s]["y"]) / 1e6, "o", color=ax.lines[-1].get_color())
+    ax.set_xlabel("PEM MW at one site (others 0)")
+    ax.set_ylabel(f"{null['objective']} (TWh)")
+    ax.set_title("Additive null\nper-site PCHIP through wave D (0 MW = base_v3)", fontsize=13)
+    ax.legend(fontsize=10)
+    ax = axes[1]
+    T = np.linspace(0, gen_pmax.sum(), 300)
+    yv = g_tot(np.column_stack([T] + [np.zeros_like(T)] * (len(sites) - 1)))
+    assert np.isfinite(yv).all()
+    ax.plot(T, yv / 1e6, lw=2.5, color="k", label="base − a (1 − exp(−T / b))")
+    pts_T = [0.0] + [m for s in sites for m in curves[s]["mw"][1:]]
+    pts_y = [base] + [v for s in sites for v in curves[s]["y"][1:]]
+    ax.plot(pts_T, np.asarray(pts_y) / 1e6, "o", color="C3", label="wave D + base_v3 (19 points)")
+    ax.set_xlabel("total PEM MW  T")
+    ax.set_ylabel(f"{null['objective']} (TWh)")
+    ax.set_title("Total-only concave null\nfitted to the same 19 points", fontsize=13)
+    ax.legend(fontsize=10)
+    for a in axes:
+        _bold(a)
+    fig.suptitle("Null truths (config-independent: no GP enters this figure)", fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(out_path, dpi=120)
+    plt.close(fig)
     return out_path
 
 
@@ -609,6 +701,8 @@ def mechanism(winners, ns, U48, Y48, sob, sigmas, noise, hres, roles, sites, gen
     flags = M.mechanism_flags(shares, null, holdout_pass=hp, bars=bars, y_ranges=yr)
     for obj in flags:
         flags[obj]["role"] = roles[obj]
+        if flags[obj]["flag_location"] == "LOCATION":                 # 54 v3.2 header: the L flag is
+            flags[obj]["flag_location"] = "COMPOSITION-OR-LOCATION"   # composition-or-location
         if roles[obj] != "seated":
             flags[obj]["suppressed"] = ((flags[obj]["suppressed"] + "; ") if flags[obj]["suppressed"] else "") + \
                 "co-reported id: shares descriptive, flags not issued (v3.3 §5.4: flags for the seated ids)"
@@ -623,7 +717,7 @@ def mechanism(winners, ns, U48, Y48, sob, sigmas, noise, hres, roles, sites, gen
     if lc is not None:
         Ulc, Ylc, labels = lc
         lc_df = lc_residuals(gps, arms, sigmas, Ulc, Ylc, labels)
-    figp = M.fig_null_truths(null, sites, gen_pmax, os.path.join(figs_dir, "fig_null_truths_committed.png"))
+    figp = fig_null_curves(null, sites, gen_pmax, os.path.join(figs_dir, "fig_null_truth_curves.png"))
     doc = {"n_star": ns, "committed_arms": {o: a.name for o, a in arms.items()}, "refit_on_48": refit,
            "null": {k: v for k, v in null.items() if k != "curves"}, "flags": flags, "bars": bars,
            "y_ranges": yr, "holdout_pass_at_n_star": hp, "direction": direction,
@@ -669,7 +763,12 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
     df = pd.DataFrame(rows)
     xdf = pd.DataFrame(xrows)
     ldf, lchecks, ln = None, None, None
-    if long_diag:
+    long_csv = os.path.join(out_dir, "ercot_gp_exploratory_longfit.csv")
+    if long_diag and replay_only and os.path.isfile(long_csv):
+        ldf = pd.read_csv(long_csv)                      # cached exploratory diagnostic (reproducible; 22 min)
+        lchecks = n_star_checks(ldf, sites, grid)
+        log("[long-fit diag] loaded from cache")
+    elif long_diag:
         lrows = []
         for obj in objs:
             lr, _ = study_long(Uv, Y[obj].to_numpy(float), sob, arms_by[obj], sig[obj], obj, roles[obj], sites, grid,
@@ -698,7 +797,8 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
     if not committed_exists:
         write_committed(out_dir, doc)                                          # LAST holdout-side write
     else:
-        with open(os.path.join(out_dir, S.COMMITTED)) as f:
+        hp_ = os.path.join(out_dir, COMMITTED_HOUSE)
+        with open(hp_ if os.path.isfile(hp_) else os.path.join(out_dir, S.COMMITTED)) as f:
             old = json.load(f)
         for obj in objs:
             assert old["objectives"][obj]["arm"] == doc["objectives"][obj]["arm"], f"replay arm differs: {obj}"
@@ -747,7 +847,8 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
             "tiers": tiers, "holdout": hres, "hold_df": hdf, "committed": doc, "cross": cross, "figs": figs,
             "mech": mres, "winners": winners, "sigmas": sig, "dfs": dfs, "uses": uses, "arms": arms_by,
             "roles": roles, "objs": objs, "ledger": S.read_ledger(out_dir), "wall_s": time.time() - t0,
-            "out_dir": out_dir, "sites": sites, "grid": grid}
+            "out_dir": out_dir, "sites": sites, "grid": grid, "Y48": Y, "U48": Uv, "sob": sob,
+            "y_range": {o: float(Y[o].max() - Y[o].min()) for o in objs}}
 
 
 # --------------------------------------------------------------------------
