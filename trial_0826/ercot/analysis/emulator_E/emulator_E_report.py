@@ -43,9 +43,11 @@ def _load(p):
         return json.load(f)
 
 
-def _runs():
-    single = [_load(p) for p in sorted(glob.glob(os.path.join(em.RUNS, "single", "EMU_single_*.json")))]
-    multi = [_load(p) for p in sorted(glob.glob(os.path.join(em.RUNS, "multi", "EMU_multi_*.json")))]
+def _runs(variants=("house", "long")):
+    single = [d for d in (_load(p) for p in sorted(glob.glob(os.path.join(em.RUNS, "single", "EMU_single_*.json"))))
+              if d["variant"] in variants]
+    multi = [d for d in (_load(p) for p in sorted(glob.glob(os.path.join(em.RUNS, "multi", "EMU_multi_*.json"))))
+             if d["variant"] in variants]
     return single, multi
 
 
@@ -528,7 +530,10 @@ def write_md():
     A("**EMULATOR. This is a machinery check, not a result.** No PCM ran. No CRC job ran. Nothing here enters a "
       "ledger, the plan, a decision row or the paper's claims. \"Truth\" means the emulator's truth (the posterior "
       "mean of the committed GPs), not the ERCOT system.\n")
-    A("## Answer in two minutes\n")
+    import emulator_E_committed as EC
+    if os.path.isfile(EC.SUMMARY):
+        L += EC.md_lines()
+    A("## B.0 Answer in two minutes (house block)\n")
     A("1. **Did the BO machinery run end to end on ERCOT?** Yes, after one change to 55. As built, the multi-seed init "
       "crashed at seed 1. qNEHVI puts 4–5 of the 8 r1 designs on the same box vertices in every seed lane, and 55 asserted "
       "disjoint r1 sets. I relaxed the assert to the prompt-55 text (\"sets differ\"). After that change, 12/12 "

@@ -66,6 +66,13 @@ LANDING_R = os.path.join(ERCOT, "waves", "n0_E", "landing_R.json")
 SIGMA_C_CSV = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise_seed_sigma_c.csv")
 ARMS_E = os.path.join(METHODS, "arms_E.json")
 PARAMS = os.path.join(HERE, "emulator_E_params.json")
+CONFIGS_HOUSE = os.path.join(ERCOT, "analysis", "ercot_gp", "committed_configs_housefit.json")
+TRUTH_PARAMS = {"house": PARAMS, "committed": os.path.join(HERE, "emulator_E_params_committed.json"),
+                "v2both": os.path.join(HERE, "emulator_E_params_v2both.json")}
+# variant = (emulator truth, BO-side GP fit). house/long = the first (house-fit) block, kept as run.
+VARIANTS = {"house": {"truth": "house", "bo": "house"}, "long": {"truth": "house", "bo": "long"},
+            "committed": {"truth": "committed", "bo": "committed"},
+            "mmA": {"truth": "house", "bo": "committed"}, "mmB": {"truth": "v2both", "bo": "committed"}}
 RUNS = os.path.join(HERE, "runs_compact")          # committed (the report reads only these)
 RUNS_BIG = os.path.join(HERE, "runs")             # gitignored (trial_0826/ercot/**/runs/): logs + subset-HV npz
 FIGS = os.path.join(HERE, "figs")
@@ -86,7 +93,7 @@ N_SUBSETS, N_BOOT, N_BOOT_SUBSETS = 100_000, 1000, 2000
 FAMILY = {"single_V1": 1, "single_E1": 2, "multi": 3, "pool": 4}
 SCEN = {"s0": 0, "s1": 1, "s2": 2}
 INJECT = {"s0": {}, "s1": {3: 2.5}, "s2": {2: 1.5, 6: 40.0}}   # round-1 run index -> injected shed (MWh)
-VARIANT = {"house": 0, "long": 1}
+VARIANT = {"house": 0, "long": 1, "committed": 2, "mmA": 3, "mmB": 4}
 
 
 def now():
@@ -236,10 +243,22 @@ def real_start_set():
     return X.loc[idx], U.loc[idx], Y.loc[idx], meta.loc[idx]
 
 
-def fit_emulator(write=True, log=print):
+def _truth_fit_def(truth, o, cc):
+    if truth == "house" or o not in SEATED:
+        return "house"
+    if truth == "v2both":
+        return "v2"
+    return "v2" if str(cc["objectives"][o].get("fit_definition") or "house").startswith("v2") else "house"
+
+
+def fit_emulator(write=True, log=print, truth="house"):
+    """truth = house (first block: house fit for every objective, configs = committed_configs_housefit.json) |
+    committed (each objective with its committed fit_definition: V1 house fallback, E1 v2) | v2both (V1 AND E1 with
+    fit v2 at the committed arm; V1-v2 is EXPLORATORY — it was not committed). N4 (logged only) is house always."""
     from analysis.ercot_gp import ercot_gp_status as S
-    from analysis.ercot_gp.ercot_gp_partb import hyper
-    cc = json.load(open(CONFIGS))
+    from analysis.ercot_gp.ercot_gp_partb import hyper, FitV2
+    cc = json.load(open(CONFIGS_HOUSE if truth == "house" else CONFIGS))
+    ccv = json.load(open(CONFIGS))
     X, U, Y, meta = real_start_set()
     Un = U.to_numpy(float)
     sites = [c.replace("mw_", "").replace("u_", "") for c in U.columns]
@@ -259,7 +278,16 @@ def fit_emulator(write=True, log=print):
         arm = S.Arm(c["arm"], tuple(c["cfg"]), "inferred")
         assert float(c["floor"]) == 0.0 and not c["measured_floor_used"]
         y = Y[o].to_numpy(float)
-        gp = S.fit(Un, y, arm, 0.0)
+        fdef = _truth_fit_def(truth, o, ccv)
+        if fdef == "v2":
+            sig = float(ccv["objectives"][o]["sigma_c"])
+            gp = FitV2(Un, y, 1e-9, tuple(c["cfg"]), sigma_c=sig, measured=False)
+            fit_meta = {"fit_definition": "v2", "sigma_c": sig, "converged": bool(gp.converged),
+                        "mode_gap_nats": float(gp.mode_gap_nats), "gap_second_nats": float(gp.gap_second_nats),
+                        "n_within_tol": int(gp.n_within_tol)}
+        else:
+            gp = S.fit(Un, y, arm, 0.0)
+            fit_meta = {"fit_definition": "house"}
         h = hyper(gp)
         cov = gp.model.covar_module
         p = GPMean.build(Un, y, cov.base_kernel.lengthscale.detach().double().numpy().reshape(-1),
@@ -268,7 +296,12 @@ def fit_emulator(write=True, log=print):
         f = GPMean(p)
         mu_flex, _ = gp.predict_t(Uchk)
         dev = np.abs(f(Uchk) - mu_flex)
-        com = c["hyperparameters"]
+        if fdef == "v2" and truth == "v2both" and not str(ccv["objectives"][o].get("fit_definition", "")).startswith("v2"):
+            com = ccv["objectives"][o]["v2_result"]["hyperparameters"]       # V1 v2: 54's v2 result (not committed)
+        elif truth == "house":
+            com = c["hyperparameters"]
+        else:
+            com = ccv["objectives"][o]["hyperparameters"]
         ls_c = np.asarray([com["lengthscales_u"][s] for s in sites], float)
         hyp = {"ls_u": dict(zip(sites, h["ls_u"])), "outputscale_sd_t": h["outputscale_sd_t"],
                "noise_sd_raw": h["noise_sd_raw"], "mean_const_std": h["mean_const_std"],
@@ -278,16 +311,17 @@ def fit_emulator(write=True, log=print):
                "noise_rel_diff": float(abs(h["noise_sd_raw"] / com["noise_sd_raw"] - 1))}
         ustar, fstar, fsob = minimize_fn(f.torch, 6, seed=0)
         umax, fmax_neg, _ = minimize_fn(lambda u: -f.torch(u), 6, seed=1)
-        p.update({"objective": o, "role": c["role"], "arm": c["arm"], "hyperparameters": hyp,
+        p.update({"objective": o, "role": c["role"], "arm": c["arm"], "hyperparameters": hyp, "fit": fit_meta,
+                  "truth": truth, "exploratory": bool(truth == "v2both" and o == "V1"),
                   "committed_hyperparameters": com, "reproduces_committed": rep,
-                  "closed_form_vs_flexgp_mean": {"n_check": 1024, "max_abs": float(dev.max()),
+                  "closed_form_vs_fit_mean": {"n_check": 1024, "max_abs": float(dev.max()),
                                                  "max_abs_over_B": float(dev.max() / B[o]) if o in B else None,
                                                  "max_abs_over_sy": float(dev.max() / gp.sy)},
                   "f_star": fstar, "u_star": ustar.tolist(), "f_star_sobol_2^14": fsob, "f_max": -fmax_neg,
                   "u_max": umax.tolist(), "y_train_min": float(y.min()), "y_train_max": float(y.max()),
                   "f_train_resid_rms": float(np.sqrt(np.mean((f(Un) - y) ** 2)))})
         out["objectives"][o] = p
-        log(f"[emulator] {o} {c['arm']}: ls_u {np.round(h['ls_u'], 4).tolist()} os_sd {h['outputscale_sd_t']:.6g} "
+        log(f"[emulator {truth}] {o} {c['arm']} {fdef}: ls_u {np.round(h['ls_u'], 4).tolist()} os_sd {h['outputscale_sd_t']:.6g} "
             f"noise_sd {h['noise_sd_raw']:.6g}; reproduces committed {rep}; closed form vs FlexGP max |d| "
             f"{dev.max():.4g}; f* {fstar:.8g} at {np.round(ustar, 4).tolist()} (Sobol min {fsob:.8g})")
     S2 = sigma_c(SEATED)
@@ -309,20 +343,30 @@ def fit_emulator(write=True, log=print):
     land = json.load(open(LANDING_R))
     out["R"] = {o: float(land["R"][o]) for o in SEATED}
     out["B"] = B
+    out["truth"] = truth
+    out["configs_file"] = os.path.relpath(CONFIGS_HOUSE if truth == "house" else CONFIGS, ERCOT)
     if write:
-        with open(PARAMS, "w") as fh:
+        with open(TRUTH_PARAMS[truth], "w") as fh:
             json.dump(out, fh, indent=1, default=float)
             fh.write("\n")
     return out
 
 
 _EMU = None
+_TRUTH = "house"
+
+
+def set_truth(truth):
+    global _EMU, _TRUTH
+    if truth != _TRUTH:
+        _EMU = None
+    _TRUTH = truth
 
 
 def load_emulator():
     global _EMU
     if _EMU is None:
-        P = json.load(open(PARAMS))
+        P = json.load(open(TRUTH_PARAMS[_TRUTH]))
         _EMU = {"P": P, "f": {o: GPMean(P["objectives"][o]) for o in SEATED + CO_REPORTED},
                 "S2": np.asarray(P["sigma_c"]["matrix"], float), "mon": P["monitor_chatter"],
                 "R": np.asarray([P["R"][o] for o in SEATED], float)}
@@ -384,11 +428,23 @@ def set_fit_epochs(epochs):
     return qnehvi_E
 
 
+def bo_setup(variant):
+    """Select the emulator truth and the BO-side GP fit for a variant. Returns {objective: fitter} (None = house)."""
+    v = VARIANTS[variant]
+    set_truth(v["truth"])
+    set_fit_epochs(LONG_EPOCHS if v["bo"] == "long" else 700)
+    if v["bo"] == "committed":
+        fl = ce.gp_fitters(json.load(open(CONFIGS)), SEATED)
+        return dict(zip(SEATED, fl))
+    return {o: None for o in SEATED}
+
+
 def _gp_summary(obj_gp, sx):
     cov = obj_gp.model.covar_module
     ls = cov.base_kernel.lengthscale.detach().double().numpy().reshape(-1) * np.asarray(sx, float)
     return {"ls_u": ls.tolist(), "outputscale_sd_t": float(np.sqrt(float(cov.outputscale.detach())) * obj_gp.sy),
-            "noise_sd_raw": obj_gp.noise_raw(), "loo_rms_z": obj_gp.loo_rms_z()}
+            "noise_sd_raw": obj_gp.noise_raw(), "loo_rms_z": obj_gp.loo_rms_z(),
+            "fit_info": getattr(obj_gp, "fit_info", {"fit_definition": "house"})}
 
 
 def _pm_optimum(fit, d, seed, settings):
@@ -407,7 +463,7 @@ def _pm_optimum(fit, d, seed, settings):
 
 
 def so_bo(U0, y0, f0, observe, f_true, f_star, cfg, floor, seed_base, method="bo", settings=None, B_unit=1.0,
-          log=print):
+          log=print, fitter=None):
     """Single-objective BO (qLogNEI) or random baseline. Minimization.
     U0 (n0, d), y0 (n0,) observed, f0 (n0,) true values at U0; observe(U) -> (y, f) for new rows;
     f_true(U) -> (n,) truth. seed for round k = seed_base + k. Returns the per-round records."""
@@ -438,7 +494,7 @@ def so_bo(U0, y0, f0, observe, f_true, f_star, cfg, floor, seed_base, method="bo
     if method == "bo":
         t0 = time.time()
         torch.manual_seed(seed_base)
-        fit = qnehvi_E.fit_models(U, y[:, None], [cfg], [floor])
+        fit = qnehvi_E.fit_models(U, y[:, None], [cfg], [floor], fitters=[fitter])
         fit_s = time.time() - t0
     recs.append(snapshot(0, fit, {"wall_s": 0.0, "fit_s": fit_s if method == "bo" else 0.0}))
     for k in range(1, st["rounds"] + 1):
@@ -479,7 +535,7 @@ def so_bo(U0, y0, f0, observe, f_true, f_star, cfg, floor, seed_base, method="bo
         t1 = time.time()
         if method == "bo":
             torch.manual_seed(s)
-            fit = qnehvi_E.fit_models(U, y[:, None], [cfg], [floor])      # refit: hyperparameters re-estimated
+            fit = qnehvi_E.fit_models(U, y[:, None], [cfg], [floor], fitters=[fitter])   # refit each round
         extra["fit_s"] = time.time() - t1
         extra["wall_s"] = time.time() - t0
         recs.append(snapshot(k, fit, extra))
@@ -490,6 +546,7 @@ def so_bo(U0, y0, f0, observe, f_true, f_star, cfg, floor, seed_base, method="bo
 
 
 def run_single(obj, seed_id, method, variant, log=print):
+    fitters = bo_setup(variant)
     emu = load_emulator()
     P = emu["P"]
     j = SEATED.index(obj)
@@ -500,7 +557,6 @@ def run_single(obj, seed_id, method, variant, log=print):
     c = P["objectives"][obj]
     cfg = tuple(c["cfg"])
     floor = 1e-9                                                           # committed floor 0 -> inferred-only 1e-9
-    set_fit_epochs(LONG_EPOCHS if variant == "long" else 700)
     obs = Observer((FAMILY[f"single_{obj}"], seed_id, 0, 0))              # same stream for BO and random (CRN)
 
     def observe(U):
@@ -511,9 +567,11 @@ def run_single(obj, seed_id, method, variant, log=print):
     t0 = time.time()
     log(f"[single EMULATOR] {obj} seed_id {seed_id} {method} variant {variant}")
     recs = so_bo(U0, Y0[:, j], F0[:, j], observe, lambda U: fj(U), float(c["f_star"]), cfg, floor,
-                 SINGLE_SEED_BASE + 100 * seed_id, method=method, B_unit=B[obj], log=log)
+                 SINGLE_SEED_BASE + 100 * seed_id, method=method, B_unit=B[obj], log=log, fitter=fitters[obj])
     out = {"label": "EMULATOR", "kind": "single", "objective": obj, "seed_id": seed_id, "method": method,
-           "variant": variant, "fit_epochs": LONG_EPOCHS if variant == "long" else 700, "cfg": list(cfg),
+           "variant": variant, "truth": VARIANTS[variant]["truth"], "bo_fit": VARIANTS[variant]["bo"],
+           "bo_fitter": fitters[obj] or {"def": "house"},
+           "fit_epochs": LONG_EPOCHS if variant == "long" else 700, "cfg": list(cfg),
            "floor": floor, "f_star": c["f_star"], "B": B[obj], "settings": SO,
            "acq": "qLogNoisyExpectedImprovement (botorch), SobolQMCNormalSampler(128, seed s), prune_baseline, cache_root"
                   if method == "bo" else "uniform random u ~ default_rng(s), 8 per round",
@@ -590,6 +648,8 @@ def emu_cfg(variant, scenario):
     for k in ("design_space", "committed_configs", "landing_R", "noise_json", "noise_exact_cov", "noise_perturbed_cov"):
         cfg[k] = os.path.join(ERCOT, cfg[k])                          # absolute: the emulator root is analysis/emulator_E
     assert os.path.abspath(cfg["design_space"]) == os.path.abspath(DS_PATH), "arms_E.json must name the dated design space"
+    if VARIANTS[variant]["bo"] in ("house", "long"):
+        cfg["committed_configs"] = CONFIGS_HOUSE                       # the house block: house-fit configs (no fit_definition)
     assert cfg["objectives"] == SEATED
     cfg["part"] = "EMULATOR"
     cfg["n0_tier_provisional"] = N_STAR
@@ -648,8 +708,8 @@ def write_emulated_wave(lane, k, obs: Observer, scenario):
 
 def run_multi(scenario, seed_id, variant, fresh=True, log=print):
     import acquire_E as ae
+    bo_setup(variant)
     emu = load_emulator()
-    set_fit_epochs(LONG_EPOCHS if variant == "long" else 700)
     ensure_emu_root()
     cfg = emu_cfg(variant, scenario)
     loader = EmuLoader()
@@ -715,7 +775,8 @@ def run_multi(scenario, seed_id, variant, fresh=True, log=print):
                   "n1_off_max": float(tab["N1_off"].max()),
                   "n1_off_flag_a": bool((tab["N1_off"] - N1OFF_BASE).max() >= N1OFF_FLAG_A),
                   "N4_mean": float(tab["N4"].mean()), "halt": bool(halted), "decision": e["decision"],
-                  "loo_rms_z": rec.get("loo_rms_z"), "noise_raw": rec.get("noise_raw")})
+                  "loo_rms_z": rec.get("loo_rms_z"), "noise_raw": rec.get("noise_raw"),
+                  "fit_info": rec.get("fit_info"), "bound_snaps": (rec.get("settings") or {}).get("bound_snaps")})
         rounds.append(r)
         log(f"  r{k}: hv {e['hv']:.6g} (true {hv_true:.6g}) gain/tau_res {r['gain_over_tau_res']} C1 ok C2 {e['C2_review']} "
             f"C3 {e['C3_review']} viol {e['violations']} mode->{led['guardrail_mode']} constraint {r['constraint_used']} "
@@ -732,6 +793,8 @@ def run_multi(scenario, seed_id, variant, fresh=True, log=print):
     recs = ae.load_records(lane.dir)
     led = ae.load_ledger(lane.dir)
     out = {"label": "EMULATOR", "kind": "multi", "scenario": scenario, "seed_id": seed_id, "variant": variant,
+           "truth": VARIANTS[variant]["truth"], "bo_fit": VARIANTS[variant]["bo"],
+           "gp_fitters": dict(zip(SEATED, lane.gp_fitters)),
            "fit_epochs": LONG_EPOCHS if variant == "long" else 700, "lane_dir": os.path.relpath(lane.dir, HERE),
            "init_s": init_s, "tau_exact": led["tau"], "tau_res": tres, "R": R.tolist(), "hv0": led["entries"][0]["hv"],
            "hv0_true_f": hv2d(F0, R), "n0_tier": led["n0_tier"], "n0_source": led["n0_source"], "loader": led["loader"],
@@ -814,6 +877,11 @@ def pareto_mask(Y):
     return keep
 
 
+def front_path(truth=None):
+    truth = truth or _TRUTH
+    return os.path.join(RUNS, "EMU_front.json" if truth == "house" else f"EMU_front_{truth}.json")
+
+
 def emulator_front(log=print):
     from scipy.stats import qmc
     emu = load_emulator()
@@ -851,7 +919,8 @@ def emulator_front(log=print):
                 "f_star": {o: emu["P"]["objectives"][o]["f_star"] for o in SEATED}})
     log(f"[front] HV(front, R) = {out['hv_front']:.6g}; {out['n_front']} non-dominated of 2^14; "
         f"polished {out['hv_front_polished']:.6g} ({out['hv_front'] / out['hv_front_polished']:.4f} of polished)")
-    with open(os.path.join(RUNS, "EMU_front.json"), "w") as fh:
+    out["truth"] = _TRUTH
+    with open(front_path(), "w") as fh:
         json.dump(out, fh, indent=1, default=float)
     return out
 
@@ -892,14 +961,15 @@ def r0_plugin(variant="house", log=print):
     """GPs fitted on the start set only (the 55 model, committed cfg): per-objective posterior-mean optimum regret
     and the plug-in (posterior-mean) Pareto front."""
     from scipy.stats import qmc
-    qn = set_fit_epochs(LONG_EPOCHS if variant == "long" else 700)
+    fitters = bo_setup(variant)
+    import qnehvi_E as qn
     emu = load_emulator()
     P = emu["P"]
     U0 = np.asarray(P["start_set"]["U"], float)
     Y0 = np.asarray(P["start_set"]["y_obs"], float)
     cfgs = [tuple(P["objectives"][o]["cfg"]) for o in SEATED]
     torch.manual_seed(20261006)
-    fit = qn.fit_models(U0, Y0, cfgs, [1e-9, 1e-9])
+    fit = qn.fit_models(U0, Y0, cfgs, [1e-9, 1e-9], fitters=[fitters[o] for o in SEATED])
     out = {"variant": variant, "objectives": {}}
     fns = []
     for j, o in enumerate(SEATED):
@@ -977,24 +1047,28 @@ def baselines(plug, log=print):
     return out, designs
 
 
-def best_known_front(extra_U, log=print):
+def best_known_front(extra_U, log=print, variants=("house", "long")):
     """Non-dominated set (true f) of Sobol 2^14 + vertices + scalarizations (EMU_front.json polished front) +
     EVERY design evaluated by any lane, single run or baseline."""
     emu = load_emulator()
     R = emu["R"]
-    fr = json.load(open(os.path.join(RUNS, "EMU_front.json")))
+    fr = json.load(open(front_path()))
     parts = [np.asarray(fr["front_polished"], float)]
-    srcs = {"polished_front": len(parts[0])}
-    for d in glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*", "design_matrix.csv")):
+    srcs = {"polished_front": len(parts[0]), "variants": list(variants)}
+    wl = [w for v in variants for w in glob.glob(os.path.join(HERE, "waves", f"methods_E_EMU_{v}_*", "design_matrix.csv"))]
+    for d in wl:
         dm = pd.read_csv(d, float_precision="round_trip")
         parts.append(true_f(dm[[c for c in dm.columns if c.startswith("u_")]].to_numpy(float)))
-    srcs["lane_waves"] = len(glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*")))
+    srcs["lane_waves"] = len(wl)
     for p in glob.glob(os.path.join(RUNS, "single", "*.json")):
         d = json.load(open(p))
+        if d["variant"] not in variants:
+            continue
         U = [u for r in d["records"][1:] for u in r["u_new"]]
         parts.append(true_f(np.asarray(U, float)))
-    pool = json.load(open(os.path.join(RUNS, "EMU_random_pool.json")))
-    parts.append(np.asarray(pool["f"], float))
+    if _TRUTH == "house":
+        pool = json.load(open(os.path.join(RUNS, "EMU_random_pool.json")))
+        parts.append(np.asarray(pool["f"], float))
     parts.append(np.asarray(emu["P"]["start_set"]["f"], float))
     for k, U in extra_U.items():
         parts.append(true_f(U))
@@ -1013,7 +1087,7 @@ def best_known_front(extra_U, log=print):
                     "by any lane, single run, random pool or matched-budget baseline; a LOWER bound on the true front"}
 
 
-def calib_split(log=print):
+def calib_split(log=print, variants=("house", "long")):
     """Per batch: fraction of designs outside the start-set hull (u); cov95 / rms z inside vs outside."""
     emu = load_emulator()
     U0 = np.asarray(emu["P"]["start_set"]["U"], float)
@@ -1027,6 +1101,8 @@ def calib_split(log=print):
 
     for p in sorted(glob.glob(os.path.join(RUNS, "single", "*_bo_*.json"))):
         d = json.load(open(p))
+        if d["variant"] not in variants:
+            continue
         for r in d["records"][1:]:
             U = np.asarray(r["u_new"], float)
             z = (np.asarray(r["y_new"]) - np.asarray(r["pred_mean"])) / np.asarray(r["pred_sd"])
@@ -1041,6 +1117,8 @@ def calib_split(log=print):
     for w in sorted(glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*"))):
         name = os.path.basename(w)
         _, _, _, var, sc, sd, rk = name.split("_")
+        if var not in variants:
+            continue
         dm = pd.read_csv(os.path.join(w, "design_matrix.csv"), float_precision="round_trip").sort_values("index")
         ob = pd.read_csv(os.path.join(w, "objectives_EMULATOR.csv")).sort_values("index")
         pr = pd.read_csv(os.path.join(w, "predictions.csv")).sort_values("index")
@@ -1100,6 +1178,31 @@ def seed_overlap(variant="house", scenario="s0", seeds=(0, 1, 2, 3, 4), log=prin
     return out
 
 
+def extras_variant(variant, log=print):
+    """Review analyses for a non-house variant (committed block and the mismatch checks)."""
+    truth = VARIANTS[variant]["truth"]
+    plug = r0_plugin(variant, log)
+    set_truth(truth)
+    same = [v for v in VARIANTS if VARIANTS[v]["truth"] == truth]
+    base, bdes = (baselines(plug, log) if variant == "committed" else ({}, {}))
+    bk = best_known_front(bdes, log, variants=same)
+    cs = calib_split(log, variants=(variant,))
+    cs.to_csv(os.path.join(HERE, f"emulator_E_calib_hull_{variant}.csv"), index=False, float_format="%.6g")
+    ov = seed_overlap(variant=variant, log=log) if variant == "committed" else None
+    hb = bk["hv_best_known"]
+    bsum = {name: {"n_rep": int(len(H)), "p5": np.percentile(np.asarray(H) / hb, 5, axis=0).tolist(),
+                   "p50": np.percentile(np.asarray(H) / hb, 50, axis=0).tolist(),
+                   "p95": np.percentile(np.asarray(H) / hb, 95, axis=0).tolist(), "max": (np.asarray(H) / hb).max(0).tolist()}
+            for name, H in base.items()}
+    out = {"label": "EMULATOR", "variant": variant, "truth": truth, "r0_plugin": {variant: plug}, "best_known": bk,
+           "baselines": bsum, "seed_overlap": ov,
+           "baseline_rule": (f"as the house block: matched budget, {N_REP} replicates, default_rng({BASE_SEED})"
+                             if bsum else "none (mismatch check)")}
+    with open(os.path.join(RUNS, f"EMU_extras_{variant}.json"), "w") as fh:
+        json.dump(out, fh, indent=1, default=float)
+    return out
+
+
 def extras(log=print):
     plug_h = r0_plugin("house", log)
     plug_l = r0_plugin("long", log)
@@ -1135,7 +1238,8 @@ def extras(log=print):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("fit-emulator")
+    fe = sub.add_parser("fit-emulator")
+    fe.add_argument("--truth", choices=list(TRUTH_PARAMS), default="house")
     s = sub.add_parser("single")
     s.add_argument("--obj", choices=SEATED, required=True)
     s.add_argument("--seed", type=int, required=True)
@@ -1146,13 +1250,15 @@ def main(argv=None):
     m.add_argument("--seeds", default="0")
     m.add_argument("--variant", choices=list(VARIANT), default="house")
     sub.add_parser("random-pool")
-    sub.add_parser("front")
-    sub.add_parser("extras")
+    fp = sub.add_parser("front")
+    fp.add_argument("--truth", choices=list(TRUTH_PARAMS), default="house")
+    ex = sub.add_parser("extras")
+    ex.add_argument("--variant", choices=list(VARIANTS), default="house")
     a = ap.parse_args(argv)
     os.makedirs(RUNS, exist_ok=True)
     os.makedirs(RUNS_BIG, exist_ok=True)
     if a.cmd == "fit-emulator":
-        fit_emulator()
+        fit_emulator(truth=a.truth)
     elif a.cmd == "single":
         run_single(a.obj, a.seed, a.method, a.variant)
     elif a.cmd == "multi":
@@ -1161,9 +1267,10 @@ def main(argv=None):
     elif a.cmd == "random-pool":
         random_pool()
     elif a.cmd == "front":
+        set_truth(a.truth)
         emulator_front()
     elif a.cmd == "extras":
-        extras()
+        extras() if a.variant == "house" else extras_variant(a.variant)
     return 0
 
 
