@@ -1,0 +1,28 @@
+# methods_E_EMU_committed_s0_s4_r3 — methods_E acquisition round (prompt 55; NOT submitted by the writer)
+
+Arm `qnehvi`, seed_id 4, round 3,
+acq qnehvi seed 20261409; bo-gp 60e6328236e745b3d34dc8cd704bb72888ae5d15; botorch
+0.16.1; guardrail_mode monitor. Created 2026-11-24T08:36:44+00:00.
+
+Rows are `oat_site = __ALL__` multi-site designs (contract 5): `mw_<site>` /
+`u_<site>` at full precision, `pem_mw = sum mw`, `tier = bo`. The retrofit dict
+`retrofit_gen_dict_<i>.json` lists every site with mw > 0 (a site at exactly 0
+is ABSENT). Bid 40.0 $/MWh, full year from 01-01-2019.
+
+| row | MW 110 | MW 140 | MW 146 | MW 163 | MW 270 | MW 274 | sum MW | u 110 | u 140 | u 146 | u 163 | u 270 | u 274 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 338.600 | 0.000 | 0.000 | 0.000 | 0.000 | 746.400 | 1085.000 | 1.00000 | 0.00000 | 0.00000 | 0.00000 | 0.00000 | 1.00000 |
+| 2 | 338.600 | 0.000 | 0.000 | 92.899 | 0.000 | 746.400 | 1177.899 | 1.00000 | 0.00000 | 0.00000 | 0.50108 | 0.00000 | 1.00000 |
+| 3 | 0.000 | 0.000 | 0.000 | 106.898 | 0.000 | 746.400 | 853.298 | 0.00000 | 0.00000 | 0.00000 | 0.57658 | 0.00000 | 1.00000 |
+| 4 | 0.000 | 105.264 | 0.000 | 185.400 | 579.000 | 746.400 | 1616.064 | 0.00000 | 0.42005 | 0.00000 | 1.00000 | 1.00000 | 1.00000 |
+| 5 | 64.986 | 250.600 | 189.404 | 185.400 | 579.000 | 746.400 | 2015.790 | 0.19192 | 1.00000 | 0.70673 | 1.00000 | 1.00000 | 1.00000 |
+| 6 | 0.000 | 250.600 | 0.000 | 185.400 | 0.000 | 746.400 | 1182.400 | 0.00000 | 1.00000 | 0.00000 | 1.00000 | 0.00000 | 1.00000 |
+| 7 | 0.000 | 159.223 | 0.000 | 185.400 | 579.000 | 746.400 | 1670.023 | 0.00000 | 0.63537 | 0.00000 | 1.00000 | 1.00000 | 1.00000 |
+| 8 | 183.122 | 250.600 | 201.274 | 177.908 | 579.000 | 746.400 | 2138.303 | 0.54082 | 1.00000 | 0.75102 | 0.95959 | 1.00000 | 1.00000 |
+
+Submission: Kay runs `bash analysis/methods_E/submit_ready_E.sh` on the CRC
+login node (generic `methods_E_array.sh` + `methods_E_collect.sh`, `-v WAVE=methods_E_EMU_committed_s0_s4_r3`,
+`-wd trial_0826/ercot/waves`, identity from `waves/GAP_DECISION.json` at run
+time, every row `--full`, slim tables + `pool_full_metrics.json` + `COLLECTED`
+committed, `*.csv.gz` left in storage). `predictions.csv` holds the pre-round
+GP mean / total sd per objective (calibration gates C2 / C3 at grading).

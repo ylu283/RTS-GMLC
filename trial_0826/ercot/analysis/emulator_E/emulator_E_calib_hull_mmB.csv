@@ -1,0 +1,17 @@
+kind,variant,scenario,objective,seed_id,round,n_outside_hull,frac_outside_hull,n_exact_vertex,cov95_inside,n_inside,rms_z_inside,cov95_outside,rms_z_outside,cov95,C2
+single,mmB,,E1,0,1,8,1,7,,0,,8,0.174996,8,False
+single,mmB,,E1,0,2,8,1,8,,0,,3,3.38883,3,True
+single,mmB,,E1,0,3,8,1,8,,0,,8,0.860734,8,False
+single,mmB,,E1,0,4,8,1,8,,0,,7,0.948441,7,False
+single,mmB,,V1,0,1,8,1,0,,0,,8,1.12419,8,False
+single,mmB,,V1,0,2,8,1,1,,0,,8,0.254892,8,False
+single,mmB,,V1,0,3,8,1,0,,0,,8,0.253329,8,False
+single,mmB,,V1,0,4,8,1,1,,0,,8,0.187498,8,False
+multi,mmB,s0,V1,0,1,8,1,5,,0,,8,0.862652,8,False
+multi,mmB,s0,E1,0,1,8,1,5,,0,,8,0.149868,8,False
+multi,mmB,s0,V1,0,2,8,1,1,,0,,8,0.360527,8,False
+multi,mmB,s0,E1,0,2,8,1,1,,0,,8,0.399726,8,False
+multi,mmB,s0,V1,0,3,8,1,2,,0,,8,0.437825,8,False
+multi,mmB,s0,E1,0,3,8,1,2,,0,,6,1.17619,6,False
+multi,mmB,s0,V1,0,4,8,1,2,,0,,8,0.846172,8,False
+multi,mmB,s0,E1,0,4,8,1,2,,0,,8,0.816737,8,False

@@ -1,0 +1,227 @@
+{
+ "label": "EMULATOR",
+ "pass_fail": [
+  {
+   "n": 1,
+   "check": "No crash; each lane ends where its scenario says",
+   "result": "single 12/12, multi 15/15, ends as expected = True",
+   "pass": true
+  },
+  {
+   "n": 2,
+   "check": "C1 ingest on every emulated round",
+   "result": "45/45",
+   "pass": true
+  },
+  {
+   "n": 3,
+   "check": "C2/C3 per objective (power statement, not a pass/fail on its own)",
+   "result": "V1: C2 0, C3 0 in 57 cells (expected C2 0.021); rms z median 0.17; E1: C2 1, C3 1 in 57 cells (expected C2 0.021); rms z median 0.73",
+   "pass": null
+  },
+  {
+   "n": 4,
+   "check": "Single-objective within 2 B_j by r4 on >= 2 of 3 seeds",
+   "result": "V1 3/3; E1 3/3",
+   "pass": true
+  },
+  {
+   "n": 5,
+   "check": "Single-objective BO beats random-8 at r4 on every objective",
+   "result": "V1 BO 0.176 B vs random 18.69 B; E1 BO 0.000 B vs random 18.98 B",
+   "pass": true
+  },
+  {
+   "n": 6,
+   "check": "Branches: s0 monitor to the cap; s1 constrained from r2, n_hv 55/63/71/79; s2 HALT + refusal (5 lanes each)",
+   "result": "s0 True, s1 True, s2 True",
+   "pass": true
+  },
+  {
+   "n": 7,
+   "check": "tau_exact = 0 -> cap-only; R2 / N1_off no flags",
+   "result": "cap-only True; monitors quiet True",
+   "pass": true
+  },
+  {
+   "n": 8,
+   "check": "Fit v2 (E1) converged at every round fit (>= 2 restarts within 1e-3 n nats)",
+   "result": "multi 45/45, single 15/15",
+   "pass": true
+  },
+  {
+   "n": 9,
+   "check": "HV fraction of the best-known front (true f; upper bounds)",
+   "result": "s0 r4 0.971\u20130.980",
+   "pass": null
+  }
+ ],
+ "per_objective_gates": {
+  "V1": {
+   "cells": 57,
+   "C2": 0,
+   "C3": 0,
+   "expected_C2": 0.02109,
+   "limit_C2": 0,
+   "rms_z_median": 0.169,
+   "rms_z_range": [
+    0.07,
+    0.409
+   ],
+   "cov95_batches": [
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ]
+  },
+  "E1": {
+   "cells": 57,
+   "C2": 1,
+   "C3": 1,
+   "expected_C2": 0.02109,
+   "limit_C2": 0,
+   "rms_z_median": 0.732,
+   "rms_z_range": [
+    0.075,
+    3.389
+   ],
+   "cov95_batches": [
+    8,
+    3,
+    8,
+    7,
+    8,
+    6,
+    7,
+    7,
+    8,
+    5,
+    8,
+    8,
+    8,
+    8,
+    8,
+    7,
+    8,
+    8,
+    5,
+    7,
+    8,
+    8,
+    7,
+    7,
+    8,
+    6,
+    8,
+    8,
+    8,
+    8,
+    7,
+    7,
+    8,
+    8,
+    6,
+    6,
+    8,
+    8,
+    7,
+    7,
+    8,
+    7,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+   ]
+  }
+ },
+ "within_2B": {
+  "V1": 3,
+  "E1": 3
+ },
+ "beats_random": {
+  "V1": {
+   "bo_mean": 0.17552066468376018,
+   "random_mean": 18.686849134143205,
+   "per_seed": {
+    "0": true,
+    "1": true,
+    "2": true
+   }
+  },
+  "E1": {
+   "bo_mean": 5.1217739871442e-13,
+   "random_mean": 18.977106244589667,
+   "per_seed": {
+    "0": true,
+    "1": true,
+    "2": true
+   }
+  }
+ }
+}

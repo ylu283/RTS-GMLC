@@ -1,0 +1,774 @@
+{
+ "label": "EMULATOR",
+ "kind": "multi",
+ "scenario": "s1",
+ "seed_id": 0,
+ "variant": "committed",
+ "truth": "committed",
+ "bo_fit": "committed",
+ "gp_fitters": {
+  "V1": {
+   "def": "house",
+   "source": "house (fallback)"
+  },
+  "E1": {
+   "def": "v2",
+   "sigma_c": 312422.73941039236,
+   "source": "v2 (AMENDMENT 2026-11-24b)"
+  }
+ },
+ "fit_epochs": 700,
+ "lane_dir": "lanes/committed/s1/s0",
+ "init_s": 0.7699790000915527,
+ "tau_exact": {
+  "tau_joint": 0.0,
+  "tau_marginal": 0.0,
+  "sensitivity_joint_over_marginal": null,
+  "budget_cap_only": true,
+  "form": "homoscedastic (Sigma_exact for every start)",
+  "sigma_source": "../noise_v3/ercot_noise_exact_cov.csv"
+ },
+ "tau_res": {
+  "tau_res": 442607360128.6895,
+  "tau_exact": 0.0,
+  "label": "REPORT-ONLY resolution ruler tau_res: the plan-6.2 recipe (tau_joint code path) with the chatter covariance Sigma_c in place of Sigma_exact; printed beside tau_exact, never replaces it",
+  "report_only": true,
+  "n_draws": 1000,
+  "seed": 20261006,
+  "hv_mean": 100558189160811.12,
+  "sd_marginal": [
+   3275.213783177645,
+   398135.0884646604
+  ]
+ },
+ "R": [
+  3977491.3852933007,
+  8163727647.918913
+ ],
+ "hv0": 100523275400219.73,
+ "hv0_true_f": 100887976056642.84,
+ "n0_tier": 48,
+ "n0_source": "PROVISIONAL arms_E n0_tier_provisional = 48 (E-D7_decided null)",
+ "loader": "real(n0_E: analysis.ercot_gp.ercot_gp_loader.load; Y replaced by the EMULATED start values)+EMULATOR wave tables",
+ "configs_source": "real",
+ "acq_seeds": {
+  "1": 20261007,
+  "2": 20261008,
+  "3": 20261009,
+  "4": 20261010
+ },
+ "settings": {
+  "1": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261007,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 1,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "2": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261008,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "3": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261009,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "4": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261010,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  }
+ },
+ "designs_u": {
+  "1": [
+   [
+    0.0516839132578189,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.5968857121121612,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.9393341270739941
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.23457942881681398,
+    1.0,
+    0.7972279019333053,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "2": [
+   [
+    0.026530454051217067,
+    1.0,
+    0.40075927903497377,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.014613589791873272,
+    1.0,
+    0.7925263725519907,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.2885379811456593,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.8372664239567352
+   ],
+   [
+    0.0,
+    0.2534642575760557,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.46345949838728645,
+    1.0,
+    0.7560368414619851,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.2195949338700369,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.3930236083334466,
+    1.0,
+    0.0
+   ]
+  ],
+  "3": [
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.10892132426436696,
+    1.0,
+    0.8248013018100843,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.7079457848365497
+   ],
+   [
+    0.6568558104794718,
+    1.0,
+    0.7050300427507062,
+    0.9969511332808157,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.2558084871012904,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0,
+    0.2638213827666245,
+    1.0,
+    1.0,
+    1.0
+   ]
+  ],
+  "4": [
+   [
+    0.3175225662869757,
+    1.0,
+    0.8335898982822132,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.6899919075523635,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.10647682607792985,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.4895528531613833,
+    1.0,
+    0.8413718487969031,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.07025046734148688,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.3306517644860697
+   ],
+   [
+    0.16029726395810162,
+    1.0,
+    0.8396101061702375,
+    1.0,
+    1.0,
+    1.0
+   ]
+  ]
+ },
+ "guardrail_mode": "constrain",
+ "guardrail_flipped_at_round": 1,
+ "halt": null,
+ "halt_file": false,
+ "first_fire_round": {
+  "tau_joint": null,
+  "tau_marginal": null
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "propose_warnings": {
+    "ResourceWarning": 101,
+    "FutureWarning": 96,
+    "UserWarning": 1,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.679072856903076,
+   "qnehvi_s": 8.3,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 1,
+    "r2_max": 188.24249648827964
+   },
+   "grade_s": 0.7671899795532227,
+   "wall_s": 10.460157871246338,
+   "hv": 138846721737957.97,
+   "gain": 38323446337738.234,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 86.58565082739602,
+   "hv_true_f": 138176315001620.25,
+   "n": 56,
+   "n_hv": 55,
+   "violations": [
+    "methods_E_EMU_committed_s1_s0_r1:3"
+   ],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 188.24249648827964,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": -0.03,
+     "rms_z": 0.168,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": -0.007,
+     "rms_z": 0.253,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "none",
+   "n1_off_max": 30797.62250941674,
+   "n1_off_flag_a": false,
+   "N4_mean": 4522.475876337102,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.4268,
+    "E1": 0.8267
+   },
+   "noise_raw": {
+    "V1": 14949.051609849952,
+    "E1": 174965.13916944584
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": 53.68406410300448,
+     "gap_second_nats": 2.884701544303425e-07,
+     "n_within_tol": 13,
+     "n_failed": 0,
+     "map_total": -19.200766147217088,
+     "noise_sd_raw": 174965.1391694458,
+     "noise_over_sigma_c": 0.5600269029701294
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 1,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 2,
+   "propose_warnings": {
+    "ResourceWarning": 102,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.928179025650024,
+   "qnehvi_s": 9.1,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 175.8235135844525
+   },
+   "grade_s": 0.8178319931030273,
+   "wall_s": 10.757277011871338,
+   "hv": 147166814043295.5,
+   "gain": 8320092305337.531,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 18.79790770519143,
+   "hv_true_f": 146785565423102.0,
+   "n": 64,
+   "n_hv": 63,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 175.8235135844525,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.045,
+     "rms_z": 0.157,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": -0.108,
+     "rms_z": 0.501,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30845.706622808793,
+   "n1_off_flag_a": false,
+   "N4_mean": 4424.50852732041,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3742,
+    "E1": 0.7829
+   },
+   "noise_raw": {
+    "V1": 14969.759000492735,
+    "E1": 169056.59994969668
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": NaN,
+     "gap_second_nats": 5.5657475073189744e-08,
+     "n_within_tol": 16,
+     "n_failed": 0,
+     "map_total": -5.880356892658121,
+     "noise_sd_raw": 169056.5999496966,
+     "noise_over_sigma_c": 0.5411149017793714
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 3,
+   "propose_warnings": {
+    "ResourceWarning": 103,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.524497985839844,
+   "qnehvi_s": 8.7,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 183.88516516894077
+   },
+   "grade_s": 0.7686550617218018,
+   "wall_s": 10.30519700050354,
+   "hv": 148197362740191.34,
+   "gain": 1030548696895.8438,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 2.3283586983194504,
+   "hv_true_f": 147994965252088.25,
+   "n": 72,
+   "n_hv": 71,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 183.88516516894077,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": -0.043,
+     "rms_z": 0.171,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.302,
+     "rms_z": 1.42,
+     "cov95": 6,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30830.39938388275,
+   "n1_off_flag_a": false,
+   "N4_mean": 4341.480874621314,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3363,
+    "E1": 0.8292
+   },
+   "noise_raw": {
+    "V1": 16207.210120149819,
+    "E1": 171926.05593106223
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": NaN,
+     "gap_second_nats": 2.2587257220152424e-07,
+     "n_within_tol": 16,
+     "n_failed": 0,
+     "map_total": 13.90543025493077,
+     "noise_sd_raw": 171926.05593106218,
+     "noise_over_sigma_c": 0.5502994316467582
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 4,
+   "propose_warnings": {
+    "ResourceWarning": 104,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 11.058325052261353,
+   "qnehvi_s": 10.2,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 190.72902240932652
+   },
+   "grade_s": 0.9069788455963135,
+   "wall_s": 11.977771043777466,
+   "hv": 149343143247398.8,
+   "gain": 1145780507207.4688,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 2.5887064030619134,
+   "hv_true_f": 149174217106656.5,
+   "n": 80,
+   "n_hv": 79,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 190.72902240932652,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.016,
+     "rms_z": 0.147,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.587,
+     "rms_z": 1.261,
+     "cov95": 6,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30809.966718329317,
+   "n1_off_flag_a": false,
+   "N4_mean": 4223.449399097961,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3179,
+    "E1": 0.9043
+   },
+   "noise_raw": {
+    "V1": 16166.694738602577,
+    "E1": 261313.67501133788
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": NaN,
+     "gap_second_nats": 7.95657228991331e-09,
+     "n_within_tol": 16,
+     "n_failed": 0,
+     "map_total": 22.146093731630934,
+     "noise_sd_raw": 261313.67501133788,
+     "noise_over_sigma_c": 0.8364105490672412
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  }
+ ],
+ "noise_stream": [
+  6666,
+  3,
+  0,
+  1,
+  2
+ ],
+ "loader_calls": 29,
+ "finished_utc": "2026-11-24T08:34:45+00:00"
+}

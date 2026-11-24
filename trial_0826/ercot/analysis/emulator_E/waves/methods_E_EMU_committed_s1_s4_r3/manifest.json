@@ -1,0 +1,63 @@
+{
+  "wave": "methods_E_EMU_committed_s1_s4_r3",
+  "campaign": "methods_E",
+  "prompt": "55",
+  "q": 8,
+  "tier": "bo",
+  "design_space": "../../waves/design_space_E_2026-11-24.json",
+  "design_space_md5": "d131a769541feff0b240de7da71f5d06",
+  "contract_version": "2026-11-24",
+  "identity": "v3 from waves/GAP_DECISION.json at run time",
+  "sites": [
+    "110",
+    "140",
+    "146",
+    "163",
+    "270",
+    "274"
+  ],
+  "gen_pmax": [
+    338.599998942999,
+    250.5999989428539,
+    267.9999991911224,
+    185.3999876467921,
+    578.9999877407346,
+    746.3999877635443
+  ],
+  "bid": 40.0,
+  "git_head": "36b74b7",
+  "created_at": "2026-11-24T08:37:13+00:00",
+  "methods_arm": "qnehvi",
+  "seed_id": 4,
+  "methods_round": 3,
+  "acq": "qnehvi",
+  "acq_seed": 20261409,
+  "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
+  "botorch": "0.16.1",
+  "guardrail_mode": "constrain",
+  "settings": {
+    "mc_samples": 128,
+    "num_restarts": 20,
+    "raw_samples": 512,
+    "alpha": 0.0,
+    "prune_baseline": true,
+    "sequential": true,
+    "fast_mode": false,
+    "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+    "guardrail_mode": "constrain",
+    "seed": 20261409,
+    "dtype": "float64",
+    "bound_snaps": {
+      "to_0": 0,
+      "to_1": 0,
+      "tol": 1e-12,
+      "note": "bound cleanup after x * sx + mx; not lattice snapping"
+    }
+  },
+  "objectives": [
+    "V1",
+    "E1"
+  ],
+  "n_train": 64,
+  "loader": "real(n0_E: analysis.ercot_gp.ercot_gp_loader.load; Y replaced by the EMULATED start values)+EMULATOR wave tables"
+}

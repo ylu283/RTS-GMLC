@@ -2,7 +2,132 @@
 
 **EMULATOR. This is a machinery check, not a result.** No PCM ran. No CRC job ran. Nothing here enters a ledger, the plan, a decision row or the paper's claims. "Truth" means the emulator's truth (the posterior mean of the committed GPs), not the ERCOT system.
 
-## Answer in two minutes
+# A. Committed-fit rerun (fit=committed; tx123 240bde1)
+
+This block repeats the dry run on the committed fits after 54's fit-v2 round. `committed_configs.json` now names a fit definition per objective: **V1 = house (fallback)** (rbf+std; fit v2 failed its holdout, 37/48) and **E1 = fit v2** (m52+std; holdout 48/48). The emulator truth uses each objective's committed definition. The BO's own GP uses the SAME definition per objective (plan AMENDMENT 2026-11-24b §3, last sentence) through a new 55 hook (§A.6). The house block (section B below) is kept as run.
+
+## A.0 Answer in two minutes
+
+1. **What changed in the truth?** V1 is unchanged (house fallback; same f, f* = 1.047 TWh). E1 is now the fit-v2 posterior mean: longer lengthscales (2.75 / 3.59 / 4.31 / 4.33 / 2.09 / 1.41 vs 0.96–1.90), a smoother surface, and f*(E1) = $8,069.55M at the no-PEM vertex u = 0 (house truth: $8,084.05M near it). f*(E1) is now 20.5 B below the lowest observed E1. Both optima are still box vertices outside the data.
+2. **What changed in the BO GP and its bands?** The E1 GP now infers noise at 0.39–1.27 × σ_c (house: 2.39–3.29 ×). E1 bands are close to calibrated: rms z median 0.73 (house 0.21). V1 keeps the house fit: noise 3.4–4.9 × σ_c, rms z median 0.17. Fit v2 converged at every E1 round fit (60/60); the best two restarts agree to ≤ 2.9e-07 nats; the gap to the next mode is 18.5–150.2 nats (`mode_gap_v2`).
+3. **Do the gates have power now?** **V1: no** — C2 0, C3 0 in 57 cells, rms z 0.17; the house-fit V1 bands are 3.5× too wide to flag anything. **E1: yes** — C2 1, C3 1 in 57 cells (expected under the nominal rate: 0.021). The single firing is single-objective E1 seed 0 round 2 (cov95 3 of 8, every design outside the start hull). E1 cov95 per batch is listed in §A.3. A real E1 REVIEW flag is now possible; a V1 flag is still not.
+4. **Did the search change?** No. Single-objective BO reaches 0.18 B (V1) and 0.000 B (E1) by r4 on 3/3 seeds; the r0 plug-in optimum is already 0.086 / 5.1e-13 B (E1's optimum is the origin, which the start-set GP already points to). Multi s0 reaches 0.971–0.980 of the best-known front (house block 0.975–0.979). BO − r0 plug-in spread = +0.005–+0.014 (house +0.020–+0.024): **this emulator cannot separate the acquisition function from a plug-in exploit of the start-set GP.** The machinery took every expected branch (s0 cap, s1 constrained from r2, s2 HALT), C1 45/45.
+5. **Cost.** Fit v2 on E1 (16 restarts) takes 3.2 s per fit here (house 1.3 s); a multi-objective round takes 8.5 s (house 7.6 s) at 2 threads. On CRC expect tens of seconds; < 1 % of a PCM round.
+
+## A.1 Verdict (committed block)
+
+| # | check | result | verdict |
+|---|---|---|---|
+| 1 | No crash; each lane ends where its scenario says | single 12/12, multi 15/15, ends as expected = True | PASS |
+| 2 | C1 ingest on every emulated round | 45/45 | PASS |
+| 3 | C2/C3 per objective (power statement, not a pass/fail on its own) | V1: C2 0, C3 0 in 57 cells (expected C2 0.021); rms z median 0.17; E1: C2 1, C3 1 in 57 cells (expected C2 0.021); rms z median 0.73 | V1: NO POWER (house fallback); E1: has power |
+| 4 | Single-objective within 2 B_j by r4 on >= 2 of 3 seeds | V1 3/3; E1 3/3 | PASS |
+| 5 | Single-objective BO beats random-8 at r4 on every objective | V1 BO 0.176 B vs random 18.69 B; E1 BO 0.000 B vs random 18.98 B | PASS |
+| 6 | Branches: s0 monitor to the cap; s1 constrained from r2, n_hv 55/63/71/79; s2 HALT + refusal (5 lanes each) | s0 True, s1 True, s2 True | PASS |
+| 7 | tau_exact = 0 -> cap-only; R2 / N1_off no flags | cap-only True; monitors quiet True | PASS |
+| 8 | Fit v2 (E1) converged at every round fit (>= 2 restarts within 1e-3 n nats) | multi 45/45, single 15/15 | PASS |
+| 9 | HV fraction of the best-known front (true f; upper bounds) | s0 r4 0.971–0.980 | reported |
+
+## A.2 House vs committed, per metric
+
+| metric | house block (B) | committed block (A) |
+|---|---|---|
+| E1 truth f* | $8,084.05M near u = 0 | $8,069.55M at u = 0 |
+| E1 truth lengthscales (u) | 1.61 / 1.85 / 1.75 / 1.90 / 1.29 / 0.96 | 2.75 / 3.59 / 4.30 / 4.33 / 2.09 / 1.41 |
+| BO fit V1 / E1 | house / house | house (fallback) / fit v2 |
+| single r4 regret V1, mean (B) | 0.176 | 0.176 |
+| single r4 regret E1, mean (B) | 0.011 | 0.000 |
+| r0 plug-in regret V1 / E1 (B) | 0.086 / 0.006 | 0.086 / 5.1e-13 |
+| random-8 r4 regret V1 / E1, mean (B) | 18.7 / 12.3 | 18.7 / 19.0 |
+| multi s0 r4, true-f HV / best-known | 0.975–0.979 | 0.971–0.980 |
+| random vertices r4 p95 / plug-in spread | 0.910 / 0.955 | 0.918 / 0.966 |
+| BO − plug-in spread, r4 | +0.020–+0.024 | +0.005–+0.014 |
+| E1 inferred noise / σ_c | 2.39–3.29 | 0.39–1.27 |
+| V1 inferred noise / σ_c | 3.3–4.9 | 3.4–4.9 |
+| E1 rms z, median (single + multi) | 0.21 | 0.73 |
+| E1 C2 / C3 (single + multi cells) | 0 / 0 | 1 / 1 |
+| V1 C2 / C3 | 0 / 0 | 0 / 0 |
+| E1 fit v2 converged / mode gap (nats) | - | 60/60 / 18.5–150.2 |
+| r1 unique designs across 5 lanes / duplicate r1 runs | 23/40 / 17 | 24/40 / 16 |
+| min distance proposal → evaluated set (u) | 0.053 | 0.067 |
+| E1 fit time per fit (s) / multi round wall (s) | 1.3 / 7.6 | 3.2 / 8.5 |
+
+## A.3 Calibration per objective (committed)
+
+- E1 cov95 per batch (single seeds 0–2, r1–r4, then multi lanes): 8, 3, 8, 7, 8, 6, 7, 7, 8, 5, 8, 8, 8, 8, 8, 7, 8, 8, 5, 7, 8, 8, 7, 7, 8, 6, 8, 8, 8, 8, 7, 7, 8, 8, 6, 6, 8, 8, 7, 7, 8, 7, 7, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8.
+- V1 cov95 per batch: all [8] (house-fit bands).
+- Every proposed design lies outside the start set's convex hull (all batches; `emulator_E_calib_hull_committed.csv`).
+- E1 per-round fit v2: `mode_gap_v2` = best MAP minus the best restart outside the 1e-3·n-nat tolerance (54's `mode_gap_nats`): 18.5–150.2 nats; best-vs-second restart (`gap_second_v2`) ≤ 2.9e-07 nats.
+
+![single committed](figs/fig_EMU_single_regret_committed.png)
+![multi committed](figs/fig_EMU_multi_hv_committed.png)
+![front committed](figs/fig_EMU_front_committed.png)
+![calibration committed](figs/fig_EMU_calibration_committed.png)
+
+### A.3.1 Lanes (committed)
+
+| scen | seed | graded | true-f HV / best-known, r1–r4 | E1 cov95 r1–r4 | E1 noise/σ_c r1–r4 | E1 mode gap (nats) | wall s |
+|---|---|---|---|---|---|---|---|
+| s0 | 0 | 4 | 0.926/0.959/0.966/0.971 | 8/8/8/7 | 0.56/0.55/0.77/0.87 | 54/—/84/19 | 10.7/8.7/8.3/10.4 |
+| s0 | 1 | 4 | 0.934/0.964/0.973/0.976 | 8/8/5/7 | 0.56/0.54/0.39/0.77 | 54/—/—/— | 9.0/8.1/7.8/9.2 |
+| s0 | 2 | 4 | 0.934/0.964/0.972/0.977 | 8/8/7/7 | 0.56/0.54/0.54/0.87 | 54/—/—/— | 7.9/7.5/7.4/8.7 |
+| s0 | 3 | 4 | 0.934/0.962/0.971/0.977 | 8/6/8/8 | 0.56/0.54/0.96/0.89 | 54/73/—/— | 7.8/7.8/7.6/9.5 |
+| s0 | 4 | 4 | 0.927/0.964/0.972/0.980 | 8/8/7/7 | 0.56/0.54/0.51/0.79 | 54/—/—/— | 8.2/7.9/7.7/9.9 |
+| s1 | 0 | 4 | 0.904/0.960/0.968/0.976 | 8/8/6/6 | 0.56/0.54/0.55/0.84 | 54/—/—/— | 10.5/10.8/10.3/12.0 |
+| s1 | 1 | 4 | 0.887/0.948/0.959/0.965 | 8/8/7/7 | 0.56/0.54/0.62/0.74 | 54/—/—/20 | 8.8/10.8/9.7/11.6 |
+| s1 | 2 | 4 | 0.887/0.947/0.956/0.962 | 8/7/7/8 | 0.56/0.54/0.73/1.09 | 54/—/—/— | 7.9/10.3/9.5/12.3 |
+| s1 | 3 | 4 | 0.887/0.950/0.960/0.969 | 8/8/8/8 | 0.56/0.54/0.86/0.92 | 54/—/92/— | 8.2/10.3/9.3/11.2 |
+| s1 | 4 | 4 | 0.880/0.935/0.939/0.947 | 8/8/7/8 | 0.56/0.54/0.49/0.75 | 54/72/—/— | 8.5/8.8/8.1/10.4 |
+| s2 | 0 | 1 (HALT) | 0.891 | 8 | 0.56 | 54 | 10.5 |
+| s2 | 1 | 1 (HALT) | 0.908 | 8 | 0.56 | 54 | 8.6 |
+| s2 | 2 | 1 (HALT) | 0.907 | 8 | 0.56 | 54 | 8.9 |
+| s2 | 3 | 1 (HALT) | 0.908 | 8 | 0.56 | 54 | 8.8 |
+| s2 | 4 | 1 (HALT) | 0.874 | 8 | 0.56 | 54 | 8.9 |
+
+Mode gap "—" = every finite restart lies within the 1e-3·n-nat tolerance of the best (one mode found).
+
+## A.4 Matched-budget baselines and seed overlap (committed truth)
+
+| baseline | r4 p5 / p50 / p95 | r4 max |
+|---|---|---|
+| i.i.d. uniform | 0.667 / 0.683 / 0.712 | 0.742 |
+| random box vertices | 0.848 / 0.887 / 0.918 | 0.932 |
+| r0 plug-in front, random 32 | 0.910 / 0.945 / 0.964 | 0.971 |
+| r0 plug-in front, spread (no exploration) | 0.966 / 0.966 / 0.966 | 0.966 |
+| qNEHVI s0 (5 lanes) | 0.971–0.980 | 0.980 |
+
+Best-known front (committed truth): HV 1.5285e+14 = 1.0174 × polished; Sobol reference 0.876 of best-known (not a front). Seed overlap: r1 24/40 unique (52% exact vertices), r2–r4 38/35/38 of 40; Jaccard 0.10–0.16; minimum proposal distance to the evaluated set 0.067 (no re-proposal). Under option C, 16 of the 40 r1 PCM runs would duplicate another lane's design (exact match to 1e-10 in u). Shared replicates vs run all is a decision for Kay.
+
+## A.5 Model-mismatch check (non-circular; 1 seed each)
+
+The main run puts the same fit on both sides (truth and BO GP), which flatters the BO. Two checks break that symmetry.
+
+| run | truth V1 / E1 | BO GP V1 / E1 | single r4 regret V1 / E1 (B) | multi s0 seed 0 HV / best-known, r4 | C2 (single + multi) |
+|---|---|---|---|---|---|
+| committed | house / v2 | house / v2 | 0.081 / 0.000 | 0.971 | 1 + 0 |
+| mismatch A | house / house | house / v2 | 0.081 / 0.016 | 0.977 | 0 + 0 |
+| mismatch B | v2 (EXPLORATORY) / v2 | house / v2 | 0.293 / 0.000 | 0.988 | 1 + 0 |
+
+Reading: with the truth fitted differently from the BO GP, the search still reaches the vertex optima. Mismatch B is the hardest case for V1: the fit-v2 V1 truth puts f* at the all-PEM vertex (0.929 TWh, 26 B below the data) and the house-fit V1 GP has to find it: regret by round 25.658/1.037/0.036/0.182/0.293 B (r0 plug-in 1.31 B); after r2 the best-observed design drifts (a low noisy observation at a worse design), while the posterior-mean optimum reaches 0.050 B by r4. Mismatch A (house E1 truth, fit-v2 E1 GP) gives E1 regret 0.016 B and no C2. In mismatch B the E1 truth, E1 GP and noise stream equal the committed run, so its single E1 trajectory (and its one C2 at r2) is the committed one; the mismatch there is V1 only. The multi-objective mismatch lanes raise no C2. Each mismatch is scored against the best-known front of its own truth (`EMU_extras_mmA.json`, `EMU_extras_mmB.json`).
+
+## A.6 55 change for this block
+
+- `36b74b7` (methods_E 66 v2 hook): `common_E.gp_fitters` reads `fit_definition` per objective; `qnehvi_E.ObjGP(fitter=v2)` runs 54's `FitV2` on raw u and copies the MAP hyperparameters into the float64 SingleTaskGP (lengthscale / sx, negated constant); `fit_info` (converged, mode gap, noise / σ_c) goes into every round record. The house path is unchanged. A test checks that the hook reproduces FitV2's posterior mean and sd on synthetic 6-D data.
+- The house block (B) reads `committed_configs_housefit.json`, so it stays house-fit end to end.
+
+## A.7 Remaining 55 Part B items (unchanged list, status after this block)
+
+1. Fit v2 in `qnehvi_E` per `fit_definition`: **done (hook)**; per-round convergence flag recorded (not yet a gate).
+2. New `committed_configs.json`: **landed (240bde1)**. E-D7 still null — the Part B guard (refuses a provisional tier) applies.
+3. Still open: duplicate-proposal rule + idempotent grading + commit before propose; E-D5 amendment; `arms_E.json` complete (`gp.train` text, `part = "B"`, R3 / N3 / N1_off wired); τ_res into the ledger; stale README / runbook text; `dry_round_E.py` alignment + tests for the c7576a6 branches; real-loader ingest test on a fake methods_E wave; Kay's duplicate-run decision (≈ 16 of 40 r1 runs); CRC `--check-env` / `GAP_DECISION` / `--dry-run`, one lane first; the meaning of an E1 C2 flag on an out-of-hull batch.
+
+---
+
+# B. House-fit block (first run, kept as run)
+
+Written before fit v2 landed. Section A supersedes B.0 items 3–4 (the v2 rerun is done) and adds the per-objective gate-power statement. Numbers in B are the house-fit run as committed.
+
+## B.0 Answer in two minutes (house block)
 
 1. **Did the BO machinery run end to end on ERCOT?** Yes, after one change to 55. As built, the multi-seed init crashed at seed 1. qNEHVI puts 4–5 of the 8 r1 designs on the same box vertices in every seed lane, and 55 asserted disjoint r1 sets. I relaxed the assert to the prompt-55 text ("sets differ"). After that change, 12/12 single-objective runs and 15/15 multi-objective lanes finished. Each scenario took its expected branch: s0 monitor to the cap, s1 constrained from r2, s2 HALT at r1. **Kay: accept or reject this change (section 7, change 2c).**
 2. **Are the committed GPs good enough to drive it?** They are good enough to steer, but not to check themselves. On this emulator, BO gets to 0.18 B (V1) and 0.011 B (E1) of the emulator optimum by round 4 on 3/3 seeds — but the r0 start-set GP's own optimum already has regret 0.09 / 0.006 B, so this measures optimize_acqf and bound handling, not search. The front reaches 0.975–0.979 of the best-known emulator front. The house fit sets the noise sd at 6× (V1) and 2.3× (E1) the emulated chatter. Every 95 % band is too wide (rms z 0.07–0.59), so C2 and C3 cannot fire. Do not read "C2/C3 = 0" as evidence of calibration.

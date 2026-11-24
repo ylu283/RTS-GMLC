@@ -1,0 +1,772 @@
+{
+ "label": "EMULATOR",
+ "kind": "multi",
+ "scenario": "s0",
+ "seed_id": 0,
+ "variant": "mmA",
+ "truth": "house",
+ "bo_fit": "committed",
+ "gp_fitters": {
+  "V1": {
+   "def": "house",
+   "source": "house (fallback)"
+  },
+  "E1": {
+   "def": "v2",
+   "sigma_c": 312422.73941039236,
+   "source": "v2 (AMENDMENT 2026-11-24b)"
+  }
+ },
+ "fit_epochs": 700,
+ "lane_dir": "lanes/mmA/s0/s0",
+ "init_s": 0.7697970867156982,
+ "tau_exact": {
+  "tau_joint": 0.0,
+  "tau_marginal": 0.0,
+  "sensitivity_joint_over_marginal": null,
+  "budget_cap_only": true,
+  "form": "homoscedastic (Sigma_exact for every start)",
+  "sigma_source": "../noise_v3/ercot_noise_exact_cov.csv"
+ },
+ "tau_res": {
+  "tau_res": 439832227294.9964,
+  "tau_exact": 0.0,
+  "label": "REPORT-ONLY resolution ruler tau_res: the plan-6.2 recipe (tau_joint code path) with the chatter covariance Sigma_c in place of Sigma_exact; printed beside tau_exact, never replaces it",
+  "report_only": true,
+  "n_draws": 1000,
+  "seed": 20261006,
+  "hv_mean": 100249115828014.56,
+  "sd_marginal": [
+   3275.213783177645,
+   398135.0884646604
+  ]
+ },
+ "R": [
+  3977491.3852933007,
+  8163727647.918913
+ ],
+ "hv0": 100211927048531.47,
+ "hv0_true_f": 100577253228560.42,
+ "n0_tier": 48,
+ "n0_source": "PROVISIONAL arms_E n0_tier_provisional = 48 (E-D7_decided null)",
+ "loader": "real(n0_E: analysis.ercot_gp.ercot_gp_loader.load; Y replaced by the EMULATED start values)+EMULATOR wave tables",
+ "configs_source": "real",
+ "acq_seeds": {
+  "1": 20261007,
+  "2": 20261008,
+  "3": 20261009,
+  "4": 20261010
+ },
+ "settings": {
+  "1": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261007,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "2": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261008,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 4,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "3": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261009,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 6,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "4": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261010,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  }
+ },
+ "designs_u": {
+  "1": [
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.8292379429767397
+   ],
+   [
+    0.0,
+    1.0,
+    0.6045757986952632,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.2620039015262009,
+    1.0,
+    0.7554490582184776,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.06592759576769763,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ]
+  ],
+  "2": [
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.10331091912093276
+   ],
+   [
+    0.0,
+    1.0,
+    0.2767751209299787,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.5420612013620592,
+    1.0,
+    0.7070704075525927,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.5837777287930506
+   ],
+   [
+    0.1373279598731627,
+    1.0,
+    0.6539800984057981,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.7867822950924708,
+    0.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "3": [
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.29955786617864777,
+    1.0,
+    0.0
+   ],
+   [
+    0.3077770222927971,
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.45713084301738205,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.7832569517727729,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.38724422556381255,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.6988997715267756,
+    1.0,
+    0.7260712686914358,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.4267639712716082,
+    1.0,
+    0.6664522932199162,
+    1.0,
+    1.0,
+    1.0
+   ]
+  ],
+  "4": [
+   [
+    0.46444048146158373,
+    1.0,
+    0.7130409084498597,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.04256403377207235,
+    1.0,
+    0.6839137684370855,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    0.4115434603716614,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.13443216757600168,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.6908361687181138
+   ]
+  ]
+ },
+ "guardrail_mode": "monitor",
+ "guardrail_flipped_at_round": null,
+ "halt": null,
+ "halt_file": false,
+ "first_fire_round": {
+  "tau_joint": null,
+  "tau_marginal": null
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "propose_warnings": {
+    "ResourceWarning": 101,
+    "FutureWarning": 96,
+    "UserWarning": 1,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.683021783828735,
+   "qnehvi_s": 8.3,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 173.89881120608132
+   },
+   "grade_s": 0.7577202320098877,
+   "wall_s": 10.45505166053772,
+   "hv": 134163383190115.84,
+   "gain": 33951456141584.375,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 77.1918336916523,
+   "hv_true_f": 134003359921277.67,
+   "n": 56,
+   "n_hv": 56,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 173.89881120608132,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.002,
+     "rms_z": 0.166,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.543,
+     "rms_z": 0.907,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "monitor",
+   "constraint_used": "none",
+   "n1_off_max": 30809.75270799801,
+   "n1_off_flag_a": false,
+   "N4_mean": 4483.817112831663,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.4268,
+    "E1": 0.868
+   },
+   "noise_raw": {
+    "V1": 14949.051609849952,
+    "E1": 178124.16366543318
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": 54.871620355150625,
+     "gap_second_nats": 1.22345330311191e-07,
+     "n_within_tol": 11,
+     "n_failed": 0,
+     "map_total": -17.358398993603036,
+     "noise_sd_raw": 178124.1636654332,
+     "noise_over_sigma_c": 0.5701382812326372
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 2,
+   "propose_warnings": {
+    "ResourceWarning": 102,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 7.565957069396973,
+   "qnehvi_s": 6.7,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 193.33466091459928
+   },
+   "grade_s": 0.8433201313018799,
+   "wall_s": 8.423283100128174,
+   "hv": 138866894874037.78,
+   "gain": 4703511683921.9375,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 10.693876874027428,
+   "hv_true_f": 138793359185607.81,
+   "n": 64,
+   "n_hv": 64,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 193.33466091459928,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": -0.019,
+     "rms_z": 0.221,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.23,
+     "rms_z": 0.649,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "monitor",
+   "constraint_used": "none",
+   "n1_off_max": 30862.77555458618,
+   "n1_off_flag_a": false,
+   "N4_mean": 4520.7378758825425,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.371,
+    "E1": 0.8715
+   },
+   "noise_raw": {
+    "V1": 14950.703342010018,
+    "E1": 175890.42495046317
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": NaN,
+     "gap_second_nats": 7.355783893103762e-08,
+     "n_within_tol": 16,
+     "n_failed": 0,
+     "map_total": -9.40280398974468,
+     "noise_sd_raw": 175890.4249504632,
+     "noise_over_sigma_c": 0.5629885496888144
+    }
+   },
+   "bound_snaps": {
+    "to_0": 4,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 3,
+   "propose_warnings": {
+    "ResourceWarning": 103,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 8.000718832015991,
+   "qnehvi_s": 7.1,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 166.0360887064597
+   },
+   "grade_s": 0.8369626998901367,
+   "wall_s": 8.8488929271698,
+   "hv": 140959455926546.8,
+   "gain": 2092561052509.0312,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 4.757634667605988,
+   "hv_true_f": 140822903740444.84,
+   "n": 72,
+   "n_hv": 72,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 166.0360887064597,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.069,
+     "rms_z": 0.204,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": -0.121,
+     "rms_z": 0.79,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "monitor",
+   "constraint_used": "none",
+   "n1_off_max": 30852.360771889616,
+   "n1_off_flag_a": false,
+   "N4_mean": 4533.7616650622695,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3506,
+    "E1": 0.896
+   },
+   "noise_raw": {
+    "V1": 16083.466622797057,
+    "E1": 201298.83664586776
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": NaN,
+     "gap_second_nats": 1.0193907939992641e-09,
+     "n_within_tol": 16,
+     "n_failed": 0,
+     "map_total": 7.81953143448882,
+     "noise_sd_raw": 201298.8366458678,
+     "noise_over_sigma_c": 0.6443155739104048
+    }
+   },
+   "bound_snaps": {
+    "to_0": 6,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  {
+   "round": 4,
+   "propose_warnings": {
+    "ResourceWarning": 104,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.014509916305542,
+   "qnehvi_s": 8.1,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 175.74413915446718
+   },
+   "grade_s": 0.9531970024108887,
+   "wall_s": 9.980842113494873,
+   "hv": 141612439681831.8,
+   "gain": 652983755285.0,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 1.484620077298343,
+   "hv_true_f": 141412627608150.5,
+   "n": 80,
+   "n_hv": 80,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 175.74413915446718,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": -0.111,
+     "rms_z": 0.23,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.089,
+     "rms_z": 0.797,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "monitor",
+   "constraint_used": "none",
+   "n1_off_max": 30773.58644411519,
+   "n1_off_flag_a": false,
+   "N4_mean": 4437.016555237483,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3177,
+    "E1": 0.9625
+   },
+   "noise_raw": {
+    "V1": 16550.111513537755,
+    "E1": 207651.10806271687
+   },
+   "fit_info": {
+    "V1": {
+     "fit_definition": "house"
+    },
+    "E1": {
+     "fit_definition": "v2",
+     "converged": true,
+     "mode_gap_nats": 88.98890296110872,
+     "gap_second_nats": 1.6764008847758305e-08,
+     "n_within_tol": 15,
+     "n_failed": 0,
+     "map_total": 23.754691765679876,
+     "noise_sd_raw": 207651.1080627169,
+     "noise_over_sigma_c": 0.6646478692767318
+    }
+   },
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  }
+ ],
+ "noise_stream": [
+  6666,
+  3,
+  0,
+  0,
+  3
+ ],
+ "loader_calls": 29,
+ "finished_utc": "2026-11-24T08:34:39+00:00"
+}
