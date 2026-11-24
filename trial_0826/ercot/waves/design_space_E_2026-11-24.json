@@ -1,143 +1,143 @@
 {
- "contract_version": "2026-11-24",
- "identity": "v3",
- "slate_rule": "E-D3 fallback = wave-D top-6 (analysis/cost_fix/WAVE_D_TOPK_RULE.md); 32 T2 never bought",
- "sites": [
-  {
-   "site": "110",
-   "unit_type": "WIND",
-   "bus": 2,
-   "gen_pmax": 338.599998942999
+  "contract_version": "2026-11-24",
+  "identity": "v3",
+  "slate_rule": "E-D3 fallback = wave-D top-6 (analysis/cost_fix/WAVE_D_TOPK_RULE.md); 32 T2 never bought",
+  "sites": [
+    {
+      "site": "110",
+      "unit_type": "WIND",
+      "bus": 2,
+      "gen_pmax": 338.599998942999
+    },
+    {
+      "site": "140",
+      "unit_type": "WIND",
+      "bus": 2,
+      "gen_pmax": 250.5999989428539
+    },
+    {
+      "site": "146",
+      "unit_type": "WIND",
+      "bus": 75,
+      "gen_pmax": 267.9999991911224
+    },
+    {
+      "site": "163",
+      "unit_type": "WIND",
+      "bus": 120,
+      "gen_pmax": 185.3999876467921
+    },
+    {
+      "site": "270",
+      "unit_type": "WIND",
+      "bus": 120,
+      "gen_pmax": 578.9999877407346
+    },
+    {
+      "site": "274",
+      "unit_type": "WIND",
+      "bus": 120,
+      "gen_pmax": 746.3999877635443
+    }
+  ],
+  "x_columns": [
+    "mw_110",
+    "mw_140",
+    "mw_146",
+    "mw_163",
+    "mw_270",
+    "mw_274"
+  ],
+  "bounds_mw_lo": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "bounds_mw_hi": [
+    338.599998942999,
+    250.5999989428539,
+    267.9999991911224,
+    185.3999876467921,
+    578.9999877407346,
+    746.3999877635443
+  ],
+  "u": "u_s = mw_s / gen_pmax_s in [0, 1]; the GP and acquisition input (plan §2); mw = 0 means site absent",
+  "bid": 40.0,
+  "tiers": {
+    "nav": "E-D7 (32 or 48), decided after 54 Part B",
+    "grading": 48,
+    "holdout": 48
   },
-  {
-   "site": "140",
-   "unit_type": "WIND",
-   "bus": 2,
-   "gen_pmax": 250.5999989428539
+  "suspect": "plan §1.2 S1-S3 per run; a SUSPECT run is excluded from HV and gain and flagged; >= 2 SUSPECT in one round -> HALT FOR DECISION",
+  "objective_source": "pool_objectives.pool_row(key) on the committed slim tables (keys V1, E1, E3, R1, R2, R4, N1, G_run_usd, SUSPECT inputs); the per-run pool_full_metrics.json carries ONLY E8/E9/N5/headroom/R7/R8/G_run_usd/gap/md5 and is never the Y source",
+  "objectives": {
+    "V1": {
+      "seat": "V",
+      "status": "SEATED (rule v2, AMENDMENT 2026-11-24)"
+    },
+    "E1": {
+      "seat": "E",
+      "status": "SEATED (rule v2, AMENDMENT 2026-11-24)"
+    }
   },
-  {
-   "site": "146",
-   "unit_type": "WIND",
-   "bus": 75,
-   "gen_pmax": 267.9999991911224
+  "M": 2,
+  "co_reported": {
+    "N1": {
+      "status": "PRE-REGISTERED (v1), co-reported"
+    },
+    "N4": {
+      "status": "v2 candidate, not seated (REDUNDANT given seated V1: raw rho 0.966 >= 0.90; no ESCAPE because N4 is not COMPOSITION-RESOLVABLE (residual Mantel p 0.0253 > 0.01; residual IDR/B joint lower-90 2.31); not a BORDERLINE-PAIR, §4b not reached)",
+      "name": "L252 (bus-120 export limit) binding hours"
+    }
   },
-  {
-   "site": "163",
-   "unit_type": "WIND",
-   "bus": 120,
-   "gen_pmax": 185.3999876467921
+  "objective_rule": "AMENDMENT 2026-11-24",
+  "guardrails": {
+    "R1": {
+      "name": "load shed (MWh)",
+      "mode": "monitor->constrain",
+      "violation_mwh": 1.0,
+      "response": "plan §1.3: violating run stays in the ledger, infeasible-for-claims, excluded from reported fronts; from the round AFTER the first violation acquisition = constrained qNEHVI with a shed GP constraint shed <= 1 MWh; >= 2 violations in one round -> HALT FOR DECISION"
+    },
+    "R2": {
+      "name": "reserve shortfall (MWh)",
+      "mode": "monitor",
+      "flag_at": "2 x base_v3 = 312.2 MWh (base 156.08; plan AMENDMENT 2026-11-17)",
+      "response": "record the round flag; never halts; no acquisition role"
+    },
+    "R3": {
+      "name": "over-generation (MWh)",
+      "mode": "monitor",
+      "flag_at": "> 1 MWh (base_v3 0)",
+      "response": "record the round flag; never halts; no acquisition role"
+    },
+    "N3": {
+      "name": "thermal-limit slack violation (MWh)",
+      "mode": "monitor",
+      "flag_at": "base_v3 90,951 MWh + 2 x B_N3 (22.7 MWh; B_N3 = 11.33, rule v2 §8.1 bar)",
+      "response": "record the round flag; never halts; no acquisition role"
+    },
+    "N1_off": {
+      "name": "non-pocket congested line-hours N1 - N4 (line-h)",
+      "mode": "monitor (§8.8; never halts; no acquisition role)",
+      "base": 30750,
+      "flags": {
+        "a": "any run dN1_off >= 2 x B_N1off = 462.7 line-h (B_N1off 231.3, nu 22; v1-memo value 242.1 printed beside)",
+        "b": "new bottleneck: a non-pocket line with base_v3 hours_ge_99pct = 0 reaching >= 88 h",
+        "c": "N3_off = sum_violation over non-pocket lines >= base 61,477 MWh + 2 x B_N3off (84.3 MWh; B_N3off 42.14, nu 22)"
+      },
+      "report": "dN1_off vs base; leakage dN1_off / (-dN4) when dN4 < 0 (a finding, not a violation); the three non-pocket lines with the largest dhours (n0_E: L247, L188, L1)"
+    }
   },
-  {
-   "site": "270",
-   "unit_type": "WIND",
-   "bus": 120,
-   "gen_pmax": 578.9999877407346
+  "reporting": {
+    "lens": "E1_minus_40_D1 column (no front): E1 − 40·D1 is a reporting column only: Δnet ≤ 0 by construction (replacement ≈ $24/MWh < B = $40) and it falls monotonically with MW; capex excluded.",
+    "beside_N4_co_reported": "-N5 and L252 mean flow; assert every round N4 == N4_L252, else report the pocket sum with the split",
+    "induced_co2_intensity": "dX1 / D1",
+    "additionality": "-dV1 / D1",
+    "replacement_cost": "dE1 / (D1 + dV1)",
+    "vectors": "every station reports v1 pre-registered (V1 · E1 · N1), v2 as walked (V1 · E1), and the v2 prediction (V1 · E1 · N4) as a conditional reading; disclosure wording of AMENDMENT 2026-11-24 §2.1"
   },
-  {
-   "site": "274",
-   "unit_type": "WIND",
-   "bus": 120,
-   "gen_pmax": 746.3999877635443
-  }
- ],
- "x_columns": [
-  "mw_110",
-  "mw_140",
-  "mw_146",
-  "mw_163",
-  "mw_270",
-  "mw_274"
- ],
- "bounds_mw_lo": [
-  0,
-  0,
-  0,
-  0,
-  0,
-  0
- ],
- "bounds_mw_hi": [
-  338.599998942999,
-  250.5999989428539,
-  267.9999991911224,
-  185.3999876467921,
-  578.9999877407346,
-  746.3999877635443
- ],
- "u": "u_s = mw_s / gen_pmax_s in [0, 1]; the GP and acquisition input (plan §2); mw = 0 means site absent",
- "bid": 40.0,
- "tiers": {
-  "nav": "E-D7 (32 or 48), decided after 54 Part B",
-  "grading": 48,
-  "holdout": 48
- },
- "suspect": "plan §1.2 S1-S3 per run; a SUSPECT run is excluded from HV and gain and flagged; >= 2 SUSPECT in one round -> HALT FOR DECISION",
- "objective_source": "pool_objectives.pool_row(key) on the committed slim tables (keys V1, E1, E3, R1, R2, R4, N1, G_run_usd, SUSPECT inputs); the per-run pool_full_metrics.json carries ONLY E8/E9/N5/headroom/R7/R8/G_run_usd/gap/md5 and is never the Y source",
- "objectives": {
-  "V1": {
-   "seat": "V",
-   "status": "SEATED (rule v2, AMENDMENT 2026-11-24)"
-  },
-  "E1": {
-   "seat": "E",
-   "status": "SEATED (rule v2, AMENDMENT 2026-11-24)"
-  }
- },
- "M": 2,
- "co_reported": {
-  "N1": {
-   "status": "PRE-REGISTERED (v1), co-reported"
-  },
-  "N4": {
-   "status": "v2 candidate, not seated (REDUNDANT given seated V1: raw rho 0.966 >= 0.90; no ESCAPE because N4 is not COMPOSITION-RESOLVABLE (residual Mantel p 0.0253 > 0.01; residual IDR/B joint lower-90 2.31); not a BORDERLINE-PAIR, §4b not reached)",
-   "name": "L252 (bus-120 export limit) binding hours"
-  }
- },
- "objective_rule": "AMENDMENT 2026-11-24",
- "guardrails": {
-  "R1": {
-   "name": "load shed (MWh)",
-   "mode": "monitor->constrain",
-   "violation_mwh": 1.0,
-   "response": "plan §1.3: violating run stays in the ledger, infeasible-for-claims, excluded from reported fronts; from the round AFTER the first violation acquisition = constrained qNEHVI with a shed GP constraint shed <= 1 MWh; >= 2 violations in one round -> HALT FOR DECISION"
-  },
-  "R2": {
-   "name": "reserve shortfall (MWh)",
-   "mode": "monitor",
-   "flag_at": "2 x base_v3 = 312.2 MWh (base 156.08; plan AMENDMENT 2026-11-17)",
-   "response": "record the round flag; never halts; no acquisition role"
-  },
-  "R3": {
-   "name": "over-generation (MWh)",
-   "mode": "monitor",
-   "flag_at": "> 1 MWh (base_v3 0)",
-   "response": "record the round flag; never halts; no acquisition role"
-  },
-  "N3": {
-   "name": "thermal-limit slack violation (MWh)",
-   "mode": "monitor",
-   "flag_at": "base_v3 90,951 MWh + 2 x B_N3 (22.7 MWh; B_N3 = 11.33, rule v2 §8.1 bar)",
-   "response": "record the round flag; never halts; no acquisition role"
-  },
-  "N1_off": {
-   "name": "non-pocket congested line-hours N1 - N4 (line-h)",
-   "mode": "monitor (§8.8; never halts; no acquisition role)",
-   "base": 30750,
-   "flags": {
-    "a": "any run dN1_off >= 2 x B_N1off = 462.7 line-h (B_N1off 231.3, nu 22; v1-memo value 242.1 printed beside)",
-    "b": "new bottleneck: a non-pocket line with base_v3 hours_ge_99pct = 0 reaching >= 88 h",
-    "c": "N3_off = sum_violation over non-pocket lines >= base 61,477 MWh + 2 x B_N3off (84.3 MWh; B_N3off 42.14, nu 22)"
-   },
-   "report": "dN1_off vs base; leakage dN1_off / (-dN4) when dN4 < 0 (a finding, not a violation); the three non-pocket lines with the largest dhours (n0_E: L247, L188, L1)"
-  }
- },
- "reporting": {
-  "lens": "E1_minus_40_D1 column (no front): E1 − 40·D1 is a reporting column only: Δnet ≤ 0 by construction (replacement ≈ $24/MWh < B = $40) and it falls monotonically with MW; capex excluded.",
-  "beside_N4_co_reported": "-N5 and L252 mean flow; assert every round N4 == N4_L252, else report the pocket sum with the split",
-  "induced_co2_intensity": "dX1 / D1",
-  "additionality": "-dV1 / D1",
-  "replacement_cost": "dE1 / (D1 + dV1)",
-  "vectors": "every station reports v1 pre-registered (V1 · E1 · N1), v2 as walked (V1 · E1), and the v2 prediction (V1 · E1 · N4) as a conditional reading; disclosure wording of AMENDMENT 2026-11-24 §2.1"
- },
- "disclosure": "This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test."
+  "disclosure": "This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test. [ERRATUM 2026-11-24, strategy session, after the read: this verbatim disclosure predates the real walk; the walk itself gives v2 = V1 · E1 (M = 2) — N4 is suppressed by a failed composition-resolvability test (residual Mantel p 0.025 > 0.01), not by a borderline pair; the vectors reported are v1 V1 · E1 · N1, v2 V1 · E1, and the pre-read prediction V1 · E1 · N4 as a conditional reading.]"
 }
