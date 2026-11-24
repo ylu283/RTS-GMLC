@@ -155,8 +155,12 @@ def committed_configs(root: str, cfg: dict) -> tuple[dict, str]:
         return json.load(f), "stub"
 
 
-def n0_tier(configs: dict) -> int:
+def n0_tier(configs: dict, provisional: int | None = None) -> int:
+    """E-D7 nav tier. `provisional` (arms_E.json "n0_tier_provisional", prompt 66 emulator
+    only) is used ONLY while E-D7_decided is null; a decided E-D7 always wins."""
     t = configs.get("E-D7_decided")
+    if t is None and provisional is not None:
+        t = provisional
     assert t in (32, 48), f"E-D7_decided must be 32 or 48 (got {t!r}); the nav tier is undecided"
     return int(t)
 

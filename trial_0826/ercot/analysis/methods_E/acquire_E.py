@@ -140,18 +140,23 @@ class Lane:
     """Everything the lane needs that is derived from files: config, design
     space, committed configs, loader, start-set selection."""
 
-    def __init__(self, root, cfg, arm, seed):
+    def __init__(self, root, cfg, arm, seed, loader=None):
+        """`loader` = optional (load callable, source label) injected by a caller (prompt 66
+        emulator: the real 54 loader for n0_E + emulated wave tables); default = common_E.get_loader."""
         self.root, self.cfg, self.arm, self.seed = root, cfg, arm, int(seed)
         self.a = arm_cfg(cfg, arm)
         self.dir = lane_dir(root, cfg, arm, seed)
         self.ds = ce.load_design_space(root, cfg)
         self.configs, self.configs_source = ce.committed_configs(root, cfg)
-        self.n0_tier = ce.n0_tier(self.configs)
+        self.n0_tier = ce.n0_tier(self.configs, cfg.get("n0_tier_provisional"))
+        self.n0_source = (f"committed_configs ({self.configs_source}) E-D7_decided"
+                          if self.configs.get("E-D7_decided") is not None
+                          else f"PROVISIONAL arms_E n0_tier_provisional = {self.n0_tier} (E-D7_decided null)")
         self.objectives = list(cfg["objectives"])
         for o in self.objectives:
             assert o in self.ds.objectives_json, f"objective {o} not in design_space_E.json objectives"
         self.gp_cfgs, self.gp_floors = ce.gp_cfg_and_floor(self.configs, self.objectives)
-        self.load, self.loader_source = ce.get_loader(root)
+        self.load, self.loader_source = loader if loader is not None else ce.get_loader(root)
         if cfg.get("part") == "B":
             assert self.loader_source == "real", "Part B: the real loader (54) must be importable"
             assert self.configs_source == "real", "Part B: analysis/ercot_gp/committed_configs.json (54 B) required"
@@ -432,7 +437,7 @@ def cmd_init(lane: Lane, bo_gp_sha: str | None = None) -> dict:
                 "budget_cap_only": rul["budget_cap_only"], "form": rul["form"], "sigma_source": sigma_source},
         "tau_headline": "tau_joint", "tau_recipe": rul["recipe"],
         "rider_levels": rider,
-        "n0_tier": lane.n0_tier, "n0_source": f"committed_configs ({lane.configs_source}) E-D7_decided",
+        "n0_tier": lane.n0_tier, "n0_source": lane.n0_source,
         "base_waves": lane.cfg["base_waves"], "loader": lane.loader_source, "configs_source": lane.configs_source,
         "gp": {o: {"cfg": list(c), "floor": float(f)} for o, c, f in zip(lane.objectives, lane.gp_cfgs, lane.gp_floors)},
         "qnehvi": lane.cfg["qnehvi"], "q": lane.cfg["q"], "hard_cap": lane.cfg["hard_cap"],
@@ -615,6 +620,7 @@ def propose_round(lane: Lane, k: int) -> str:
     keys = {tuple(r) for r in ub.round(10).tolist()}
     assert len(keys) == lane.cfg["q"], "duplicate designs in batch"
     assert not (keys & {tuple(r) for r in acc["U"].to_numpy(float).round(10).tolist()}), "re-proposed an evaluated design"
+    overlap = {}
     if k == 1:
         for s in lane.a["seed_ids"]:          # init assert: r1 proposals differ across seeds (the seed reaches the sampler)
             if s == lane.seed:
@@ -622,7 +628,11 @@ def propose_round(lane: Lane, k: int) -> str:
             other = load_records(lane_dir(lane.root, lane.cfg, lane.arm, s)).get("1")
             if other:
                 okeys = {tuple(r) for r in np.asarray(other["designs_u"], float).round(10).tolist()}
-                assert keys != okeys and not (keys & okeys), f"r1 proposals of s{lane.seed} coincide with s{s}"
+                # prompt 55 §2.1 pins "r1 proposals DIFFER across seed_ids"; pairwise disjointness was stricter and
+                # fails legitimately when the acquisition optimum sits on a box vertex (prompt 66 emulator, real n0_E):
+                # assert the sets differ, RECORD the shared designs.
+                assert keys != okeys, f"r1 proposals of s{lane.seed} identical to s{s} (the seed does not reach the sampler)"
+                overlap[str(s)] = len(keys & okeys)
     _step(lane.dir, f"propose r{k}: writing wave {lane.wave(k)}")
     extra = {"methods_arm": lane.arm, "seed_id": lane.seed, "methods_round": k, "acq": lane.a["acq"],
              "acq_seed": seed, "bo_gp_sha": led["bo_gp_sha"], "botorch": botorch.__version__,
@@ -640,6 +650,7 @@ def propose_round(lane: Lane, k: int) -> str:
         "qnehvi_seconds": round(float(res["seconds"]), 1),
         "designs_u": ub.tolist(), "designs_mw": lane.ds.u_to_mw(ub).tolist(),
         "predictions": os.path.relpath(os.path.join(wdir, "predictions.csv"), lane.root),
+        **({"r1_shared_designs_with_seed": overlap} if k == 1 else {}),
         "decision": "proposed"}, led=led)
     return wdir
 
