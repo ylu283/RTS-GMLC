@@ -7,3 +7,5 @@ n_scoring,utc,objective,n0,arm,cfg,floor,cov95,n,bar_lo,bar_hi,pass,rmse_raw
 6,2026-11-24T06:51:09+00:00,N4,48,m52+std,m52/std/inferred/none,1e-09,48,48,43,48,True,31.903759239644078
 7,2026-11-24T06:51:09+00:00,N1,32,m52+std,m52/std/inferred/none,1e-09,44,48,43,48,True,76.1563857344361
 8,2026-11-24T06:51:09+00:00,N1,48,m52+std,m52/std/inferred/none,1e-09,41,48,43,48,False,79.83825593623038
+9,2026-11-24T08:13:34+00:00,V1,48,rbf+std|fit-v2,rbf/std/inferred/none/fit-v2,1e-09,37,48,43,48,False,16101.408895895902
+10,2026-11-24T08:13:34+00:00,E1,48,m52+std|fit-v2,m52/std/inferred/none/fit-v2,1e-09,48,48,43,48,True,1169400.840284173

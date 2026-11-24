@@ -37,7 +37,22 @@
   "N4",
   "N1"
  ],
- "generated_utc": "2026-11-24T06:51:09+00:00",
+ "generated_utc": "2026-11-24T08:13:34+00:00",
+ "n0_tier_rule": "n0_tier_recommended = n* computed under the fit definition committed for the seated ids (v2 if every seated id commits v2, else the house n*); pinned before the v2 holdout scoring",
+ "n_star_v2": 48,
+ "n_star_v2_reason": "n* = 48. n* = the smallest n in {12, 16, ..., 44} at which, for every SEATED objective and the arm selected at that n: (1) LOO cov95 lies in binom.interval(0.90, n, 0.95); (2) LOO RMSE_n / LOO RMSE_48 <= 1.1; (3) the ARD lengthscales (u units) changed by < 10 % (max over the 6 sites, relative to the previous grid n's selected arm); if no n < 48 meets all three, n* = 48. Per n (seated V1, E1): n = 12: V1 (rbf+std): RMSE ratio 7.190 > 1.1, no previous n; E1 (rbf+std): RMSE ratio 3.840 > 1.1, no previous n | n = 16: V1 (rbf+std): RMSE ratio 7.040 > 1.1, lengthscale change 39 % >= 10 %; E1 (rbf+std): RMSE ratio 3.429 > 1.1, lengthscale change 60 % >= 10 % | n = 20: V1 (rbf+std): RMSE ratio 4.139 > 1.1, lengthscale change 46 % >= 10 %; E1 (rbf+std): RMSE ratio 1.991 > 1.1, lengthscale change 60 % >= 10 % | n = 24: V1 (rbf+std): RMSE ratio 3.374 > 1.1, lengthscale change 57 % >= 10 %; E1 (rbf+std): RMSE ratio 1.635 > 1.1, lengthscale change 45 % >= 10 % | n = 28: V1 (rbf+std): RMSE ratio 2.483 > 1.1, lengthscale change 14 % >= 10 %; E1 (m52+std): RMSE ratio 1.756 > 1.1, lengthscale change 49 % >= 10 % | n = 32: V1 (m52+std): RMSE ratio 2.669 > 1.1, lengthscale change 109 % >= 10 %; E1 (m52+std): RMSE ratio 1.948 > 1.1, lengthscale change 34 % >= 10 % | n = 36: V1 (m52+std): RMSE ratio 2.049 > 1.1; E1 (m52+std): RMSE ratio 1.705 > 1.1, lengthscale change 19 % >= 10 % | n = 40: V1 (m52+std): RMSE ratio 1.426 > 1.1, lengthscale change 13 % >= 10 %; E1 (m52+std): RMSE ratio 1.470 > 1.1, lengthscale change 10 % >= 10 % | n = 44: V1 (m52+std): RMSE ratio 1.462 > 1.1; E1 (m52+std): RMSE ratio 1.245 > 1.1 -> no n < 48 meets all three; n* = 48.",
+ "fit_definition_amendment": "plan AMENDMENT 2026-11-24b",
+ "fit_v2_spec": "float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best",
+ "reopen_round": {
+  "tier": 48,
+  "scored": [
+   "V1",
+   "E1"
+  ],
+  "exposure_after": 10,
+  "retired_again": true
+ },
+ "previous_file": "committed_configs_housefit.json",
  "objectives": {
   "V1": {
    "cfg": [
@@ -83,7 +98,8 @@
    },
    "exposure_rows": [
     1,
-    2
+    2,
+    9
    ],
    "n_star": 48,
    "hyperparameters": {
@@ -148,6 +164,58 @@
       "noise_sd_raw": 17368.437113396143
      }
     }
+   },
+   "fit_definition": "house (fallback)",
+   "v2_result": {
+    "arm": "rbf+std",
+    "cfg": [
+     "rbf",
+     "std",
+     "inferred",
+     "none"
+    ],
+    "fit_spec": "float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best",
+    "loo_nlpd_mean": 10.794762176734045,
+    "loo_rmse": 11879.769979270171,
+    "loo_cov95": [
+     44,
+     48
+    ],
+    "hyperparameters": {
+     "lengthscales_u": {
+      "110": 4.66065924943477,
+      "140": 5.854769316487779,
+      "146": 5.6302356828172515,
+      "163": 5.599041908401836,
+      "270": 2.4127779652419474,
+      "274": 1.8590784566995378
+     },
+     "outputscale_sd_t": 2342673.5882683904,
+     "noise_sd_raw": 4299.14954969341,
+     "noise_over_sigma_c": 0.9823851909369686,
+     "noise_at_floor": false
+    },
+    "converged": true,
+    "n_within_tol": 14,
+    "mode_gap_nats": 119.09646539977129,
+    "gap_second_nats": 3.389320823998787e-08,
+    "n_star_v2": 48,
+    "holdout": {
+     "cov95": 37,
+     "n": 48,
+     "pass": false,
+     "rmse": 16101.408895895902,
+     "rms_z": 1.637967129463812,
+     "exposure_row": 9
+    }
+   },
+   "holdout_v2": {
+    "cov95": 37,
+    "n": 48,
+    "pass": false,
+    "rmse": 16101.408895895902,
+    "rms_z": 1.637967129463812,
+    "exposure_row": 9
    }
   },
   "E1": {
@@ -158,105 +226,165 @@
     "none"
    ],
    "arm": "m52+std",
+   "fit_definition": "v2 (AMENDMENT 2026-11-24b)",
+   "fit_spec": "float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best",
    "seated": true,
    "role": "seated",
    "floor": 0.0,
    "floor_rule": "measured iff sigma_c > 0 AND df >= 3 (sigma_c = prompt-63 chatter sd, analysis/noise_v3/ercot_noise_seed.json, df 16); else inferred-only 1e-9",
    "measured_floor_used": false,
-   "measured_arm_included": true,
    "sigma_c": 312422.73941039236,
-   "sigma_c_df": 16,
-   "loo_nlpd_mean": 16.252188836192392,
-   "loo_rmse": 3301194.360201855,
+   "loo_nlpd_mean": 15.805354846204196,
+   "loo_rmse": 1956413.661970554,
    "loo_cov95": [
-    47,
+    45,
     48
    ],
    "holdout_cov95": [
     48,
     48
    ],
-   "holdout_rmse": 1759318.9777535829,
+   "holdout_rmse": 1169400.840284173,
    "holdout_pass": true,
-   "holdout_cov95_by_tier": {
-    "32": [
-     48,
-     48
-    ],
-    "48": [
-     48,
-     48
-    ]
-   },
-   "holdout_pass_by_tier": {
-    "32": true,
-    "48": true
+   "holdout_v2": {
+    "cov95": 48,
+    "n": 48,
+    "pass": true,
+    "rmse": 1169400.840284173,
+    "rms_z": 0.7443113048352595,
+    "exposure_row": 10
    },
    "exposure_rows": [
     3,
-    4
+    4,
+    10
    ],
    "n_star": 48,
+   "n_star_v2": 48,
    "hyperparameters": {
     "lengthscales_u": {
-     "110": 1.6063691047684294,
-     "140": 1.8450294611755493,
-     "146": 1.74613616894643,
-     "163": 1.8987208120712664,
-     "270": 1.2858957010421481,
-     "274": 0.9574642522916066
+     "110": 2.7511243358571242,
+     "140": 3.5879632430682564,
+     "146": 4.305124577048126,
+     "163": 4.330764146319613,
+     "270": 2.0937409564966996,
+     "274": 1.413789060854811
     },
-    "outputscale_sd_t": 18343353.4083472,
-    "noise_sd_raw": 826745.3938607664,
+    "outputscale_sd_t": 41168255.86996647,
+    "noise_sd_raw": 190819.6028288239,
+    "noise_over_sigma_c": 0.6107737330161715,
     "noise_at_floor": false
    },
-   "by_tier": {
-    "32": {
-     "arm": "m52+std",
-     "cfg": [
-      "m52",
-      "std",
-      "inferred",
-      "none"
+   "converged": true,
+   "mode_gap_nats": 52.85438687552646,
+   "house_fit_commit": {
+    "cfg": [
+     "m52",
+     "std",
+     "inferred",
+     "none"
+    ],
+    "arm": "m52+std",
+    "seated": true,
+    "role": "seated",
+    "floor": 0.0,
+    "floor_rule": "measured iff sigma_c > 0 AND df >= 3 (sigma_c = prompt-63 chatter sd, analysis/noise_v3/ercot_noise_seed.json, df 16); else inferred-only 1e-9",
+    "measured_floor_used": false,
+    "measured_arm_included": true,
+    "sigma_c": 312422.73941039236,
+    "sigma_c_df": 16,
+    "loo_nlpd_mean": 16.252188836192392,
+    "loo_rmse": 3301194.360201855,
+    "loo_cov95": [
+     47,
+     48
+    ],
+    "holdout_cov95": [
+     48,
+     48
+    ],
+    "holdout_rmse": 1759318.9777535829,
+    "holdout_pass": true,
+    "holdout_cov95_by_tier": {
+     "32": [
+      48,
+      48
      ],
-     "holdout_cov95": 48,
-     "holdout_pass": true,
-     "holdout_rmse": 1984701.1131970403,
-     "hyperparameters": {
-      "lengthscales_u": {
-       "110": 1.8559347486907145,
-       "140": 1.8021290528847482,
-       "146": 1.6874879323702991,
-       "163": 1.8932230755027222,
-       "270": 1.2022694672868144,
-       "274": 1.1184533251202715
-      },
-      "outputscale_sd_t": 21200272.141928732,
-      "noise_sd_raw": 1204325.502435784
-     }
+     "48": [
+      48,
+      48
+     ]
     },
-    "48": {
-     "arm": "m52+std",
-     "cfg": [
-      "m52",
-      "std",
-      "inferred",
-      "none"
-     ],
-     "holdout_cov95": 48,
-     "holdout_pass": true,
-     "holdout_rmse": 1759318.9777535829,
-     "hyperparameters": {
-      "lengthscales_u": {
-       "110": 1.6063691047684294,
-       "140": 1.8450294611755493,
-       "146": 1.74613616894643,
-       "163": 1.8987208120712664,
-       "270": 1.2858957010421481,
-       "274": 0.9574642522916066
-      },
-      "outputscale_sd_t": 18343353.4083472,
-      "noise_sd_raw": 826745.3938607664
+    "holdout_pass_by_tier": {
+     "32": true,
+     "48": true
+    },
+    "exposure_rows": [
+     3,
+     4
+    ],
+    "n_star": 48,
+    "hyperparameters": {
+     "lengthscales_u": {
+      "110": 1.6063691047684294,
+      "140": 1.8450294611755493,
+      "146": 1.74613616894643,
+      "163": 1.8987208120712664,
+      "270": 1.2858957010421481,
+      "274": 0.9574642522916066
+     },
+     "outputscale_sd_t": 18343353.4083472,
+     "noise_sd_raw": 826745.3938607664,
+     "noise_at_floor": false
+    },
+    "by_tier": {
+     "32": {
+      "arm": "m52+std",
+      "cfg": [
+       "m52",
+       "std",
+       "inferred",
+       "none"
+      ],
+      "holdout_cov95": 48,
+      "holdout_pass": true,
+      "holdout_rmse": 1984701.1131970403,
+      "hyperparameters": {
+       "lengthscales_u": {
+        "110": 1.8559347486907145,
+        "140": 1.8021290528847482,
+        "146": 1.6874879323702991,
+        "163": 1.8932230755027222,
+        "270": 1.2022694672868144,
+        "274": 1.1184533251202715
+       },
+       "outputscale_sd_t": 21200272.141928732,
+       "noise_sd_raw": 1204325.502435784
+      }
+     },
+     "48": {
+      "arm": "m52+std",
+      "cfg": [
+       "m52",
+       "std",
+       "inferred",
+       "none"
+      ],
+      "holdout_cov95": 48,
+      "holdout_pass": true,
+      "holdout_rmse": 1759318.9777535829,
+      "hyperparameters": {
+       "lengthscales_u": {
+        "110": 1.6063691047684294,
+        "140": 1.8450294611755493,
+        "146": 1.74613616894643,
+        "163": 1.8987208120712664,
+        "270": 1.2858957010421481,
+        "274": 0.9574642522916066
+       },
+       "outputscale_sd_t": 18343353.4083472,
+       "noise_sd_raw": 826745.3938607664
+      }
      }
     }
    }
@@ -370,6 +498,42 @@
       "noise_sd_raw": 14.34987833693015
      }
     }
+   },
+   "fit_definition": "house (co-reported; v2 LOO-only, not holdout-scored)",
+   "v2_result": {
+    "arm": "m52+std",
+    "cfg": [
+     "m52",
+     "std",
+     "inferred",
+     "none"
+    ],
+    "fit_spec": "float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best",
+    "loo_nlpd_mean": 4.438859724264867,
+    "loo_rmse": 27.68013365262527,
+    "loo_cov95": [
+     47,
+     48
+    ],
+    "hyperparameters": {
+     "lengthscales_u": {
+      "110": 5.450913802040465,
+      "140": 7.426692277781807,
+      "146": 5.294091500869519,
+      "163": 6.010744136272589,
+      "270": 2.5038673221302683,
+      "274": 2.7010929217835984
+     },
+     "outputscale_sd_t": 1194.0384086759625,
+     "noise_sd_raw": 5.089122810755042,
+     "noise_over_sigma_c": 0.4850634868379934,
+     "noise_at_floor": false
+    },
+    "converged": true,
+    "n_within_tol": 13,
+    "mode_gap_nats": 97.68970493140566,
+    "gap_second_nats": 3.9116418548701404e-08,
+    "n_star_v2": 48
    }
   },
   "N1": {
@@ -481,6 +645,42 @@
       "noise_sd_raw": 24.56251237049551
      }
     }
+   },
+   "fit_definition": "house (co-reported; v2 LOO-only, not holdout-scored)",
+   "v2_result": {
+    "arm": "m52+std",
+    "cfg": [
+     "m52",
+     "std",
+     "inferred",
+     "none"
+    ],
+    "fit_spec": "float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best",
+    "loo_nlpd_mean": 5.657663002766149,
+    "loo_rmse": 78.95833087793743,
+    "loo_cov95": [
+     45,
+     48
+    ],
+    "hyperparameters": {
+     "lengthscales_u": {
+      "110": 3.2396095201265274,
+      "140": 2.91742245728607,
+      "146": 3.555247046055823,
+      "163": 1.6443665790660391,
+      "270": 1.3627308012643176,
+      "274": 1.6920161703834888
+     },
+     "outputscale_sd_t": 640.8793851106883,
+     "noise_sd_raw": 30.045032729558738,
+     "noise_over_sigma_c": 0.5265550981896648,
+     "noise_at_floor": false
+    },
+    "converged": true,
+    "n_within_tol": 12,
+    "mode_gap_nats": 44.39292353178425,
+    "gap_second_nats": 3.145497373679973e-08,
+    "n_star_v2": 48
    }
   }
  }

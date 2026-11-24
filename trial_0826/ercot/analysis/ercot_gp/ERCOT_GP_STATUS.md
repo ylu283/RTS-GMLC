@@ -1,6 +1,6 @@
 # ERCOT_GP_STATUS — prompt 54 Part B (v3.3 addendum; plan AMENDMENT 2026-11-24b)
 
-Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 4.2 min.
+Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 4.7 min; fit-v2 run 4.6 min.
 
 ## 0. Answers for the PI
 
@@ -30,7 +30,7 @@ rms z < 1 means the bands are wider than the errors (conservative). The house fi
 
 The % range denominator here is the 48-row grading-tier range of y for every cell (one denominator).
 
-**Q3 — How many starting runs (n\*, the navigation tier)?** **n\* = 48.** No tier below 48 meets the rule. The ratio LOO RMSE_n / RMSE_48 is above 1.1 at every n < 48 for the seated ids (n = 44: V1 1.120, E1 1.116; n = 40: V1 1.271, E1 1.259). Whether 48 itself suffices is untested: LOO RMSE still falls by ≈ 1.3× from n = 40 to 48.
+**Q3 — How many starting runs (n\*, the navigation tier)?** **n\* = 48.** No tier below 48 meets the rule. The ratio LOO RMSE_n / RMSE_48 is above 1.1 at every n < 48 for the seated ids (n = 44: V1 1.120, E1 1.116; n = 40: V1 1.271, E1 1.259). Whether 48 itself suffices is untested: LOO RMSE still falls by ≈ 1.3× from n = 40 to 48. Under fit v2 (§13) n\* = 48.
 
 **Read this before the BO.** A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13). The committed fit definition per objective is in §13 and `committed_configs.json` (`fit_definition`).
 
@@ -555,13 +555,13 @@ Standardized residuals z = (y − μ) / sd (predictive sd with noise) of the 9 `
 
 Floor: `floor` 0 in the json means the inferred-noise arm; the ledger shows the same arm's floor as 1e-09 (the house jitter bound in raw units). They are the same setting.
 
-Exposure ledger `exposure_ledger.csv`: 8 of 24 scorings in total; retired.
+Exposure ledger `exposure_ledger.csv`: 10 of 24 scorings in total; retired.
 
 ## 8. E-D7 decision rows (Kay decides; 55 Part B waits on `E-D7_decided`)
 
 ```
-| 2026-11-24 | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Options: **(a) n0 = 48 — recommended**; (b) n0 = 32; (c) n0 = 44, only if the RMSE-ratio bar is relaxed to ≈ 1.12. Numbers (house fit): LOO RMSE_n / RMSE_48 at n = 32: V1 1.871 / E1 1.463; n = 40: V1 1.271 / E1 1.259; n = 44: V1 1.120 / E1 1.116 (bar 1.1). Holdout [43, 48] (n = 32 / 48): V1 48 / 45 PASS, E1 48 / 48 PASS. **Cost: no new simulations** (the 48 n0_E runs are landed; option (b) or (c) only uses fewer of them as the starting set). **What changes it:** a bar change on the RMSE ratio (1.12 → 44); a fit-definition change that moves the ratios; a decision to start the BO earlier and accept a less accurate start. Note: n0 = 48 means no tier below 48 meets the rule; whether 48 itself suffices is untested (LOO RMSE still falls by ≈ 1.3× from n = 40 to 48). | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2 |
-| 2026-11-24 | E-D7 (fit item) | **GP fit definition for 55 (separate from the tier)** | Fit definition v2 (plan AMENDMENT 2026-11-24b: float64 MAP, L-BFGS-B, 16 restarts) is adopted by the amendment; its results replace the house fit where the v2 config passes the holdout. 55 fits its acquisition GP with the same definition as the committed (graded) one. Kay notes it; no decision needed unless a v2 config failed. | analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |
+| 2026-11-24 | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Options: **(a) n0 = 48 — recommended**; (b) n0 = 32; (c) n0 = 44, only if the RMSE-ratio bar is relaxed to ≈ 1.12. Numbers (house fit): LOO RMSE_n / RMSE_48 at n = 32: V1 1.871 / E1 1.463; n = 40: V1 1.271 / E1 1.259; n = 44: V1 1.120 / E1 1.116 (bar 1.1). Holdout [43, 48] (n = 32 / 48): V1 48 / 45 PASS, E1 48 / 48 PASS. Fit v2 (AMENDMENT 2026-11-24b): n* = 48; ratios at n = 44 V1 1.462, E1 1.245. **Cost: no new simulations** (the 48 n0_E runs are landed; option (b) or (c) only uses fewer of them as the starting set). **What changes it:** a bar change on the RMSE ratio (1.12 → 44); a fit-definition change that moves the ratios; a decision to start the BO earlier and accept a less accurate start. Note: n0 = 48 means no tier below 48 meets the rule; whether 48 itself suffices is untested (LOO RMSE still falls by ≈ 1.3× from n = 40 to 48). | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2 |
+| 2026-11-24 | E-D7 (fit item) | **GP fit definition for 55 (separate from the tier)** | Fit definition v2 (plan AMENDMENT 2026-11-24b) — results: V1 house (fallback) (rbf+std, holdout 37/48 FAIL); E1 v2 (AMENDMENT 2026-11-24b) (m52+std, holdout 48/48 PASS). Exposure 10 / 24; holdout retired again. 55 fits its acquisition GP with the same definition as the committed (graded) one. Kay notes it; no decision needed unless a v2 config failed. | analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |
 ```
 
 ## 9. What changed vs plan
@@ -577,6 +577,79 @@ The strategy session appended plan AMENDMENT 2026-11-24b. It records: the traini
 - The mechanism null is built on V1 (wave D). Its scale-free thresholds apply to every objective (pinned 11-17).
 - log1p arms: excluded for all four ids by the inclusion rule (§1).
 
+## 13. Fit definition v2 (plan AMENDMENT 2026-11-24b §3–§4)
+
+Definition: float64; MAP with the lengthscale prior LogNormal(√2 + ½·log 6, √3) on u ∈ [0, 1]^6 and the noise prior LogNormal(log(σ_c² / s_y²), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (the measured-floor arm keeps its σ_c floor); L-BFGS-B (`fit_gpytorch_mll_scipy`, maxiter 1,000, ftol = gtol = 1e-7); 16 seeded restarts (gpytorch default init + 15 prior draws, `default_rng(5454)`); the best MAP is kept. Converged = at least 2 restarts within 1e-3·n nats of the best. Arm set, inclusion rules, LOO-NLPD selection (> 2 paired se, tie order) unchanged.
+
+### 13.1 Per objective at n = 48 (v2 vs house)
+
+| objective | role | v2 arm | lengthscales u (110, 140, 146, 163, 270, 274) | outputscale sd (t) | noise sd / σ_c | converged (restarts within tol) | mode gap (nats) | LOO NLPD v2 / house | LOO RMSE v2 / house | LOO cov95 v2 / house [43, 48] | holdout cov95 v2 [43, 48] | holdout rms z v2 | committed fit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | seated | rbf+std | 4.66, 5.85, 5.63, 5.6, 2.41, 1.86 | 2.343e+06 | 0.982 | True (14/16) | 119 | 10.795 / 11.733 | 1.188e+04 / 3.063e+04 | 44 / 47 | 37 / 48 **FAIL** | 1.64 | house (fallback) |
+| E1 | seated | m52+std | 2.75, 3.59, 4.31, 4.33, 2.09, 1.41 | 4.117e+07 | 0.611 | True (12/16) | 52.9 | 15.805 / 16.252 | 1.956e+06 / 3.301e+06 | 45 / 47 | 48 / 48 **PASS** | 0.74 | v2 (AMENDMENT 2026-11-24b) |
+| N4 | co-reported | m52+std | 5.45, 7.43, 5.29, 6.01, 2.5, 2.7 | 1194 | 0.485 | True (13/16) | 97.7 | 4.439 / 5.165 | 27.68 / 54.46 | 47 / 46 | LOO-only (co-reported) |  | house (co-reported; v2 LOO-only, not holdout-scored) |
+| N1 | co-reported | m52+std | 3.24, 2.92, 3.56, 1.64, 1.36, 1.69 | 640.9 | 0.527 | True (12/16) | 44.4 | 5.658 / 5.742 | 78.96 / 88.56 | 45 / 47 | LOO-only (co-reported) |  | house (co-reported; v2 LOO-only, not holdout-scored) |
+
+Exposure: 10 of 24 after the re-open round (2 scorings: V1 and E1 at n = 48). The holdout is retired again. A seated objective whose v2 config fails [43, 48] keeps its house-fit commit (pre-registered fallback).
+
+### 13.2 Training-size study under v2 (LOO only) and n\* = 48
+
+Reason: n\* = 48. n = 12: V1 (rbf+std): RMSE ratio 7.190 > 1.1, no previous n; E1 (rbf+std): RMSE ratio 3.840 > 1.1, no previous n | n = 16: V1 (rbf+std): RMSE ratio 7.040 > 1.1, lengthscale change 39 % >= 10 %; E1 (rbf+std): RMSE ratio 3.429 > 1.1, lengthscale change 60 % >= 10 % | n = 20: V1 (rbf+std): RMSE ratio 4.139 > 1.1, lengthscale change 46 % >= 10 %; E1 (rbf+std): RMSE ratio 1.991 > 1.1, lengthscale change 60 % >= 10 % | n = 24: V1 (rbf+std): RMSE ratio 3.374 > 1.1, lengthscale change 57 % >= 10 %; E1 (rbf+std): RMSE ratio 1.635 > 1.1, lengthscale change 45 % >= 10 % | n = 28: V1 (rbf+std): RMSE ratio 2.483 > 1.1, lengthscale change 14 % >= 10 %; E1 (m52+std): RMSE ratio 1.756 > 1.1, lengthscale change 49 % >= 10 % | n = 32: V1 (m52+std): RMSE ratio 2.669 > 1.1, lengthscale change 109 % >= 10 %; E1 (m52+std): RMSE ratio 1.948 > 1.1, lengthscale change 34 % >= 10 % | n = 36: V1 (m52+std): RMSE ratio 2.049 > 1.1; E1 (m52+std): RMSE ratio 1.705 > 1.1, lengthscale change 19 % >= 10 % | n = 40: V1 (m52+std): RMSE ratio 1.426 > 1.1, lengthscale change 13 % >= 10 %; E1 (m52+std): RMSE ratio 1.470 > 1.1, lengthscale change 10 % >= 10 % | n = 44: V1 (m52+std): RMSE ratio 1.462 > 1.1; E1 (m52+std): RMSE ratio 1.245 > 1.1 -> no n < 48 meets all three; n* = 48.
+
+| objective | n | arm | LOO NLPD | LOO RMSE | RMSE_n / RMSE_48 | LOO cov95 [bar] | max ls change | noise / σ_c | converged | mode gap | all met |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | 12 | rbf+std | 12.841 | 8.542e+04 | 7.190 | 12 [10, 12] |  | 0.606 | True | 10.4 |  |
+| V1 | 16 | rbf+std | 12.779 | 8.363e+04 | 7.040 | 16 [14, 16] | 39.2% | 0.606 | True | 17.3 |  |
+| V1 | 20 | rbf+std | 12.170 | 4.917e+04 | 4.139 | 20 [17, 20] | 46.1% | 0.601 | True | 26.7 |  |
+| V1 | 24 | rbf+std | 11.944 | 4.008e+04 | 3.374 | 23 [21, 24] | 57.4% | 0.601 | True | 40.6 |  |
+| V1 | 28 | rbf+std | 11.606 | 2.949e+04 | 2.483 | 27 [25, 28] | 14.2% | 0.592 | True | 49.5 |  |
+| V1 | 32 | m52+std | 11.689 | 3.17e+04 | 2.669 | 32 [28, 32] | 108.6% | 0.592 | True | 55 |  |
+| V1 | 36 | m52+std | 11.448 | 2.434e+04 | 2.049 | 36 [32, 36] | 9.9% | 0.582 | True | 67.9 |  |
+| V1 | 40 | m52+std | 11.155 | 1.694e+04 | 1.426 | 40 [36, 40] | 13.3% | 0.56 | True | 82 |  |
+| V1 | 44 | m52+std | 11.144 | 1.737e+04 | 1.462 | 44 [39, 44] | 6.9% | 0.61 | True | 4.35 |  |
+| V1 | 48 | rbf+std | 10.795 | 1.188e+04 | 1.000 | 44 [43, 48] | 54.9% | 0.982 | True | 119 |  |
+| E1 | 12 | rbf+std | 17.267 | 7.514e+06 | 3.840 | 12 [10, 12] |  | 0.606 | True | 0.0125 |  |
+| E1 | 16 | rbf+std | 17.126 | 6.708e+06 | 3.429 | 15 [14, 16] | 60.3% | 0.607 | True | 1.46 |  |
+| E1 | 20 | rbf+std | 16.447 | 3.896e+06 | 1.991 | 20 [17, 20] | 60.3% | 0.602 | True | 14.8 |  |
+| E1 | 24 | rbf+std | 16.133 | 3.199e+06 | 1.635 | 24 [21, 24] | 44.9% | 0.599 | True | 20.6 |  |
+| E1 | 28 | m52+std | 16.346 | 3.436e+06 | 1.756 | 27 [25, 28] | 48.8% | 0.603 | True | 22.7 |  |
+| E1 | 32 | m52+std | 16.476 | 3.81e+06 | 1.948 | 30 [28, 32] | 33.8% | 0.612 | True | 27.1 |  |
+| E1 | 36 | m52+std | 16.305 | 3.336e+06 | 1.705 | 33 [32, 36] | 18.8% | 0.609 | True | 33.8 |  |
+| E1 | 40 | m52+std | 16.086 | 2.875e+06 | 1.470 | 38 [36, 40] | 10.0% | 0.598 | True | 38 |  |
+| E1 | 44 | m52+std | 15.972 | 2.435e+06 | 1.245 | 42 [39, 44] | 5.5% | 0.593 | True | 45.6 |  |
+| E1 | 48 | m52+std | 15.805 | 1.956e+06 | 1.000 | 45 [43, 48] | 11.9% | 0.611 | True | 52.9 |  |
+| N4 | 12 | rbf+std | 6.016 | 96.43 | 3.484 | 12 [10, 12] |  | 0.606 | True | 7.69 |  |
+| N4 | 16 | rbf+std | 5.605 | 66.85 | 2.415 | 16 [14, 16] | 91.2% | 0.605 | True | 13.3 |  |
+| N4 | 20 | m52+std | 5.720 | 82.94 | 2.996 | 19 [17, 20] | 114.9% | 0.609 | True | 14.8 |  |
+| N4 | 24 | m52+std | 5.275 | 56.24 | 2.032 | 23 [21, 24] | 59.9% | 0.605 | True | 23 |  |
+| N4 | 28 | m52+std | 5.175 | 50.91 | 1.839 | 27 [25, 28] | 24.6% | 0.603 | True | 28.7 |  |
+| N4 | 32 | m52+std | 5.086 | 48.01 | 1.734 | 31 [28, 32] | 31.4% | 0.646 | True | 36 |  |
+| N4 | 36 | m52+std | 4.876 | 40.53 | 1.464 | 35 [32, 36] | 24.6% | 0.61 | True | 44.5 |  |
+| N4 | 40 | m52+std | 4.680 | 30.69 | 1.109 | 38 [36, 40] | 20.2% | 0.607 | True | 52.5 |  |
+| N4 | 44 | m52+std | 4.488 | 27.45 | 0.992 | 43 [39, 44] | 12.1% | 0.49 | True | 62.2 |  |
+| N4 | 48 | m52+std | 4.439 | 27.68 | 1.000 | 47 [43, 48] | 15.3% | 0.485 | True | 97.7 |  |
+| N1 | 12 | rbf+std | 6.018 | 97.38 | 1.233 | 12 [10, 12] |  | 0.54 | True | 7.68 |  |
+| N1 | 16 | rbf+std | 5.729 | 73.64 | 0.933 | 16 [14, 16] | 69.7% | 0.515 | True | 14.4 |  |
+| N1 | 20 | rbf+std | 5.527 | 59.4 | 0.752 | 20 [17, 20] | 66.7% | 0.506 | True | 19.2 |  |
+| N1 | 24 | m52+std | 6.056 | 102.7 | 1.301 | 23 [21, 24] | 28.4% | 0.702 | True | 18 |  |
+| N1 | 28 | m52+std | 5.971 | 96.41 | 1.221 | 28 [25, 28] | 24.6% | 0.579 | True | 21.4 |  |
+| N1 | 32 | m52+std | 5.912 | 93.9 | 1.189 | 32 [28, 32] | 29.1% | 0.605 | True | 28.3 |  |
+| N1 | 36 | m52+std | 5.785 | 83.22 | 1.054 | 34 [32, 36] | 40.9% | 0.579 | True | 34.8 |  |
+| N1 | 40 | m52+std | 5.899 | 98.19 | 1.244 | 39 [36, 40] | 40.3% | 0.636 | True | 32.3 |  |
+| N1 | 44 | m52+std | 5.705 | 85.09 | 1.078 | 43 [39, 44] | 12.4% | 0.484 | True | 38.5 |  |
+| N1 | 48 | m52+std | 5.658 | 78.96 | 1.000 | 45 [43, 48] | 23.2% | 0.527 | True | 44.4 |  |
+
+All v2 arms (every n) are in `ercot_gp_status_v2.csv` with the convergence flag and the best-vs-second gap.
+
+### 13.3 Prompt-61 residual row under the committed v2 configs (descriptive)
+
+| objective | P1_60 | P1_120 | P1_180 | P2_800_b120 | P2_800_b275 | P2_800_all | P2_500_270 | P2_500_110_140 | P3_1500_all | mean z | mean abs z | n abs z > 1.96 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | +0.28 | -2.13 | +2.32 | +0.37 | +2.17 | -1.70 | +5.64 | +1.34 | +2.92 | +1.24 | 2.10 | 5 |
+| E1 | +0.27 | +1.26 | +0.56 | -1.57 | -0.21 | +1.53 | -1.27 | -0.92 | -0.70 | -0.12 | 0.92 | 0 |
+| N4 | -4.15 | -0.88 | -0.43 | +3.08 | +1.90 | +1.11 | -2.73 | -0.73 | -1.51 | -0.48 | 1.84 | 3 |
+| N1 | -1.21 | -0.19 | +0.01 | +0.23 | -0.14 | +1.19 | +0.04 | +0.91 | +0.57 | +0.16 | 0.50 | 0 |
+
 ## 12. Rule-v2 disclosure (AMENDMENT 2026-11-24, with the erratum of aa98045; the fit inputs are unchanged by it)
 
 > This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test. [ERRATUM 2026-11-24, strategy session, after the read: this verbatim disclosure predates the real walk; the walk itself gives v2 = V1 · E1 (M = 2) — N4 is suppressed by a failed composition-resolvability test (residual Mantel p 0.025 > 0.01), not by a borderline pair; the vectors reported are v1 V1 · E1 · N1, v2 V1 · E1, and the pre-read prediction V1 · E1 · N4 as a conditional reading.]
@@ -588,4 +661,7 @@ The strategy session appended plan AMENDMENT 2026-11-24b. It records: the traini
 - `figs/fig_parity_holdout.png`
 - `figs/fig_house_vs_longfit.png`
 - `figs/fig_null_truth_curves.png`
+- `figs/fig_training_size_curves_v2.png`
+- `figs/fig_lengthscales_vs_n_v2.png`
+- `figs/fig_parity_holdout_v2.png`
 
