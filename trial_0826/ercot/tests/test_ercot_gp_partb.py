@@ -169,3 +169,78 @@ def test_long_fit_diag_is_scoped_and_exploratory():
                            grid=(32, 48), epochs=900)
     assert S.common.train_gp is orig
     assert {r["fit"] for r in rows} == {"adam900"} and set(w) == {32, 48}
+
+
+# --------------------------------------------------------------------------
+# fit definition v2 (plan AMENDMENT 2026-11-24b §3) and the re-open round (§4)
+# --------------------------------------------------------------------------
+def _smooth(n=48, sigma=0.05, seed=11):
+    from scipy.stats import qmc
+    U = qmc.Sobol(d=6, scramble=True, seed=seed).random_base2(6)[:n]
+    f = np.sin(3 * U[:, 0]) + 0.5 * U[:, 1] ** 2 - 0.3 * U[:, 2] * U[:, 3] + 0.2 * U[:, 4]
+    return U, f + np.random.default_rng(seed).normal(0, sigma, n)
+
+
+def test_fit_v2_recovers_known_sigma_and_converges():
+    U, y = _smooth(sigma=0.05)
+    with P.fit_v2():
+        gp = S.fit(U, y, S.DEFAULT_ARM, 0.08)          # sigma_c prior centre 1.6x the truth: within the prior's reach
+    assert isinstance(gp, P.FitV2) and gp._tx.dtype == torch.float64
+    s = P.hyper(gp)["noise_sd_raw"]
+    assert 0.025 < s < 0.1, s                          # within a factor 2 of the true 0.05
+    assert gp.converged and gp.n_within_tol >= 2 and len(gp.restart_values) == 16
+    mu, sd, t = gp.loo_t()
+    assert np.isfinite(mu).all() and (sd > 0).all()
+
+
+def test_fit_v2_measured_floor_and_hook_scoped():
+    U, y = _smooth(sigma=0.01)
+    meas = S.Arm("m52+std+meas", S.DEFAULT_CFG, "measured")
+    with P.fit_v2():
+        gp = S.fit(U, y, meas, 0.2)
+    assert S.FIT_IMPL is None
+    assert P.hyper(gp)["noise_sd_raw"] >= 0.2 * (1 - 1e-6)    # the measured floor binds
+    assert not isinstance(S.fit(U, y, S.DEFAULT_ARM, 0.0), P.FitV2)
+
+
+import torch  # noqa: E402
+
+
+def test_reopen_round_end_to_end(e2e, tmp_path):
+    import shutil
+    out0, res, (U, Y, sob, Uh, Yh, roles, gp_, kw, lc), _ = e2e
+    out = str(tmp_path / "v2")
+    shutil.copytree(out0, out)
+    led0 = len(S.read_ledger(out))
+    # refusals before the round is opened
+    with pytest.raises(S.HoldoutRetired, match="housefit"):
+        P.reopen_score(None, S.DEFAULT_ARM, "S1", 48, None, np.zeros(48), out, 0.0, ["S1"])
+    with pytest.raises(S.HoldoutRetired, match="not seated"):
+        P.reopen_score(None, S.DEFAULT_ARM, "S2", 48, None, np.zeros(48), out, 0.0, ["S1"])
+    with pytest.raises(S.HoldoutRetired, match="only n = 48"):
+        P.reopen_score(None, S.DEFAULT_ARM, "S1", 32, None, np.zeros(48), out, 0.0, ["S1"])
+    house = P.run(U, Y, sob, lambda: (np.asarray(Uh, float), Yh), _seed(), None, roles, SITES, gp_, out, "synthetic",
+                  grid=GRID, explore=False, replay_only=True, mech=False, log=lambda *a: None)
+    r2 = P.run_v2(U, Y, sob, lambda: (np.asarray(Uh, float), Yh), _seed(), roles, SITES, out, house, grid=GRID,
+                  lc=lc, log=lambda *a: None)
+    led = S.read_ledger(out)
+    assert len(led) == led0 + 1 and led.iloc[-1]["arm"].endswith(P.V2_TAG)      # one seated id -> one scoring
+    assert os.path.isfile(os.path.join(out, P.COMMITTED_HOUSE))
+    doc = json.load(open(os.path.join(out, S.COMMITTED)))
+    assert doc["objectives"]["S1"]["fit_definition"] in (P.FIT_V2_LABEL, P.FIT_HOUSE_FALLBACK)
+    assert doc["objectives"]["S2"]["fit_definition"] == P.FIT_HOUSE_CO
+    assert "n_star_v2" in doc and doc["reopen_round"]["exposure_after"] == len(led)
+    # retired again: no new v2 scoring; a rerun replays and appends nothing; the house replay still works
+    with pytest.raises(S.HoldoutRetired, match="over|already"):
+        P.reopen_score(r2["winners"]["S1"][48]["gp"], r2["winners"]["S1"][48]["arm"], "S1", 48, np.asarray(Uh, float),
+                       Yh["S1"].to_numpy(float), out, 2e3, ["S1"])
+    house2 = P.run(U, Y, sob, lambda: (np.asarray(Uh, float), Yh), _seed(), None, roles, SITES, gp_, out, "synthetic",
+                   grid=GRID, explore=False, replay_only=True, mech=False, log=lambda *a: None)
+    r3 = P.run_v2(U, Y, sob, lambda: (np.asarray(Uh, float), Yh), _seed(), roles, SITES, out, house2, grid=GRID,
+                  log=lambda *a: None)
+    assert len(S.read_ledger(out)) == len(led) and all(h["replay"] for h in r3["holdout"].values())
+    from types import SimpleNamespace
+    from analysis.ercot_gp import ercot_gp_partb_report as R
+    house2["extra"] = {}
+    md = R.write_all(house2, _seed(), {"contract_version": "syn"}, SimpleNamespace(design_space="x"), res2=r3)
+    assert "## 13. Fit definition v2" in md and "## 12. Rule-v2 disclosure" in md

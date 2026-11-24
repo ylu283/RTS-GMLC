@@ -150,7 +150,12 @@ def arm_set(y_grading, meas_use):
 # --------------------------------------------------------------------------
 # fit / LOO / predict
 # --------------------------------------------------------------------------
+FIT_IMPL = None   # plan AMENDMENT 2026-11-24b: ercot_gp_partb.fit_v2() installs the v2 fit here
+
+
 def fit(U, y, arm, meas_sd=0.0):
+    if FIT_IMPL is not None:
+        return FIT_IMPL(np.asarray(U, float), np.asarray(y, float), arm, meas_sd)
     torch.manual_seed(SEED)
     return FlexGP(np.asarray(U, float), np.asarray(y, float), arm.floor(meas_sd), arm.cfg)
 
@@ -189,7 +194,7 @@ def noise_sd(gp):
 
 def latent_sd_t(gp, Uq):
     """Latent (noise-free) posterior sd, t units (gp_status_47 / bo_1021 convention)."""
-    xq = torch.tensor((np.atleast_2d(Uq) - gp.mx) / gp.sx, dtype=torch.float32)
+    xq = torch.tensor((np.atleast_2d(Uq) - gp.mx) / gp.sx, dtype=gp._tx.dtype)
     with torch.no_grad(), gpytorch.settings.fast_pred_var():
         return gp.model(xq).stddev.numpy() * gp.sy
 

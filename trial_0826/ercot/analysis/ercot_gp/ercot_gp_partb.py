@@ -72,6 +72,7 @@ NOISE_JSON = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise.json")
 LC_CSV = os.path.join(ERCOT, "analysis", "location_contrast", "location_contrast_E.csv")
 LC_DM = os.path.join(ERCOT, "waves", "location_contrast_E", "design_matrix.csv")
 CO_REPORTED_DEFAULT = ("N4", "N1")
+REPLAY_RTOL = 1e-3   # float32 house fit: identical cov95 required; RMSE to 0.1 % (thread / BLAS path noise)
 V2_TAG = "|fit-v2"                 # ledger arm suffix of the AMENDMENT 2026-11-24b re-open round
 COMMITTED_HOUSE = "committed_configs_housefit.json"
 FLOOR_RULE = ("measured iff sigma_c > 0 AND df >= 3 (sigma_c = prompt-63 chatter sd, "
@@ -129,7 +130,10 @@ def _arm_row(obj, role, n, a, gp, lo_, sel_r, sigma_c, sites):
          "median_95_halfwidth_raw": half,
          "outputscale_sd_t": h["outputscale_sd_t"], "noise_sd_raw": h["noise_sd_raw"],
          "noise_at_floor": h["noise_at_floor"], "sigma_c": sigma_c,
-         "noise_over_sigma_c": h["noise_sd_raw"] / sigma_c if sigma_c > 0 else np.nan}
+         "noise_over_sigma_c": h["noise_sd_raw"] / sigma_c if sigma_c > 0 else np.nan,
+         "converged": getattr(gp, "converged", np.nan), "n_within_tol": getattr(gp, "n_within_tol", np.nan),
+         "mode_gap_nats": getattr(gp, "mode_gap_nats", np.nan), "gap_second_nats": getattr(gp, "gap_second_nats", np.nan),
+         "map_total": getattr(gp, "map_total", np.nan), "n_failed_restarts": getattr(gp, "n_failed", np.nan)}
     sx = np.asarray(gp.sx, float)
     for s, v, x in zip(sites, h["ls_u"], sx):
         ls_std = v / x
@@ -196,6 +200,169 @@ def study_long(U, y, sob, arms, sigma_c, obj, role, sites, grid=N_GRID, epochs=L
     for r in rows:
         r["fit"] = f"adam{epochs}"
     return rows, winners
+
+
+# --------------------------------------------------------------------------
+# fit definition v2 (plan AMENDMENT 2026-11-24b §3)
+# --------------------------------------------------------------------------
+V2_RESTARTS = 16
+V2_SEED = 5454
+V2_NOISE_LB = 1e-6                       # standardized noise variance lower bound
+V2_OPTIONS = {"maxiter": 1000, "ftol": 1e-7, "gtol": 1e-7}
+V2_CONV_TOL_PER_N = 1e-3                 # converged iff >= 2 restarts within 1e-3 * n nats of the best
+V2_SPEC = ("float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input "
+           "standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; "
+           "standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via "
+           "botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 "
+           "prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best")
+
+
+def _exact_gp_cls():
+    import gpytorch
+
+    class ExactGP(gpytorch.models.ExactGP):
+        def __init__(self, x, y, lik, kern):
+            super().__init__(x, y, lik)
+            self.mean_module = gpytorch.means.ConstantMean()
+            self.covar_module = kern
+
+        def forward(self, x):
+            return gpytorch.distributions.MultivariateNormal(self.mean_module(x), self.covar_module(x))
+
+        def transform_inputs(self, X, input_transform=None):     # botorch closure hook: identity (u as given)
+            return X
+    return ExactGP
+
+
+class FitV2:
+    """Fit definition v2. Same public surface as the D-1025 FlexGP (predict_t, loo_t, mx, sx, my, sy,
+    transform, y_med, floor_var, lik, model, _tx, _ty), so selection, LOO, holdout and the path sampler
+    run unchanged. Inputs are u in [0, 1]^d as given (mx = 0, sx = 1)."""
+
+    def __init__(self, X, y, floor, cfg, sigma_c=0.0, measured=False, n_restarts=V2_RESTARTS, seed=V2_SEED):
+        import math
+        import gpytorch
+        from gpytorch.constraints import GreaterThan
+        from gpytorch.priors import LogNormalPrior
+        from botorch.optim.fit import fit_gpytorch_mll_scipy
+        kernel, transform, noise, prior = cfg
+        assert noise == "inferred", "fit v2 covers the plan-5 arms (inferred noise, optional measured floor)"
+        self.cfg, self.transform = tuple(cfg), transform
+        X, y = np.asarray(X, float), np.asarray(y, float)
+        n, d = X.shape
+        if transform == "log1p":
+            assert (y >= 0).all()
+            self.y_med = float(np.median(y))
+            floor_t, sig_t, t = floor / (1.0 + self.y_med), sigma_c / (1.0 + self.y_med), np.log1p(y)
+        else:
+            self.y_med = None
+            floor_t, sig_t, t = floor, sigma_c, y
+        self.mx, self.sx = np.zeros(d), np.ones(d)
+        self.my = float(t.mean())
+        self.sy = float(np.std(t, ddof=0)) or 1.0
+        self.floor_var = max(V2_NOISE_LB, (floor_t / self.sy) ** 2) if measured else V2_NOISE_LB
+        self.noise_prior_loc = math.log((sig_t / self.sy) ** 2) if sig_t > 0 else None
+        tx = torch.tensor(X, dtype=torch.float64)
+        ty = torch.tensor((t - self.my) / self.sy, dtype=torch.float64)
+        self._tx, self._ty = tx, ty
+        ls_loc, ls_scale = math.sqrt(2.0) + 0.5 * math.log(d), math.sqrt(3.0)
+        ExactGP = _exact_gp_cls()
+
+        def build():
+            lsp = LogNormalPrior(ls_loc, ls_scale)
+            if kernel == "m52":
+                base = gpytorch.kernels.MaternKernel(nu=2.5, ard_num_dims=d, lengthscale_prior=lsp,
+                                                     lengthscale_constraint=GreaterThan(2.5e-2))
+            elif kernel == "rbf":
+                base = gpytorch.kernels.RBFKernel(ard_num_dims=d, lengthscale_prior=lsp,
+                                                  lengthscale_constraint=GreaterThan(2.5e-2))
+            else:
+                raise ValueError(kernel)
+            kern = gpytorch.kernels.ScaleKernel(base)
+            npr = LogNormalPrior(self.noise_prior_loc, 1.0) if self.noise_prior_loc is not None else None
+            lik = gpytorch.likelihoods.GaussianLikelihood(noise_prior=npr, noise_constraint=GreaterThan(self.floor_var))
+            model = ExactGP(tx, ty, lik, kern).double()
+            return model, lik
+
+        rng = np.random.default_rng(seed)
+        draws = [(rng.lognormal(ls_loc, ls_scale, size=d),
+                  float(np.exp(rng.normal(self.noise_prior_loc if self.noise_prior_loc is not None else math.log(0.1), 1.0))))
+                 for _ in range(n_restarts - 1)]
+        vals, states = [], []
+        for r in range(n_restarts):
+            model, lik = build()
+            if r > 0:
+                ls, nv = draws[r - 1]
+                model.covar_module.base_kernel.lengthscale = torch.tensor(np.clip(ls, 0.03, 1e3), dtype=torch.float64)
+                lik.noise = torch.tensor(max(nv, 1.5 * self.floor_var), dtype=torch.float64)
+            mll = gpytorch.mlls.ExactMarginalLogLikelihood(lik, model)
+            model.train(); lik.train()
+            try:
+                with gpytorch.settings.cholesky_jitter(double_value=1e-8):
+                    fit_gpytorch_mll_scipy(mll, options=dict(V2_OPTIONS))
+                    with torch.no_grad():
+                        v = float(mll(model(tx), ty)) * n            # total MAP objective (nats)
+            except Exception as e:                                    # noqa: BLE001 — a failed restart is recorded
+                if os.environ.get("FITV2_DEBUG"):
+                    raise
+                v = -np.inf
+            vals.append(v if np.isfinite(v) else -np.inf)
+            states.append((model, lik))
+        vals = np.asarray(vals)
+        b = int(np.argmax(vals))
+        assert np.isfinite(vals[b]), "fit v2: every restart failed"
+        self.model, self.lik = states[b]
+        self.model.eval(); self.lik.eval()
+        tol = V2_CONV_TOL_PER_N * n
+        within = vals >= vals[b] - tol
+        self.restart_values = vals.tolist()
+        self.map_total = float(vals[b])
+        self.n_within_tol = int(within.sum())
+        self.converged = bool(self.n_within_tol >= 2)
+        other = vals[~within & np.isfinite(vals)]
+        self.mode_gap_nats = float(vals[b] - other.max()) if len(other) else float("nan")
+        srt = np.sort(vals[np.isfinite(vals)])[::-1]
+        self.gap_second_nats = float(srt[0] - srt[1]) if len(srt) > 1 else float("nan")
+        self.n_failed = int((~np.isfinite(vals)).sum())
+
+    def predict_t(self, Xq):
+        import gpytorch
+        xq = torch.tensor(np.atleast_2d(Xq), dtype=torch.float64)
+        with torch.no_grad(), gpytorch.settings.fast_pred_var():
+            post = self.lik(self.model(xq))
+            return post.mean.numpy() * self.sy + self.my, post.stddev.numpy() * self.sy
+
+    def loo_t(self):
+        """Closed-form LOO with the FITTED constant mean (the house used the training mean of the
+        standardized y, i.e. 0; v2 uses its fitted constant)."""
+        with torch.no_grad():
+            K = self.model.covar_module(self._tx).to_dense()
+            Kn = K + self.lik.noise * torch.eye(len(self._tx), dtype=K.dtype)
+            Ki = torch.linalg.inv(Kn)
+            c = self.model.mean_module.constant
+            alpha = Ki @ (self._ty - c)
+            diag = Ki.diagonal()
+            resid = (alpha / diag).numpy()
+            sd = np.sqrt(1.0 / diag.numpy())
+        t_true = self._ty.numpy() * self.sy + self.my
+        return t_true - resid * self.sy, sd * self.sy, t_true
+
+
+def _fit_v2_impl(U, y, arm, meas_sd):
+    return FitV2(U, y, arm.floor(meas_sd), arm.cfg, sigma_c=float(meas_sd), measured=arm.floor_mode == "measured")
+
+
+class fit_v2:
+    """Context manager: every ercot_gp_status.fit inside uses fit definition v2."""
+
+    def __enter__(self):
+        self._orig = S.FIT_IMPL
+        S.FIT_IMPL = _fit_v2_impl
+        return self
+
+    def __exit__(self, *exc):
+        S.FIT_IMPL = self._orig
+        return False
 
 
 # --------------------------------------------------------------------------
@@ -315,8 +482,9 @@ def holdout(winners, tiers, Uh, Yh, out_dir, sigmas, allow_new=True):
                 assert row["arm"] == w["arm"].name, (obj, n, row["arm"], w["arm"].name)
                 assert int(row["cov95"]) == h["metrics"]["cov95"], (
                     f"replay {obj}@{n}: cov95 {h['metrics']['cov95']} != ledger {row['cov95']} (not deterministic)")
-                assert abs(float(row["rmse_raw"]) - h["metrics"]["rmse"]) <= 1e-6 * max(1.0, abs(h["metrics"]["rmse"])), (
-                    f"replay {obj}@{n}: rmse differs from the ledger")
+                rel = abs(float(row["rmse_raw"]) - h["metrics"]["rmse"]) / max(1.0, abs(h["metrics"]["rmse"]))
+                assert rel <= REPLAY_RTOL, f"replay {obj}@{n}: rmse differs from the ledger by {rel:.2e} (relative)"
+                h["replay_rmse_rel_diff"] = rel
                 h["ledger_row"], h["replay"] = row, True
             else:
                 if not allow_new:
@@ -852,6 +1020,206 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
 
 
 # --------------------------------------------------------------------------
+# AMENDMENT 2026-11-24b §4: the one holdout re-open round under fit v2
+# --------------------------------------------------------------------------
+V2_TIER = 48
+V2_MAX_SCORINGS = 2                       # V1 and E1 at n = 48, once each
+FIT_V2_LABEL = "v2 (AMENDMENT 2026-11-24b)"
+FIT_HOUSE_FALLBACK = "house (fallback)"
+FIT_HOUSE_CO = "house (co-reported; v2 LOO-only, not holdout-scored)"
+N0_REC_RULE = ("n0_tier_recommended = n* computed under the fit definition committed for the seated ids "
+               "(v2 if every seated id commits v2, else the house n*); pinned before the v2 holdout scoring")
+
+
+def _v2_rows(led):
+    return led[led["arm"].astype(str).str.contains(V2_TAG, regex=False)]
+
+
+def reopen_score(gp, arm, objective, n0, Uh, yh, out_dir, sigma_c, seated):
+    """ONE v2 scoring (append-only). Refuses: a non-seated id, n0 != 48, a repeat, a third v2 scoring,
+    the 25th scoring overall, a missing committed_configs_housefit.json, or a committed file that already
+    carries fit_definition (the re-open round is over)."""
+    if objective not in seated:
+        raise S.HoldoutRetired(f"re-open round: {objective} is not seated (co-reported ids are LOO-only)")
+    if int(n0) != V2_TIER:
+        raise S.HoldoutRetired(f"re-open round: n0 = {n0}; only n = {V2_TIER}")
+    if not os.path.isfile(os.path.join(out_dir, COMMITTED_HOUSE)):
+        raise S.HoldoutRetired(f"re-open round needs {COMMITTED_HOUSE} first")
+    cp = os.path.join(out_dir, S.COMMITTED)
+    if os.path.isfile(cp):
+        with open(cp) as f:
+            if any("fit_definition" in v for v in json.load(f).get("objectives", {}).values()):
+                raise S.HoldoutRetired("re-open round is over: committed_configs.json carries fit_definition (retired again)")
+    led = S.read_ledger(out_dir)
+    v2 = _v2_rows(led)
+    if len(led) >= S.EXPOSURE_CAP:
+        raise S.HoldoutRetired(f"exposure budget spent ({len(led)} >= {S.EXPOSURE_CAP})")
+    if (v2["objective"].astype(str) == objective).any():
+        raise S.HoldoutRetired(f"{objective}: v2 already scored once")
+    if len(v2) >= V2_MAX_SCORINGS:
+        raise S.HoldoutRetired(f"re-open round allows {V2_MAX_SCORINGS} scorings")
+    yh = np.asarray(yh, float)
+    assert len(yh) == S.N_HOLDOUT
+    h = _holdout_eval(gp, arm, Uh, yh, sigma_c)
+    m = h["metrics"]
+    row = {"n_scoring": len(led) + 1, "utc": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+           "objective": objective, "n0": int(n0), "arm": arm.name + V2_TAG, "cfg": "/".join(arm.cfg) + "/fit-v2",
+           "floor": arm.floor(sigma_c), "cov95": m["cov95"], "n": m["n"], "bar_lo": S.HOLDOUT_BAR[0],
+           "bar_hi": S.HOLDOUT_BAR[1], "pass": h["pass"], "rmse_raw": m["rmse"]}
+    import csv as _csv
+    with open(os.path.join(out_dir, S.LEDGER), "a", newline="") as f:
+        _csv.DictWriter(f, fieldnames=S.LEDGER_COLS).writerow(row)
+    h["ledger_row"], h["replay"] = row, False
+    return h
+
+
+def run_v2(U, Y, sob, load_holdout, seed, roles, sites, out_dir, house, grid=N_GRID, lc=None, log=print):
+    """Fit v2 round. `house` = the house-fit run result (replayed). Writes ercot_gp_status_v2.csv,
+    ercot_gp_nstar_checks_v2.csv, v2 figures; scores V1 / E1 once at n = 48; rewrites committed_configs.json
+    LAST (previous file kept as committed_configs_housefit.json)."""
+    import shutil
+    t0 = time.time()
+    figs_dir = os.path.join(out_dir, "figs")
+    Uv = np.asarray(U, float)
+    sob = np.asarray(sob, int)
+    objs = list(Y.columns)
+    seated = [o for o in objs if roles[o] == "seated"]
+    co = [o for o in objs if roles[o] != "seated"]
+    cp, hp = os.path.join(out_dir, S.COMMITTED), os.path.join(out_dir, COMMITTED_HOUSE)
+    with open(cp) as f:
+        cur = json.load(f)
+    done = any("fit_definition" in v for v in cur.get("objectives", {}).values())
+    rows, winners, sig, uses = [], {}, {}, {}
+    with fit_v2():
+        for obj in objs:
+            y = Y[obj].to_numpy(float)
+            sig[obj], _, uses[obj] = seed_floor(seed, obj)
+            arms = S.arm_set(y, uses[obj])
+            r, _, w = study(Uv, y, sob, arms, sig[obj], obj, roles[obj], sites, grid, explore=False)
+            for x in r:
+                x["fit"] = "v2"
+            rows += r
+            winners[obj] = w
+            log(f"[v2 study] {obj}: selected { {n: w[n]['arm'].name for n in grid} } ({time.time() - t0:.0f} s)")
+    df = pd.DataFrame(rows)
+    checks = n_star_checks(df, sites, grid)
+    ns, reason, alt = n_star(checks, seated, co, grid)
+    reason_lines = [ln for ln in reason.split("Per n (")[1].split("): ", 1)[1].split(" | ")] if "Per n (" in reason else [reason]
+    log(f"[v2 n*] {ns}")
+    # ---- the re-open round (random_E loaded only now) ----
+    Uh, Yh = load_holdout()
+    if not os.path.isfile(hp):
+        assert not done
+        shutil.copy(cp, hp)                                   # keep the house-round file
+    led = S.read_ledger(out_dir)
+    hres = {}
+    for obj in seated:
+        w = winners[obj][V2_TIER]
+        rec = _v2_rows(led)
+        rec = rec[rec["objective"].astype(str) == obj]
+        if len(rec):
+            row = rec.iloc[0].to_dict()
+            h = _holdout_eval(w["gp"], w["arm"], Uh, Yh[obj].to_numpy(float), sig[obj])
+            assert row["arm"] == w["arm"].name + V2_TAG, (obj, row["arm"], w["arm"].name)
+            assert int(row["cov95"]) == h["metrics"]["cov95"], f"v2 replay {obj}: cov95 differs from the ledger"
+            h["ledger_row"], h["replay"] = row, True
+        else:
+            if done:
+                raise S.HoldoutRetired(f"{obj}: no v2 row and the re-open round is over")
+            h = reopen_score(w["gp"], w["arm"], obj, V2_TIER, Uh, Yh[obj].to_numpy(float), out_dir, sig[obj], seated)
+        hres[obj] = h
+        log(f"[v2 holdout] {obj} {w['arm'].name}: {h['metrics']['cov95']}/48 {'PASS' if h['pass'] else 'FAIL'}"
+            f"{' (replay)' if h['replay'] else ''}")
+    led = S.read_ledger(out_dir)
+    # ---- committed_configs.json rewrite (LAST) ----
+    with open(hp) as f:
+        house_doc = json.load(f)
+    commit_v2 = {o: bool(hres[o]["pass"]) for o in seated}
+    n0_rec = ns if all(commit_v2.values()) else house_doc["n_star"]
+    objd = {}
+    for obj in objs:
+        hc = dict(house_doc["objectives"][obj])
+        w = winners[obj][V2_TIER]
+        hh = hyper(w["gp"])
+        v2info = {"arm": w["arm"].name, "cfg": list(w["arm"].cfg), "fit_spec": V2_SPEC,
+                  "loo_nlpd_mean": float(w["loo"]["metrics"]["nlpd"]), "loo_rmse": float(w["loo"]["metrics"]["rmse"]),
+                  "loo_cov95": [int(w["loo"]["metrics"]["cov95"]), V2_TIER],
+                  "hyperparameters": {"lengthscales_u": dict(zip(sites, hh["ls_u"])), "outputscale_sd_t": hh["outputscale_sd_t"],
+                                      "noise_sd_raw": hh["noise_sd_raw"],
+                                      "noise_over_sigma_c": hh["noise_sd_raw"] / sig[obj] if sig[obj] > 0 else None,
+                                      "noise_at_floor": hh["noise_at_floor"]},
+                  "converged": bool(w["gp"].converged), "n_within_tol": int(w["gp"].n_within_tol),
+                  "mode_gap_nats": w["gp"].mode_gap_nats, "gap_second_nats": w["gp"].gap_second_nats,
+                  "n_star_v2": int(ns)}
+        if obj in seated:
+            h = hres[obj]
+            m = h["metrics"]
+            v2info["holdout"] = {"cov95": int(m["cov95"]), "n": S.N_HOLDOUT, "pass": bool(h["pass"]), "rmse": float(m["rmse"]),
+                                 "rms_z": float(m["rms_z"]), "exposure_row": int(h["ledger_row"]["n_scoring"])}
+        if obj in seated and commit_v2[obj]:
+            a = w["arm"]
+            e = {"cfg": list(a.cfg), "arm": a.name, "fit_definition": FIT_V2_LABEL, "fit_spec": V2_SPEC,
+                 "seated": True, "role": roles[obj],
+                 "floor": float(sig[obj]) if a.floor_mode == "measured" else 0.0, "floor_rule": FLOOR_RULE,
+                 "measured_floor_used": a.floor_mode == "measured", "sigma_c": float(sig[obj]),
+                 "loo_nlpd_mean": v2info["loo_nlpd_mean"], "loo_rmse": v2info["loo_rmse"], "loo_cov95": v2info["loo_cov95"],
+                 "holdout_cov95": [v2info["holdout"]["cov95"], S.N_HOLDOUT], "holdout_rmse": v2info["holdout"]["rmse"],
+                 "holdout_pass": v2info["holdout"]["pass"], "holdout_v2": v2info["holdout"],
+                 "exposure_rows": list(hc["exposure_rows"]) + [v2info["holdout"]["exposure_row"]],
+                 "n_star": int(house_doc["n_star"]), "n_star_v2": int(ns),
+                 "hyperparameters": v2info["hyperparameters"], "converged": v2info["converged"],
+                 "mode_gap_nats": v2info["mode_gap_nats"], "house_fit_commit": hc}
+        else:
+            e = hc
+            e["fit_definition"] = FIT_HOUSE_FALLBACK if obj in seated else FIT_HOUSE_CO
+            e["v2_result"] = v2info
+            if obj in seated:
+                e["holdout_v2"] = v2info["holdout"]
+                e["exposure_rows"] = list(hc["exposure_rows"]) + [v2info["holdout"]["exposure_row"]]
+        objd[obj] = e
+    doc = {k: v for k, v in house_doc.items() if k != "objectives"}
+    doc.update({"design_space_version": house_doc["design_space_version"], "n0_tier_recommended": int(n0_rec),
+                "n0_tier_rule": N0_REC_RULE, "n_star": int(house_doc["n_star"]), "n_star_v2": int(ns),
+                "n_star_v2_reason": reason, "E-D7_decided": None, "fit_definition_amendment": "plan AMENDMENT 2026-11-24b",
+                "fit_v2_spec": V2_SPEC, "reopen_round": {"tier": V2_TIER, "scored": seated,
+                                                       "exposure_after": int(len(led)), "retired_again": True},
+                "previous_file": COMMITTED_HOUSE,
+                "generated_utc": _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"), "objectives": objd})
+    if not done:
+        with open(cp, "w") as f:
+            json.dump(doc, f, indent=1, default=float)                   # LAST: retires the holdout again
+    else:
+        for obj in objs:
+            assert cur["objectives"][obj]["fit_definition"] == objd[obj]["fit_definition"], obj
+            assert cur["objectives"][obj]["arm"] == objd[obj]["arm"], obj
+        doc = cur
+    # ---- deliverables (never touch committed_configs.json) ----
+    hold_rows = [{"objective": o, "role": roles[o], "n": V2_TIER, "scope": "holdout", "fit": "v2",
+                  "arm": winners[o][V2_TIER]["arm"].name, "holdout_cov95": hres[o]["metrics"]["cov95"],
+                  "holdout_pass": hres[o]["pass"], "holdout_rmse": hres[o]["metrics"]["rmse"],
+                  "holdout_rms_z": hres[o]["metrics"]["rms_z"], "holdout_nlpd": hres[o]["metrics"]["nlpd"],
+                  "exposure_row": int(hres[o]["ledger_row"]["n_scoring"])} for o in seated]
+    out = df.copy()
+    out.insert(3, "scope", "loo")
+    pd.concat([out, pd.DataFrame(hold_rows)], ignore_index=True, sort=False).to_csv(
+        os.path.join(out_dir, "ercot_gp_status_v2.csv"), index=False)
+    checks.to_csv(os.path.join(out_dir, "ercot_gp_nstar_checks_v2.csv"), index=False)
+    figs = [fig_curves(df, objs, roles, ns, os.path.join(figs_dir, "fig_training_size_curves_v2.png"), grid),
+            fig_lengthscales(df, objs, roles, sites, ns, os.path.join(figs_dir, "fig_lengthscales_vs_n_v2.png"), grid),
+            fig_parity({o: {V2_TIER: winners[o][V2_TIER]} for o in seated}, {o: {V2_TIER: hres[o]} for o in seated},
+                       Uh, Yh, [V2_TIER], os.path.join(figs_dir, "fig_parity_holdout_v2.png"), label=" (fit v2)")]
+    lc_df = None
+    if lc is not None:
+        Ulc, Ylc, labels = lc
+        gps = {o: winners[o][V2_TIER]["gp"] for o in objs}
+        lc_df = lc_residuals(gps, {o: winners[o][V2_TIER]["arm"] for o in objs}, sig, Ulc, Ylc, labels)
+        lc_df.to_csv(os.path.join(out_dir, "ercot_gp_lc_residuals_v2.csv"), index=False)
+    return {"study": df, "checks": checks, "n_star": ns, "reason": reason, "reason_lines": reason_lines, "alt": alt,
+            "holdout": hres, "committed": doc, "winners": winners, "objs": objs, "roles": roles, "seated": seated,
+            "exposure": int(len(led)), "figs": figs, "lc": lc_df, "wall_s": time.time() - t0, "sigmas": sig}
+
+
+# --------------------------------------------------------------------------
 # real inputs
 # --------------------------------------------------------------------------
 def real_grading(design_space, objs):
@@ -890,6 +1258,8 @@ def main(argv=None):
     ap.add_argument("--replay-only", action="store_true")
     ap.add_argument("--no-mechanism", action="store_true")
     ap.add_argument("--no-long-diag", action="store_true", help="skip the exploratory long-fit diagnostic")
+    ap.add_argument("--fit", choices=["house", "v2"], default="house",
+                    help="v2: replay the house round, then the AMENDMENT 2026-11-24b fit-v2 round")
     a = ap.parse_args(argv)
     from analysis.ercot_gp.ercot_gp_loader import read_design_space
     ds = read_design_space(a.design_space)
@@ -908,11 +1278,15 @@ def main(argv=None):
     gen_pmax = np.asarray([float(s["gen_pmax"]) for s in ds["sites"]], float)
     lc = location_contrast_rows(sites=sites, objs=objs)
     res = run(U, Y, sob, real_holdout_loader(a.design_space, objs, extra), seed, noise, roles, sites, gen_pmax,
-              a.out_dir, ds["contract_version"], replay_only=a.replay_only, mech=not a.no_mechanism, lc=lc,
-              long_diag=not a.no_long_diag)
+              a.out_dir, ds["contract_version"], replay_only=a.replay_only or a.fit == "v2", mech=not a.no_mechanism,
+              lc=lc, long_diag=not a.no_long_diag)
     res["extra"] = extra
+    res2 = None
+    if a.fit == "v2" or os.path.isfile(os.path.join(a.out_dir, COMMITTED_HOUSE)):
+        res2 = run_v2(U, Y, sob, real_holdout_loader(a.design_space, objs, extra), seed, roles, sites, a.out_dir, res,
+                      lc=lc)
     from analysis.ercot_gp import ercot_gp_partb_report as R
-    R.write_all(res, seed, ds, a)
+    R.write_all(res, seed, ds, a, res2=res2)
     print(f"n* = {res['n_star']}; tiers {res['tiers']}; ledger {len(res['ledger'])}; wall {res['wall_s']:.0f} s")
 
 
