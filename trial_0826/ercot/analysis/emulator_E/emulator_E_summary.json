@@ -1,0 +1,99 @@
+{
+ "label": "EMULATOR",
+ "pass_fail": [
+  {
+   "check": "no crash: every planned run finished (12 single house, 15 multi house lanes) and each lane ended where its scenario says (s0/s1: 4 graded rounds; s2: r1 then HALT)",
+   "result": "single 12/12, multi 15/15, lane ends as expected = True",
+   "pass": true,
+   "note": "AS BUILT the multi-seed init CRASHED at seed 1 (55's r1 pairwise-disjointness assert; shared vertex designs); PASS is after the disclosed one-line 55 change"
+  },
+  {
+   "check": "C1 ingest passes on every emulated round (55 ingest_gate)",
+   "result": "49/49",
+   "pass": true
+  },
+  {
+   "check": "C2 / C3 flag counts at or below nominal (per (round, objective): C2 3.7e-4, C3 1.1e-6; PASS iff count <= Poisson 95 % quantile of the expected count)",
+   "result": "C2 0 (single 0/24, multi 0/90; expected 0.042, limit 0); C3 0 (expected 1.3e-04, limit 0)",
+   "pass": true
+  },
+  {
+   "check": "single-objective BO within 2 B_j of the emulator optimum by round 4 on >= 2 of 3 seeds (regret of the best-observed design, true f)",
+   "result": "V1: 3/3; E1: 3/3",
+   "pass": true
+  },
+  {
+   "check": "single-objective BO beats the random-8 baseline at matched budget (round 4, 80 evaluations) on every objective (mean regret over 3 seeds; per-seed shown)",
+   "result": "V1: BO 0.176 B vs random 18.687 B, per seed {0: True, 1: True, 2: True}; E1: BO 0.011 B vs random 12.292 B, per seed {0: True, 1: True, 2: True}",
+   "pass": true
+  },
+  {
+   "check": "multi s0 clean: 4 rounds, guardrail_mode monitor, no halt (5 lanes)",
+   "result": "True",
+   "pass": true
+  },
+  {
+   "check": "multi s1 one injected shed violation in r1: mode flips at r1, constrained qNEHVI (shed GP) in r2-r4, violating run out of HV (n_hv 55/63/71/79), r1 unconstrained (5 lanes)",
+   "result": "True",
+   "pass": true
+  },
+  {
+   "check": "multi s2 two injected violations in r1: HALT_FOR_DECISION.md written, propose r2 REFUSED (5 lanes)",
+   "result": "True",
+   "pass": true
+  },
+  {
+   "check": "tau_exact = 0 -> budget-cap-only: gain/tau_exact null, would_stop never fires, every lane to the cap",
+   "result": "True",
+   "pass": true
+  },
+  {
+   "check": "R2 / N1_off monitors at base + chatter: no flags (R2 > 312.16 MWh; dN1_off >= 462.7 line-h)",
+   "result": "R2 max 210.5 MWh; N1_off max 30954",
+   "pass": true
+  },
+  {
+   "check": "HV fraction of the emulator front reported (no threshold; a finding)",
+   "result": "s0 true-f HV / polished front: [0.9966, 0.9923, 0.9966, 0.9964, 0.9936]",
+   "pass": true
+  }
+ ],
+ "within_2B": {
+  "V1": 3,
+  "E1": 3
+ },
+ "beats_random": {
+  "V1": {
+   "bo_mean": 0.17552066468376018,
+   "random_mean": 18.686849134143205,
+   "per_seed": {
+    "0": true,
+    "1": true,
+    "2": true
+   }
+  },
+  "E1": {
+   "bo_mean": 0.011431959098272326,
+   "random_mean": 12.291838895735586,
+   "per_seed": {
+    "0": true,
+    "1": true,
+    "2": true
+   }
+  }
+ },
+ "c_counts": {
+  "single_C2": 0,
+  "single_C3": 0,
+  "multi_C2": 0,
+  "multi_C3": 0,
+  "n_single": 24,
+  "n_multi": 90,
+  "expected_C2": 0.04218,
+  "expected_C3": 0.0001254
+ },
+ "hv_front_sobol": 129360280237874.28,
+ "hv_front_polished": 142385804210826.0,
+ "hv_random48_obs": 103089197015716.27,
+ "hv_random48_true": 103497320668402.56
+}

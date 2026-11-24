@@ -1,5 +1,27 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
 
+## Prompt 66 — EMULATOR BO dry run on the committed GPs (v1, 2026-11-24; executor; no PCM, no CRC)
+
+EMULATOR — machinery check only; nothing enters a ledger, the plan or a decision row. Branch
+`ercot/66-emulator-bo`, rebased on tx123 93c81a4 (plan AMENDMENT 2026-11-24b: GP fit v2 MAP/L-BFGS-B — this run used the house fit; rerun after the v2 refit). Report `analysis/emulator_E/EMULATOR_BO.md`.
+
+- [x] Step 0 (as 55's proxy) `arms_E.json`: dated design space, objectives [V1, E1], R2 156.08 / 312.16,
+  N1_off monitor; scratch + 3 M-dependent test asserts follow the config; tests/test_methods_E_*.py 35 passed (bc3168c).
+- [x] 55 minimal changes (c7576a6, disclosed): injected loader; `n0_tier_provisional` = 48 only while
+  E-D7_decided is null; r1 cross-seed assert = "sets differ" (55 §2.1 text) instead of pairwise disjoint —
+  AS BUILT, init CRASHED at seed 1 on the real start set (4-5 of 8 r1 designs are shared box vertices).
+  **Kay: confirm or reject change (c).**
+- [x] Emulator: committed GPs refitted by 54's code path (hyperparameters reproduce committed to 3e-6),
+  frozen float64 closed form; eps ~ N(0, Sigma_c[V1, E1]) rng 6666; start-set Y emulated.
+- [x] Single-objective qLogNEI, 3 seeds x 4 rounds: within 2 B by r4 on 3/3 seeds (V1, E1); round-4 regret
+  BO 0.18 B / 0.011 B vs random-8 18.7 B / 12.3 B.
+- [x] Multi (55 machinery, real loader, real committed configs): s0 5 lanes 4 rounds; s1 constrained from r2;
+  s2 HALT at r1 + propose refused; C1 49/49; C2/C3 0; tau_exact = 0 -> cap-only; p_random = 1 [1, 1];
+  true-f HV 0.990-0.997 of the polished front (1.09-1.10 of the spec's Sobol 2^14 front); ~6-10 s per round.
+- [x] EXPLORATORY 10,000-epoch BO fit: same search quality; noise sd near chatter (house fit over-states it
+  6x / 2.3x, so C2/C3 have little power); C2 fires at r1 on 3/6 single runs (E1 vertex batch).
+- [ ] Review (three agents: BO statistics; machinery/exec; audience) before any artifact — strategy session.
+
 ## Prompt 65 — E-D1b rule v2: disclosed post-hoc amendment + re-walk + dated design space (v1.1, 2026-11-24; executor writes here only)
 
 ### 2026-11-24 — executor (worktree `RTS-GMLC-e65`, branch `ercot/65-objective-rule-v2`)

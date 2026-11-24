@@ -1,0 +1,251 @@
+{
+  "campaign": "methods_E",
+  "prompt": "55",
+  "part": "EMULATOR",
+  "arm": "qnehvi",
+  "seed_id": 3,
+  "acq": "qnehvi",
+  "objectives": [
+    "V1",
+    "E1"
+  ],
+  "objective_status": {
+    "V1": "SEATED (rule v2, AMENDMENT 2026-11-24)",
+    "E1": "SEATED (rule v2, AMENDMENT 2026-11-24)"
+  },
+  "ref_point": [
+    3977491.3852933007,
+    8163727647.918913
+  ],
+  "R_source": "../../waves/n0_E/landing_R.json",
+  "R_rule": "R = nadir + 0.1 (nadir - ideal) per objective over the 48 grading rows (plan \u00a76.3)",
+  "R_n_rows": 48,
+  "tau": {
+    "tau_joint": 0.0,
+    "tau_marginal": 0.0,
+    "sensitivity_joint_over_marginal": null,
+    "budget_cap_only": true,
+    "form": "homoscedastic (Sigma_exact for every start)",
+    "sigma_source": "../noise_v3/ercot_noise_exact_cov.csv"
+  },
+  "tau_headline": "tau_joint",
+  "tau_recipe": "std (ddof 0) of the exact HV over N draws, default_rng(seed); every start perturbed jointly by multivariate_normal(0, Sigma, method='svd') (joint) or by independent normals with the marginal sds (marginal); Sigma = 0 -> tau = 0 without drawing",
+  "rider_levels": {
+    "V1": {
+      "level": 4523.397462490539,
+      "label": "sensitivity-level rider (52 perturbed-population sd; NOT a noise level)"
+    },
+    "E1": {
+      "level": 585748.918240619,
+      "label": "sensitivity-level rider (52 perturbed-population sd; NOT a noise level)"
+    }
+  },
+  "n0_tier": 48,
+  "n0_source": "PROVISIONAL arms_E n0_tier_provisional = 48 (E-D7_decided null)",
+  "base_waves": [
+    "n0_E"
+  ],
+  "loader": "real(n0_E: analysis.ercot_gp.ercot_gp_loader.load; Y replaced by the EMULATED start values)+EMULATOR wave tables",
+  "configs_source": "real",
+  "gp": {
+    "V1": {
+      "cfg": [
+        "rbf",
+        "std",
+        "inferred",
+        "none"
+      ],
+      "floor": 1e-09
+    },
+    "E1": {
+      "cfg": [
+        "m52",
+        "std",
+        "inferred",
+        "none"
+      ],
+      "floor": 1e-09
+    }
+  },
+  "qnehvi": {
+    "acq": "qNoisyExpectedHypervolumeImprovement",
+    "alpha": 0.0,
+    "prune_baseline": true,
+    "cache_root": true,
+    "sampler": "SobolQMCNormalSampler",
+    "mc_samples": 128,
+    "optimizer": "optimize_acqf",
+    "bounds": "[0, 1]^d (u units)",
+    "num_restarts": 20,
+    "raw_samples": 512,
+    "sequential": true,
+    "dtype": "float64",
+    "ref_point": "R from landing_R.json restricted to `objectives` (contract 6.4); negated after z-scoring (BoTorch maximizes)"
+  },
+  "q": 8,
+  "hard_cap": 4,
+  "stop_rule": "record_only",
+  "acq_seed_base": 20261006,
+  "guardrails": {
+    "R1": {
+      "name": "load shed (MWh)",
+      "mode": "monitor->constrain",
+      "violation_mwh": 1.0,
+      "response": "plan 1.3: violating run stays in the ledger, infeasible-for-claims, excluded from reported fronts and HV; from the round AFTER the first violation acquisition = constrained qNEHVI with a shed GP constraint shed <= 1 MWh (degenerate-constant shed column: feasibility = 1, recorded); >= 2 violations in one round -> HALT FOR DECISION"
+    },
+    "R2": {
+      "name": "reserve shortfall (MWh)",
+      "mode": "monitor",
+      "base_mwh": 156.08,
+      "flag_at_mwh": 312.16,
+      "response": "round flag if any run > 2 x base_v3 (base 156.08 MWh, plan AMENDMENT 2026-11-17; design space 2026-11-24); recorded; never halts; no acquisition role"
+    },
+    "N1_off": {
+      "name": "non-pocket congested line-hours N1 - N4 (line-h)",
+      "mode": "monitor",
+      "definition": "N1 - N4 (line-h)",
+      "base": 30750,
+      "flags": {
+        "a": "any run dN1_off >= 2 x B_N1off = 462.7 line-h (B_N1off 231.3, nu 22; v1-memo value 242.1 printed beside)",
+        "b": "new bottleneck: a non-pocket line with base_v3 hours_ge_99pct = 0 reaching >= 88 h",
+        "c": "N3_off = sum_violation over non-pocket lines >= base 61,477 MWh + 2 x B_N3off (84.3 MWh; B_N3off 42.14, nu 22)"
+      },
+      "response": "record the round flag; never halts; no acquisition role (design space 2026-11-24 guardrails.N1_off, section 8.8)"
+    }
+  },
+  "guardrail_mode": "monitor",
+  "guardrail_flipped_at_round": null,
+  "violations": [],
+  "suspects": [],
+  "r2_flag_rounds": [],
+  "first_fire_round": {
+    "tau_joint": null,
+    "tau_marginal": null
+  },
+  "C2_review_rounds": [],
+  "C3_review_rounds": [],
+  "halt": null,
+  "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
+  "design_space_version": "2026-11-24",
+  "init_at": "2026-11-24T07:45:50+00:00",
+  "entries": [
+    {
+      "round": 0,
+      "n": 48,
+      "n_hv": 48,
+      "hv": 100211927048531.47,
+      "gain": null,
+      "n_outside_ref": 0,
+      "decision": "start",
+      "at": "2026-11-24T07:45:50+00:00"
+    },
+    {
+      "round": 1,
+      "n": 56,
+      "n_hv": 56,
+      "hv": 134179610644479.03,
+      "gain": 33967683595947.562,
+      "gain_tau_joint": null,
+      "would_stop_joint": false,
+      "gain_tau_marginal": null,
+      "would_stop_marginal": false,
+      "joint_vs_marginal": {
+        "ratio_joint_over_marginal": null,
+        "agree": true,
+        "fires": {
+          "joint": false,
+          "marginal": false
+        }
+      },
+      "n_outside_ref": 0,
+      "violations": [],
+      "suspects": [],
+      "r2_flag": false,
+      "C2_review": false,
+      "C3_review": false,
+      "decision": "graded (record_only)",
+      "at": "2026-11-24T07:45:56+00:00"
+    },
+    {
+      "round": 2,
+      "n": 64,
+      "n_hv": 64,
+      "hv": 139678525640060.44,
+      "gain": 5498914995581.406,
+      "gain_tau_joint": null,
+      "would_stop_joint": false,
+      "gain_tau_marginal": null,
+      "would_stop_marginal": false,
+      "joint_vs_marginal": {
+        "ratio_joint_over_marginal": null,
+        "agree": true,
+        "fires": {
+          "joint": false,
+          "marginal": false
+        }
+      },
+      "n_outside_ref": 0,
+      "violations": [],
+      "suspects": [],
+      "r2_flag": false,
+      "C2_review": false,
+      "C3_review": false,
+      "decision": "graded (record_only)",
+      "at": "2026-11-24T07:46:01+00:00"
+    },
+    {
+      "round": 3,
+      "n": 72,
+      "n_hv": 72,
+      "hv": 140370174447475.39,
+      "gain": 691648807414.9531,
+      "gain_tau_joint": null,
+      "would_stop_joint": false,
+      "gain_tau_marginal": null,
+      "would_stop_marginal": false,
+      "joint_vs_marginal": {
+        "ratio_joint_over_marginal": null,
+        "agree": true,
+        "fires": {
+          "joint": false,
+          "marginal": false
+        }
+      },
+      "n_outside_ref": 0,
+      "violations": [],
+      "suspects": [],
+      "r2_flag": false,
+      "C2_review": false,
+      "C3_review": false,
+      "decision": "graded (record_only)",
+      "at": "2026-11-24T07:46:07+00:00"
+    },
+    {
+      "round": 4,
+      "n": 80,
+      "n_hv": 80,
+      "hv": 141968352238822.38,
+      "gain": 1598177791346.9844,
+      "gain_tau_joint": null,
+      "would_stop_joint": false,
+      "gain_tau_marginal": null,
+      "would_stop_marginal": false,
+      "joint_vs_marginal": {
+        "ratio_joint_over_marginal": null,
+        "agree": true,
+        "fires": {
+          "joint": false,
+          "marginal": false
+        }
+      },
+      "n_outside_ref": 0,
+      "violations": [],
+      "suspects": [],
+      "r2_flag": false,
+      "C2_review": false,
+      "C3_review": false,
+      "decision": "graded (record_only)",
+      "at": "2026-11-24T07:46:14+00:00"
+    }
+  ]
+}
