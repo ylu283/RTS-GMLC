@@ -833,7 +833,7 @@ def grade_round(lane: Lane, k: int) -> tuple[dict, bool]:
                     + "".join(f"- {r}\n" for r in halt_reasons)
                     + "\nThe machinery has STOPPED proposing for this lane (plan 1.2 / 1.3). Round "
                     f"{k} is graded and recorded above; nothing was proposed. Kay decides; to resume, rename "
-                    "this file (e.g. HALT_FOR_DECISION.md -> HALT_r{k}_DECIDED.md) and record the decision in "
+                    f"this file (e.g. HALT_FOR_DECISION.md -> HALT_r{k}_DECIDED.md) and record the decision in "
                     "PROGRESS.md. The cost objective is never switched mid-campaign.\n")
     return led, bool(halt_reasons)
 
