@@ -131,6 +131,20 @@ class ObjGP:
         return float(np.sqrt(float(self.model.likelihood.noise.detach())) * self.sy)
 
 
+BOUND_TOL = 1e-12
+
+
+def snap_bounds(u):
+    """In place: u < 1e-12 -> 0.0, u > 1 - 1e-12 -> 1.0. Bound cleanup after the standardized-space round trip
+    (x * sx + mx leaves 5.55e-17 at a lower-bound optimum); NOT lattice snapping. Returns the counts."""
+    lo = (u > 0.0) & (u < BOUND_TOL)
+    hi = (u < 1.0) & (u > 1.0 - BOUND_TOL)
+    u[u < BOUND_TOL] = 0.0
+    u[u > 1.0 - BOUND_TOL] = 1.0
+    return {"to_0": int(lo.sum()), "to_1": int(hi.sum()), "tol": BOUND_TOL,
+            "note": "bound cleanup after x * sx + mx; not lattice snapping"}
+
+
 def standardize_x(U):
     U = np.asarray(U, float)
     mx = U.mean(0)
@@ -212,7 +226,9 @@ def propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed
     xb = xb.detach()
     u_batch = xb.numpy() * fit["sx"] + fit["mx"]
     u_batch = np.clip(u_batch, 0.0, 1.0)                 # optimize_acqf stays in the box; clip = exact-bound hygiene
+    snaps = snap_bounds(u_batch)                         # prompt 66 (E): 5.55e-17 -> exact 0 (contract 5: site absent)
     assert u_batch.shape == (q, d)
+    xb = torch.tensor((u_batch - fit["mx"]) / fit["sx"], dtype=DTYPE)   # predictions at the design that is run
     pm = np.empty((q, M)); ps = np.empty((q, M))
     for j, o in enumerate(objs):
         pm[:, j], ps[:, j] = o.predict_raw(xb)
@@ -225,4 +241,4 @@ def propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed
                          "alpha": alpha, "prune_baseline": bool(qcfg.get("prune_baseline", True)),
                          "sequential": bool(qcfg.get("sequential", True)), "fast_mode": FAST,
                          "constraint": fit["constraint"], "guardrail_mode": guardrail_mode,
-                         "seed": int(seed), "dtype": "float64"}}
+                         "seed": int(seed), "dtype": "float64", "bound_snaps": snaps}}

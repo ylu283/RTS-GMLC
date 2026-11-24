@@ -67,6 +67,7 @@ def design_rows(ds: DesignSpace, U: np.ndarray) -> list[dict]:
     U = np.asarray(U, float)
     assert U.ndim == 2 and U.shape[1] == ds.d, U.shape
     assert np.all(U >= 0.0) and np.all(U <= 1.0), "u outside [0, 1]"
+    assert not np.any((U > 0) & (U < 1e-9)), "u in (0, 1e-9): a near-zero site would enter the PCM (contract 5: exact 0 = absent)"
     X = ds.u_to_mw(U)
     rows = []
     for i, (u, x) in enumerate(zip(U, X), start=1):

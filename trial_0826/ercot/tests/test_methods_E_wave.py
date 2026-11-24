@@ -118,3 +118,11 @@ def test_stub_loader_refuses_without_v3_identity_and_applies_overrides(root):
     _, _, Y3, m3 = sl.load(waves, objectives=["V1"], design_space=os.path.join(root, "waves", "design_space_E.json"), extr=os.path.join(root, "extracts"))
     assert m3.loc["n0_E:7", "R1"] == 3.0 and bool(m3.loc["n0_E:7", "suspect"]) and Y3.loc["n0_E:7", "V1"] == 1.0
     os.remove(os.path.join(root, "extracts", "n0_E", "run_index_7", "stub_pool_row.json"))
+
+
+def test_design_rows_refuses_near_zero_site(ds):
+    """prompt 66 (E): a u in (0, 1e-9) would put a PEM unit with fraction ~5e-17 into the PCM."""
+    U = np.full((2, ds.d), 0.5)
+    U[1, 0] = 5.55e-17
+    with pytest.raises(AssertionError, match="near-zero"):
+        ww.design_rows(ds, U)

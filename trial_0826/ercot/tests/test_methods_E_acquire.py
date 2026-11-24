@@ -315,3 +315,21 @@ def test_real_fast_acquisition_init_and_r1(scratch, monkeypatch):
     u0, u1 = np.asarray(r0["designs_u"]), np.asarray(r1["designs_u"])
     assert u0.shape == (8, 6) and np.all(u0 >= 0) and np.all(u0 <= 1) and not np.allclose(u0, u1)
     assert set(r0["loo_rms_z"]) == set(l0.objectives) and all(v > 0 for v in r0["noise_raw"].values())
+
+
+def test_lower_bound_optimum_returns_exact_zero():
+    """prompt 66 (E): a lower-bound optimum comes back as exact 0.0 (not 5.55e-17); bound_snaps recorded."""
+    import qnehvi_E
+    rng = np.random.default_rng(0)
+    U = rng.uniform(0.2, 1.0, size=(12, 3))
+    Y = np.column_stack([U.sum(1), (1 - U).sum(1) + 0.3 * U[:, 0]])      # site 0 at 0 helps both objectives
+    res = qnehvi_E.propose(U, Y, Y.max(0) + 0.5, [("m52", "std", "inferred", "none")] * 2, [1e-9, 1e-9], seed=5,
+                           q=2, qcfg={"num_restarts": 2, "raw_samples": 32, "mc_samples": 16}, log=lambda *_: None)
+    ub = res["u_batch"]
+    assert not np.any((ub > 0) & (ub < 1e-9)) and not np.any((ub < 1) & (ub > 1 - 1e-9))
+    assert (ub == 0.0).any(), ub
+    bs = res["settings"]["bound_snaps"]
+    assert set(bs) >= {"to_0", "to_1", "tol"}
+    u = np.array([[5.55e-17, 1 - 1e-15, 0.5, 0.0]])
+    s = qnehvi_E.snap_bounds(u)
+    assert (s["to_0"], s["to_1"]) == (1, 1) and u.tolist() == [[0.0, 1.0, 0.5, 0.0]]
