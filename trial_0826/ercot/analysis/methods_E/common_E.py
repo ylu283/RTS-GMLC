@@ -175,6 +175,18 @@ def gp_cfg_and_floor(configs: dict, objectives: list[str]) -> tuple[list[tuple],
     return cfgs, np.asarray(floors, float)
 
 
+def gp_fitters(configs: dict, objectives: list[str]) -> list[dict]:
+    """Per objective, the fit definition from committed_configs (prompt 54 AMENDMENT 2026-11-24b): a value starting
+    with "v2" -> {"def": "v2", "sigma_c": <committed sigma_c>}; anything else or missing -> {"def": "house"}."""
+    out = []
+    for o in objectives:
+        c = configs["objectives"][o]
+        fd = str(c.get("fit_definition") or "house")
+        out.append({"def": "v2", "sigma_c": float(c.get("sigma_c", 0.0)), "source": fd} if fd.startswith("v2")
+                   else {"def": "house", "source": fd})
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # objectives loader (contract 6.1) with the Part A stub
 # --------------------------------------------------------------------------- #

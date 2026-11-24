@@ -159,6 +159,7 @@ class Lane:
         for o in self.objectives:
             assert o in self.ds.objectives_json, f"objective {o} not in design_space_E.json objectives"
         self.gp_cfgs, self.gp_floors = ce.gp_cfg_and_floor(self.configs, self.objectives)
+        self.gp_fitters = ce.gp_fitters(self.configs, self.objectives)      # fit definition per objective (66 hook)
         self.load, self.loader_source = loader if loader is not None else ce.get_loader(root)
         if cfg.get("part") == "B":
             assert self.loader_source == "real", "Part B: the real loader (54) must be importable"
@@ -442,7 +443,8 @@ def cmd_init(lane: Lane, bo_gp_sha: str | None = None) -> dict:
         "rider_levels": rider,
         "n0_tier": lane.n0_tier, "n0_source": lane.n0_source,
         "base_waves": lane.cfg["base_waves"], "loader": lane.loader_source, "configs_source": lane.configs_source,
-        "gp": {o: {"cfg": list(c), "floor": float(f)} for o, c, f in zip(lane.objectives, lane.gp_cfgs, lane.gp_floors)},
+        "gp": {o: {"cfg": list(c), "floor": float(f), "fit": ft} for o, c, f, ft in
+               zip(lane.objectives, lane.gp_cfgs, lane.gp_floors, lane.gp_fitters)},
         "qnehvi": lane.cfg["qnehvi"], "q": lane.cfg["q"], "hard_cap": lane.cfg["hard_cap"],
         "stop_rule": lane.cfg["stop_rule"], "acq_seed_base": lane.cfg["acq_seed_base"],
         "guardrails": lane.cfg["guardrails"], "guardrail_mode": "monitor", "guardrail_flipped_at_round": None,
@@ -617,7 +619,8 @@ def propose_round(lane: Lane, k: int) -> str:
     mode = led["guardrail_mode"]
     _step(lane.dir, f"propose r{k}: qNEHVI on n={len(U)} (seed {seed}, guardrail_mode {mode})")
     res = qnehvi_E.propose(U, Y, R, lane.gp_cfgs, lane.gp_floors, seed=seed, q=lane.cfg["q"],
-                           qcfg=lane.cfg["qnehvi"], shed=shed, shed_limit=lane.violation_mwh, guardrail_mode=mode)
+                           qcfg=lane.cfg["qnehvi"], shed=shed, shed_limit=lane.violation_mwh, guardrail_mode=mode,
+                           fitters=lane.gp_fitters)
     ub = res["u_batch"]
     assert ub.shape == (lane.cfg["q"], lane.ds.d), ub.shape
     keys = {tuple(r) for r in ub.round(10).tolist()}
@@ -656,6 +659,7 @@ def propose_round(lane: Lane, k: int) -> str:
         "bo_gp_sha": led["bo_gp_sha"], "n_train": int(len(U)),
         "loo_rms_z": dict(zip(lane.objectives, res["loo_rms_z"])),
         "noise_raw": dict(zip(lane.objectives, [float(v) for v in res["noise_raw"]])),
+        "fit_info": dict(zip(lane.objectives, res.get("fit_info", [{}] * len(lane.objectives)))),
         "qnehvi_seconds": round(float(res["seconds"]), 1),
         "designs_u": ub.tolist(), "designs_mw": lane.ds.u_to_mw(ub).tolist(),
         "predictions": os.path.relpath(os.path.join(wdir, "predictions.csv"), lane.root),

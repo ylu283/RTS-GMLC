@@ -177,7 +177,7 @@ def lane_modules(root):
     return acquire_E
 
 
-def cheap_propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed_limit=None,
+def cheap_propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed_limit=None, fitters=None,
                   guardrail_mode="monitor", log=print):
     """Test stand-in for qnehvi_E.propose with the SAME return schema: q random
     u rows (not in U), predictions = training mean / sd. Exercises every ledger,

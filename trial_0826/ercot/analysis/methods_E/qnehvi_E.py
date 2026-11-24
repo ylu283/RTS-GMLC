@@ -68,7 +68,11 @@ class ObjGP:
     """One objective (or the shed constraint): transform, standardization, the
     float64 SingleTaskGP, predictions in raw units."""
 
-    def __init__(self, tx, y, floor, cfg=("m52", "std", "inferred", "none"), negate=True):
+    def __init__(self, tx, y, floor, cfg=("m52", "std", "inferred", "none"), negate=True, fitter=None, u_raw=None,
+                 sx=None):
+        """fitter = None / {"def": "house"} -> bogp.train_gp (Adam 700; the 55 build); {"def": "v2", "sigma_c": s} ->
+        fit definition v2 (plan AMENDMENT 2026-11-24b): hyperparameters from prompt 54's FitV2 on the RAW u (u_raw),
+        copied into this SingleTaskGP (lengthscale / sx because tx = (u - mx) / sx; mean constant negated)."""
         from botorch.models import SingleTaskGP
         kernel, transform, noise, prior = cfg
         self.cfg, self.transform, self.negate = tuple(cfg), transform, negate
@@ -103,7 +107,28 @@ class ObjGP:
                              covar_module=_kernel(kernel, tx.shape[1], prior),
                              mean_module=gpytorch.means.ConstantMean(),
                              outcome_transform=None, input_transform=None).to(DTYPE)
-        train_gp(model, model.likelihood, tx, model.train_targets)
+        self.fit_def = (fitter or {}).get("def", "house")
+        self.fit_info = {"fit_definition": self.fit_def}
+        if self.fit_def == "v2":
+            assert u_raw is not None and sx is not None and transform == "std", "v2 hook: needs u_raw, sx; std transform"
+            fv = fit_v2(np.asarray(u_raw, float), y, cfg, float((fitter or {}).get("sigma_c", 0.0)))
+            assert abs(fv.my - self.my) <= 1e-9 * max(1.0, abs(self.my)) and abs(fv.sy - self.sy) <= 1e-9 * self.sy
+            with torch.no_grad():
+                cm = model.covar_module
+                cm.base_kernel.lengthscale = (fv.model.covar_module.base_kernel.lengthscale.detach().double()
+                                              / torch.tensor(np.asarray(sx, float), dtype=DTYPE))
+                cm.outputscale = fv.model.covar_module.outputscale.detach().double()
+                lik.noise = torch.clamp(fv.lik.noise.detach().double(), min=self.floor_var * 1.0001 + 1e-12)
+                c = fv.model.mean_module.constant.detach().double()
+                model.mean_module.constant = -c if negate else c
+            sig = float((fitter or {}).get("sigma_c", 0.0))
+            self.fit_info.update({"converged": bool(fv.converged), "mode_gap_nats": float(fv.mode_gap_nats),
+                                  "gap_second_nats": float(fv.gap_second_nats), "n_within_tol": int(fv.n_within_tol),
+                                  "n_failed": int(fv.n_failed), "map_total": float(fv.map_total),
+                                  "noise_sd_raw": float(np.sqrt(float(fv.lik.noise)) * fv.sy),
+                                  "noise_over_sigma_c": (float(np.sqrt(float(fv.lik.noise)) * fv.sy) / sig) if sig > 0 else None})
+        else:
+            train_gp(model, model.likelihood, tx, model.train_targets)
         model.eval()
         self.model = model
         self._tx, self._ty = tx, ty_t
@@ -152,7 +177,16 @@ def standardize_x(U):
     return mx, sx
 
 
-def fit_models(U, Y, cfgs, floors, shed=None, shed_limit=None):
+def fit_v2(U, y, cfg, sigma_c):
+    """prompt 54's FitV2 (analysis/ercot_gp/ercot_gp_partb.py) on raw u; imported lazily (the house path never needs it)."""
+    root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    from analysis.ercot_gp.ercot_gp_partb import FitV2
+    return FitV2(np.asarray(U, float), np.asarray(y, float), 1e-9, tuple(cfg), sigma_c=float(sigma_c), measured=False)
+
+
+def fit_models(U, Y, cfgs, floors, shed=None, shed_limit=None, fitters=None):
     """Fit the M objective GPs (+ the shed constraint GP when `shed` is given).
     Returns dict(models=ModelListGP, objs=[ObjGP], shed=ObjGP|None, mx, sx,
     constraint=...)."""
@@ -162,7 +196,9 @@ def fit_models(U, Y, cfgs, floors, shed=None, shed_limit=None):
     assert np.isfinite(U).all() and np.isfinite(Y).all()
     mx, sx = standardize_x(U)
     tx = torch.tensor((U - mx) / sx, dtype=DTYPE)
-    objs = [ObjGP(tx, Y[:, j], floors[j], cfgs[j], negate=True) for j in range(Y.shape[1])]
+    fitters = list(fitters) if fitters is not None else [None] * Y.shape[1]
+    objs = [ObjGP(tx, Y[:, j], floors[j], cfgs[j], negate=True, fitter=fitters[j], u_raw=U, sx=sx)
+            for j in range(Y.shape[1])]
     models = [o.model for o in objs]
     shed_gp, constraint = None, "none"
     if shed is not None:
@@ -179,7 +215,7 @@ def fit_models(U, Y, cfgs, floors, shed=None, shed_limit=None):
 
 
 def propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed_limit=None,
-            guardrail_mode="monitor", log=print):
+            guardrail_mode="monitor", log=print, fitters=None):
     """One acquisition round. U (n, d) in [0, 1], Y (n, M) raw (minimize), ref_point
     (M,) raw. Returns dict(u_batch (q, d), acq_values, pred_mean (q, M),
     pred_sd (q, M), seconds, fit=..., settings=...)."""
@@ -200,7 +236,7 @@ def propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed
     n, d = U.shape
     M = Y.shape[1]
     use_constraint = guardrail_mode == "constrain" and shed is not None
-    fit = fit_models(U, Y, cfgs, floors, shed=shed if use_constraint else None, shed_limit=shed_limit)
+    fit = fit_models(U, Y, cfgs, floors, shed=shed if use_constraint else None, shed_limit=shed_limit, fitters=fitters)
     objs = fit["objs"]
     ref_std = np.array([-(float(ref_point[j]) - objs[j].my) / objs[j].sy if objs[j].transform == "std"
                         else -(np.log1p(float(ref_point[j])) - objs[j].my) / objs[j].sy for j in range(M)])
@@ -237,6 +273,7 @@ def propose(U, Y, ref_point, cfgs, floors, seed, q=8, qcfg=None, shed=None, shed
             "transforms": [o.transform for o in objs],
             "loo_rms_z": [round(o.loo_rms_z(), 4) for o in objs],
             "noise_raw": [o.noise_raw() for o in objs],
+            "fit_info": [o.fit_info for o in objs],
             "settings": {"mc_samples": mc, "num_restarts": num_restarts, "raw_samples": raw_samples,
                          "alpha": alpha, "prune_baseline": bool(qcfg.get("prune_baseline", True)),
                          "sequential": bool(qcfg.get("sequential", True)), "fast_mode": FAST,
