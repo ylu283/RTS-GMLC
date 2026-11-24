@@ -1,0 +1,3 @@
+# wave_writer_E.assert_gitignore (55) checks this line on the emulator root
+extracts/methods_E_*/**/*.csv.gz
+__pycache__/
