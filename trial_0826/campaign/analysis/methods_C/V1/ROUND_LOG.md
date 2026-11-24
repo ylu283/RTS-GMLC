@@ -117,10 +117,20 @@ arm's JIDs from methods_C/PROGRESS.md.
 - bo_gp_sha: 60e6328236e745b3d34dc8cd704bb72888ae5d15
 - botorch: 0.16.1
 - predictions: waves/methods_C_V1_r4/predictions.csv
+- graded_at: 2026-11-24T06:16:14+00:00
+- cumulative_hv: 7.962175879746916e+17
+- gain: 1.6060000581809536e+16
+- gain_tau: 0.3051493588959151
 - threshold: 5.262996664950399e+16
+- would_stop: True
+- gain_tau_het: 5.315461279515099
+- would_stop_het: False
+- gain_tau_285: 2.467478228088658
+- would_stop_285: False
 - gp_floor: 1e-09
 - loo_rms_z: {'load_shed_mwh': 0.8165, 'true_curtailment_mwh': 0.7555, 'total_cost_less_synthetic_usd': 0.5583}
-- decision: proposed
+- n_outside_ref: 2
+- decision: graded (record_only)
 - designs (omega, tiers ['nuclear', 'pv', 'tail', 'wind_122', 'wind_303', 'wind_317']):
     - [0.05000, 0.88125, 0.40625, 0.88125, 1.00000, 0.28750]
     - [0.05000, 0.05000, 0.05000, 1.00000, 1.00000, 0.05000]
@@ -130,4 +140,5 @@ arm's JIDs from methods_C/PROGRESS.md.
     - [0.05000, 0.05000, 0.05000, 0.76250, 0.76250, 0.05000]
     - [0.05000, 1.00000, 0.05000, 0.76250, 1.00000, 0.05000]
     - [0.28750, 1.00000, 0.52500, 0.52500, 1.00000, 1.00000]
+- calibration z-stats: {"load_shed_mwh": {"mean_z": 0.432, "rms_z": 0.689, "cov95": 8}, "true_curtailment_mwh": {"mean_z": -0.187, "rms_z": 0.715, "cov95": 8}, "total_cost_less_synthetic_usd": {"mean_z": 0.142, "rms_z": 0.471, "cov95": 8}}
 <!-- END r4 -->

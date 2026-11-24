@@ -94,6 +94,26 @@
       "n_outside_ref": 2,
       "decision": "graded (record_only)",
       "at": "2026-11-18T15:33:31+00:00"
+    },
+    {
+      "round": 4,
+      "n": 64,
+      "hv": 7.962175879746916e+17,
+      "gain": 1.6060000581809536e+16,
+      "gain_tau": 0.3051493588959151,
+      "would_stop": true,
+      "gain_tau_het": 5.315461279515099,
+      "would_stop_het": false,
+      "gain_tau_285": 2.467478228088658,
+      "would_stop_285": false,
+      "loo_rms_z": {
+        "load_shed_mwh": 0.8165,
+        "true_curtailment_mwh": 0.7555,
+        "total_cost_less_synthetic_usd": 0.5583
+      },
+      "n_outside_ref": 2,
+      "decision": "graded (record_only)",
+      "at": "2026-11-24T06:16:14+00:00"
     }
   ],
   "tau_rulers": {
