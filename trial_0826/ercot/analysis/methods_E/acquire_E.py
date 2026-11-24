@@ -149,8 +149,9 @@ class Lane:
         self.ds = ce.load_design_space(root, cfg)
         self.configs, self.configs_source = ce.committed_configs(root, cfg)
         if self.configs.get("E-D7_decided") is None and cfg.get("n0_tier_provisional") is not None:
-            assert cfg.get("part") != "B", ("Part B: a provisional n0 tier is REFUSED — E-D7 must be decided in "
-                                            "committed_configs.json (a real lane never runs on a provisional tier)")
+            if cfg.get("part") == "B":
+                raise RuntimeError("Part B: a provisional n0 tier is REFUSED — E-D7 must be decided in "
+                                   "committed_configs.json (a real lane never runs on a provisional tier)")
         self.n0_tier = ce.n0_tier(self.configs, cfg.get("n0_tier_provisional"))
         self.n0_source = (f"committed_configs ({self.configs_source}) E-D7_decided"
                           if self.configs.get("E-D7_decided") is not None

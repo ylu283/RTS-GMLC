@@ -125,8 +125,9 @@ class ObjGP:
             self.fit_info.update({"converged": bool(fv.converged), "mode_gap_nats": float(fv.mode_gap_nats),
                                   "gap_second_nats": float(fv.gap_second_nats), "n_within_tol": int(fv.n_within_tol),
                                   "n_failed": int(fv.n_failed), "map_total": float(fv.map_total),
-                                  "noise_sd_raw": float(np.sqrt(float(fv.lik.noise)) * fv.sy),
-                                  "noise_over_sigma_c": (float(np.sqrt(float(fv.lik.noise)) * fv.sy) / sig) if sig > 0 else None})
+                                  "noise_sd_raw": float(np.sqrt(float(fv.lik.noise.detach())) * fv.sy),
+                                  "noise_over_sigma_c": (float(np.sqrt(float(fv.lik.noise.detach())) * fv.sy) / sig)
+                                  if sig > 0 else None})
         else:
             train_gp(model, model.likelihood, tx, model.train_targets)
         model.eval()

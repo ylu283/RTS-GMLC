@@ -338,8 +338,12 @@ def test_lower_bound_optimum_returns_exact_zero():
 def test_fit_v2_hook_matches_fitv2_and_gp_fitters_mapping():
     """prompt 66 v2 rerun: ObjGP with fitter v2 reproduces prompt 54's FitV2 posterior (mean and sd) on synthetic data;
     common_E.gp_fitters maps committed fit_definition strings."""
-    import qnehvi_E
+    import importlib.util
     import torch
+    spec = importlib.util.spec_from_file_location("qnehvi_E_live", ME / "qnehvi_E.py")   # pinned: the live file, never a
+    qnehvi_E = importlib.util.module_from_spec(spec)                                       # scratch copy left on sys.path
+    spec.loader.exec_module(qnehvi_E)
+    assert os.path.samefile(qnehvi_E.__file__, ME / "qnehvi_E.py")
     rng = np.random.default_rng(3)
     U = rng.uniform(size=(30, 6))
     y = 1e6 * (np.sin(3 * U[:, 0]) + U[:, 5] ** 2 - 0.5 * U[:, 2]) + 2e4 * rng.standard_normal(30)
@@ -359,3 +363,11 @@ def test_fit_v2_hook_matches_fitv2_and_gp_fitters_mapping():
     assert common_E.gp_fitters(cfgs, ["V1", "E1", "N4"]) == [
         {"def": "house", "source": "house (fallback)"},
         {"def": "v2", "sigma_c": 5.0, "source": "v2 (AMENDMENT 2026-11-24b)"}, {"def": "house", "source": "house"}]
+
+
+def test_part_b_refuses_provisional_tier(scratch, monkeypatch):
+    """prompt 66 review: with E-D7_decided null, a Part B lane never runs on n0_tier_provisional (RuntimeError)."""
+    root, ae, cfg = scratch()
+    monkeypatch.setattr(ae.ce, "committed_configs", lambda r, c: ({"E-D7_decided": None, "objectives": {}}, "real"))
+    with pytest.raises(RuntimeError, match="provisional n0 tier is REFUSED"):
+        ae.Lane(root, dict(cfg, part="B", n0_tier_provisional=48), "qnehvi", 0)
