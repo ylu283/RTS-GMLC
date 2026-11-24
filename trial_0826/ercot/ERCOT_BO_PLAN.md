@@ -867,3 +867,87 @@ Not read: `extracts/random_E` and `extracts/methods_E_*`. No GP was
 fit. Holdout exposure is unchanged. These Y landed after 62 Part B (the
 E-D1b input). They change no seat: the Part C block is appended to §E
 of `POOL_N0E_STANDINGS.md`.
+
+## AMENDMENT 2026-11-24 — E-D1b rule v2 (disclosed post-hoc): role gate, residual-resolvability guard, confidence-bound thresholds, order-based suppression, component and conflict rules, materiality floors, one pooled bar, override protocol
+
+Source: prompt 65 v1.1 §2 with §8 folded in (§8 overrides §2–§5 where they differ) and `debug/objective-rule-review-2026-11-24.md` §3 (rule v2, items 0–10 verbatim). Committed ALONE, before `analysis/pool/pool_n0E_v2.py` and before any rule-v2 statistic is computed; no GP fitted (`analysis/ercot_gp/committed_configs.json` absent); no acquisition; holdout exposure 0 / 24; random_E unread.
+
+**2.1 Seen before this block.** Everything in AMENDMENT 2026-11-17's
+ledger plus: the v1 Part B read (d706199: all n0_E statistics, seats
+V1 · E1 · N1), the Seed-bar re-grade (baf77c3: N1 3.05, R4 1.12, N4
+14.4), screening_v3 (e58f4bd: N4 LOCATIONAL, N1 not; bus set holds),
+location_contrast_E (4b7bf85), the family-free strength-first trial
+(V1, V2, N1), the three reviewer reports (11-24). This amendment is
+NOT blind. It is justified only by §1–§5 quantities (spread, noise,
+rank concordance, conflict, physical role), never by any front, HV, GP
+fit or optimum (none exist). No surrogate has been fitted on n0_E for
+decision purposes; holdout exposure 0 / 24; random_E unread.
+
+Ledger additions (prompt 65 v1.1 §8.15): the 11-24 reviews computed anchor E1 / N1_off / X1 spreads from the noise_seed_E Seeds 1–4 runs (already-seen runs) and estimated residual IDR/B from printed η²_T and IDR; the floors and the §4b clause were worded after that.
+
+**Disclosure wording for every output:** "This amendment is post hoc and not blind. It was written after the v1 read, the Seed re-grade, screening_v3 and the N4–V1 residual interval were known. We do not present it as a pre-registered selection. Every station reports three vectors from the same runs: v1 pre-registered (V1 · E1 · N1), v2 (V1 · E1 · N4), and v2 with borderline → REDUNDANT (V1 · E1). A claim about the flowgate objective is stated only as conditional on v2. Rule v2 is pre-registered unchanged for the next dataset, which is its real test."
+
+**2.2 Role table (physics, one line each; signed by Kay as the PI's proxy; the PI may revise before the fit; corrected per prompt 65 v1.1 §8.10).** Only OUTCOME measures can be seated. Seatable OUTCOME set: {V1, E1, X1, N4}.
+
+| id | role | reason |
+|---|---|---|
+| V1 | OUTCOME | wasted renewable energy; ISO/policy metric (lost PTC value) |
+| V2 | PROXY(E1) | 1 − thermal share at fixed load; a reparametrisation of total PEM MW; ρ with E1 0.99 |
+| V3 | DIAGNOSTIC | internal to the twin's dispatch |
+| E1 | OUTCOME | production cost (efficiency); the E seat is fixed by plan §1.2 |
+| E2, E3 | COMPONENT(E1) | fixed / variable parts of E1 |
+| E4 | TRANSFER | generator-side settlement Σ LMP × generation + reserve + uplift (incl. the twin) |
+| E5 | OUTCOME (dead) | uplift ≡ 0 |
+| E6 | TRANSFER | VRE producer revenue incl. the twin's sales |
+| E7 | PROXY(E4) | mean price = E4 / constant load |
+| E8 | DIAGNOSTIC | price dispersion, no welfare meaning |
+| E9 | DIAGNOSTIC (dead) | scarcity bus-hours; dead / not responding |
+| X1 | OUTCOME | CO₂ externality (collinear with E1 here) |
+| R1 | GUARD | load shed; plan §1.3 |
+| R2 | GUARD | reserve shortfall; plan §1.3 |
+| R3 | GUARD | over-generation slack |
+| R4 | PROXY(E2 start-up cost) | thermal starts; start-up cost already in E2 and not additive in $, so not COMPONENT; wear not modelled |
+| R5, R6 | DIAGNOSTIC | ramping descriptors |
+| R7, R8 | DIAGNOSTIC | commitment state; undirected |
+| N1 | PROXY | unweighted count over ~120 lines the design cannot reach; = N4 + N1_off |
+| N2 | DIAGNOSTIC | coarse count |
+| N3 | GUARD | thermal-limit slack violation |
+| N4 | OUTCOME | L252 (bus-120 export limit) binding hours — the one pocket line that binds (asserted); congestion frequency the PEM relieves; L252's 29.5 GWh/yr overload is design-invariant, so no upgrade-deferral claim |
+| N5 | DIAGNOSTIC | full-only; direction inverted (min of a negative spread rewards congestion); −N5 reported as depth beside N4 |
+| D1 | DIAGNOSTIC (investor outcome) | H2 electricity; near-deterministic in x; used in the E1 − B·D1 lens |
+| D2 | DIAGNOSTIC | utilization ratio |
+| D3 | check | nuclear starts |
+
+**2.3 Rule v2.** M_max = 4; family tiers V MAY, E MUST (fixed to E1 by §1.2), X MAY, R MAY, N MAY. The ten numbered items of the memo (§3, copied verbatim) state the rule; the instantiations that follow (prompt 65 v1.1 §8, verbatim, numbering kept) govern wherever they differ from the items. The "FLAGGED-pair exception" of prompt 65 v1 is deleted.
+
+Rule v2 (verbatim, memo §3 items 0–10):
+
+0. Governance: rule, value tree and thresholds committed alone with a sha256 before any statistic on the selection population; signer named; seen-data ledger; changes only via §9.
+1. Value structure (signed by the PI): families = fundamental nodes with tier MUST / MAY / GUARD; every measure has one role OUTCOME / ALTERNATE / COMPONENT(of) / TRANSFER / PROXY(target) / GUARD / DIAGNOSTIC with a one-line physical reason and a written direction; PROXY, TRANSFER, DIAGNOSTIC never seated; family order is the only cross-node tie-break.
+2. Noise bar: B_j = max(3·σ_j, max|δ|) with σ_j pooled over the pre-registered sources (perturbation deltas /√2, solver-seed replicates; in-box anchors preferred), df recorded; sources disagreeing by > 2× are disclosed, never switched after the read; structural-zero pairs excluded by an md5 rule.
+3. Resolvable: RESOLVED iff lower 90 % bound of IDR/B ≥ 2 (χ² interval on σ at its df) and Mantel p ≤ 0.01 on the size-residuals; ADEQUATE iff point estimate ≥ 5; FLAGGED in [3, 5); not seatable below 3. Materiality floor M_j in natural units: IDR ≥ max(2·B_j, M_j). COMPOSITION-RESOLVABLE iff the same on r_j = y_j − f̂_j(T).
+4. Redundant: raw oriented Spearman ≥ 0.90 AND NOT (both COMPOSITION-RESOLVABLE and upper 90 % bound of residual ρ < 0.50); SIZE-CO-MONOTONE otherwise (both kept, disclosed); borderline pairs resolve to REDUNDANT; order-based suppression (a candidate is suppressed iff REDUNDANT with any earlier eligible candidate in walk order); Kendall τ and the Brockhoff–Zitzler δ dominance-preservation share reported.
+5. Conflict: TRADE-OFF(size) raw ≤ −0.50; TRADE-OFF(composition) residual ≤ −0.50 with both COMPOSITION-RESOLVABLE.
+6. Seat walk (M_max = 4): families in order; within a family OUTCOMEs in PI order then ALTERNATEs; eligible iff ADEQUATE (or FLAGGED, marked) and not suppressed; a MUST family with nothing RESOLVED → HALT FOR PI (constraint / replicates / declared proxy / drop with disclosure); a MAY family → EMPTY, "not at stake in this box"; a seat with no CONFLICT partner is demoted; empty seats never back-filled; a second seat in one family only by PI decision under five conditions (disjoint component or complement, ADEQUATE, residual |ρ| < 0.5, a trade-off or a locational pass, δ ≥ 5 %); fixed seats from earlier frozen tests are honoured, failing ones HALT.
+7. Components: at most one of {m, m′ = m + c}; if m is seated, c becomes a guardrail with a flag at 2·B_c worsening vs base.
+8. Consequences: M ≠ planned → ref point, τ and gate numbers re-derived by pre-registered formulas before the campaign.
+9. Override: amendment before any surrogate fit / acquisition / holdout read; ledger diff; general rule re-applied to all families; reason only in §1–§5 quantities; pre-registered vector co-reported; at most one per campaign.
+10. Output: one table per measure (role, tier, B_j all sources, IDR/B with CI, residual IDR/B with CI, η²_T, Mantel p raw/residual, ρ raw/residual with CIs, δ, conflicts, status, why each alternative lost).
+
+Instantiations (prompt 65 v1.1 §8.1–§8.8, §8.12; verbatim):
+
+1. **Bar (two-run scale, pooled df 22).** Perturbation source (design-2 (site 206) structural-zero pair excluded): per design d ∈ {1, 3, 4} the three runs {reference (A ≡ B by md5, counted once), A-perturbed, B-perturbed}; s²_pert = Σ_d Σ_r (y_r − ȳ_d)² / Σ_d (n_d − 1), ν_pert = 6. Seed source: s²_seed = mean of the 4 per-design ddof-1 variances, ν_seed = 16. Pooled s_j² = (6·s²_pert + 16·s²_seed)/22, ν = 22 (equal-variance assumption; sources disagreeing > 2× disclosed: N1, E9). B_j = max(3·√2·s_j, max|δ| over the 6 perturbed and 16 Seed deltas). σ interval (two-sided 90 %): s_j·[√(22/χ²_{22,0.95}), √(22/χ²_{22,0.05})] = s_j·[0.805, 1.335]; B_j^up = max(3·√2·1.335·s_j, max|δ|). Every "90 % bound" is an end of a two-sided 90 % interval. Zero-bar set is computed, not asserted from v1 (expected {E5, R1, R3}; E9 picks up a Seed bar).
+2. **Joint bootstrap for IDR/B** (b = 1…10,000, default_rng(6262)): resample the 48 designs with replacement, IDR* = Q90 − Q10 (v1 quantile method); σ*² = s_j²·22/χ²_22 drawn independently; B* = max(3√2σ*, max|δ|); lower bound = 5th percentile of IDR*/B*. Residuals: f̂_j fixed on the full data, resample r_j. Disclose that the iid bootstrap on Sobol points is conservative.
+4. **Definitions.** RESOLVED iff lower-90 % joint bound of IDR/B ≥ 2 AND raw Mantel p ≤ 0.01. COMPOSITION-RESOLVABLE iff residual Mantel p ≤ 0.01 AND lower-90 % joint bound of IDR(r_j)/B_j ≥ 2 AND IDR(r_j) ≥ M_j. Seatable iff role OUTCOME AND RESOLVED AND IDR ≥ max(2·B_j, M_j) AND IDR/B (point) ≥ 3 AND not suppressed; ADEQUATE ≥ 5, FLAGGED [3, 5) marked. Mantel: Spearman between |Δy| (or |Δr|) and ‖Δu‖₂ in unit-cube design coordinates, 1,128 pairs, 9,999 label permutations, default_rng(6262), same permutation stream for every id, one-sided p = (1 + #{perm ≥ obs})/10,000.
+5. **Materiality floors (disclosed: set after the relative responses were seen; compared against the point IDR):** V1 1 % of base_v3 curtailment = 58,287 MWh; E1 0.1 % of base_v3 total cost = $8.06M — the median pair gap bound G_a + G_b ($40.16M; E1 IDR 0.83×) is printed as an evidence column, NEVER a floor; X1 0.1 % of base CO₂ = 194,521 t; N4 1 % of 8,760 h = 88 h; R4 informational only (role gate excludes it): 1 % of base on/offs = 154.
+6. **Redundancy (directed).** c (later in walk order) is REDUNDANT given p (earlier, already SEATED) iff oriented raw ρ(c, p) ≥ 0.90 AND NOT ESCAPE. ESCAPE iff c is COMPOSITION-RESOLVABLE AND [p is not COMPOSITION-RESOLVABLE, OR the 90 % interval of residual ρ(c, p) lies entirely below 0.50]. BORDERLINE-PAIR iff c is COMPOSITION-RESOLVABLE and the residual-ρ 90 % interval contains 0.50. A raw ρ whose 90 % interval contains 0.90 is treated as ≥ 0.90. Fisher-z se: raw √(1.06/45); residual √(1.06/39) = 0.165 (the 6-bin smoother spends ≈ 6 df). Labels: SIZE-CO-MONOTONE = raw ≥ 0.90 with ESCAPE; non-seatable ids never suppress.
+   **§4b borderline resolution (inside the rule; no run-time PI exception):** a BORDERLINE-PAIR (c, p) is NOT REDUNDANT iff some s already seated before c satisfies (i) upper-90 % bound of residual ρ(c, s) ≤ −0.50 (CI-confirmed composition trade-off) AND (ii) Steiger's Z for dependent correlations sharing s (Fisher z of the residual Spearmans, n_eff = 42) gives one-sided p ≤ 0.05 that ρ_res(c, s) < ρ_res(p, s). Otherwise REDUNDANT. The δ-share is printed beside it and never decides.
+7. **Walk.** Families V, E, X, R, N; within a family OUTCOME before ALTERNATE, then PI priority, then global_order id; c is suppressed iff REDUNDANT given some already-SEATED member. After the walk, a seat with no TRADE-OFF partner (raw ≤ −0.50 or residual ≤ −0.50 with both COMPOSITION-RESOLVABLE) among the other seats is DEMOTED → DIAGNOSTIC, its family EMPTY, checked once (no iteration); if E1 has no partner → HALT. Empty seats never back-filled.
+8. **N1_off guardrail (monitor; never halts; no acquisition role).** Per run from line_summary.csv: N1_off = N1 − N4 (base_v3 30,750 line-h); ΔN1_off vs base; leakage ΔN1_off/(−ΔN4) when ΔN4 < 0 (a finding, not a violation). Round flag if any run has (a) ΔN1_off ≥ 2·B_N1off with B_N1off computed on N1_off from the noise_seed_E (df 16) and noise_v3 line_summary tables by the item-1 recipe (expected ≈ 390–480; printed; the 11-17 value 242.1 printed beside as the v1-memo value); or (b) a NEW bottleneck: a non-pocket line with base hours_ge_99pct = 0 reaching ≥ 88 h; or (c) N3_off = Σ sum_violation over non-pocket lines ≥ base (61,477 MWh) + 2·B_N3off. Every round prints the three non-pocket lines with the largest Δhours (expected L247, L188, L1).
+12. **δ-error:** reference set F = all non-dead OUTCOME ids (V1, E1, X1, N4) oriented by dir, values in bar units ỹ_j = y_j/B_j; δ_k of dropping k from S = max over pairs (a, b) with a ⪯_{S∖k} b of (ỹ_ak − ỹ_bk)₊; share π_k = #{pairs comparable under S∖k with ỹ_ak − ỹ_bk > 2} / #{comparable pairs}; report π_k, δ_k and Kendall τ_b (raw and residual, per pair) for each seat and each single-swap alternative; bootstrap 2,000 design resamples, rng 6262, distinct-index pairs, π 2.5/97.5 %, δ point + 90th percentile. Never selecting except the second-seat condition π ≥ 5 %.
+
+**2.4 Reporting lens (§8.11).** column only (no front): Δnet ≤ 0 by construction (replacement ≈ $24/MWh < B = $40) and falls monotonically with MW; capex excluded — one sentence in every table. Assertion of the twin's exclusion from E1: on base_v3 and n0_E:25 (one anchor, via pool_row / gen_summary — disclosed) Σ non-renewable Unit Cost == E1 == overall Total costs to $1 and Unit Cost over is_pem rows is NaN/0; the CRC Prescient source check is replaced by the citation (data_extractors.py get_fixed_costs / get_variable_costs thermal-only, checkout c453890).
+
+**2.5 Override protocol** (rule v2 §9): this is the one override of this campaign; a second one HALTs. The pre-registered vector V1 · E1 · N1 is co-reported from the same runs at every analysis station. Governance (§8.14): §3 expected seats are a prediction, not a target. If the real walk gives anything other than V1 · E1 · N4, write the §3 outputs to the worktree UNCOMMITTED, do NOT commit (iii) or (iv), do NOT write §5, report the seat table and STOP. Any rule change after commit (ii) is a second override (§2.5) and HALTs the campaign; the PI's only lever then is to reject the whole amendment and revert to v1 (V1 · E1 · N1). The §3 sentence about a "FLAGGED-pair exception" is deleted. Commit (iii) and (iv) only on the expected result.
+
+**2.6 Consequences (§8.9; the dated design space).** `objectives` = ONLY the v2 seats in JSON order (V1, E1, N4), each `status: "SEATED (rule v2, AMENDMENT 2026-11-24)"`; new top-level `co_reported: {"N1": {"status": "PRE-REGISTERED (v1), co-reported"}}`; `guardrails`: R1 (plan §1.3), R2 `flag_at: "2 x base_v3 = 312.2 MWh (base 156.08; plan AMENDMENT 2026-11-17)"`, R3 (over-generation, monitor, flag > 1 MWh; base 0), N3 (thermal-limit slack, monitor, flag at +2·B_N3 vs base 90,951 MWh), N1_off (item 8); `reporting`: E1 − 40·D1 column, −N5 and L252 mean flow beside N4, induced CO₂ intensity ΔX1/D1, additionality −ΔV1/D1, replacement cost ΔE1/(D1 + ΔV1); `objective_rule: "AMENDMENT 2026-11-24"`; assert every round `N4 == N4_L252` else report the pocket sum with the split. 54 Part B passes `--design-space waves/design_space_E_2026-11-24.json` (no 54 code change; 54 has no accepted-version list — that assert lives in tools/make_ercot_n0.py and keeps its default path). 55 (owner of analysis/methods_E/) updates arms_E.json in its own commit: design_space path, objectives ["V1","E1","N4"], R2 base 156.08 / flag 312.16, N1_off monitor.
