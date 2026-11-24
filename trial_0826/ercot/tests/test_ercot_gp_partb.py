@@ -155,3 +155,16 @@ def test_report_renders(e2e):
               "Prompt-61 residual row", "## 9. What changed vs plan", "Exploratory"):
         assert h in md, h
     assert os.path.isfile(os.path.join(out, "pi_agenda_E-D7_draft.md"))
+
+
+def test_long_fit_diag_is_scoped_and_exploratory():
+    U, Y, sob, *_ = S.synthetic_inputs()
+    orig = S.common.train_gp
+    with P.long_fit(900):
+        assert S.common.train_gp is not orig and S.common.train_gp.keywords == {"n_epochs": 900}
+    assert S.common.train_gp is orig
+    y = Y["S1"].to_numpy(float)
+    rows, w = P.study_long(np.asarray(U, float), y, sob, S.arm_set(y, True), 2e3, "S1", "seated", SITES,
+                           grid=(32, 48), epochs=900)
+    assert S.common.train_gp is orig
+    assert {r["fit"] for r in rows} == {"adam900"} and set(w) == {32, 48}

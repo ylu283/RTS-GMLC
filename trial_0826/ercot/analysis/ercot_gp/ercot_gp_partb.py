@@ -161,6 +161,37 @@ def study(U, y, sob, arms, sigma_c, obj, role, sites, grid=N_GRID, explore=True)
     return rows, xrows, winners
 
 
+LONG_EPOCHS = 10000
+
+
+class long_fit:
+    """Context manager: the house fit with more Adam epochs (EXPLORATORY ONLY; plan §5 freezes
+    the campaign fit definition = bogp.train_gp defaults, 700 epochs)."""
+
+    def __init__(self, epochs=LONG_EPOCHS):
+        self.epochs = epochs
+
+    def __enter__(self):
+        import functools
+        self._orig = S.common.train_gp
+        S.common.train_gp = functools.partial(self._orig, n_epochs=self.epochs)
+        return self
+
+    def __exit__(self, *exc):
+        S.common.train_gp = self._orig
+        return False
+
+
+def study_long(U, y, sob, arms, sigma_c, obj, role, sites, grid=N_GRID, epochs=LONG_EPOCHS):
+    """EXPLORATORY: the plan-§5 arms and selection rule re-run with `epochs` Adam epochs.
+    Reported, never committed, never holdout-scored."""
+    with long_fit(epochs):
+        rows, _, winners = study(U, y, sob, arms, sigma_c, obj, role, sites, grid, explore=False)
+    for r in rows:
+        r["fit"] = f"adam{epochs}"
+    return rows, winners
+
+
 # --------------------------------------------------------------------------
 # n*
 # --------------------------------------------------------------------------
@@ -390,8 +421,9 @@ def _plt():
 
 
 def _bold(ax):
-    from matplotlib.ticker import FuncFormatter, NullFormatter
+    from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
     if ax.get_yscale() == "log":
+        ax.yaxis.set_major_locator(LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
         ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
         ax.yaxis.set_minor_formatter(NullFormatter())
     ax.figure.canvas.draw()
@@ -474,6 +506,39 @@ def fig_lengthscales(df, objs, roles, sites, ns, out_path, grid=N_GRID):
         if j == 0:
             ax.legend(fontsize=9)
     fig.tight_layout()
+    fig.savefig(out_path, dpi=110)
+    plt.close(fig)
+    return out_path
+
+
+def fig_house_vs_long(df, ldf, objs, roles, sites, ns, out_path, grid=N_GRID, epochs=LONG_EPOCHS):
+    """EXPLORATORY: selected arm under the house fit (700 epochs) vs the long fit."""
+    plt = _plt()
+    fig, axes = plt.subplots(3, len(objs), figsize=(5.4 * len(objs), 12.6), squeeze=False)
+    for j, obj in enumerate(objs):
+        for lab, d, sty in (("house fit (700 ep)", df, "s-"), (f"long fit ({epochs} ep)", ldf, "o--")):
+            sel = d[(d["objective"] == obj) & d["selected"]].sort_values("n")
+            nlpd = sel["loo_nlpd"].to_numpy(float)
+            rm = sel["loo_rmse"].to_numpy(float)
+            ns_ = sel["noise_over_sigma_c"].to_numpy(float)
+            assert np.isfinite(nlpd).all() and np.isfinite(rm).all() and (rm > 0).all(), (obj, lab)
+            axes[0, j].plot(sel["n"], nlpd, sty, lw=2, label=lab)
+            axes[1, j].plot(sel["n"], rm, sty, lw=2, label=lab)
+            if np.isfinite(ns_).all() and (ns_ > 0).all():
+                axes[2, j].plot(sel["n"], ns_, sty, lw=2, label=lab)
+        axes[0, j].set_title(f"{obj} ({'seated' if roles[obj] == 'seated' else 'co-reported'}), selected arm")
+        axes[0, j].set_ylabel("LOO NLPD (mean, nats)")
+        axes[1, j].set_ylabel("LOO RMSE (raw units)")
+        axes[2, j].set_ylabel("inferred noise sd / sigma_c")
+        axes[2, j].axhline(1.0, color="0.3", ls=":", lw=1.5)
+        axes[2, j].set_yscale("log")
+        for i in range(3):
+            axes[i, j].set_xlabel("n (nested Sobol prefix)")
+            _bold(axes[i, j])
+        if j == 0:
+            axes[0, j].legend(fontsize=10)
+    fig.suptitle("EXPLORATORY: house fit vs longer Adam fit (never committed)", fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
     return out_path
@@ -575,7 +640,8 @@ def mechanism(winners, ns, U48, Y48, sob, sigmas, noise, hres, roles, sites, gen
 # end-to-end
 # --------------------------------------------------------------------------
 def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, ds_version,
-        grid=N_GRID, explore=True, replay_only=False, mech=True, mech_kw=None, lc=None, log=print):
+        grid=N_GRID, explore=True, replay_only=False, mech=True, mech_kw=None, lc=None, log=print,
+        long_diag=False, long_epochs=LONG_EPOCHS):
     """U / Y: grading-tier rows (sobol_index aligned). `load_holdout()` -> (Uh, Yh) is
     called only AFTER n* is fixed (random_E enters only through the holdout grader)."""
     t0 = time.time()
@@ -602,10 +668,24 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
             f"{ {n: w[n]['arm'].name for n in grid} } ({time.time() - t0:.0f} s)")
     df = pd.DataFrame(rows)
     xdf = pd.DataFrame(xrows)
+    ldf, lchecks, ln = None, None, None
+    if long_diag:
+        lrows = []
+        for obj in objs:
+            lr, _ = study_long(Uv, Y[obj].to_numpy(float), sob, arms_by[obj], sig[obj], obj, roles[obj], sites, grid,
+                               epochs=long_epochs)
+            lrows += lr
+            log(f"[long-fit diag] {obj} ({time.time() - t0:.0f} s)")
+        ldf = pd.DataFrame(lrows)
+        lchecks = n_star_checks(ldf, sites, grid)
     checks = n_star_checks(df, sites, grid)
     seated = [o for o in objs if roles[o] == "seated"]
     co = [o for o in objs if roles[o] != "seated"]
     ns, reason, alt = n_star(checks, seated, co, grid)
+    if lchecks is not None:
+        ln = n_star(lchecks, seated, co, grid)
+        alt["long_fit_descriptive"] = {"epochs": long_epochs, "n_star": ln[0], "co_reported_included": ln[2]["co_reported_included"],
+                                       "without_lengthscale_condition": ln[2]["without_lengthscale_condition"]}
     log(f"[n*] {reason}")
     tiers = sorted(set(PLAN_TIERS) | {ns})
     assert len(tiers) * len(objs) <= S.EXPOSURE_CAP
@@ -646,17 +726,24 @@ def run(U, Y, sob, load_holdout, seed, noise, roles, sites, gen_pmax, out_dir, d
     pd.concat([df_out, hdf], ignore_index=True, sort=False).to_csv(os.path.join(out_dir, "ercot_gp_status.csv"), index=False)
     xdf.to_csv(os.path.join(out_dir, "ercot_gp_exploratory.csv"), index=False)
     checks.to_csv(os.path.join(out_dir, "ercot_gp_nstar_checks.csv"), index=False)
+    if ldf is not None:
+        ldf.to_csv(os.path.join(out_dir, "ercot_gp_exploratory_longfit.csv"), index=False)
+        lchecks.to_csv(os.path.join(out_dir, "ercot_gp_exploratory_longfit_nstar_checks.csv"), index=False)
     cross = noise_crosscheck(winners, seed, tiers, roles)
     cross.to_csv(os.path.join(out_dir, "ercot_gp_noise_crosscheck.csv"), index=False)
     figs = [fig_curves(df, objs, roles, ns, os.path.join(figs_dir, "fig_training_size_curves.png"), grid),
             fig_lengthscales(df, objs, roles, sites, ns, os.path.join(figs_dir, "fig_lengthscales_vs_n.png"), grid),
             fig_parity(winners, hres, Uh, Yh, tiers, os.path.join(figs_dir, "fig_parity_holdout.png"))]
+    if ldf is not None:
+        figs.append(fig_house_vs_long(df, ldf, objs, roles, sites, ns, os.path.join(figs_dir, "fig_house_vs_longfit.png"),
+                                      grid, long_epochs))
     mres = None
     if mech:
         mres = mechanism(winners, ns, Uv, Y, sob, sig, noise, hres, roles, sites, np.asarray(gen_pmax, float),
                          out_dir, figs_dir, lc=lc, **(mech_kw or {}))
         figs.append(mres["fig"])
-    return {"study": df, "exploratory": xdf, "checks": checks, "n_star": ns, "reason": reason, "alt": alt,
+    return {"study": df, "exploratory": xdf, "long": ldf, "long_checks": lchecks, "long_n_star": ln,
+            "long_epochs": long_epochs, "checks": checks, "n_star": ns, "reason": reason, "alt": alt,
             "tiers": tiers, "holdout": hres, "hold_df": hdf, "committed": doc, "cross": cross, "figs": figs,
             "mech": mres, "winners": winners, "sigmas": sig, "dfs": dfs, "uses": uses, "arms": arms_by,
             "roles": roles, "objs": objs, "ledger": S.read_ledger(out_dir), "wall_s": time.time() - t0,
@@ -701,6 +788,7 @@ def main(argv=None):
     ap.add_argument("--out-dir", default=HERE)
     ap.add_argument("--replay-only", action="store_true")
     ap.add_argument("--no-mechanism", action="store_true")
+    ap.add_argument("--no-long-diag", action="store_true", help="skip the exploratory long-fit diagnostic")
     a = ap.parse_args(argv)
     from analysis.ercot_gp.ercot_gp_loader import read_design_space
     ds = read_design_space(a.design_space)
@@ -719,7 +807,8 @@ def main(argv=None):
     gen_pmax = np.asarray([float(s["gen_pmax"]) for s in ds["sites"]], float)
     lc = location_contrast_rows(sites=sites, objs=objs)
     res = run(U, Y, sob, real_holdout_loader(a.design_space, objs, extra), seed, noise, roles, sites, gen_pmax,
-              a.out_dir, ds["contract_version"], replay_only=a.replay_only, mech=not a.no_mechanism, lc=lc)
+              a.out_dir, ds["contract_version"], replay_only=a.replay_only, mech=not a.no_mechanism, lc=lc,
+              long_diag=not a.no_long_diag)
     res["extra"] = extra
     from analysis.ercot_gp import ercot_gp_partb_report as R
     R.write_all(res, seed, ds, a)

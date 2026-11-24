@@ -122,7 +122,9 @@ def status_md(res, seed, ds, extra):
           + ", ".join(f"{o} {v}" for o, v in alt["seated_each"].items())
           + "; each co-reported id alone: " + ", ".join(f"{o} {v}" for o, v in alt["co_reported_alone"].items())
           + f"; without the lengthscale condition {alt['without_lengthscale_condition']}; with the median (not max) "
-          f"lengthscale change {alt['lengthscale_median_not_max']}; coverage alone {alt['cov_only']}.", ""]
+          f"lengthscale change {alt['lengthscale_median_not_max']}; coverage alone {alt['cov_only']}"
+          + (f"; the same rule on the exploratory long fit (Adam {alt['long_fit_descriptive']['epochs']} epochs) "
+             f"{alt['long_fit_descriptive']['n_star']}" if 'long_fit_descriptive' in alt else "") + ".", ""]
     pa, pa_n = part_a_criterion(res)
     L += [f"Part A criterion (pinned 11-14, verbatim, evaluated for continuity; v3.3 replaces it): \"{S.SUFFICIENCY_CRITERION}\" "
           "→ seated: " + "; ".join(f"{o} cov95@32 {pa[o]['loo_cov95_32']}, ratio {pa[o]['ratio']:.3f}, holdout@32 "
@@ -152,6 +154,29 @@ def status_md(res, seed, ds, extra):
                      f"vs {r['vs_selected_arm']} | {int(r['loo_cov95'])} [{int(r['bar_lo'])}, {int(r['bar_hi'])}] | {r['loo_rmse']:.4g} | "
                      f"{r['noise_sd_raw']:.4g} | {', '.join(f'{v:.3g}' for v in r[lsc])} |")
 
+    ldf = res.get("long")
+    if ldf is not None and len(ldf):
+        ep = res.get("long_epochs")
+        lsel = ldf[ldf["selected"]]
+        L += ["", f"### Exploratory: the same arms and selection rule with a longer fit (Adam {ep} epochs; reported, NEVER committed, never holdout-scored)", "",
+              "The house fit (plan §5 'campaign fit definition' = bogp `train_gp` defaults: Adam, 700 epochs, lr 0.01, from "
+              "gpytorch's default init raw lengthscale 0) moves each raw lengthscale by at most ≈ 7 (700 × 0.01), and the "
+              "fitted raw lengthscales sit at 3.3–6.8 — the optimizer budget, not the likelihood, bounds them. This table "
+              "re-runs every plan arm and the selection rule with the longer fit.", "",
+              "| objective | n | house arm | house LOO NLPD | long arm | long LOO NLPD | house / long LOO RMSE | house / long cov95 [bar] | house / long noise / σ_c | long lengthscales u |",
+              "|---|---|---|---|---|---|---|---|---|---|"]
+        for obj in objs:
+            for n in res["grid"]:
+                h = sel[(sel.objective == obj) & (sel.n == n)].iloc[0]
+                g = lsel[(lsel.objective == obj) & (lsel.n == n)].iloc[0]
+                L.append(f"| {obj} | {n} | {h['arm']} | {h['loo_nlpd']:.3f} | {g['arm']} | {g['loo_nlpd']:.3f} | "
+                         f"{h['loo_rmse']:.4g} / {g['loo_rmse']:.4g} | {int(h['loo_cov95'])} / {int(g['loo_cov95'])} [{int(h['bar_lo'])}, {int(h['bar_hi'])}] | "
+                         f"{_g(h['noise_over_sigma_c'], '{:.3g}')} / {_g(g['noise_over_sigma_c'], '{:.3g}')} | {', '.join(f'{v:.3g}' for v in g[lsc])} |")
+        ln = res.get("long_n_star")
+        if ln is not None:
+            L += ["", f"n* rule on the long fit (descriptive only): **{ln[0]}** (co-reported included: {ln[2]['co_reported_included']}; "
+                  f"without the lengthscale condition: {ln[2]['without_lengthscale_condition']}). Reason: {ln[1]}",
+                  "", "Figure: `figs/fig_house_vs_longfit.png`."]
     L += ["", f"## 4. Holdout (random_E, i.i.d. 48; bar [43, 48] = binom.interval(0.90, 48, 0.95); once per objective per tier)", "",
           "| objective | role | n | arm | cov95 / 48 | pass | RMSE | RMSE % range | NLPD | rms z | mean z | Spearman | median 95 % half-width | latent share | exposure row |",
           "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
@@ -179,7 +204,16 @@ def status_md(res, seed, ds, extra):
     m = res.get("mech")
     if m:
         from analysis.ercot_gp import ercot_gp_mechanism as M
-        L += [M.mechanism_md(m["facts"], m["null"], m["flags"]), ""]
+        mm = M.mechanism_md(m["facts"], m["null"], m["flags"])
+        mm = mm.replace("## Mechanism sanity", "## 6. Mechanism sanity", 1)
+        mm = mm.replace("The direct 8-run check is prompt 61 (`location_contrast_E`); when it lands, its standardized residuals under the "
+                        "committed config are added here as one descriptive row.",
+                        "The direct 8-run check is prompt 61 (`location_contrast_E`, landed 4b7bf85); its standardized residuals "
+                        "under the committed config are the descriptive row below." if m.get("lc") is not None else
+                        "The direct 8-run check is prompt 61 (`location_contrast_E`); not available in this run.")
+        mm = mm.replace("### (c) No-simulation null (pinned before any n0_E Y was read)",
+                        "### (c) No-simulation null (machinery pinned before any n0_E Y was read; refitted here with the committed V1 config)")
+        L += [mm, ""]
         L += ["### Direction and scale (descriptive)", "", "| objective | Spearman(y, total MW T) on 48 rows | grading range | B_j (contract addendum bar) | range / B_j | committed arm | refit on 48 |",
               "|---|---|---|---|---|---|---|"]
         for o, v in m["direction"].items():
