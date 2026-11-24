@@ -389,11 +389,37 @@ Read: the 18 noise_seed_E runs + ONLY the 4 n0_E anchors (n0_E:25 / 29 / 46 / 4,
   unchanged, qualification changed; REDUNDANT→E1: X1, V2; GUARDRAIL: R2 (+ R1 dead); SURVIVORS: E4, N4,
   N5, E6, R5, N3, E2, R6, N2, E3, E8; DIAGNOSTIC: R7, R8, V3, E7, D1, D2; DEAD: E9 (wave D), E5, R1, R3.**
   The strategy session drafts E-D1b from this table.
-- [ ] **STOP — waiting on gate (iv) (E-D1b → dated `design_space_E.json`, or Kay's word to fit the four
-  provisional seats V1 / E1 / R4 / N1).** Then ONE command: `python analysis/ercot_gp/ercot_gp_status.py
+- [x] ~~**STOP — waiting on gate (iv)**~~ — met 11-24: prompt 65's `waves/design_space_E_2026-11-24.json` (seats V1 · E1; co-reported N1, N4). Then ONE command: `python analysis/ercot_gp/ercot_gp_status.py
   --real` (fits plan-5 arms at 32 / 48, LOO selection, holdout once per config per tier, exposure ≤ 8 of
   24, `committed_configs.json` LAST, cross-check, figures, mechanism flags, `ERCOT_GP_STATUS.md`,
   E-D7 draft row); then E-D7 to Kay; 55 Part B waits on `E-D7_decided`.
+
+### Part B — fit (v3.3 addendum, 2026-11-24 night; branch `ercot/54-partB`, worktree `RTS-GMLC-e54b`)
+
+- [x] **Code** (committed before the run): `analysis/ercot_gp/ercot_gp_partb.py` + `ercot_gp_partb_report.py` +
+  `tests/test_ercot_gp_partb.py` (8 tests); `ercot_gp_status.score_holdout` takes an admitted-tier list (third
+  tier n*). 46 ercot_gp tests green in bogp-botorch. Command: `python analysis/ercot_gp/ercot_gp_partb.py --real
+  --design-space waves/design_space_E_2026-11-24.json` (then `--replay-only` rebuilds pages from deterministic
+  replays; the replay asserts cov95 / RMSE equal to the ledger and never appends).
+- [x] **Training-size study** V1, E1 (seated) + N4, N1 (co-reported) at n ∈ {12, 16, …, 48} (nested Sobol
+  prefixes), plan-§5 arms m52+std · m52+std+meas (σ_c from `ercot_noise_seed.json`, df 16: LIVE for all four) ·
+  rbf+std; log1p arms excluded by the inclusion rule for all four. Selected at 48: V1 rbf+std; E1 / N4 / N1
+  m52+std. Measured-floor arm never selected.
+- [x] **n\* = 48** (E-D7 recommendation; Kay decides): LOO RMSE_n / RMSE_48 > 1.1 at every n < 48 for both seated
+  ids (n = 44: V1 1.120, E1 1.116); coverage inside the bar at every n; the exploratory long fit gives 48 too.
+- [x] **Holdout** (random_E, bar [43, 48]): 8 scorings of 24 (tiers 32, 48; no third tier). V1 48 / 45, E1 48 / 48,
+  N4 48 / 48 PASS; **N1 44 PASS at 32, 41 FAIL at 48** (co-reported; recorded, no re-selection).
+  `committed_configs.json` written after the last scoring → holdout RETIRED.
+- [x] Noise cross-check vs σ_c (house-fit inferred / σ_c at 48: V1 3.97, E1 2.65, N4 1.37, N1 0.43); mechanism page
+  (V1 INTERACTION / location UNRESOLVED; E1 INTERACTION / LOCATION; N4 / N1 shares only) + the prompt-61 residual row.
+- [x] **Finding for Kay / 55 (exploratory, not committed):** the house fit (Adam 700 epochs) is step-budget-bound
+  (raw lengthscales 3.3–6.8 vs a reach of ≈ 7); a 10,000-epoch fit lowers LOO NLPD by 0.4–0.8 nats but its noise is
+  unstable across n. The plan-§5 fit definition is frozen; a change needs an amendment.
+- Deliverables: `analysis/ercot_gp/ERCOT_GP_STATUS.md` (with the drafted E-D7 row and the §10 amendment text — not
+  appended to the plan), `ercot_gp_status.csv`, `committed_configs.json`, `exposure_ledger.csv`, `figs/`,
+  `ercot_gp_{exploratory,exploratory_longfit,nstar_checks,noise_crosscheck,lc_residuals}.csv`,
+  `ercot_gp_mechanism.json`, `pi_agenda_E-D7_draft.md`.
+- [ ] **STOP** — E-D7 to Kay; 55 Part B waits on `E-D7_decided`.
 
 ## Prompt 53 — ERCOT design-space freeze + n0_E / random_E waves (v3.1, 2026-11-13; executor writes here only)
 
