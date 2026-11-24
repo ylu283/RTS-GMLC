@@ -16,7 +16,7 @@
   {
    "n": 3,
    "check": "C2/C3 per objective (power statement, not a pass/fail on its own)",
-   "result": "V1: C2 0, C3 0 in 57 cells (expected C2 0.021); rms z median 0.17; E1: C2 1, C3 1 in 57 cells (expected C2 0.021); rms z median 0.73",
+   "result": "V1: C2 0, C3 0 in 57 (round, objective) cells; rms z median 0.17; E1: C2 1, C3 1 in 57 (round, objective) cells; rms z median 0.73",
    "pass": null
   },
   {

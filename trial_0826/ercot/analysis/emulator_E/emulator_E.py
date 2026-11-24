@@ -1203,6 +1203,28 @@ def extras_variant(variant, log=print):
     return out
 
 
+def mm_baselines(variant, log=print):
+    """Matched-budget true-f baselines on a mismatch truth (review item 4): same rules as the committed block, the
+    plug-in from that variant's r0 BO GP; fractions against the variant's existing best-known front (not updated)."""
+    p = os.path.join(RUNS, f"EMU_extras_{variant}.json")
+    X = json.load(open(p))
+    set_truth(VARIANTS[variant]["truth"])
+    base, _ = baselines(X["r0_plugin"][variant], log)
+    hb = X["best_known"]["hv_best_known"]
+    X["baselines"] = {name: {"n_rep": int(len(H)), "p5": np.percentile(np.asarray(H) / hb, 5, axis=0).tolist(),
+                             "p50": np.percentile(np.asarray(H) / hb, 50, axis=0).tolist(),
+                             "p95": np.percentile(np.asarray(H) / hb, 95, axis=0).tolist(),
+                             "max": (np.asarray(H) / hb).max(0).tolist()} for name, H in base.items()}
+    X["baseline_rule"] = (f"matched budget on the {VARIANTS[variant]['truth']} truth, {N_REP} replicates, "
+                          f"default_rng({BASE_SEED}); fractions of this variant's best-known front (baseline designs NOT "
+                          "added to it; max fraction recorded)")
+    with open(p, "w") as fh:
+        json.dump(X, fh, indent=1, default=float)
+    log(f"[mm-baselines {variant}] vertices p95 r4 {X['baselines']['vertices']['p95'][4]:.3f}, plug-in spread "
+        f"{X['baselines']['plugin_spread']['p50'][4]:.3f}, max any {max(b['max'][4] for b in X['baselines'].values()):.3f}")
+    return X
+
+
 def extras(log=print):
     plug_h = r0_plugin("house", log)
     plug_l = r0_plugin("long", log)
@@ -1252,6 +1274,8 @@ def main(argv=None):
     sub.add_parser("random-pool")
     fp = sub.add_parser("front")
     fp.add_argument("--truth", choices=list(TRUTH_PARAMS), default="house")
+    mb = sub.add_parser("mm-baselines")
+    mb.add_argument("--variant", choices=["mmA", "mmB"], required=True)
     ex = sub.add_parser("extras")
     ex.add_argument("--variant", choices=list(VARIANTS), default="house")
     a = ap.parse_args(argv)
@@ -1269,6 +1293,8 @@ def main(argv=None):
     elif a.cmd == "front":
         set_truth(a.truth)
         emulator_front()
+    elif a.cmd == "mm-baselines":
+        mm_baselines(a.variant)
     elif a.cmd == "extras":
         extras() if a.variant == "house" else extras_variant(a.variant)
     return 0

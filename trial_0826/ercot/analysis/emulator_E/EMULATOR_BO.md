@@ -8,10 +8,10 @@ This block repeats the dry run on the committed fits after 54's fit-v2 round. `c
 
 ## A.0 Answer in two minutes
 
-1. **What changed in the truth?** V1 is unchanged (house fallback; same f, f* = 1.047 TWh). E1 is now the fit-v2 posterior mean: longer lengthscales (2.75 / 3.59 / 4.31 / 4.33 / 2.09 / 1.41 vs 0.96–1.90), a smoother surface, and f*(E1) = $8,069.55M at the no-PEM vertex u = 0 (house truth: $8,084.05M near it). f*(E1) is now 20.5 B below the lowest observed E1. Both optima are still box vertices outside the data.
-2. **What changed in the BO GP and its bands?** The E1 GP now infers noise at 0.39–1.27 × σ_c (house: 2.39–3.29 ×). E1 bands are close to calibrated: rms z median 0.73 (house 0.21). V1 keeps the house fit: noise 3.4–4.9 × σ_c, rms z median 0.17. Fit v2 converged at every E1 round fit (60/60); the best two restarts agree to ≤ 2.9e-07 nats; the gap to the next mode is 18.5–150.2 nats (`mode_gap_v2`).
-3. **Do the gates have power now?** **V1: no** — C2 0, C3 0 in 57 cells, rms z 0.17; the house-fit V1 bands are 3.5× too wide to flag anything. **E1: yes** — C2 1, C3 1 in 57 cells (expected under the nominal rate: 0.021). The single firing is single-objective E1 seed 0 round 2 (cov95 3 of 8, every design outside the start hull). E1 cov95 per batch is listed in §A.3. A real E1 REVIEW flag is now possible; a V1 flag is still not.
-4. **Did the search change?** No. Single-objective BO reaches 0.18 B (V1) and 0.000 B (E1) by r4 on 3/3 seeds; the r0 plug-in optimum is already 0.086 / 5.1e-13 B (E1's optimum is the origin, which the start-set GP already points to). Multi s0 reaches 0.971–0.980 of the best-known front (house block 0.975–0.979). BO − r0 plug-in spread = +0.005–+0.014 (house +0.020–+0.024): **this emulator cannot separate the acquisition function from a plug-in exploit of the start-set GP.** The machinery took every expected branch (s0 cap, s1 constrained from r2, s2 HALT), C1 45/45.
+1. **What changed in the truth?** V1 is unchanged (house fallback; same f, f* = 1.047 TWh). E1 is now the fit-v2 posterior mean: longer lengthscales (2.751 / 3.588 / 4.305 / 4.331 / 2.094 / 1.414 vs 0.96–1.90), a smoother surface, and f*(E1) = $8,069.6M at the no-PEM vertex u = 0 (house truth: $8,084.1M near it), $38M = 20.5 B below the lowest observed E1. **This is a smooth-trend model claim, not data:** u = 0 lies 0.34 lengthscales from the nearest start point and the fitted constant mean is -6.6 s_y, so the value at the origin comes from the trend. The first real round tests it. Both optima are still box vertices outside the data.
+2. **What changed in the BO GP and its bands?** The E1 GP now infers noise at 0.39–1.27 × the committed σ_c (house: 2.39–3.29 ×). The emulator adds the shrunk Σ_c chatter, sd 398k = 1.274 σ_c, so against the noise actually present the E1 GP noise is 0.31–0.99 × — it UNDER-estimates the noise in 60 of 60 round fits. E1 rms z median 0.73 (house 0.21). V1 keeps the house fit: noise 4.6–6.6 × the emulator noise, rms z median 0.17. Fit v2 converged at every E1 round fit (60/60); the best two restarts agree to ≤ 2.9e-07 nats; the gap to the next mode is 18.5–150.2 nats (`mode_gap_v2`).
+3. **What do the gates do now?** **V1: no power** — C2 0, C3 0 in 57 cells; rms z median 0.17, i.e. the V1 bands are ≈ 6× too wide. A V1 misfit is invisible to C2/C3. **E1: the v2 bands are narrow enough that a flag is possible; the multi path never fired** (E1 C2 0 of 45 batches, minimum cov95 5). The one E1 event (C2 + C3) is single-objective seed 0 round 2: 8 IDENTICAL designs at u = 0, a point already observed 2× in r1. All 8 z share one posterior-mean error (+1.78 predictive sd) plus independent noise draws. The mechanism is under-estimated noise at a replicated design (r1 fit noise 0.676 σ_c vs emulator noise 1.274 σ_c, ρ = 0.53; coverage at a replicate 2Φ(1.96ρ) − 1 = 0.70), not distance from the start set. Simulated for this batch (latent sd from the predictive sd minus the fitted noise; emulated chatter; 200,000 draws): P(C2) 0.10, P(C3) 0.018, both 0.013 per batch (the review's model gave 0.22 / 0.083 / 0.07). C2 and C3 are record + REVIEW only (acquire_E.py): the real campaign would get two REVIEW entries, no stop.
+4. **Did the search change?** No. Single-objective V1 reaches 0.18 B by r4 on 3/3 seeds (r0 plug-in 0.086 B). **Single-objective E1 collapses to replicating u = 0:** (designs at u = 0, unique designs) per round — seed 0: (2,7) (8,1) (8,1) (8,1); seed 1: (1,8) (7,2) (8,1) (8,1); seed 2: (1,8) (8,1) (8,1) (8,1); 71 of 72 r2–r4 designs sit at the exact origin (house block: 0 of 72). "E1 0.000 B" is the r0 plug-in (5.1e-13 B); single-objective E1 says nothing about search. It is direct evidence that a v2 GP + noisy EI replicates the incumbent (§A.7). The multi path did not (minimum proposal distance to the evaluated set 0.067). Multi s0 reaches 0.971–0.980 of the best-known front (house block 0.975–0.979); BO − r0 plug-in spread = +0.005–+0.014. **On a self-consistent truth BO ≈ plug-in. Under V1 mismatch BO recovers from a 1.31 B plug-in error** (§A.5). The machinery took every expected branch (s0 cap, s1 constrained from r2, s2 HALT), C1 45/45.
 5. **Cost.** Fit v2 on E1 (16 restarts) takes 3.2 s per fit here (house 1.3 s); a multi-objective round takes 8.5 s (house 7.6 s) at 2 threads. On CRC expect tens of seconds; < 1 % of a PCM round.
 
 ## A.1 Verdict (committed block)
@@ -20,7 +20,7 @@ This block repeats the dry run on the committed fits after 54's fit-v2 round. `c
 |---|---|---|---|
 | 1 | No crash; each lane ends where its scenario says | single 12/12, multi 15/15, ends as expected = True | PASS |
 | 2 | C1 ingest on every emulated round | 45/45 | PASS |
-| 3 | C2/C3 per objective (power statement, not a pass/fail on its own) | V1: C2 0, C3 0 in 57 cells (expected C2 0.021); rms z median 0.17; E1: C2 1, C3 1 in 57 cells (expected C2 0.021); rms z median 0.73 | V1: NO POWER (house fallback); E1: has power |
+| 3 | C2/C3 per objective (power statement, not a pass/fail on its own) | V1: C2 0, C3 0 in 57 (round, objective) cells; rms z median 0.17; E1: C2 1, C3 1 in 57 (round, objective) cells; rms z median 0.73 | V1: NO POWER (house fallback). E1: a flag is possible; the multi path never fired; the single E1 event is replicate-noise under-estimation at u = 0 (A.0 item 3). REVIEW only, never a stop |
 | 4 | Single-objective within 2 B_j by r4 on >= 2 of 3 seeds | V1 3/3; E1 3/3 | PASS |
 | 5 | Single-objective BO beats random-8 at r4 on every objective | V1 BO 0.176 B vs random 18.69 B; E1 BO 0.000 B vs random 18.98 B | PASS |
 | 6 | Branches: s0 monitor to the cap; s1 constrained from r2, n_hv 55/63/71/79; s2 HALT + refusal (5 lanes each) | s0 True, s1 True, s2 True | PASS |
@@ -42,8 +42,11 @@ This block repeats the dry run on the committed fits after 54's fit-v2 round. `c
 | multi s0 r4, true-f HV / best-known | 0.975–0.979 | 0.971–0.980 |
 | random vertices r4 p95 / plug-in spread | 0.910 / 0.955 | 0.918 / 0.966 |
 | BO − plug-in spread, r4 | +0.020–+0.024 | +0.005–+0.014 |
-| E1 inferred noise / σ_c | 2.39–3.29 | 0.39–1.27 |
-| V1 inferred noise / σ_c | 3.3–4.9 | 3.4–4.9 |
+| E1 inferred noise / committed σ_c | 2.39–3.29 | 0.39–1.27 |
+| E1 inferred noise / emulator noise (shrunk Σ_c sd) | 1.87–2.58 | 0.31–0.99 |
+| V1 inferred noise / committed σ_c | 3.3–4.9 | 3.4–4.9 |
+| V1 inferred noise / emulator noise | 4.4–6.6 | 4.6–6.6 |
+| single E1 designs at u = 0, r2–r4 | 0 of 72 | 71 of 72 |
 | E1 rms z, median (single + multi) | 0.21 | 0.73 |
 | E1 C2 / C3 (single + multi cells) | 0 / 0 | 1 / 1 |
 | V1 C2 / C3 | 0 / 0 | 0 / 0 |
@@ -54,9 +57,11 @@ This block repeats the dry run on the committed fits after 54's fit-v2 round. `c
 
 ## A.3 Calibration per objective (committed)
 
-- E1 cov95 per batch (single seeds 0–2, r1–r4, then multi lanes): 8, 3, 8, 7, 8, 6, 7, 7, 8, 5, 8, 8, 8, 8, 8, 7, 8, 8, 5, 7, 8, 8, 7, 7, 8, 6, 8, 8, 8, 8, 7, 7, 8, 8, 6, 6, 8, 8, 7, 7, 8, 7, 7, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8.
-- V1 cov95 per batch: all [8] (house-fit bands).
-- Every proposed design lies outside the start set's convex hull (all batches; `emulator_E_calib_hull_committed.csv`).
+- E1 cov95 per batch (single seeds 0–2, r1–r4, then multi lanes): 8, 3, 8, 7, 8, 6, 7, 7, 8, 5, 8, 8, 8, 8, 8, 7, 8, 8, 5, 7, 8, 8, 7, 7, 8, 6, 8, 8, 8, 8, 7, 7, 8, 8, 6, 6, 8, 8, 7, 7, 8, 7, 7, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 8. Multi path: minimum 5, no C2.
+- The one E1 C2 + C3 is the replicated-origin batch (single seed 0, r2). Mechanism: under-estimated noise at a replicate (ρ = 0.53, replicate coverage 0.70); P(C2) 0.10, P(C3) 0.018 per batch by simulation. It is not a hull effect: every proposed design lies outside the start-set hull (`emulator_E_calib_hull_committed.csv`), and the other out-of-hull E1 batches keep cov95 ≥ 5 — far from the data the posterior variance dominates the band, so low noise alone does not break coverage. A replicate removes that posterior variance and exposes the noise estimate.
+- Single-objective E1 replicate collapse: (designs at u = 0, unique) per round — seed 0: (2,7) (8,1) (8,1) (8,1); seed 1: (1,8) (7,2) (8,1) (8,1); seed 2: (1,8) (8,1) (8,1) (8,1).
+- V1 cov95 per batch: all [8] (house-fit bands ≈ 6× too wide).
+- Noise references: `noise_over_sigma_c` divides by the committed σ_c (E1 312,423; V1 4,376); the emulator adds the shrunk Σ_c sd (E1 398,135 = 1.274 σ_c; V1 3,275 = 0.748 σ_c). Against the emulator noise: E1 0.31–0.99, V1 4.6–6.6 (`*_noise_over_emulator` columns).
 - E1 per-round fit v2: `mode_gap_v2` = best MAP minus the best restart outside the 1e-3·n-nat tolerance (54's `mode_gap_nats`): 18.5–150.2 nats; best-vs-second restart (`gap_second_v2`) ≤ 2.9e-07 nats.
 
 ![single committed](figs/fig_EMU_single_regret_committed.png)
@@ -108,6 +113,14 @@ The main run puts the same fit on both sides (truth and BO GP), which flatters t
 | mismatch A | house / house | house / v2 | 0.081 / 0.016 | 0.977 | 0 + 0 |
 | mismatch B | v2 (EXPLORATORY) / v2 | house / v2 | 0.293 / 0.000 | 0.988 | 1 + 0 |
 
+| truth | random vertices r4 p95 | r0 plug-in spread r4 | BO multi s0 seed 0, r4 |
+|---|---|---|---|
+| committed | 0.918 | 0.966 | 0.971 |
+| mismatch A | 0.910 | 0.967 | 0.977 |
+| mismatch B | 0.940 | 0.975 | 0.988 |
+
+Non-circular evidence (mismatch B, V1): the r0 plug-in regret is 1.31 B; BO's minimum true f among evaluated designs reaches 0.002 B by r2; the posterior-mean optimum regret goes 0.079 → 0.050 B (r2 → r4). The rising best-observed regret (0.036 → 0.293 B) is winner's curse on noisy incumbents: the best observation's noise is -0.76 and -1.40 chatter sd at r3 / r4. The house GP does not mis-steer. **Recommendation for the real campaign: report incumbents by posterior mean or by replicates, not by best observed. A V1 misfit will be invisible to C2/C3.**
+
 Reading: with the truth fitted differently from the BO GP, the search still reaches the vertex optima. Mismatch B is the hardest case for V1: the fit-v2 V1 truth puts f* at the all-PEM vertex (0.929 TWh, 26 B below the data) and the house-fit V1 GP has to find it: regret by round 25.658/1.037/0.036/0.182/0.293 B (r0 plug-in 1.31 B); after r2 the best-observed design drifts (a low noisy observation at a worse design), while the posterior-mean optimum reaches 0.050 B by r4. Mismatch A (house E1 truth, fit-v2 E1 GP) gives E1 regret 0.016 B and no C2. In mismatch B the E1 truth, E1 GP and noise stream equal the committed run, so its single E1 trajectory (and its one C2 at r2) is the committed one; the mismatch there is V1 only. The multi-objective mismatch lanes raise no C2. Each mismatch is scored against the best-known front of its own truth (`EMU_extras_mmA.json`, `EMU_extras_mmB.json`).
 
 ## A.6 55 change for this block
@@ -119,7 +132,8 @@ Reading: with the truth fitted differently from the BO GP, the search still reac
 
 1. Fit v2 in `qnehvi_E` per `fit_definition`: **done (hook)**; per-round convergence flag recorded (not yet a gate).
 2. New `committed_configs.json`: **landed (240bde1)**. E-D7 still null — the Part B guard (refuses a provisional tier) applies.
-3. Still open: duplicate-proposal rule + idempotent grading + commit before propose; E-D5 amendment; `arms_E.json` complete (`gp.train` text, `part = "B"`, R3 / N3 / N1_off wired); τ_res into the ledger; stale README / runbook text; `dry_round_E.py` alignment + tests for the c7576a6 branches; real-loader ingest test on a fake methods_E wave; Kay's duplicate-run decision (≈ 16 of 40 r1 runs); CRC `--check-env` / `GAP_DECISION` / `--dry-run`, one lane first; the meaning of an E1 C2 flag on an out-of-hull batch.
+3. **Duplicate / replicate rule (direct evidence now):** single-objective E1 with the v2 GP and noisy EI put 71 of 72 r2–r4 designs on the incumbent u = 0. The 55 multi path did not replicate here, but nothing prevents it; the re-proposal assert in `propose_round` would stop a lane that does. Declare the rule (replicate allowed, or re-optimize the slot) before launch.
+4. Still open: idempotent grading + commit before propose; E-D5 amendment; `arms_E.json` complete (`gp.train` text, `part = "B"`, R3 / N3 / N1_off wired); τ_res into the ledger; stale README / runbook text; `dry_round_E.py` alignment + tests for the c7576a6 branches; real-loader ingest test on a fake methods_E wave; Kay's duplicate-run decision (≈ 16 of 40 r1 runs); CRC `--check-env` / `GAP_DECISION` / `--dry-run`, one lane first; what a C2 REVIEW flag on a replicated design means (noise estimate, not model failure).
 
 ---
 

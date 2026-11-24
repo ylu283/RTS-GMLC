@@ -25,14 +25,23 @@ Decisions for Kay:
 - [ ] Cross-lane duplicate-vertex runs: 17 of 40 r1 PCM runs under option C duplicate another lane — shared
   replicates vs run all (E-D4).
 - [ ] Re-proposal rule: replace the "re-proposed an evaluated design" assert with a declared rule (55 Part B).
-- [ ] Meaning of a C2 flag on an out-of-hull batch (review, not halt; report hull distance) — now live for E1.
+- [ ] Meaning of a C2 REVIEW flag on a replicated design (noise estimate, not model failure); review, never halt.
 
 Committed-fit rerun (tx123 240bde1; EMULATOR_BO.md section A):
 - [x] 55 hook 36b74b7: acquisition GP uses each objective's committed fit definition (V1 house fallback, E1 FitV2).
 - [x] Truth = committed fits (E1 v2 reproduces committed hyperparameters to 7e-5); f*(E1) now at u = 0, 20.5 B below data.
 - [x] All branches as expected (s0/s1/s2 x 5 lanes), C1 45/45, fit v2 converged at 60/60 E1 round fits (mode gap 18-150 nats).
-- [x] Gate power: V1 none (house bands, noise 3.4-4.9 sigma_c, rms z 0.17); E1 yes (noise 0.39-1.27 sigma_c, rms z 0.73;
-  1 C2 + 1 C3 in 57 cells, single E1 seed 0 r2, out-of-hull batch).
+- [x] Gates (corrected after review): V1 no power (house bands ~6x too wide, rms z 0.17; a V1 misfit is invisible to
+  C2/C3). E1: v2 bands are narrow enough that a flag is possible; the multi path never fired (0/45, min cov95 5). The one
+  E1 C2 + C3 is single seed 0 r2 = 8 identical designs at the replicated u = 0: under-estimated noise at a replicate
+  (E1 GP noise 0.31-0.99 x the emulator noise in 60/60 fits; rho 0.53, replicate coverage 0.70), not a hull effect.
+  C2/C3 are REVIEW-only: two REVIEW entries, no stop.
+- [x] Replicate collapse: single-objective E1 (v2 GP + noisy EI) put 71 of 72 r2-r4 designs at u = 0 (house: 0 of 72);
+  "E1 0.000 B" is the r0 plug-in. Direct evidence for the duplicate/replicate rule (55 Part B). Multi path did not.
+- [x] Mismatch B (non-circular): V1 plug-in regret 1.31 B, BO min-f-evaluated 0.002 B by r2; rising best-observed regret
+  = winner's curse -> report incumbents by posterior mean or replicates. Baselines on mismatch truths: plug-in spread
+  0.967 (A) / 0.975 (B) vs BO 0.977 / 0.988.
+- [x] f*(E1) at u = 0 ($38M = 20.5 B below data) is a smooth-trend model claim; the first real round tests it.
 - [x] Search unchanged: single r4 V1 0.18 B / E1 0.000 B; s0 HV 0.971-0.980 of best-known; BO - plug-in spread
   +0.005..+0.014 (cannot separate acquisition from plug-in exploit). Mismatch A/B: search still reaches the vertices.
 - [x] Seed overlap: 16 of 40 r1 runs duplicate across lanes (input to E-D4).
