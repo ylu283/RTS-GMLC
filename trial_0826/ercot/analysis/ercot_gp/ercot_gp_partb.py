@@ -617,15 +617,19 @@ def fig_curves(df, objs, roles, ns, out_path, grid=N_GRID):
         d = df[df["objective"] == obj]
         sel = d[d["selected"]].sort_values("n")
         r48 = float(sel.loc[sel["n"] == max(grid), "loo_rmse"].iloc[0])
+        styles = {"m52+std": ("o-", 1.6), "m52+std+meas": ("^--", 1.4), "rbf+std": ("v:", 1.8),
+                  "m52+log1p": ("D-.", 1.2), "rbf+log1p": ("x-.", 1.2)}
         for arm in d["arm"].unique():
             a = d[d["arm"] == arm].sort_values("n")
+            sty_, lw_ = styles.get(arm, ("o-", 1.2))
             vals = {"loo_rmse_ratio": a["loo_rmse"].to_numpy(float) / r48, "loo_nlpd": a["loo_nlpd"].to_numpy(float),
                     "cov_frac": a["loo_cov95"].to_numpy(float) / a["n"].to_numpy(float),
                     "noise_over_sigma_c": a["noise_over_sigma_c"].to_numpy(float)}
             for i, k in enumerate(rows):
                 v = vals[k]
                 assert np.isfinite(v).all() or k == "noise_over_sigma_c", (obj, arm, k)
-                axes[i, j].plot(a["n"], v, "o-", lw=1.2, ms=3, alpha=0.75, label=arm)
+                axes[i, j].plot(a["n"] + {"m52+std+meas": 0.4, "rbf+std": -0.4}.get(arm, 0.0), v, sty_, lw=lw_, ms=4,
+                                alpha=0.85, label=arm)
         sv = {"loo_rmse_ratio": sel["loo_rmse"].to_numpy(float) / r48, "loo_nlpd": sel["loo_nlpd"].to_numpy(float),
               "cov_frac": sel["loo_cov95"].to_numpy(float) / sel["n"].to_numpy(float),
               "noise_over_sigma_c": sel["noise_over_sigma_c"].to_numpy(float)}
@@ -643,20 +647,23 @@ def fig_curves(df, objs, roles, ns, out_path, grid=N_GRID):
                 ax.axhline(0.95, color="0.3", ls=":", lw=1)
             if k == "noise_over_sigma_c":
                 ax.axhline(1.0, color="0.3", ls=":", lw=1.5)
-                if np.isfinite(sv[k]).any():
-                    ax.set_yscale("log")
-                else:
+                allv = d["noise_over_sigma_c"].to_numpy(float)
+                allv = allv[np.isfinite(allv) & (allv > 0)]
+                if not len(allv):
                     ax.text(0.5, 0.5, "no sigma_c for this id", transform=ax.transAxes, ha="center", fontweight="bold")
+                elif allv.max() / allv.min() > 10:
+                    ax.set_yscale("log")
             ax.set_xlabel("n (nested Sobol prefix)")
             ax.set_ylabel(ylab[k])
             if i == 0:
                 ax.set_title(f"{obj} ({'seated' if roles[obj] == 'seated' else 'co-reported'})")
             _bold(ax)
-            if i == 0 and j == 0:
-                ax.legend(fontsize=9)
-    fig.suptitle(f"Training-size study (LOO only)\nred dashed = n* = {ns}; grey bars = binom 90 % region per n",
+    h_, l_ = axes[0, 0].get_legend_handles_labels()
+    fig.legend(h_, l_, loc="lower center", ncol=len(l_), fontsize=11, frameon=False,
+               prop={"weight": "bold", "size": 11})
+    fig.suptitle(f"Training-size study (LOO only; arms offset by ±0.4 in n so none hides another)\nred dashed = n* = {ns}; grey bars = binom 90 % region per n",
                  fontweight="bold")
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.tight_layout(rect=(0, 0.03, 1, 0.97))
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
     return out_path
@@ -720,13 +727,14 @@ def fig_house_vs_long(df, ldf, objs, roles, sites, ns, out_path, grid=N_GRID, ep
 UNITS = {"V1": ("GWh", 1e-3), "E1": ("$M", 1e-6), "N4": ("h", 1.0), "N1": ("line-h", 1.0)}
 
 
-def fig_parity(winners, hres, Uh, Yh, tiers, out_path, label=""):
+def fig_parity(winners, hres, Uh, Yh, tiers, out_path, label="", residual_row=False):
     """True parity plot per objective x tier: observed (x) vs predictive median (y), 1:1 line,
     95 % TOTAL band (noise incl.; wide light bar) and 95 % LATENT band (narrow dark bar)."""
     plt = _plt()
     from matplotlib.ticker import ScalarFormatter
     objs = list(winners)
-    fig, axes = plt.subplots(len(tiers), len(objs), figsize=(5.0 * len(objs), 4.9 * len(tiers)), squeeze=False)
+    nrow = len(tiers) * (2 if residual_row else 1)
+    fig, axes = plt.subplots(nrow, len(objs), figsize=(5.6 * len(objs), 4.9 * nrow), squeeze=False)
     Uh = np.asarray(Uh, float)
     for i, n in enumerate(tiers):
         for j, obj in enumerate(objs):
@@ -742,7 +750,7 @@ def fig_parity(winners, hres, Uh, Yh, tiers, out_path, label=""):
             lo_l, hi_l = f(mu - 1.96 * lat), f(mu + 1.96 * lat)
             for v in (y, med, lo_t, hi_t, lo_l, hi_l):
                 assert np.isfinite(v).all(), (obj, n)
-            ax = axes[i, j]
+            ax = axes[i * (2 if residual_row else 1), j]
             ax.vlines(y * k, lo_t * k, hi_t * k, color="C0", alpha=0.25, lw=6, label="95 % total band (noise incl.)")
             ax.vlines(y * k, lo_l * k, hi_l * k, color="C1", alpha=0.95, lw=1.6, label="95 % latent band")
             inside = (lo_t <= y) & (y <= hi_t)
@@ -762,8 +770,28 @@ def fig_parity(winners, hres, Uh, Yh, tiers, out_path, label=""):
             from matplotlib.ticker import MaxNLocator
             ax.xaxis.set_major_locator(MaxNLocator(5))
             _bold(ax)
-            if i == 0 and j == 0:
+            if residual_row:
+                ar = axes[i * 2 + 1, j]
+                r_ = (y - med) * k
+                ar.vlines(y * k, (lo_t - med) * k, (hi_t - med) * k, color="C0", alpha=0.25, lw=6, label="95 % total band")
+                ar.vlines(y * k, (lo_l - med) * k, (hi_l - med) * k, color="C1", alpha=0.95, lw=1.6, label="95 % latent band")
+                ar.plot(y[inside] * k, r_[inside], "o", color="k", ms=4, label="inside total band")
+                ar.plot(y[~inside] * k, r_[~inside], "o", color="C3", ms=6, label=f"outside ({int((~inside).sum())})")
+                ar.axhline(0, color="0.3", ls="--", lw=1.2)
+                ar.set_xlabel(f"observed {obj} ({unit})")
+                ar.set_ylabel(f"observed − predicted ({unit})")
+                ar.set_title(f"{obj} residuals with the 95 % bands", fontsize=11)
+                for axis in (ar.xaxis, ar.yaxis):
+                    fm = ScalarFormatter(useOffset=False)
+                    fm.set_scientific(False)
+                    axis.set_major_formatter(fm)
+                ar.xaxis.set_major_locator(MaxNLocator(5))
+                _bold(ar)
+                ar.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1.0))
+            if i == 0 and j == 0 and not residual_row:
                 ax.legend(fontsize=8, loc="upper left")
+            if residual_row and j == len(objs) - 1:
+                ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1.0))
     fig.tight_layout()
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
@@ -1127,6 +1155,10 @@ def run_v2(U, Y, sob, load_holdout, seed, roles, sites, out_dir, house, grid=N_G
             if done:
                 raise S.HoldoutRetired(f"{obj}: no v2 row and the re-open round is over")
             h = reopen_score(w["gp"], w["arm"], obj, V2_TIER, Uh, Yh[obj].to_numpy(float), out_dir, sig[obj], seated)
+        yh_ = Yh[obj].to_numpy(float)
+        h["y_range"], h["y_max"] = float(np.ptp(yh_)), float(yh_.max())
+        h["z_at_ymax"] = float(h["z"][int(np.argmax(yh_))])
+        h["band_sd_median"] = float(np.median(h["sd_t"]))
         hres[obj] = h
         log(f"[v2 holdout] {obj} {w['arm'].name}: {h['metrics']['cov95']}/48 {'PASS' if h['pass'] else 'FAIL'}"
             f"{' (replay)' if h['replay'] else ''}")
@@ -1207,7 +1239,8 @@ def run_v2(U, Y, sob, load_holdout, seed, roles, sites, out_dir, house, grid=N_G
     figs = [fig_curves(df, objs, roles, ns, os.path.join(figs_dir, "fig_training_size_curves_v2.png"), grid),
             fig_lengthscales(df, objs, roles, sites, ns, os.path.join(figs_dir, "fig_lengthscales_vs_n_v2.png"), grid),
             fig_parity({o: {V2_TIER: winners[o][V2_TIER]} for o in seated}, {o: {V2_TIER: hres[o]} for o in seated},
-                       Uh, Yh, [V2_TIER], os.path.join(figs_dir, "fig_parity_holdout_v2.png"), label=" (fit v2)")]
+                       Uh, Yh, [V2_TIER], os.path.join(figs_dir, "fig_parity_holdout_v2.png"), label=" (fit v2)",
+                       residual_row=True)]
     lc_df = None
     if lc is not None:
         Ulc, Ylc, labels = lc

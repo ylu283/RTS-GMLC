@@ -94,6 +94,94 @@ def mech_lc_sentence(res, obj=None):
             + f"; {int((z > 0).sum())} of {len(z)} {obj} z are positive (mean {z.mean():+.2f}).")
 
 
+NOISE_MODE_SD_RATIO = float(np.exp(-0.5))   # LogNormal(mu, 1) on the variance: mode e^(mu - 1) -> sd ratio e^(-1/2)
+REVIEWER_SYNTH = ("The acceptance reviewer reproduced the pattern with FitV2 on synthetic data (near-linear + quadratic + "
+                  "six local bumps, noise 4,376; 48 scrambled-Sobol training points, 48 i.i.d. holdout points): rbf LOO "
+                  "43–46 → holdout 37–48 (one replicate LOO 44 → holdout 37, rms z 1.54); m52 LOO 45–47 → holdout 41–47; "
+                  "on a smooth function rbf 42–46, m52 46–48. Under misfit the rbf arm is the fragile one (acceptance "
+                  "reviewer, synthetic check, 2026-11-24).")
+
+
+def _arm(df, obj, n, arm):
+    d = df[(df.objective == obj) & (df.n == n) & (df.arm == arm)]
+    return d.iloc[0] if len(d) else None
+
+
+def v2_facts(res, res2):
+    """Every number the v2 text quotes, computed from the replayed results."""
+    from scipy.stats import binom
+    d2, ch2 = res2["study"], res2["checks"]
+    seat = res2["seated"]
+    f = {"mode": NOISE_MODE_SD_RATIO}
+    f["noise_sel"] = {o: [float(_row(d2, o, n)["noise_over_sigma_c"]) for n in res["grid"]] for o in res2["objs"]}
+    hv, hh = {}, {}
+    for o in seat:
+        hv[o] = res2["holdout"][o]
+        hh[o] = res["holdout"][o][48]
+    f["hold_v2"], f["hold_house"] = hv, hh
+    f["p_le"] = {o: float(binom.cdf(hv[o]["metrics"]["cov95"], 48, 0.95)) for o in seat}
+    v = "V1"
+    if v in seat:
+        w = res2["winners"][v][48]
+        f["v1_arm48"] = w["arm"].name
+        f["v1_loo_cov48"] = int(w["loo"]["metrics"]["cov95"])
+        f["p_le_loo"] = float(binom.cdf(f["v1_loo_cov48"], 48, 0.95))
+        rb = [(n, _arm(d2, v, n, "rbf+std")) for n in res["grid"] if 32 <= n <= 44]
+        f["rbf_cov_frac"] = [float(r["loo_cov95"]) / n for n, r in rb if r is not None]
+        f["rbf_noise_44"] = float(_arm(d2, v, 44, "rbf+std")["noise_over_sigma_c"])
+        f["rbf_noise_48"] = float(_arm(d2, v, 48, "rbf+std")["noise_over_sigma_c"])
+        r48 = _row(d2, v, 48)
+        f["v1_ls48"] = [float(r48[c]) for c in r48.index if c.startswith("ls_u_")]
+        f["v1_os48"] = float(r48["outputscale_sd_t"])
+        f["ratio_hold_loo"] = hv[v]["metrics"]["rmse"] / float(w["loo"]["metrics"]["rmse"])
+        f["band_hold"] = hv[v].get("band_sd_median", np.nan)
+        f["band_loo"] = float(np.median(w["loo"]["sd_t"]))
+        f["hold_range"] = hv[v].get("y_range", np.nan)
+        f["grad_range"] = res["y_range"][v]
+        f["top_y"], f["top_z"] = hv[v].get("y_max", np.nan), hv[v].get("z_at_ymax", np.nan)
+        lc = res2.get("lc")
+        if lc is not None:
+            z = lc[lc.objective == v].set_index("label")["z"]
+            f["lc_n_big"], f["lc_n"], f["lc_mean"] = int((np.abs(z) > 1.96).sum()), len(z), float(z.mean())
+            f["lc_max_lab"], f["lc_max"] = str(z.abs().idxmax()), float(z[z.abs().idxmax()])
+        ru = _arm(d2, v, 48, "m52+std")
+        f["runner"] = {"arm": "m52+std", "cov": int(ru["loo_cov95"]), "rms_z": float(ru["loo_rms_z"]), "rmse": float(ru["loo_rmse"])}
+        f["lfl"] = {a: float(_arm(d2, v, 44, a)["loo_rmse"]) / float(_arm(d2, v, 48, a)["loo_rmse"])
+                    for a in ("m52+std", "rbf+std")}
+        f["lfl_abs"] = {a: (float(_arm(d2, v, 44, a)["loo_rmse"]), float(_arm(d2, v, 48, a)["loo_rmse"]))
+                        for a in ("m52+std", "rbf+std")}
+        c48 = ch2[(ch2.objective == v) & (ch2.n == 48)].iloc[0]
+        f["v1_ls_change48"] = float(c48["ls_rel_change_max"])
+        f["v1_arm44"] = _row(d2, v, 44)["arm"]
+    f["sel_ratio44"] = {o: float(ch2[(ch2.objective == o) & (ch2.n == 44)]["rmse_ratio_vs_48"].iloc[0]) for o in seat}
+    if "E1" in seat:
+        f["e1_cut"] = 1.0 - hv["E1"]["metrics"]["rmse"] / hh["E1"]["metrics"]["rmse"]
+        hw_v1 = float(_row(res["study"], "V1", 48)["median_95_halfwidth_raw"]) / res["sigmas"]["V1"]
+        hw_e1 = float(_row(d2, "E1", 48)["median_95_halfwidth_raw"]) / res2["sigmas"]["E1"]
+        f["gate_ratio"] = hw_v1 / hw_e1
+        ldf = res.get("long")
+        if ldf is not None and len(ldf):
+            f["v1_house_over_long_band"] = (float(_row(res["study"], "V1", 48)["median_95_halfwidth_raw"])
+                                            / float(_row(ldf, "V1", 48)["median_95_halfwidth_raw"]))
+        f["v1_house_over_v2_band"] = (float(_row(res["study"], "V1", 48)["median_95_halfwidth_raw"])
+                                      / float(_row(d2, "V1", 48)["median_95_halfwidth_raw"]))
+    return f
+
+
+def noise_statement(f):
+    return (f"The v2 noise prior is LogNormal(log(σ_c² / s_y²), 1) on the variance. Its mode is at e^(μ − 1), i.e. "
+            f"{f['mode']:.2f} σ_c in sd (below the measured chatter). The fitted v2 noise of the selected arms sits there: "
+            + "; ".join(f"{o} " + ", ".join(f"{x:.3f}" for x in v[:4]) + " … σ_c" for o, v in f["noise_sel"].items() if o in ("V1", "E1"))
+            + ". So the likelihood is flat in the noise and the prior sets it. Observation noise is not identifiable from 48 "
+            "Sobol points. The measured chatter σ_c (df 16) is the correct lower bound; any extra residual is model "
+            "discrepancy, not noise. The measured-floor arm (noise lower bound 1.00 σ_c) is the design that encodes this; "
+            "LOO NLPD never selected it. "
+            + (f"V1 rbf+std's noise rises to {f['rbf_noise_44']:.2f} σ_c at n = 44 and {f['rbf_noise_48']:.2f} σ_c at n = 48: "
+               "the data ask for more noise, a sign of misfit. " if "rbf_noise_48" in f else "")
+            + "N4 and N1 fall to " + ", ".join(f"{f['noise_sel'][o][-1]:.2f}" for o in ("N4", "N1") if o in f["noise_sel"])
+            + " σ_c at n = 48: the opposite direction.")
+
+
 # --------------------------------------------------------------------------
 # E-D7 decision row
 # --------------------------------------------------------------------------
@@ -123,6 +211,30 @@ def pi_rows(res, res2=None, date=None):
         "RMSE ratio (1.12 → 44); a fit-definition change that moves the ratios; a decision to start the BO earlier "
         "and accept a less accurate start. Note: n0 = 48 means no tier below 48 meets the rule; whether 48 itself "
         "suffices is untested (LOO RMSE still falls by ≈ 1.3× from n = 40 to 48). | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2 |")
+    if res2 is not None and {"V1", "E1"} <= set(res2["seated"]):
+        f = v2_facts(res, res2)
+        r_lo, r_hi = min(f["sel_ratio44"].values()), max(f["sel_ratio44"].values())
+        lf = sorted(f["lfl"].values())
+        row1 = (f"| {date} | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Recommend n0 = 48: no tier below 48 "
+                f"meets the rule under either fit, and under the converged fit (v2) LOO RMSE still falls "
+                f"{r_lo:.2f}–{r_hi:.2f}× from n = 44 to 48 (like-for-like V1 {lf[0]:.2f}–{lf[1]:.2f}). So the first BO "
+                "rounds are still learning the model, not just navigating it; this costs no new simulations because all "
+                "48 runs have landed. Options: **(a) 48 — recommended**; (b) 32; (c) 44 only under a 1.12 ratio bar. "
+                "| analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2, §13.2 |")
+        hv, hh = f["hold_v2"], f["hold_house"]
+        row2 = (f"| {date} | E-D7 (fit item) | **GP fit definition for 55** | Under the pre-registered rule E1 uses fit v2 "
+                f"(holdout {hv['E1']['metrics']['cov95']}/48, {100 * f['e1_cut']:.0f} % lower RMSE) and V1 keeps the house "
+                f"fit. V1's v2 fit had {hh['V1']['metrics']['rmse'] / hv['V1']['metrics']['rmse']:.1f}× lower holdout error "
+                f"and better NLPD, but its bands were too narrow ({hv['V1']['metrics']['cov95']}/48, P = "
+                f"{f['p_le']['V1']:.0e} by chance) because a smooth stationary kernel misses location-specific effects; V1 "
+                "in 55 therefore runs with conservative, wide bands and its calibration gate has little power. "
+                "**Recommendation (i): the mixed commit as committed.** Alternatives considered and rejected: (ii) a V1 "
+                "noise bound from the holdout residual — a second re-open, forbidden by AMENDMENT 2026-11-24b §4, and it "
+                f"tunes to the holdout; (iii) V1 m52+std under v2 (the runner-up: LOO {f['runner']['cov']}/48, rms z "
+                f"{f['runner']['rms_z']:.2f}, RMSE {f['runner']['rmse'] / 1e3:.1f}k, never scored) — a re-selection after "
+                "scoring; (iv) both objectives on the house fit — discards E1's verified gain. "
+                "| analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |")
+        return row1, row2
     if res2 is None:
         fit = ("Fit definition v2 (plan AMENDMENT 2026-11-24b: float64 MAP, L-BFGS-B, 16 restarts) is adopted by the "
                "amendment; its results replace the house fit where the v2 config passes the holdout.")
@@ -159,6 +271,13 @@ def pi_block(res, res2, B):
             h = res["holdout"][o][n]
             L.append(f"| {o} | {roles[o]} | {n} | {int(r['loo_cov95'])} / {n} [{int(r['bar_lo'])}, {int(r['bar_hi'])}] | "
                      f"{h['metrics']['cov95']} / 48 {_pf(h['pass'])} | {h['metrics']['rms_z']:.2f} |")
+    if res2 is not None:
+        for o in res2["seated"]:
+            hv = res2["holdout"][o]
+            if not hv["pass"]:
+                L[L.index("| objective | role | n | LOO cov95 / n [bar] | holdout cov95 / 48 [43, 48] | holdout rms z |") - 2] += (
+                    f" Under fit v2, {o}'s bands are too narrow: holdout {hv['metrics']['cov95']} / 48 (rms z "
+                    f"{hv['metrics']['rms_z']:.2f}); {o} therefore keeps the house fit (§13).")
     rz = [res["holdout"][o][n]["metrics"]["rms_z"] for o in ok for n in (32, 48)]
     L += ["", "rms z < 1 means the bands are wider than the errors (conservative)."
           + (f" The house fit gives rms z {min(rz):.2f}–{max(rz):.2f} for {', '.join(ok)}." if rz else ""), ""]
@@ -193,10 +312,23 @@ def pi_block(res, res2, B):
             hv = com2[o]["holdout_v2"]
             parts.append(f"{o}: v2 {res2['winners'][o][48]['arm'].name} holdout {hv['cov95']} / 48 (rms z {hv['rms_z']:.2f}) "
                          f"{_pf(hv['pass'])} → committed **{com2[o]['fit_definition']}**")
+        f = v2_facts(res, res2)
         L += ["**Fit v2 outcome (AMENDMENT 2026-11-24b, one re-open round, 2 scorings, exposure "
               f"{res2['exposure']} / 24).** " + "; ".join(parts) + ". 55 fits each acquisition GP with the definition "
               "committed for that objective. A v2 config that fails the bar keeps the house-fit commit (pre-registered "
-              "fallback); we did not re-select and did not score again.", ""]
+              "fallback); we did not re-select and did not score again.", "",
+              (f"V1 in 55 still runs on the house bands. At n = 48 (median LOO 95 % half-width) they are "
+               f"{f['v1_house_over_v2_band']:.1f}× wider than V1's v2 bands"
+               + (f" and {f['v1_house_over_long_band']:.1f}× wider than the exploratory long fit's" if "v1_house_over_long_band" in f else "")
+               + f"; relative to chatter (half-width / σ_c) they are {f['gate_ratio']:.1f}× E1's v2 bands. So V1's C2 / C3 gate "
+               "has little power and E1's has more. " if "gate_ratio" in f else "") + "v2 LOO uses the fitted constant mean; house LOO used 0 after standardization. This is not "
+              "strictly like-for-like; the effect is small.", "",
+              "**Consequences of the mixed commit for 55.** (1) qNEHVI hypervolume gains will be driven by V1's variance: "
+              "the search tilts toward V1 exploration and the V1 front is blurrier. (2) The house V1 refit cannot learn as "
+              "n grows (the Adam step cap), so its drift is path-dependent; record it per round. (3) Pre-register in 55, "
+              "report-only: log the V1 v2-m52 and v2-rbf posteriors beside the house fit every round, and report gate "
+              "power per objective.", "",
+              "**Noise.** " + noise_statement(f), ""]
     for o in bad:
         fails = [n for n in (32, 48) if not res["holdout"][o][n]["pass"]]
         L += [f"**{o} ({roles[o]}) FAILS the holdout at n = {', '.join(map(str, fails))}** ("
@@ -206,8 +338,9 @@ def pi_block(res, res2, B):
     span = raw_ls_span(res)
     L += ["**Notes.**", "",
           f"- Mechanism (descriptive): {mech_lc_sentence(res)}",
-          f"- Provenance: the long-fit diagnostic ({LONG_SHA}) was coded 7 minutes after the holdout was scored. It was "
-          "never scored or committed. It motivates the fit change (AMENDMENT 2026-11-24b).",
+          f"- Provenance: the fit change was designed after the house holdout results were known (8 scorings; the "
+          f"diagnostic {LONG_SHA} was coded 7 min later). Its stated basis is a training-side optimizer diagnosis "
+          "reproduced on synthetic data. Readers should treat the v2 holdout round as a second look, not a blind test.",
           (f"- House-fit lengthscales at n = 48: raw parameter {span[0]:.1f}–{span[1]:.1f}; Adam can move it by at most "
            "≈ 7 from 0 in 700 steps at lr 0.01 (`ls_raw_*` in `ercot_gp_status.csv`)." if span else ""),
           "- The rule-v2 disclosure is in §12.", ""]
@@ -295,7 +428,8 @@ def status_md(res, seed, ds, extra, res2=None):
         lsel = _sel(ldf)
         L += ["", f"### Exploratory: the same arms and selection rule with a longer fit (Adam {ep:,} steps; NEVER committed, never holdout-scored)", "",
               long_fit_caveat(res), "",
-              f"Provenance: this diagnostic ({LONG_SHA}) was coded 7 minutes after the holdout was scored.", "",
+              f"Provenance: the fit change was designed after the house holdout results were known (8 scorings; this "
+              f"diagnostic, {LONG_SHA}, was coded 7 min later). Treat the v2 holdout round as a second look, not a blind test.", "",
               "| objective | n | house arm | house LOO NLPD | long arm | long LOO NLPD | house / long LOO RMSE | house / long cov95 [bar] | house / long noise / σ_c | long lengthscales u |",
               "|---|---|---|---|---|---|---|---|---|---|"]
         for obj in objs:
@@ -419,14 +553,16 @@ def v2_section(res, res2, B):
     lsc = [f"ls_u_{s}" for s in sites]
     L = ["## 13. Fit definition v2 (plan AMENDMENT 2026-11-24b §3–§4)", "",
          "Definition: float64; MAP with the lengthscale prior LogNormal(√2 + ½·log 6, √3) on u ∈ [0, 1]^6 and the noise "
-         "prior LogNormal(log(σ_c² / s_y²), 1) on the standardized noise variance; standardized noise lower bound 1e-6 "
+         "prior LogNormal(log(σ_c² / s_y²), 1) on the standardized noise variance (its mode is at 0.61 σ_c in sd, below "
+         "the measured chatter; the `fit_v2_spec` string in committed_configs.json names the same prior); standardized "
+         "noise lower bound 1e-6 "
          "(the measured-floor arm keeps its σ_c floor); L-BFGS-B (`fit_gpytorch_mll_scipy`, maxiter 1,000, ftol = gtol = "
          "1e-7); 16 seeded restarts (gpytorch default init + 15 prior draws, `default_rng(5454)`); the best MAP is kept. "
          "Converged = at least 2 restarts within 1e-3·n nats of the best. Arm set, inclusion rules, LOO-NLPD selection "
          "(> 2 paired se, tie order) unchanged.", "",
          "### 13.1 Per objective at n = 48 (v2 vs house)", "",
-         "| objective | role | v2 arm | lengthscales u (" + ", ".join(sites) + ") | outputscale sd (t) | noise sd / σ_c | converged (restarts within tol) | mode gap (nats) | LOO NLPD v2 / house | LOO RMSE v2 / house | LOO cov95 v2 / house [43, 48] | holdout cov95 v2 [43, 48] | holdout rms z v2 | committed fit |",
-         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+         "| objective | role | v2 arm | lengthscales u (" + ", ".join(sites) + ") | outputscale sd (t) | noise sd / σ_c | converged (restarts within tol) | mode gap (nats) | LOO NLPD v2 / house | LOO RMSE v2 / house | LOO cov95 v2 / house [43, 48] | holdout cov95 v2 [43, 48] | holdout rms z v2 | holdout NLPD v2 / house | holdout RMSE v2 / house | committed fit |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for o in objs:
         r = _row(d2, o, 48)
         h = _row(res["study"], o, 48)
@@ -436,12 +572,54 @@ def v2_section(res, res2, B):
                  f"{_g(r['noise_over_sigma_c'], '{:.3g}')} | {bool(r['converged'])} ({int(r['n_within_tol'])}/16) | {_g(r['mode_gap_nats'], '{:.3g}')} | "
                  f"{r['loo_nlpd']:.3f} / {h['loo_nlpd']:.3f} | {r['loo_rmse']:.4g} / {h['loo_rmse']:.4g} | "
                  f"{int(r['loo_cov95'])} / {int(h['loo_cov95'])} | "
-                 + (f"{hv['cov95']} / 48 **{_pf(hv['pass'])}** | {hv['rms_z']:.2f}" if hv else "LOO-only (co-reported) | ")
+                 + (f"{hv['cov95']} / 48 **{_pf(hv['pass'])}** | {hv['rms_z']:.2f} | "
+                    f"{res2['holdout'][o]['metrics']['nlpd']:.2f} / {res['holdout'][o][48]['metrics']['nlpd']:.2f} | "
+                    f"{_nat(res2['holdout'][o]['metrics']['rmse'], o)} / {_nat(res['holdout'][o][48]['metrics']['rmse'], o)}"
+                    if hv else "LOO-only (co-reported) | | | ")
                  + f" | {c['fit_definition']} |")
+    f = v2_facts(res, res2)
+    hv1, hh1 = f["hold_v2"].get("V1"), f["hold_house"].get("V1")
+    if hv1 is not None and not hv1["pass"]:
+        L += ["", f"V1's v2 fit fails only on band width: its holdout NLPD is {hv1['metrics']['nlpd']:.2f} (house "
+              f"{hh1['metrics']['nlpd']:.2f}) and its holdout RMSE {_nat(hv1['metrics']['rmse'], 'V1')} (house "
+              f"{_nat(hh1['metrics']['rmse'], 'V1')}, {hh1['metrics']['rmse'] / hv1['metrics']['rmse']:.1f}× worse). The "
+              "fallback keeps the less accurate, wider model."]
     L += ["", f"Exposure: {res2['exposure']} of 24 after the re-open round (2 scorings: V1 and E1 at n = 48). The holdout is "
           "retired again. A seated objective whose v2 config fails [43, 48] keeps its house-fit commit (pre-registered fallback).", "",
-          f"### 13.2 Training-size study under v2 (LOO only) and n\\* = {res2['n_star']}", "",
+          "**Noise under v2.** " + noise_statement(f), ""]
+    if hv1 is not None and not hv1["pass"]:
+        rcf = f["rbf_cov_frac"]
+        L += ["### 13.1b Why V1's v2 config failed the holdout", "",
+              f"(a) **Not chance.** P(≤ {hv1['metrics']['cov95']} | 48, 0.95) = {f['p_le']['V1']:.0e}. LOO "
+              f"{f['v1_loo_cov48']}/48 was not a warning by itself (P(≤ {f['v1_loo_cov48']}) = {f['p_le_loo']:.2f}). But "
+              f"rbf+std's LOO coverage ran at {min(rcf):.2f}–{max(rcf):.2f} for n = 32–44, and it became the selected arm "
+              f"only at n = 48 (selected at n = 32–44: {', '.join(sorted(set(_row(res2['study'], 'V1', n)['arm'] for n in (32, 36, 40, 44))))}). NLPD selection rewards sharp bands, and the rule has "
+              "no coverage tie-break.",
+              f"(b) **Misspecification.** V1 is near-linear in the totals. The rbf lengthscales "
+              f"{min(f['v1_ls48']):.1f}–{max(f['v1_ls48']):.1f} in u make it close to a low-order polynomial, with "
+              f"outputscale {f['v1_os48']:.3g} smoothing over site effects. "
+              + (f"The prompt-61 residual row under v2 has {f['lc_n_big']} of {f['lc_n']} |z| > 1.96, mean z "
+                 f"{f['lc_mean']:+.2f}, {f['lc_max_lab']} {f['lc_max']:+.2f}." if "lc_n_big" in f else ""),
+              f"(c) **LOO on the Sobol prefix is optimistic for an i.i.d. holdout.** Holdout errors are "
+              f"{f['ratio_hold_loo']:.2f}× the LOO errors ({_nat(hv1['metrics']['rmse'], 'V1')} vs "
+              f"{_nat(res2['winners']['V1'][48]['loo']['metrics']['rmse'], 'V1')}), while "
+              f"the holdout band sd (median {_nat(f['band_hold'], 'V1')}) is narrower than the LOO band sd (median "
+              f"{_nat(f['band_loo'], 'V1')}). Dropping one Sobol point opens a hole wider than a random point's "
+              "nearest-neighbour gap. Winner's-curse arm selection on the same LOO adds to it.",
+              f"(d) **Minor distribution shift.** The holdout V1 range is {_nat(f['hold_range'], 'V1')} against "
+              f"{_nat(f['grad_range'], 'V1')} on the grading tier; the top holdout point ({_nat(f['top_y'], 'V1')}) has "
+              f"z = {f['top_z']:+.2f}" + (" and lies outside its band." if abs(f["top_z"]) > 1.96 else "."),
+              "", REVIEWER_SYNTH, "",
+              "These holdout quantities come from the deterministic replay of the recorded scoring (no new scoring).", ""]
+    L += [f"### 13.2 Training-size study under v2 (LOO only) and n\\* = {res2['n_star']}", "",
           f"Reason: n\\* = {res2['n_star']}. " + " | ".join(res2["reason_lines"]), "",
+          (f"Like-for-like V1 ratios at n = 44 (same arm at 44 and 48): m52+std "
+           f"{_nat(f['lfl_abs']['m52+std'][0], 'V1')} / {_nat(f['lfl_abs']['m52+std'][1], 'V1')} = {f['lfl']['m52+std']:.3f}; "
+           f"rbf+std {_nat(f['lfl_abs']['rbf+std'][0], 'V1')} / {_nat(f['lfl_abs']['rbf+std'][1], 'V1')} = "
+           f"{f['lfl']['rbf+std']:.3f}. The headline {f['sel_ratio44']['V1']:.2f} compares {f['v1_arm44']} at 44 with "
+           f"{f['v1_arm48']} at 48. The {100 * f['v1_ls_change48']:.0f} % lengthscale change at n = 48 is an arm switch "
+           f"({f['v1_arm44']} → {f['v1_arm48']}), not instability. The converged fit is still learning fast from 44 → 48; "
+           "the first BO rounds are model-learning rounds." if "lfl" in f else ""), "",
           "| objective | n | arm | LOO NLPD | LOO RMSE | RMSE_n / RMSE_48 | LOO cov95 [bar] | max ls change | noise / σ_c | converged | mode gap | all met |",
           "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for _, r in ch2.iterrows():
@@ -454,7 +632,7 @@ def v2_section(res, res2, B):
     if res2.get("lc") is not None:
         lc = res2["lc"]
         labs = list(dict.fromkeys(lc["label"]))
-        L += ["### 13.3 Prompt-61 residual row under the committed v2 configs (descriptive)", "",
+        L += ["### 13.3 Prompt-61 residual row under the v2 configs at n = 48 (V1 v2 NOT committed; descriptive)", "",
               "| objective | " + " | ".join(labs) + " | mean z | mean abs z | n abs z > 1.96 |", "|---|" + "---|" * (len(labs) + 3)]
         for o in lc["objective"].unique():
             z = lc[lc.objective == o].set_index("label").loc[labs, "z"].to_numpy(float)

@@ -1,10 +1,10 @@
 # ERCOT_GP_STATUS — prompt 54 Part B (v3.3 addendum; plan AMENDMENT 2026-11-24b)
 
-Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 3.7 min; fit-v2 run 4.1 min.
+Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 3.7 min; fit-v2 run 4.2 min.
 
 ## 0. Answers for the PI
 
-**Q1 — Are the GP's 95 % bands honest (calibration)?** Yes for V1, E1, N4 (holdout inside [43, 48] at n = 32 and 48). Not for N1: it fails at n = 48.
+**Q1 — Are the GP's 95 % bands honest (calibration)?** Yes for V1, E1, N4 (holdout inside [43, 48] at n = 32 and 48). Not for N1: it fails at n = 48. Under fit v2, V1's bands are too narrow: holdout 37 / 48 (rms z 1.64); V1 therefore keeps the house fit (§13).
 
 | objective | role | n | LOO cov95 / n [bar] | holdout cov95 / 48 [43, 48] | holdout rms z |
 |---|---|---|---|---|---|
@@ -36,12 +36,18 @@ The % range denominator here is the 48-row grading-tier range of y for every cel
 
 **Fit v2 outcome (AMENDMENT 2026-11-24b, one re-open round, 2 scorings, exposure 10 / 24).** V1: v2 rbf+std holdout 37 / 48 (rms z 1.64) FAIL → committed **house (fallback)**; E1: v2 m52+std holdout 48 / 48 (rms z 0.74) PASS → committed **v2 (AMENDMENT 2026-11-24b)**. 55 fits each acquisition GP with the definition committed for that objective. A v2 config that fails the bar keeps the house-fit commit (pre-registered fallback); we did not re-select and did not score again.
 
+V1 in 55 still runs on the house bands. At n = 48 (median LOO 95 % half-width) they are 3.4× wider than V1's v2 bands and 2.7× wider than the exploratory long fit's; relative to chatter (half-width / σ_c) they are 1.4× E1's v2 bands. So V1's C2 / C3 gate has little power and E1's has more. v2 LOO uses the fitted constant mean; house LOO used 0 after standardization. This is not strictly like-for-like; the effect is small.
+
+**Consequences of the mixed commit for 55.** (1) qNEHVI hypervolume gains will be driven by V1's variance: the search tilts toward V1 exploration and the V1 front is blurrier. (2) The house V1 refit cannot learn as n grows (the Adam step cap), so its drift is path-dependent; record it per round. (3) Pre-register in 55, report-only: log the V1 v2-m52 and v2-rbf posteriors beside the house fit every round, and report gate power per objective.
+
+**Noise.** The v2 noise prior is LogNormal(log(σ_c² / s_y²), 1) on the variance. Its mode is at e^(μ − 1), i.e. 0.61 σ_c in sd (below the measured chatter). The fitted v2 noise of the selected arms sits there: V1 0.606, 0.606, 0.601, 0.601 … σ_c; E1 0.606, 0.607, 0.602, 0.599 … σ_c. So the likelihood is flat in the noise and the prior sets it. Observation noise is not identifiable from 48 Sobol points. The measured chatter σ_c (df 16) is the correct lower bound; any extra residual is model discrepancy, not noise. The measured-floor arm (noise lower bound 1.00 σ_c) is the design that encodes this; LOO NLPD never selected it. V1 rbf+std's noise rises to 1.15 σ_c at n = 44 and 0.98 σ_c at n = 48: the data ask for more noise, a sign of misfit. N4 and N1 fall to 0.49, 0.53 σ_c at n = 48: the opposite direction.
+
 **N1 (co-reported) FAILS the holdout at n = 48** (n = 32: 44 / 48, n = 48: 41 / 48; bar [43, 48]). It is not seated. We recorded the failure. We did not re-select and did not score again.
 
 **Notes.**
 
 - Mechanism (descriptive): V1 has |z| > 1.96 on 3 of 9 designs: P2_500_270 +3.54, P2_500_110_140 +2.65, P3_1500_all +2.05; 7 of 9 V1 z are positive (mean +1.17).
-- Provenance: the long-fit diagnostic (65179e1) was coded 7 minutes after the holdout was scored. It was never scored or committed. It motivates the fit change (AMENDMENT 2026-11-24b).
+- Provenance: the fit change was designed after the house holdout results were known (8 scorings; the diagnostic 65179e1 was coded 7 min later). Its stated basis is a training-side optimizer diagnosis reproduced on synthetic data. Readers should treat the v2 holdout round as a second look, not a blind test.
 - House-fit lengthscales at n = 48: raw parameter 3.3–6.8; Adam can move it by at most ≈ 7 from 0 in 700 steps at lr 0.01 (`ls_raw_*` in `ercot_gp_status.csv`).
 - The rule-v2 disclosure is in §12.
 
@@ -410,7 +416,7 @@ ARD lengthscales (u units) of the SELECTED arm vs n (descriptive; in u-space the
 
 A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width. Plan AMENDMENT 2026-11-24b sets fit definition v2; an objective keeps the house fit only where its v2 config fails the holdout (§13).
 
-Provenance: this diagnostic (65179e1) was coded 7 minutes after the holdout was scored.
+Provenance: the fit change was designed after the house holdout results were known (8 scorings; this diagnostic, 65179e1, was coded 7 min later). Treat the v2 holdout round as a second look, not a blind test.
 
 | objective | n | house arm | house LOO NLPD | long arm | long LOO NLPD | house / long LOO RMSE | house / long cov95 [bar] | house / long noise / σ_c | long lengthscales u |
 |---|---|---|---|---|---|---|---|---|---|
@@ -562,8 +568,8 @@ Exposure ledger `exposure_ledger.csv`: 10 of 24 scorings in total; retired.
 ## 8. E-D7 decision rows (Kay decides; 55 Part B waits on `E-D7_decided`)
 
 ```
-| 2026-11-24 | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Options: **(a) n0 = 48 — recommended**; (b) n0 = 32; (c) n0 = 44, only if the RMSE-ratio bar is relaxed to ≈ 1.12. Numbers (house fit): LOO RMSE_n / RMSE_48 at n = 32: V1 1.871 / E1 1.463; n = 40: V1 1.271 / E1 1.259; n = 44: V1 1.120 / E1 1.116 (bar 1.1). Holdout [43, 48] (n = 32 / 48): V1 48 / 45 PASS, E1 48 / 48 PASS. Fit v2 (AMENDMENT 2026-11-24b): n* = 48; ratios at n = 44 V1 1.462, E1 1.245. **Cost: no new simulations** (the 48 n0_E runs are landed; option (b) or (c) only uses fewer of them as the starting set). **What changes it:** a bar change on the RMSE ratio (1.12 → 44); a fit-definition change that moves the ratios; a decision to start the BO earlier and accept a less accurate start. Note: n0 = 48 means no tier below 48 meets the rule; whether 48 itself suffices is untested (LOO RMSE still falls by ≈ 1.3× from n = 40 to 48). | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2 |
-| 2026-11-24 | E-D7 (fit item) | **GP fit definition for 55 (separate from the tier)** | Fit definition v2 (plan AMENDMENT 2026-11-24b) — results: V1 house (fallback) (rbf+std, holdout 37/48 FAIL); E1 v2 (AMENDMENT 2026-11-24b) (m52+std, holdout 48/48 PASS). Exposure 10 / 24; holdout retired again. 55 fits its acquisition GP with the same definition as the committed (graded) one. Kay notes it; no decision needed unless a v2 config failed. | analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |
+| 2026-11-24 | E-D7 | **ERCOT navigation tier n0 (prompt 54 Part B)** | Recommend n0 = 48: no tier below 48 meets the rule under either fit, and under the converged fit (v2) LOO RMSE still falls 1.24–1.46× from n = 44 to 48 (like-for-like V1 1.25–1.28). So the first BO rounds are still learning the model, not just navigating it; this costs no new simulations because all 48 runs have landed. Options: **(a) 48 — recommended**; (b) 32; (c) 44 only under a 1.12 ratio bar. | analysis/ercot_gp/ERCOT_GP_STATUS.md §0, §2, §13.2 |
+| 2026-11-24 | E-D7 (fit item) | **GP fit definition for 55** | Under the pre-registered rule E1 uses fit v2 (holdout 48/48, 34 % lower RMSE) and V1 keeps the house fit. V1's v2 fit had 2.3× lower holdout error and better NLPD, but its bands were too narrow (37/48, P = 2e-05 by chance) because a smooth stationary kernel misses location-specific effects; V1 in 55 therefore runs with conservative, wide bands and its calibration gate has little power. **Recommendation (i): the mixed commit as committed.** Alternatives considered and rejected: (ii) a V1 noise bound from the holdout residual — a second re-open, forbidden by AMENDMENT 2026-11-24b §4, and it tunes to the holdout; (iii) V1 m52+std under v2 (the runner-up: LOO 48/48, rms z 0.83, RMSE 13.5k, never scored) — a re-selection after scoring; (iv) both objectives on the house fit — discards E1's verified gain. | analysis/ercot_gp/ERCOT_GP_STATUS.md §13 |
 ```
 
 ## 9. What changed vs plan
@@ -581,22 +587,39 @@ The strategy session appended plan AMENDMENT 2026-11-24b. It records: the traini
 
 ## 13. Fit definition v2 (plan AMENDMENT 2026-11-24b §3–§4)
 
-Definition: float64; MAP with the lengthscale prior LogNormal(√2 + ½·log 6, √3) on u ∈ [0, 1]^6 and the noise prior LogNormal(log(σ_c² / s_y²), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (the measured-floor arm keeps its σ_c floor); L-BFGS-B (`fit_gpytorch_mll_scipy`, maxiter 1,000, ftol = gtol = 1e-7); 16 seeded restarts (gpytorch default init + 15 prior draws, `default_rng(5454)`); the best MAP is kept. Converged = at least 2 restarts within 1e-3·n nats of the best. Arm set, inclusion rules, LOO-NLPD selection (> 2 paired se, tie order) unchanged.
+Definition: float64; MAP with the lengthscale prior LogNormal(√2 + ½·log 6, √3) on u ∈ [0, 1]^6 and the noise prior LogNormal(log(σ_c² / s_y²), 1) on the standardized noise variance (its mode is at 0.61 σ_c in sd, below the measured chatter; the `fit_v2_spec` string in committed_configs.json names the same prior); standardized noise lower bound 1e-6 (the measured-floor arm keeps its σ_c floor); L-BFGS-B (`fit_gpytorch_mll_scipy`, maxiter 1,000, ftol = gtol = 1e-7); 16 seeded restarts (gpytorch default init + 15 prior draws, `default_rng(5454)`); the best MAP is kept. Converged = at least 2 restarts within 1e-3·n nats of the best. Arm set, inclusion rules, LOO-NLPD selection (> 2 paired se, tie order) unchanged.
 
 ### 13.1 Per objective at n = 48 (v2 vs house)
 
-| objective | role | v2 arm | lengthscales u (110, 140, 146, 163, 270, 274) | outputscale sd (t) | noise sd / σ_c | converged (restarts within tol) | mode gap (nats) | LOO NLPD v2 / house | LOO RMSE v2 / house | LOO cov95 v2 / house [43, 48] | holdout cov95 v2 [43, 48] | holdout rms z v2 | committed fit |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| V1 | seated | rbf+std | 4.66, 5.85, 5.63, 5.6, 2.41, 1.86 | 2.343e+06 | 0.982 | True (14/16) | 119 | 10.795 / 11.733 | 1.188e+04 / 3.063e+04 | 44 / 47 | 37 / 48 **FAIL** | 1.64 | house (fallback) |
-| E1 | seated | m52+std | 2.75, 3.59, 4.31, 4.33, 2.09, 1.41 | 4.117e+07 | 0.611 | True (12/16) | 52.9 | 15.805 / 16.252 | 1.956e+06 / 3.301e+06 | 45 / 47 | 48 / 48 **PASS** | 0.74 | v2 (AMENDMENT 2026-11-24b) |
-| N4 | co-reported | m52+std | 5.45, 7.43, 5.29, 6.01, 2.5, 2.7 | 1194 | 0.485 | True (13/16) | 97.7 | 4.439 / 5.165 | 27.68 / 54.46 | 47 / 46 | LOO-only (co-reported) |  | house (co-reported; v2 LOO-only, not holdout-scored) |
-| N1 | co-reported | m52+std | 3.24, 2.92, 3.56, 1.64, 1.36, 1.69 | 640.9 | 0.527 | True (12/16) | 44.4 | 5.658 / 5.742 | 78.96 / 88.56 | 45 / 47 | LOO-only (co-reported) |  | house (co-reported; v2 LOO-only, not holdout-scored) |
+| objective | role | v2 arm | lengthscales u (110, 140, 146, 163, 270, 274) | outputscale sd (t) | noise sd / σ_c | converged (restarts within tol) | mode gap (nats) | LOO NLPD v2 / house | LOO RMSE v2 / house | LOO cov95 v2 / house [43, 48] | holdout cov95 v2 [43, 48] | holdout rms z v2 | holdout NLPD v2 / house | holdout RMSE v2 / house | committed fit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | seated | rbf+std | 4.66, 5.85, 5.63, 5.6, 2.41, 1.86 | 2.343e+06 | 0.982 | True (14/16) | 119 | 10.795 / 11.733 | 1.188e+04 / 3.063e+04 | 44 / 47 | 37 / 48 **FAIL** | 1.64 | 11.31 / 11.73 | 16,101 MWh / 37,361 MWh | house (fallback) |
+| E1 | seated | m52+std | 2.75, 3.59, 4.31, 4.33, 2.09, 1.41 | 4.117e+07 | 0.611 | True (12/16) | 52.9 | 15.805 / 16.252 | 1.956e+06 / 3.301e+06 | 45 / 47 | 48 / 48 **PASS** | 0.74 | 15.39 / 15.84 | $1.17M / $1.76M | v2 (AMENDMENT 2026-11-24b) |
+| N4 | co-reported | m52+std | 5.45, 7.43, 5.29, 6.01, 2.5, 2.7 | 1194 | 0.485 | True (13/16) | 97.7 | 4.439 / 5.165 | 27.68 / 54.46 | 47 / 46 | LOO-only (co-reported) | | |  | house (co-reported; v2 LOO-only, not holdout-scored) |
+| N1 | co-reported | m52+std | 3.24, 2.92, 3.56, 1.64, 1.36, 1.69 | 640.9 | 0.527 | True (12/16) | 44.4 | 5.658 / 5.742 | 78.96 / 88.56 | 45 / 47 | LOO-only (co-reported) | | |  | house (co-reported; v2 LOO-only, not holdout-scored) |
+
+V1's v2 fit fails only on band width: its holdout NLPD is 11.31 (house 11.73) and its holdout RMSE 16,101 MWh (house 37,361 MWh, 2.3× worse). The fallback keeps the less accurate, wider model.
 
 Exposure: 10 of 24 after the re-open round (2 scorings: V1 and E1 at n = 48). The holdout is retired again. A seated objective whose v2 config fails [43, 48] keeps its house-fit commit (pre-registered fallback).
+
+**Noise under v2.** The v2 noise prior is LogNormal(log(σ_c² / s_y²), 1) on the variance. Its mode is at e^(μ − 1), i.e. 0.61 σ_c in sd (below the measured chatter). The fitted v2 noise of the selected arms sits there: V1 0.606, 0.606, 0.601, 0.601 … σ_c; E1 0.606, 0.607, 0.602, 0.599 … σ_c. So the likelihood is flat in the noise and the prior sets it. Observation noise is not identifiable from 48 Sobol points. The measured chatter σ_c (df 16) is the correct lower bound; any extra residual is model discrepancy, not noise. The measured-floor arm (noise lower bound 1.00 σ_c) is the design that encodes this; LOO NLPD never selected it. V1 rbf+std's noise rises to 1.15 σ_c at n = 44 and 0.98 σ_c at n = 48: the data ask for more noise, a sign of misfit. N4 and N1 fall to 0.49, 0.53 σ_c at n = 48: the opposite direction.
+
+### 13.1b Why V1's v2 config failed the holdout
+
+(a) **Not chance.** P(≤ 37 | 48, 0.95) = 2e-05. LOO 44/48 was not a warning by itself (P(≤ 44) = 0.22). But rbf+std's LOO coverage ran at 0.91–0.95 for n = 32–44, and it became the selected arm only at n = 48 (selected at n = 32–44: m52+std). NLPD selection rewards sharp bands, and the rule has no coverage tie-break.
+(b) **Misspecification.** V1 is near-linear in the totals. The rbf lengthscales 1.9–5.9 in u make it close to a low-order polynomial, with outputscale 2.34e+06 smoothing over site effects. The prompt-61 residual row under v2 has 5 of 9 |z| > 1.96, mean z +1.24, P2_500_270 +5.64.
+(c) **LOO on the Sobol prefix is optimistic for an i.i.d. holdout.** Holdout errors are 1.36× the LOO errors (16,101 MWh vs 11,880 MWh), while the holdout band sd (median 8,315 MWh) is narrower than the LOO band sd (median 12,106 MWh). Dropping one Sobol point opens a hole wider than a random point's nearest-neighbour gap. Winner's-curse arm selection on the same LOO adds to it.
+(d) **Minor distribution shift.** The holdout V1 range is 2,592,053 MWh against 2,334,862 MWh on the grading tier; the top holdout point (4,128,388 MWh) has z = +2.16 and lies outside its band.
+
+The acceptance reviewer reproduced the pattern with FitV2 on synthetic data (near-linear + quadratic + six local bumps, noise 4,376; 48 scrambled-Sobol training points, 48 i.i.d. holdout points): rbf LOO 43–46 → holdout 37–48 (one replicate LOO 44 → holdout 37, rms z 1.54); m52 LOO 45–47 → holdout 41–47; on a smooth function rbf 42–46, m52 46–48. Under misfit the rbf arm is the fragile one (acceptance reviewer, synthetic check, 2026-11-24).
+
+These holdout quantities come from the deterministic replay of the recorded scoring (no new scoring).
 
 ### 13.2 Training-size study under v2 (LOO only) and n\* = 48
 
 Reason: n\* = 48. n = 12: V1 (rbf+std): RMSE ratio 7.190 > 1.1, no previous n; E1 (rbf+std): RMSE ratio 3.840 > 1.1, no previous n | n = 16: V1 (rbf+std): RMSE ratio 7.040 > 1.1, lengthscale change 39 % >= 10 %; E1 (rbf+std): RMSE ratio 3.429 > 1.1, lengthscale change 60 % >= 10 % | n = 20: V1 (rbf+std): RMSE ratio 4.139 > 1.1, lengthscale change 46 % >= 10 %; E1 (rbf+std): RMSE ratio 1.991 > 1.1, lengthscale change 60 % >= 10 % | n = 24: V1 (rbf+std): RMSE ratio 3.374 > 1.1, lengthscale change 57 % >= 10 %; E1 (rbf+std): RMSE ratio 1.635 > 1.1, lengthscale change 45 % >= 10 % | n = 28: V1 (rbf+std): RMSE ratio 2.483 > 1.1, lengthscale change 14 % >= 10 %; E1 (m52+std): RMSE ratio 1.756 > 1.1, lengthscale change 49 % >= 10 % | n = 32: V1 (m52+std): RMSE ratio 2.669 > 1.1, lengthscale change 109 % >= 10 %; E1 (m52+std): RMSE ratio 1.948 > 1.1, lengthscale change 34 % >= 10 % | n = 36: V1 (m52+std): RMSE ratio 2.049 > 1.1; E1 (m52+std): RMSE ratio 1.705 > 1.1, lengthscale change 19 % >= 10 % | n = 40: V1 (m52+std): RMSE ratio 1.426 > 1.1, lengthscale change 13 % >= 10 %; E1 (m52+std): RMSE ratio 1.470 > 1.1, lengthscale change 10 % >= 10 % | n = 44: V1 (m52+std): RMSE ratio 1.462 > 1.1; E1 (m52+std): RMSE ratio 1.245 > 1.1 -> no n < 48 meets all three; n* = 48.
+
+Like-for-like V1 ratios at n = 44 (same arm at 44 and 48): m52+std 17,372 MWh / 13,520 MWh = 1.285; rbf+std 14,904 MWh / 11,880 MWh = 1.255. The headline 1.46 compares m52+std at 44 with rbf+std at 48. The 55 % lengthscale change at n = 48 is an arm switch (m52+std → rbf+std), not instability. The converged fit is still learning fast from 44 → 48; the first BO rounds are model-learning rounds.
 
 | objective | n | arm | LOO NLPD | LOO RMSE | RMSE_n / RMSE_48 | LOO cov95 [bar] | max ls change | noise / σ_c | converged | mode gap | all met |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -643,7 +666,7 @@ Reason: n\* = 48. n = 12: V1 (rbf+std): RMSE ratio 7.190 > 1.1, no previous n; E
 
 All v2 arms (every n) are in `ercot_gp_status_v2.csv` with the convergence flag and the best-vs-second gap.
 
-### 13.3 Prompt-61 residual row under the committed v2 configs (descriptive)
+### 13.3 Prompt-61 residual row under the v2 configs at n = 48 (V1 v2 NOT committed; descriptive)
 
 | objective | P1_60 | P1_120 | P1_180 | P2_800_b120 | P2_800_b275 | P2_800_all | P2_500_270 | P2_500_110_140 | P3_1500_all | mean z | mean abs z | n abs z > 1.96 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
