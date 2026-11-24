@@ -58,17 +58,17 @@ def test_init_tau_once_R_hv0_and_readback(scratch):
     lane = _lane(ae, root, cfg)
     led = ae.cmd_init(lane)
     assert led["n0_tier"] == 32 and led["entries"][0]["n"] == 32 and led["loader"] == "stub" and led["configs_source"] == "stub"
-    assert led["objectives"] == ["V1", "E1", "R4", "N1"] and len(led["ref_point"]) == 4
+    assert led["objectives"] == cfg["objectives"] == ["V1", "E1"] and len(led["ref_point"]) == 2   # arms_E.json, design space 2026-11-24
     assert led["tau"]["tau_joint"] > 0 and led["tau"]["tau_marginal"] > 0 and not led["tau"]["budget_cap_only"]
     assert led["guardrail_mode"] == "monitor" and led["first_fire_round"] == {"tau_joint": None, "tau_marginal": None}
     assert "PLACEHOLDER" in led["R_source"] and "PLACEHOLDER" in led["tau"]["sigma_source"]
     ti = json.load(open(ae.tau_init_path(lane.dir)))
-    assert ti["n_starts"] == 32 and ti["M"] == 4 and ti["n_draws"] == 1000 and ti["seed"] == 20261006
+    assert ti["n_starts"] == 32 and ti["M"] == 2 and ti["n_draws"] == 1000 and ti["seed"] == 20261006
     assert len(ti["start_set_keys"]) == 32 and all(k.startswith("n0_E:") for k in ti["start_set_keys"])
     rul = ae.recompute_rulers(lane)                       # independent recomputation == ledger
     assert rul["tau_joint"] == led["tau"]["tau_joint"] and rul["tau_marginal"] == led["tau"]["tau_marginal"]
     readme = open(os.path.join(root, cfg["arms"]["qnehvi"]["dir"], "README.md")).read()
-    for s in ("E-D5 OPEN", "Banned framings", "the rule now works", "1 - (1 - 3.7e-04)^4", "PROVISIONAL", "sensitivity"):
+    for s in ("E-D5 OPEN", "Banned framings", "the rule now works", f"1 - (1 - 3.7e-04)^{len(cfg['objectives'])}", "PROVISIONAL", "sensitivity"):
         assert s in readme, s
     with pytest.raises(RuntimeError, match="REFUSED"):
         ae.cmd_init(lane)
@@ -292,7 +292,7 @@ def test_wave_files_from_the_brain(scratch):
     d1 = json.load(open(os.path.join(wdir, "retrofit_gen_dict_1.json")))
     assert "140" not in d1 and len(d1) == 5
     pr = pd.read_csv(os.path.join(wdir, "predictions.csv"))
-    assert set(pr.columns) >= {"index", "V1_pred_mean", "V1_pred_sd", "V1_transform", "N1_pred_sd"}
+    assert set(pr.columns) >= {"index", "V1_pred_mean", "V1_pred_sd", "V1_transform", "E1_pred_sd"}
     man = json.load(open(os.path.join(wdir, "manifest.json")))
     assert man["acq_seed"] == 20261007 and man["seed_id"] == 0 and man["methods_round"] == 1 and man["guardrail_mode"] == "monitor"
 

@@ -140,6 +140,9 @@ def build_scratch(tmp, cfg_overrides=None, n0_seed=53, with_git=True, qsub_shim=
             cfg[k].update(v)
         else:
             cfg[k] = v
+    ds_cfg = os.path.join(root, cfg["design_space"])           # the dated path arms_E.json names (prompt 66 update)
+    if not os.path.isfile(ds_cfg):
+        shutil.copy(os.path.join(root, "waves", "design_space_E.json"), ds_cfg)
     with open(os.path.join(me, "arms_E.json"), "w") as f:
         json.dump(cfg, f, indent=1)
     if with_git:
