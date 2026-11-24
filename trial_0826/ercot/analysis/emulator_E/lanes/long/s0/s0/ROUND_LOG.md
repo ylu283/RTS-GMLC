@@ -10,18 +10,18 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 
 <!-- BEGIN r1 -->
 ## Round 1 (methods_E_EMU_long_s0_s0_r1)
-- proposed_at: "2026-11-24T07:42:52+00:00"
+- proposed_at: "2026-11-24T08:04:49+00:00"
 - wave: "methods_E_EMU_long_s0_s0_r1"
 - acq: "qnehvi"
 - acq_seed: 20261007
 - guardrail_mode: "monitor"
-- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261007, "dtype": "float64"}
+- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261007, "dtype": "float64", "bound_snaps": {"to_0": 0, "to_1": 0, "tol": 1e-12, "note": "bound cleanup after x * sx + mx; not lattice snapping"}}
 - botorch: "0.16.1"
 - bo_gp_sha: "60e6328236e745b3d34dc8cd704bb72888ae5d15"
 - loo_rms_z: {"V1": 0.884, "E1": 0.9256}
 - noise_raw: {"V1": 2688.0197417641402, "E1": 18371.00353167308}
 - predictions: "waves/methods_E_EMU_long_s0_s0_r1/predictions.csv"
-- graded_at: "2026-11-24T07:42:53+00:00"
+- graded_at: "2026-11-24T08:04:50+00:00"
 - n_train: 56
 - n_hv: 56
 - cumulative_hv: 131252288571960.22
@@ -42,7 +42,8 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 - C3_review: false
 - halt: null
 - decision: "graded (record_only)"
-- qnehvi_seconds: 33.3
+- qnehvi_seconds: 36.1
+- r1_shared_designs_with_seed: {}
 - designs (MW per site ['110', '140', '146', '163', '270', '274']):
     - [338.600, 0.000, 0.000, 185.400, 579.000, 0.000]
     - [19.902, 0.000, 0.000, 185.400, 579.000, 0.000]
@@ -65,22 +66,22 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 
 <!-- BEGIN r2 -->
 ## Round 2 (methods_E_EMU_long_s0_s0_r2)
-- proposed_at: "2026-11-24T07:43:22+00:00"
+- proposed_at: "2026-11-24T08:05:25+00:00"
 - wave: "methods_E_EMU_long_s0_s0_r2"
 - acq: "qnehvi"
 - acq_seed: 20261008
 - guardrail_mode: "monitor"
-- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261008, "dtype": "float64"}
+- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261008, "dtype": "float64", "bound_snaps": {"to_0": 2, "to_1": 0, "tol": 1e-12, "note": "bound cleanup after x * sx + mx; not lattice snapping"}}
 - botorch: "0.16.1"
 - bo_gp_sha: "60e6328236e745b3d34dc8cd704bb72888ae5d15"
 - loo_rms_z: {"V1": 0.8905, "E1": 0.9013}
 - noise_raw: {"V1": 128.72096535574946, "E1": 18309.677942305072}
 - predictions: "waves/methods_E_EMU_long_s0_s0_r2/predictions.csv"
-- graded_at: "2026-11-24T07:43:23+00:00"
+- graded_at: "2026-11-24T08:05:26+00:00"
 - n_train: 64
 - n_hv: 64
-- cumulative_hv: 138063118761417.4
-- gain: 6810830189457.1875
+- cumulative_hv: 138063118761417.39
+- gain: 6810830189457.172
 - gain_tau_joint: null
 - would_stop_joint: false
 - gain_tau_marginal: null
@@ -97,7 +98,7 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 - C3_review: false
 - halt: null
 - decision: "graded (record_only)"
-- qnehvi_seconds: 28.3
+- qnehvi_seconds: 34.4
 - designs (MW per site ['110', '140', '146', '163', '270', '274']):
     - [45.326, 250.600, 268.000, 185.400, 579.000, 746.400]
     - [0.000, 250.600, 131.053, 185.400, 579.000, 746.400]
@@ -120,22 +121,22 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 
 <!-- BEGIN r3 -->
 ## Round 3 (methods_E_EMU_long_s0_s0_r3)
-- proposed_at: "2026-11-24T07:43:50+00:00"
+- proposed_at: "2026-11-24T08:06:01+00:00"
 - wave: "methods_E_EMU_long_s0_s0_r3"
 - acq: "qnehvi"
 - acq_seed: 20261009
 - guardrail_mode: "monitor"
-- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261009, "dtype": "float64"}
+- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261009, "dtype": "float64", "bound_snaps": {"to_0": 0, "to_1": 0, "tol": 1e-12, "note": "bound cleanup after x * sx + mx; not lattice snapping"}}
 - botorch: "0.16.1"
 - bo_gp_sha: "60e6328236e745b3d34dc8cd704bb72888ae5d15"
-- loo_rms_z: {"V1": 0.9513, "E1": 0.9172}
-- noise_raw: {"V1": 1730.5131967176226, "E1": 255964.25376744493}
+- loo_rms_z: {"V1": 0.9512, "E1": 0.9172}
+- noise_raw: {"V1": 1730.513235670433, "E1": 255964.25376742566}
 - predictions: "waves/methods_E_EMU_long_s0_s0_r3/predictions.csv"
-- graded_at: "2026-11-24T07:43:50+00:00"
+- graded_at: "2026-11-24T08:06:01+00:00"
 - n_train: 72
 - n_hv: 72
-- cumulative_hv: 140137564727264.56
-- gain: 2074445965847.1562
+- cumulative_hv: 140137559292477.75
+- gain: 2074440531060.3594
 - gain_tau_joint: null
 - would_stop_joint: false
 - gain_tau_marginal: null
@@ -152,10 +153,10 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 - C3_review: false
 - halt: null
 - decision: "graded (record_only)"
-- qnehvi_seconds: 26.1
+- qnehvi_seconds: 33.6
 - designs (MW per site ['110', '140', '146', '163', '270', '274']):
-    - [0.000, 0.000, 0.000, 75.408, 579.000, 0.000]
-    - [233.573, 250.600, 211.292, 185.400, 579.000, 746.400]
+    - [0.000, 0.000, 0.000, 75.407, 579.000, 0.000]
+    - [233.575, 250.600, 211.290, 185.400, 579.000, 746.400]
     - [262.919, 0.000, 0.000, 185.400, 579.000, 0.000]
     - [130.696, 250.600, 184.368, 185.400, 579.000, 746.400]
     - [0.000, 250.600, 0.000, 0.000, 0.000, 746.400]
@@ -175,22 +176,22 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 
 <!-- BEGIN r4 -->
 ## Round 4 (methods_E_EMU_long_s0_s0_r4)
-- proposed_at: "2026-11-24T07:44:21+00:00"
+- proposed_at: "2026-11-24T08:06:40+00:00"
 - wave: "methods_E_EMU_long_s0_s0_r4"
 - acq: "qnehvi"
 - acq_seed: 20261010
 - guardrail_mode: "monitor"
-- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261010, "dtype": "float64"}
+- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261010, "dtype": "float64", "bound_snaps": {"to_0": 0, "to_1": 0, "tol": 1e-12, "note": "bound cleanup after x * sx + mx; not lattice snapping"}}
 - botorch: "0.16.1"
 - bo_gp_sha: "60e6328236e745b3d34dc8cd704bb72888ae5d15"
-- loo_rms_z: {"V1": 0.8706, "E1": 0.939}
-- noise_raw: {"V1": 2067.819692403797, "E1": 158750.65625743108}
+- loo_rms_z: {"V1": 0.8705, "E1": 0.939}
+- noise_raw: {"V1": 2067.8153828250315, "E1": 158754.7759629556}
 - predictions: "waves/methods_E_EMU_long_s0_s0_r4/predictions.csv"
-- graded_at: "2026-11-24T07:44:22+00:00"
+- graded_at: "2026-11-24T08:06:41+00:00"
 - n_train: 80
 - n_hv: 80
-- cumulative_hv: 141227700546010.12
-- gain: 1090135818745.5625
+- cumulative_hv: 141227700821692.75
+- gain: 1090141529215.0
 - gain_tau_joint: null
 - would_stop_joint: false
 - gain_tau_marginal: null
@@ -207,16 +208,16 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
 - C3_review: false
 - halt: null
 - decision: "graded (record_only)"
-- qnehvi_seconds: 29.9
+- qnehvi_seconds: 37.3
 - designs (MW per site ['110', '140', '146', '163', '270', '274']):
-    - [0.000, 0.000, 0.000, 185.400, 211.852, 746.400]
+    - [0.000, 0.000, 0.000, 185.400, 211.851, 746.400]
     - [0.000, 250.600, 61.696, 185.400, 579.000, 746.400]
     - [0.000, 0.000, 0.000, 0.000, 579.000, 746.400]
-    - [0.000, 21.361, 0.000, 185.400, 579.000, 746.400]
+    - [0.000, 21.362, 0.000, 185.400, 579.000, 746.400]
     - [338.600, 0.000, 0.000, 185.400, 0.000, 746.400]
     - [7.218, 250.600, 163.363, 185.400, 579.000, 746.400]
-    - [338.600, 0.000, 0.000, 185.400, 65.670, 746.400]
-    - [162.869, 250.600, 268.000, 185.400, 579.000, 746.400]
+    - [338.600, 0.000, 0.000, 185.400, 65.673, 746.400]
+    - [162.864, 250.600, 268.000, 185.400, 579.000, 746.400]
 - realized Y (['V1', 'E1']):
     - [2.55322e+06, 8.1129e+09]
     - [1.59476e+06, 8.12977e+09]
@@ -225,5 +226,5 @@ Stop NOW: `touch lanes/long/s0/s0/STOP` on the CRC clone, then qdel the lane's J
     - [2.45905e+06, 8.11574e+09]
     - [1.43511e+06, 8.13778e+09]
     - [2.33089e+06, 8.11984e+09]
-    - [1.14713e+06, 8.15704e+09]
+    - [1.14714e+06, 8.15704e+09]
 <!-- END r4 -->

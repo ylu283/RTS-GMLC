@@ -30,7 +30,7 @@
   "hv_marginal_mean": 100211927048531.48,
   "recipe": "std (ddof 0) of the exact HV over N draws, default_rng(seed); every start perturbed jointly by multivariate_normal(0, Sigma, method='svd') (joint) or by independent normals with the marginal sds (marginal); Sigma = 0 -> tau = 0 without drawing",
   "statement": "The exact cross-batch replicate covariance is identically zero, so tau_joint = tau_marginal = 0: the stop rule is budget-cap-only and the cap governs (plan section 3). This is a finding about a deterministic instrument, not a failure.",
-  "computed_at": "2026-11-24T07:45:50+00:00",
+  "computed_at": "2026-11-24T08:05:52+00:00",
   "start_set_keys": [
     "n0_E:1",
     "n0_E:2",

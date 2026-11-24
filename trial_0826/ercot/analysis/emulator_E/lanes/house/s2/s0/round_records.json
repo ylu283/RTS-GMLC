@@ -1,7 +1,7 @@
 {
   "1": {
     "round": 1,
-    "proposed_at": "2026-11-24T07:44:37+00:00",
+    "proposed_at": "2026-11-24T08:04:18+00:00",
     "wave": "methods_E_EMU_house_s2_s0_r1",
     "acq": "qnehvi",
     "acq_seed": 20261007,
@@ -17,7 +17,13 @@
       "constraint": "none",
       "guardrail_mode": "monitor",
       "seed": 20261007,
-      "dtype": "float64"
+      "dtype": "float64",
+      "bound_snaps": {
+        "to_0": 0,
+        "to_1": 1,
+        "tol": 1e-12,
+        "note": "bound cleanup after x * sx + mx; not lattice snapping"
+      }
     },
     "botorch": "0.16.1",
     "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
@@ -30,7 +36,7 @@
       "V1": 14949.051609849952,
       "E1": 750721.1138779742
     },
-    "qnehvi_seconds": 4.6,
+    "qnehvi_seconds": 5.3,
     "designs_u": [
       [
         0.13464333237112203,
@@ -92,7 +98,7 @@
         0.0,
         0.0,
         0.0,
-        0.9999999999999999,
+        1.0,
         0.0,
         1.0
       ]
@@ -158,15 +164,20 @@
         0.0,
         0.0,
         0.0,
-        185.39998764679208,
+        185.3999876467921,
         0.0,
         746.3999877635443
       ]
     ],
     "predictions": "waves/methods_E_EMU_house_s2_s0_r1/predictions.csv",
-    "r1_shared_designs_with_seed": {},
+    "r1_shared_designs_with_seed": {
+      "1": 4,
+      "2": 5,
+      "3": 4,
+      "4": 4
+    },
     "decision": "graded (record_only) + HALT FOR DECISION",
-    "graded_at": "2026-11-24T07:44:38+00:00",
+    "graded_at": "2026-11-24T08:04:19+00:00",
     "n_hv": 54,
     "cumulative_hv": 126047686831893.67,
     "gain": 25835759783362.203,
@@ -217,7 +228,7 @@
       "reasons": [
         "2 R1 shed violations (> 1.0 MWh) in round 1: ['methods_E_EMU_house_s2_s0_r1:2', 'methods_E_EMU_house_s2_s0_r1:6']"
       ],
-      "at": "2026-11-24T07:44:38+00:00"
+      "at": "2026-11-24T08:04:19+00:00"
     },
     "realized": [
       [

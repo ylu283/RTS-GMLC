@@ -1,0 +1,672 @@
+{
+ "label": "EMULATOR",
+ "kind": "multi",
+ "scenario": "s1",
+ "seed_id": 1,
+ "variant": "house",
+ "fit_epochs": 700,
+ "lane_dir": "lanes/house/s1/s1",
+ "init_s": 0.9431948661804199,
+ "tau_exact": {
+  "tau_joint": 0.0,
+  "tau_marginal": 0.0,
+  "sensitivity_joint_over_marginal": null,
+  "budget_cap_only": true,
+  "form": "homoscedastic (Sigma_exact for every start)",
+  "sigma_source": "../noise_v3/ercot_noise_exact_cov.csv"
+ },
+ "tau_res": {
+  "tau_res": 439832227294.9964,
+  "tau_exact": 0.0,
+  "label": "REPORT-ONLY resolution ruler tau_res: the plan-6.2 recipe (tau_joint code path) with the chatter covariance Sigma_c in place of Sigma_exact; printed beside tau_exact, never replaces it",
+  "report_only": true,
+  "n_draws": 1000,
+  "seed": 20261006,
+  "hv_mean": 100249115828014.56,
+  "sd_marginal": [
+   3275.213783177645,
+   398135.0884646604
+  ]
+ },
+ "R": [
+  3977491.3852933007,
+  8163727647.918913
+ ],
+ "hv0": 100211927048531.47,
+ "hv0_true_f": 100577253228560.42,
+ "n0_tier": 48,
+ "n0_source": "PROVISIONAL arms_E n0_tier_provisional = 48 (E-D7_decided null)",
+ "loader": "real(n0_E: analysis.ercot_gp.ercot_gp_loader.load; Y replaced by the EMULATED start values)+EMULATOR wave tables",
+ "configs_source": "real",
+ "acq_seeds": {
+  "1": 20261107,
+  "2": 20261108,
+  "3": 20261109,
+  "4": 20261110
+ },
+ "settings": {
+  "1": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "none",
+   "guardrail_mode": "monitor",
+   "seed": 20261107,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 0,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "2": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261108,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 3,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "3": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261109,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 6,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  },
+  "4": {
+   "mc_samples": 128,
+   "num_restarts": 20,
+   "raw_samples": 512,
+   "alpha": 0.0,
+   "prune_baseline": true,
+   "sequential": true,
+   "fast_mode": false,
+   "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "guardrail_mode": "constrain",
+   "seed": 20261110,
+   "dtype": "float64",
+   "bound_snaps": {
+    "to_0": 6,
+    "to_1": 0,
+    "tol": 1e-12,
+    "note": "bound cleanup after x * sx + mx; not lattice snapping"
+   }
+  }
+ },
+ "designs_u": {
+  "1": [
+   [
+    0.13464081017370572,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.611332875362279,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.2946687734585779,
+    1.0,
+    0.7909101850871278,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.42893470552648316,
+    1.0
+   ]
+  ],
+  "2": [
+   [
+    0.16363439739528357,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.8994058992841463,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.2742872128781716,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.40737580007538166,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.4628499223680027
+   ],
+   [
+    1.0,
+    1.0,
+    0.4560709035949513,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0,
+    0.04094639763008634,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "3": [
+   [
+    0.0,
+    0.3514541841806802,
+    0.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.6590807665160132,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.43949607675273117,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.7484776526555406
+   ],
+   [
+    0.13554571943666988,
+    1.0,
+    0.7408680337301844,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.6323458631421115,
+    1.0,
+    0.8247393884163243,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.271776421137996,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0
+   ]
+  ],
+  "4": [
+   [
+    0.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.1313756971501765,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.033033964905671176,
+    1.0,
+    0.7552131076968149,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.7880255205644875,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.4272947011771061,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.3790996349647995,
+    1.0,
+    0.8509524483679498,
+    1.0,
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    1.0,
+    0.35921947418068034
+   ]
+  ]
+ },
+ "guardrail_mode": "constrain",
+ "guardrail_flipped_at_round": 1,
+ "halt": null,
+ "halt_file": false,
+ "first_fire_round": {
+  "tau_joint": null,
+  "tau_marginal": null
+ },
+ "rounds": [
+  {
+   "round": 1,
+   "propose_warnings": {
+    "ResourceWarning": 101,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 6.195344924926758,
+   "qnehvi_s": 5.2,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 1,
+    "r2_max": 172.13708904547093
+   },
+   "grade_s": 0.9294941425323486,
+   "wall_s": 7.138591051101685,
+   "hv": 132416216371591.34,
+   "gain": 32204289323059.875,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 73.21948535040019,
+   "hv_true_f": 132295580737604.25,
+   "n": 56,
+   "n_hv": 55,
+   "violations": [
+    "methods_E_EMU_house_s1_s1_r1:3"
+   ],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 172.13708904547093,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.01,
+     "rms_z": 0.171,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": -0.035,
+     "rms_z": 0.129,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "none",
+   "n1_off_max": 30783.71174914761,
+   "n1_off_flag_a": false,
+   "N4_mean": 4488.572702570531,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.4268,
+    "E1": 0.7727
+   },
+   "noise_raw": {
+    "V1": 14949.051609849952,
+    "E1": 750721.1138779742
+   }
+  },
+  {
+   "round": 2,
+   "propose_warnings": {
+    "ResourceWarning": 102,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.53870677947998,
+   "qnehvi_s": 8.5,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 177.4743959808689
+   },
+   "grade_s": 0.9375379085540771,
+   "wall_s": 10.489958763122559,
+   "hv": 138443453313135.84,
+   "gain": 6027236941544.5,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 13.703490939289493,
+   "hv_true_f": 138206356405520.73,
+   "n": 64,
+   "n_hv": 63,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 177.4743959808689,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.048,
+     "rms_z": 0.245,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.074,
+     "rms_z": 0.212,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30840.122153446227,
+   "n1_off_flag_a": false,
+   "N4_mean": 4520.338216154032,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3725,
+    "E1": 0.7327
+   },
+   "noise_raw": {
+    "V1": 14787.251830337373,
+    "E1": 779973.664660025
+   }
+  },
+  {
+   "round": 3,
+   "propose_warnings": {
+    "ResourceWarning": 103,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 9.379785060882568,
+   "qnehvi_s": 8.4,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 173.10467818181496
+   },
+   "grade_s": 0.9697709083557129,
+   "wall_s": 10.36291790008545,
+   "hv": 140772149700907.94,
+   "gain": 2328696387772.0938,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 5.294510595764581,
+   "hv_true_f": 140690591601198.52,
+   "n": 72,
+   "n_hv": 71,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 173.10467818181496,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": -0.042,
+     "rms_z": 0.209,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": -0.086,
+     "rms_z": 0.277,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30799.758580892765,
+   "n1_off_flag_a": false,
+   "N4_mean": 4518.663433924975,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3632,
+    "E1": 0.7119
+   },
+   "noise_raw": {
+    "V1": 15233.94192131779,
+    "E1": 809824.4206066695
+   }
+  },
+  {
+   "round": 4,
+   "propose_warnings": {
+    "ResourceWarning": 104,
+    "FutureWarning": 96,
+    "NumericsWarning": 1
+   },
+   "propose_s": 10.87362003326416,
+   "qnehvi_s": 9.8,
+   "C1_ok": true,
+   "C1_reason": "ok",
+   "C1_info": {
+    "n_suspect": 0,
+    "n_violation": 0,
+    "r2_max": 179.00123003615033
+   },
+   "grade_s": 0.9274327754974365,
+   "wall_s": 11.81499719619751,
+   "hv": 141547031379296.44,
+   "gain": 774881678388.5,
+   "gain_tau_joint": null,
+   "would_stop_joint": false,
+   "would_stop_marginal": false,
+   "gain_over_tau_res": 1.7617664879949446,
+   "hv_true_f": 141545777618916.5,
+   "n": 80,
+   "n_hv": 79,
+   "violations": [],
+   "suspects": [],
+   "r2_flag": false,
+   "r2_max": 179.00123003615033,
+   "C2": false,
+   "C3": false,
+   "calibration": {
+    "V1": {
+     "mean_z": 0.094,
+     "rms_z": 0.19,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    },
+    "E1": {
+     "mean_z": 0.187,
+     "rms_z": 0.338,
+     "cov95": 8,
+     "n_abs_z_gt3": 0,
+     "transform": "std"
+    }
+   },
+   "guardrail_mode_after": "constrain",
+   "constraint_used": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
+   "n1_off_max": 30792.835624429095,
+   "n1_off_flag_a": false,
+   "N4_mean": 4422.586485532862,
+   "halt": false,
+   "decision": "graded (record_only)",
+   "loo_rms_z": {
+    "V1": 0.3366,
+    "E1": 0.7044
+   },
+   "noise_raw": {
+    "V1": 15796.818947362637,
+    "E1": 781104.7732137359
+   }
+  }
+ ],
+ "noise_stream": [
+  6666,
+  3,
+  1,
+  1,
+  0
+ ],
+ "loader_calls": 29,
+ "finished_utc": "2026-11-24T08:05:37+00:00"
+}

@@ -1,0 +1,9 @@
+{
+ "statement": "Not bit-identical, but no conclusion moves. Every r1 proposal is identical to the pre-fix run once the pre-fix 5.55e-17 values are read as 0 (16/16 lane r1 batches, all single-objective r1 batches). From r2 on, the training inputs differ by ~5e-17, and the Adam fit + multi-start optimizer then take a different path in some lanes (multi: 7/11 r2, 7/11 r3, 3/11 r4 batches identical; some designs move to another vertex). Aggregates: max change in single-objective regret 0.012 B; in observed HV 0.3% and in true-f HV 0.3% relative; cov95 unchanged in every single-objective round. The fix snapped 56 u cells to 0 and 7 to 1 across the regenerated multi lanes. This path sensitivity is itself a finding: lane trajectories are not reproducible across a 1e-16 input change, only their aggregates are.",
+ "max_design_shift_u": 1.0,
+ "max_single_regret_change_B": 0.011864614779999998,
+ "max_hv_rel_change": 0.003379118024399647,
+ "max_true_hv_rel_change": 0.0032594379914304794,
+ "snaps_to_0": 56,
+ "snaps_to_1": 7
+}

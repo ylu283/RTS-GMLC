@@ -10,18 +10,18 @@ Stop NOW: `touch lanes/house/s2/s4/STOP` on the CRC clone, then qdel the lane's 
 
 <!-- BEGIN r1 -->
 ## Round 1 (methods_E_EMU_house_s2_s4_r1)
-- proposed_at: "2026-11-24T07:45:03+00:00"
+- proposed_at: "2026-11-24T08:04:53+00:00"
 - wave: "methods_E_EMU_house_s2_s4_r1"
 - acq: "qnehvi"
 - acq_seed: 20261407
 - guardrail_mode: "monitor"
-- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261407, "dtype": "float64"}
+- settings: {"mc_samples": 128, "num_restarts": 20, "raw_samples": 512, "alpha": 0.0, "prune_baseline": true, "sequential": true, "fast_mode": false, "constraint": "none", "guardrail_mode": "monitor", "seed": 20261407, "dtype": "float64", "bound_snaps": {"to_0": 0, "to_1": 0, "tol": 1e-12, "note": "bound cleanup after x * sx + mx; not lattice snapping"}}
 - botorch: "0.16.1"
 - bo_gp_sha: "60e6328236e745b3d34dc8cd704bb72888ae5d15"
 - loo_rms_z: {"V1": 0.4268, "E1": 0.7727}
 - noise_raw: {"V1": 14949.051609849952, "E1": 750721.1138779742}
 - predictions: "waves/methods_E_EMU_house_s2_s4_r1/predictions.csv"
-- graded_at: "2026-11-24T07:45:04+00:00"
+- graded_at: "2026-11-24T08:04:54+00:00"
 - n_train: 56
 - n_hv: 54
 - cumulative_hv: 126965211661861.05
@@ -40,9 +40,9 @@ Stop NOW: `touch lanes/house/s2/s4/STOP` on the CRC clone, then qdel the lane's 
 - calibration: {"V1": {"mean_z": -0.028, "rms_z": 0.186, "cov95": 8, "n_abs_z_gt3": 0, "transform": "std"}, "E1": {"mean_z": -0.075, "rms_z": 0.169, "cov95": 8, "n_abs_z_gt3": 0, "transform": "std"}}
 - C2_review: false
 - C3_review: false
-- halt: {"round": 1, "reasons": ["2 R1 shed violations (> 1.0 MWh) in round 1: ['methods_E_EMU_house_s2_s4_r1:2', 'methods_E_EMU_house_s2_s4_r1:6']"], "at": "2026-11-24T07:45:04+00:00"}
+- halt: {"round": 1, "reasons": ["2 R1 shed violations (> 1.0 MWh) in round 1: ['methods_E_EMU_house_s2_s4_r1:2', 'methods_E_EMU_house_s2_s4_r1:6']"], "at": "2026-11-24T08:04:54+00:00"}
 - decision: "graded (record_only) + HALT FOR DECISION"
-- qnehvi_seconds: 4.3
+- qnehvi_seconds: 5.4
 - r1_shared_designs_with_seed: {"0": 4, "1": 4, "2": 4, "3": 4}
 - designs (MW per site ['110', '140', '146', '163', '270', '274']):
     - [47.480, 0.000, 0.000, 185.400, 579.000, 0.000]

@@ -100,6 +100,18 @@
       "flag_at_mwh": 312.16,
       "response": "round flag if any run > 2 x base_v3 (base 156.08 MWh, plan AMENDMENT 2026-11-17; design space 2026-11-24); recorded; never halts; no acquisition role"
     },
+    "R3": {
+      "name": "over-generation (MWh)",
+      "mode": "monitor",
+      "flag_at": "> 1 MWh (base_v3 0)",
+      "response": "record the round flag; never halts; no acquisition role (design space 2026-11-24; config text only, not yet wired into grading \u2014 55 Part B)"
+    },
+    "N3": {
+      "name": "thermal-limit slack violation (MWh)",
+      "mode": "monitor",
+      "flag_at": "base_v3 90,951 MWh + 2 x B_N3 (22.7 MWh; B_N3 = 11.33, rule v2 \u00a78.1 bar)",
+      "response": "record the round flag; never halts; no acquisition role (design space 2026-11-24; config text only, not yet wired into grading \u2014 55 Part B)"
+    },
     "N1_off": {
       "name": "non-pocket congested line-hours N1 - N4 (line-h)",
       "mode": "monitor",
@@ -127,7 +139,7 @@
   "halt": null,
   "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
   "design_space_version": "2026-11-24",
-  "init_at": "2026-11-24T07:44:31+00:00",
+  "init_at": "2026-11-24T08:04:11+00:00",
   "entries": [
     {
       "round": 0,
@@ -137,7 +149,7 @@
       "gain": null,
       "n_outside_ref": 0,
       "decision": "start",
-      "at": "2026-11-24T07:44:31+00:00"
+      "at": "2026-11-24T08:04:11+00:00"
     },
     {
       "round": 1,
@@ -164,14 +176,14 @@
       "C2_review": false,
       "C3_review": false,
       "decision": "graded (record_only)",
-      "at": "2026-11-24T07:44:38+00:00"
+      "at": "2026-11-24T08:04:19+00:00"
     },
     {
       "round": 2,
       "n": 64,
       "n_hv": 64,
-      "hv": 138813020233603.84,
-      "gain": 5446539455951.109,
+      "hv": 138813020248573.53,
+      "gain": 5446539470920.797,
       "gain_tau_joint": null,
       "would_stop_joint": false,
       "gain_tau_marginal": null,
@@ -191,14 +203,14 @@
       "C2_review": false,
       "C3_review": false,
       "decision": "graded (record_only)",
-      "at": "2026-11-24T07:44:44+00:00"
+      "at": "2026-11-24T08:04:26+00:00"
     },
     {
       "round": 3,
       "n": 72,
       "n_hv": 72,
-      "hv": 140391348456428.22,
-      "gain": 1578328222824.375,
+      "hv": 140391349720414.1,
+      "gain": 1578329471840.5625,
       "gain_tau_joint": null,
       "would_stop_joint": false,
       "gain_tau_marginal": null,
@@ -218,14 +230,14 @@
       "C2_review": false,
       "C3_review": false,
       "decision": "graded (record_only)",
-      "at": "2026-11-24T07:44:50+00:00"
+      "at": "2026-11-24T08:04:35+00:00"
     },
     {
       "round": 4,
       "n": 80,
       "n_hv": 80,
-      "hv": 141433022872118.94,
-      "gain": 1041674415690.7188,
+      "hv": 141433026348496.94,
+      "gain": 1041676628082.8438,
       "gain_tau_joint": null,
       "would_stop_joint": false,
       "gain_tau_marginal": null,
@@ -245,7 +257,7 @@
       "C2_review": false,
       "C3_review": false,
       "decision": "graded (record_only)",
-      "at": "2026-11-24T07:44:57+00:00"
+      "at": "2026-11-24T08:04:45+00:00"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "1": {
     "round": 1,
-    "proposed_at": "2026-11-24T07:46:53+00:00",
+    "proposed_at": "2026-11-24T08:06:56+00:00",
     "wave": "methods_E_EMU_house_s1_s4_r1",
     "acq": "qnehvi",
     "acq_seed": 20261407,
@@ -17,7 +17,13 @@
       "constraint": "none",
       "guardrail_mode": "monitor",
       "seed": 20261407,
-      "dtype": "float64"
+      "dtype": "float64",
+      "bound_snaps": {
+        "to_0": 0,
+        "to_1": 0,
+        "tol": 1e-12,
+        "note": "bound cleanup after x * sx + mx; not lattice snapping"
+      }
     },
     "botorch": "0.16.1",
     "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
@@ -171,7 +177,7 @@
       "3": 4
     },
     "decision": "graded (record_only)",
-    "graded_at": "2026-11-24T07:46:54+00:00",
+    "graded_at": "2026-11-24T08:06:57+00:00",
     "n_hv": 55,
     "cumulative_hv": 132820832401166.19,
     "gain": 32608905352634.72,
@@ -254,7 +260,7 @@
   },
   "2": {
     "round": 2,
-    "proposed_at": "2026-11-24T07:47:02+00:00",
+    "proposed_at": "2026-11-24T08:07:05+00:00",
     "wave": "methods_E_EMU_house_s1_s4_r2",
     "acq": "qnehvi",
     "acq_seed": 20261408,
@@ -270,7 +276,13 @@
       "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
       "guardrail_mode": "constrain",
       "seed": 20261408,
-      "dtype": "float64"
+      "dtype": "float64",
+      "bound_snaps": {
+        "to_0": 0,
+        "to_1": 0,
+        "tol": 1e-12,
+        "note": "bound cleanup after x * sx + mx; not lattice snapping"
+      }
     },
     "botorch": "0.16.1",
     "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
@@ -283,7 +295,7 @@
       "V1": 14852.939759178093,
       "E1": 783052.6636612387
     },
-    "qnehvi_seconds": 7.4,
+    "qnehvi_seconds": 7.1,
     "designs_u": [
       [
         0.0,
@@ -418,7 +430,7 @@
     ],
     "predictions": "waves/methods_E_EMU_house_s1_s4_r2/predictions.csv",
     "decision": "graded (record_only)",
-    "graded_at": "2026-11-24T07:47:03+00:00",
+    "graded_at": "2026-11-24T08:07:05+00:00",
     "n_hv": 63,
     "cumulative_hv": 138326698748103.86,
     "gain": 5505866346937.672,
@@ -499,7 +511,7 @@
   },
   "3": {
     "round": 3,
-    "proposed_at": "2026-11-24T07:47:12+00:00",
+    "proposed_at": "2026-11-24T08:07:13+00:00",
     "wave": "methods_E_EMU_house_s1_s4_r3",
     "acq": "qnehvi",
     "acq_seed": 20261409,
@@ -515,7 +527,13 @@
       "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
       "guardrail_mode": "constrain",
       "seed": 20261409,
-      "dtype": "float64"
+      "dtype": "float64",
+      "bound_snaps": {
+        "to_0": 0,
+        "to_1": 0,
+        "tol": 1e-12,
+        "note": "bound cleanup after x * sx + mx; not lattice snapping"
+      }
     },
     "botorch": "0.16.1",
     "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
@@ -528,7 +546,7 @@
       "V1": 15301.363900461187,
       "E1": 815478.2148006173
     },
-    "qnehvi_seconds": 7.6,
+    "qnehvi_seconds": 7.3,
     "designs_u": [
       [
         0.0,
@@ -663,7 +681,7 @@
     ],
     "predictions": "waves/methods_E_EMU_house_s1_s4_r3/predictions.csv",
     "decision": "graded (record_only)",
-    "graded_at": "2026-11-24T07:47:12+00:00",
+    "graded_at": "2026-11-24T08:07:14+00:00",
     "n_hv": 71,
     "cumulative_hv": 139984956576918.83,
     "gain": 1658257828814.9688,
@@ -744,7 +762,7 @@
   },
   "4": {
     "round": 4,
-    "proposed_at": "2026-11-24T07:47:21+00:00",
+    "proposed_at": "2026-11-24T08:07:23+00:00",
     "wave": "methods_E_EMU_house_s1_s4_r4",
     "acq": "qnehvi",
     "acq_seed": 20261410,
@@ -760,7 +778,13 @@
       "constraint": "shed <= 1.0 MWh (GP on the accumulated R1 column)",
       "guardrail_mode": "constrain",
       "seed": 20261410,
-      "dtype": "float64"
+      "dtype": "float64",
+      "bound_snaps": {
+        "to_0": 0,
+        "to_1": 0,
+        "tol": 1e-12,
+        "note": "bound cleanup after x * sx + mx; not lattice snapping"
+      }
     },
     "botorch": "0.16.1",
     "bo_gp_sha": "60e6328236e745b3d34dc8cd704bb72888ae5d15",
@@ -773,7 +797,7 @@
       "V1": 15287.822954172841,
       "E1": 817483.633484924
     },
-    "qnehvi_seconds": 8.2,
+    "qnehvi_seconds": 7.6,
     "designs_u": [
       [
         0.0,
@@ -908,7 +932,7 @@
     ],
     "predictions": "waves/methods_E_EMU_house_s1_s4_r4/predictions.csv",
     "decision": "graded (record_only)",
-    "graded_at": "2026-11-24T07:47:22+00:00",
+    "graded_at": "2026-11-24T08:07:23+00:00",
     "n_hv": 79,
     "cumulative_hv": 141327750202078.44,
     "gain": 1342793625159.6094,

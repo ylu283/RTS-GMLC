@@ -66,7 +66,8 @@ LANDING_R = os.path.join(ERCOT, "waves", "n0_E", "landing_R.json")
 SIGMA_C_CSV = os.path.join(ERCOT, "analysis", "noise_v3", "ercot_noise_seed_sigma_c.csv")
 ARMS_E = os.path.join(METHODS, "arms_E.json")
 PARAMS = os.path.join(HERE, "emulator_E_params.json")
-RUNS = os.path.join(HERE, "runs")
+RUNS = os.path.join(HERE, "runs_compact")          # committed (the report reads only these)
+RUNS_BIG = os.path.join(HERE, "runs")             # gitignored (trial_0826/ercot/**/runs/): logs + subset-HV npz
 FIGS = os.path.join(HERE, "figs")
 
 SEATED = ["V1", "E1"]
@@ -460,6 +461,8 @@ def so_bo(U0, y0, f0, observe, f_true, f_star, cfg, floor, seed_base, method="bo
             extra["acq_warnings"] = wc.counts
             xb = xb.detach()
             Unew = np.clip(xb.numpy() * fit["sx"] + fit["mx"], 0.0, 1.0)
+            extra["bound_snaps"] = qnehvi_E.snap_bounds(Unew)              # same bound cleanup as 55 (prompt 66 E)
+            xb = torch.tensor((Unew - fit["mx"]) / fit["sx"], dtype=torch.float64)
             pm, ps = o.predict_raw(xb)
             acq_s = time.time() - t0
         else:
@@ -785,7 +788,8 @@ def random_pool(log=print):
             idx = pos[rng.choice(48, size=32, replace=False)]
             boot[b, i] = hv2d(np.vstack([Y0, Yp[idx]]), R)
     log(f"[pool] bootstrap {N_BOOT} x {N_BOOT_SUBSETS} done ({time.time() - t0:.0f} s)")
-    np.savez_compressed(os.path.join(RUNS, "EMU_random_pool_subsets.npz"), **{f"k{k}": v for k, v in sub.items()}, boot=boot)
+    os.makedirs(RUNS_BIG, exist_ok=True)
+    np.savez_compressed(os.path.join(RUNS_BIG, "EMU_random_pool_subsets.npz"), **{f"k{k}": v for k, v in sub.items()}, boot=boot)
     out = {"label": "EMULATOR", "U": Upool.tolist(), "y": Yp.tolist(), "f": Fp.tolist(),
            "hv_all48_obs": hv2d(np.vstack([Y0, Yp]), R), "hv_all48_true": hv2d(np.vstack([F0, Fp]), R),
            "subset_quantiles": {k: np.percentile(v, [10, 50, 90]).tolist() for k, v in sub.items()},
@@ -853,6 +857,278 @@ def emulator_front(log=print):
 
 
 # --------------------------------------------------------------------------- #
+# prompt 66 review additions (A1-A6): r0 plug-in, best-known front, matched-budget
+# baselines, calibration split by start-set hull, seed overlap
+# --------------------------------------------------------------------------- #
+
+VERTICES = np.array(np.meshgrid(*[[0.0, 1.0]] * 6)).reshape(6, -1).T
+N_REP = 1000
+BASE_SEED = 20261166
+
+
+def in_hull(P, X):
+    """bool per row of X: inside the convex hull of the rows of P (LP feasibility)."""
+    from scipy.optimize import linprog
+    P = np.asarray(P, float)
+    A = np.vstack([P.T, np.ones(len(P))])
+    out = []
+    for x in np.atleast_2d(X):
+        r = linprog(np.zeros(len(P)), A_eq=A, b_eq=np.append(x, 1.0), bounds=[(0, None)] * len(P), method="highs")
+        out.append(bool(r.status == 0))
+    return np.asarray(out)
+
+
+def _pm_torch(objgp, mx, sx):
+    """raw-unit posterior mean of a (negated) ObjGP as a differentiable function of u."""
+    mxt, sxt = torch.tensor(mx, dtype=torch.float64), torch.tensor(sx, dtype=torch.float64)
+
+    def f(u):
+        m = objgp.model(((u - mxt) / sxt)).mean
+        return -m * objgp.sy + objgp.my
+    return f
+
+
+def r0_plugin(variant="house", log=print):
+    """GPs fitted on the start set only (the 55 model, committed cfg): per-objective posterior-mean optimum regret
+    and the plug-in (posterior-mean) Pareto front."""
+    from scipy.stats import qmc
+    qn = set_fit_epochs(LONG_EPOCHS if variant == "long" else 700)
+    emu = load_emulator()
+    P = emu["P"]
+    U0 = np.asarray(P["start_set"]["U"], float)
+    Y0 = np.asarray(P["start_set"]["y_obs"], float)
+    cfgs = [tuple(P["objectives"][o]["cfg"]) for o in SEATED]
+    torch.manual_seed(20261006)
+    fit = qn.fit_models(U0, Y0, cfgs, [1e-9, 1e-9])
+    out = {"variant": variant, "objectives": {}}
+    fns = []
+    for j, o in enumerate(SEATED):
+        og = fit["objs"][j]
+        og.model.eval()
+        fn = _pm_torch(og, fit["mx"], fit["sx"])
+        fns.append(fn)
+        u, v, _ = minimize_fn(fn, 6, seed=j, n_sobol=2 ** 12, n_starts=16)
+        reg = (float(emu["f"][o](u[None, :])[0]) - P["objectives"][o]["f_star"]) / B[o]
+        out["objectives"][o] = {"pm_opt_u": u.tolist(), "pm_opt_pred": v, "regret_B": reg,
+                                "noise_sd_raw": og.noise_raw(), "ls_u": (og.model.covar_module.base_kernel.lengthscale
+                                                                         .detach().numpy().reshape(-1) * fit["sx"]).tolist()}
+    S = qmc.Sobol(6, scramble=True, seed=6615).random(2 ** 14)
+    cand = [S, VERTICES]
+    with torch.no_grad():
+        Ms = np.column_stack([fn(torch.tensor(np.vstack(cand), dtype=torch.float64)).numpy() for fn in fns])
+    lo, span = Ms.min(0), Ms.max(0) - Ms.min(0)
+    extra = []
+    for w in np.linspace(0.02, 0.98, 49):
+        for kind in ("ws", "cheb"):
+            def g(u, w=w, kind=kind):
+                a = (fns[0](u) - lo[0]) / span[0]
+                b = (fns[1](u) - lo[1]) / span[1]
+                return w * a + (1 - w) * b if kind == "ws" else torch.maximum(w * a, (1 - w) * b) + 0.01 * (a + b)
+            u_, _, _ = minimize_fn(g, 6, seed=int(w * 1000) + 7, n_sobol=2 ** 10, n_starts=4)
+            extra.append(u_)
+    Uc = np.vstack(cand + [np.asarray(extra)])
+    with torch.no_grad():
+        Mc = np.column_stack([fn(torch.tensor(Uc, dtype=torch.float64)).numpy() for fn in fns])
+    m = pareto_mask(Mc)
+    order = np.argsort(Mc[m][:, 0])
+    out["plugin_front_u"] = Uc[m][order].tolist()
+    out["plugin_front_pred"] = Mc[m][order].tolist()
+    log(f"[r0 plug-in {variant}] regret V1 {out['objectives']['V1']['regret_B']:.4f} B, E1 "
+        f"{out['objectives']['E1']['regret_B']:.4f} B; plug-in front {int(m.sum())} designs")
+    return out
+
+
+def _hv_traj(F0, Fd, R, q=8, rounds=4):
+    return [hv2d(np.vstack([F0, Fd[:q * k]]), R) for k in range(rounds + 1)]
+
+
+def baselines(plug, log=print):
+    """Matched budget (8 per round x 4, same 48 starts), true-f HV per round; N_REP replicates each."""
+    emu = load_emulator()
+    R = emu["R"]
+    F0 = np.asarray(emu["P"]["start_set"]["f"], float)
+    rng = np.random.default_rng(BASE_SEED)
+    U_pf = np.asarray(plug["plugin_front_u"], float)
+    out = {}
+    designs = {}
+    # (i) uniform, (ii) random vertices (32 of 64 without replacement), (iii-r) random 32 of the plug-in front
+    for name in ("uniform", "vertices", "plugin_random"):
+        H = np.empty((N_REP, 5))
+        allU = []
+        for r in range(N_REP):
+            if name == "uniform":
+                U = rng.uniform(size=(32, 6))
+            elif name == "vertices":
+                U = VERTICES[rng.choice(64, size=32, replace=False)]
+            else:
+                U = U_pf[rng.choice(len(U_pf), size=min(32, len(U_pf)), replace=False)]
+            H[r] = _hv_traj(F0, true_f(U), R)
+            allU.append(U)
+        out[name] = H.tolist()
+        designs[name] = np.vstack(allU)
+        log(f"[baseline] {name}: HV r4 p5/p50/p95 {np.percentile(H[:, 4], [5, 50, 95]).round(-9).tolist()}")
+    # (iii) deterministic plug-in exploit: 32 designs spread along the plug-in front (quantiles of predicted V1);
+    # round k gets every 4th starting at k-1, so each round spans the front. No exploration.
+    idx = np.unique(np.round(np.linspace(0, len(U_pf) - 1, 32)).astype(int))
+    Ud = U_pf[idx]
+    Ud = np.vstack([Ud[k::4] for k in range(4)])
+    out["plugin_spread"] = [_hv_traj(F0, true_f(Ud), R)]
+    designs["plugin_spread"] = Ud
+    return out, designs
+
+
+def best_known_front(extra_U, log=print):
+    """Non-dominated set (true f) of Sobol 2^14 + vertices + scalarizations (EMU_front.json polished front) +
+    EVERY design evaluated by any lane, single run or baseline."""
+    emu = load_emulator()
+    R = emu["R"]
+    fr = json.load(open(os.path.join(RUNS, "EMU_front.json")))
+    parts = [np.asarray(fr["front_polished"], float)]
+    srcs = {"polished_front": len(parts[0])}
+    for d in glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*", "design_matrix.csv")):
+        dm = pd.read_csv(d, float_precision="round_trip")
+        parts.append(true_f(dm[[c for c in dm.columns if c.startswith("u_")]].to_numpy(float)))
+    srcs["lane_waves"] = len(glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*")))
+    for p in glob.glob(os.path.join(RUNS, "single", "*.json")):
+        d = json.load(open(p))
+        U = [u for r in d["records"][1:] for u in r["u_new"]]
+        parts.append(true_f(np.asarray(U, float)))
+    pool = json.load(open(os.path.join(RUNS, "EMU_random_pool.json")))
+    parts.append(np.asarray(pool["f"], float))
+    parts.append(np.asarray(emu["P"]["start_set"]["f"], float))
+    for k, U in extra_U.items():
+        parts.append(true_f(U))
+    F = np.vstack(parts)
+    m = pareto_mask(F)
+    hvb = hv2d(F[m], R)
+    hv_pol = fr["hv_front_polished"]
+    hv_pol_bo = hv2d(np.vstack([parts[0]] + parts[1:1 + srcs["lane_waves"]]), R)
+    log(f"[best-known] HV {hvb:.6g} = {hvb / hv_pol:.4f} x polished; polished U lane designs {hv_pol_bo / hv_pol:.4f} x; "
+        f"Sobol {fr['hv_front'] / hvb:.4f} of best-known")
+    return {"hv_best_known": hvb, "hv_polished": hv_pol, "hv_sobol": fr["hv_front"],
+            "best_over_polished": hvb / hv_pol, "polished_plus_lane_designs_over_polished": hv_pol_bo / hv_pol,
+            "sobol_over_best": fr["hv_front"] / hvb, "front": F[m][np.argsort(F[m][:, 0])].tolist(),
+            "n_points": int(len(F)), "sources": srcs,
+            "rule": "non-dominated set (true f) of Sobol 2^14 + 64 vertices + 98 scalarizations + every design evaluated "
+                    "by any lane, single run, random pool or matched-budget baseline; a LOWER bound on the true front"}
+
+
+def calib_split(log=print):
+    """Per batch: fraction of designs outside the start-set hull (u); cov95 / rms z inside vs outside."""
+    emu = load_emulator()
+    U0 = np.asarray(emu["P"]["start_set"]["U"], float)
+    rows = []
+
+    def stats(z):
+        z = np.asarray(z, float)
+        if len(z) == 0:
+            return None, None
+        return int((np.abs(z) <= 1.96).sum()), float(np.sqrt(np.mean(z ** 2)))
+
+    for p in sorted(glob.glob(os.path.join(RUNS, "single", "*_bo_*.json"))):
+        d = json.load(open(p))
+        for r in d["records"][1:]:
+            U = np.asarray(r["u_new"], float)
+            z = (np.asarray(r["y_new"]) - np.asarray(r["pred_mean"])) / np.asarray(r["pred_sd"])
+            h = in_hull(U0, U)
+            ci, ri = stats(z[h]); co, ro = stats(z[~h])
+            rows.append({"kind": "single", "variant": d["variant"], "scenario": "", "objective": d["objective"],
+                         "seed_id": d["seed_id"], "round": r["round"], "n_outside_hull": int((~h).sum()),
+                         "frac_outside_hull": float((~h).mean()), "n_exact_vertex": int(np.all((U == 0) | (U == 1), 1).sum()),
+                         "cov95_inside": ci, "n_inside": int(h.sum()), "rms_z_inside": ri,
+                         "cov95_outside": co, "rms_z_outside": ro, "cov95": r["calibration"]["cov95"],
+                         "C2": r["calibration"]["C2"]})
+    for w in sorted(glob.glob(os.path.join(HERE, "waves", "methods_E_EMU_*"))):
+        name = os.path.basename(w)
+        _, _, _, var, sc, sd, rk = name.split("_")
+        dm = pd.read_csv(os.path.join(w, "design_matrix.csv"), float_precision="round_trip").sort_values("index")
+        ob = pd.read_csv(os.path.join(w, "objectives_EMULATOR.csv")).sort_values("index")
+        pr = pd.read_csv(os.path.join(w, "predictions.csv")).sort_values("index")
+        U = dm[[c for c in dm.columns if c.startswith("u_")]].to_numpy(float)
+        h = in_hull(U0, U)
+        for o in SEATED:
+            z = (ob[o].to_numpy(float) - pr[f"{o}_pred_mean"].to_numpy(float)) / pr[f"{o}_pred_sd"].to_numpy(float)
+            ci, ri = stats(z[h]); co, ro = stats(z[~h])
+            cov = int((np.abs(z) <= 1.96).sum())
+            rows.append({"kind": "multi", "variant": var, "scenario": sc, "objective": o, "seed_id": int(sd[1:]),
+                         "round": int(rk[1:]), "n_outside_hull": int((~h).sum()), "frac_outside_hull": float((~h).mean()),
+                         "n_exact_vertex": int(np.all((U == 0) | (U == 1), 1).sum()),
+                         "cov95_inside": ci, "n_inside": int(h.sum()), "rms_z_inside": ri, "cov95_outside": co,
+                         "rms_z_outside": ro, "cov95": cov, "C2": bool(cov <= 4)})
+    df = pd.DataFrame(rows)
+    log(f"[hull] batches {len(df)}; mean fraction outside the start-set hull {df['frac_outside_hull'].mean():.3f}")
+    return df
+
+
+def seed_overlap(variant="house", scenario="s0", seeds=(0, 1, 2, 3, 4), log=print):
+    """E-D4 statistics across the seed lanes of one scenario."""
+    emu = load_emulator()
+    U0 = np.asarray(emu["P"]["start_set"]["U"], float)
+    lanes = {}
+    for s in seeds:
+        lanes[s] = []
+        for k in range(1, 5):
+            dm = pd.read_csv(os.path.join(HERE, "waves", f"methods_E_EMU_{variant}_{scenario}_s{s}_r{k}", "design_matrix.csv"),
+                             float_precision="round_trip").sort_values("index")
+            lanes[s].append(dm[[c for c in dm.columns if c.startswith("u_")]].to_numpy(float))
+    key = lambda U: {tuple(r) for r in np.round(U, 10).tolist()}  # noqa: E731
+    per_round = []
+    for k in range(4):
+        allU = np.vstack([lanes[s][k] for s in seeds])
+        per_round.append({"round": k + 1, "n_designs": int(len(allU)), "n_unique": len(key(allU)),
+                          "frac_exact_vertex": float(np.all((allU == 0) | (allU == 1), 1).mean())})
+    sets = {s: key(np.vstack(lanes[s])) for s in seeds}
+    jac = {f"{a}-{b}": len(sets[a] & sets[b]) / len(sets[a] | sets[b]) for i, a in enumerate(seeds) for b in seeds[i + 1:]}
+    mind = []
+    for s in seeds:
+        ev = U0.copy()
+        for k in range(4):
+            Uk = lanes[s][k]
+            d = np.sqrt(((Uk[:, None, :] - ev[None, :, :]) ** 2).sum(-1)).min(1)
+            mind.append({"seed_id": s, "round": k + 1, "min_dist_to_evaluated": float(d.min()),
+                         "n_below_1e-6": int((d < 1e-6).sum()), "n_below_0.05": int((d < 0.05).sum())})
+            ev = np.vstack([ev, Uk])
+    r1 = per_round[0]
+    dup = r1["n_designs"] - r1["n_unique"]
+    out = {"variant": variant, "scenario": scenario, "per_round": per_round, "jaccard_32": jac,
+           "jaccard_range": [min(jac.values()), max(jac.values())], "min_dist": mind,
+           "r1_duplicate_runs_of_40": int(dup),
+           "statement": (f"Under option C, {dup} of the {r1['n_designs']} r1 PCM runs would duplicate another lane's design "
+                         "(exact match to 1e-10 in u). Shared replicates vs run all is a decision for Kay.")}
+    log(f"[overlap] r1 unique {r1['n_unique']}/{r1['n_designs']}, vertices {r1['frac_exact_vertex']:.2f}; "
+        f"Jaccard {out['jaccard_range']}; min dist to evaluated {min(m['min_dist_to_evaluated'] for m in mind):.3g}")
+    return out
+
+
+def extras(log=print):
+    plug_h = r0_plugin("house", log)
+    plug_l = r0_plugin("long", log)
+    base, bdes = baselines(plug_h, log)
+    bk = best_known_front(bdes, log)
+    cs = calib_split(log)
+    cs.to_csv(os.path.join(HERE, "emulator_E_calib_hull.csv"), index=False, float_format="%.6g")
+    ov = seed_overlap(log=log)
+    hb = bk["hv_best_known"]
+    bsum = {}
+    for name, H in base.items():
+        Hf = np.asarray(H, float) / hb
+        bsum[name] = {"n_rep": int(len(Hf)), "p5": np.percentile(Hf, 5, axis=0).tolist(),
+                      "p50": np.percentile(Hf, 50, axis=0).tolist(), "p95": np.percentile(Hf, 95, axis=0).tolist(),
+                      "max": Hf.max(0).tolist()}
+    out = {"label": "EMULATOR", "r0_plugin": {"house": plug_h, "long": plug_l}, "best_known": bk,
+           "baselines": bsum, "baseline_rule": ("matched budget: same 48 starts (true f), 8 designs per round x 4, "
+                                                "true-f HV / best-known HV per round; uniform = i.i.d. u; vertices = 32 of "
+                                                "the 64 box vertices without replacement; plugin_random = 32 random designs "
+                                                "of the r0 plug-in front; plugin_spread = 32 designs at quantiles of the "
+                                                f"plug-in front (1 replicate, no exploration); {N_REP} replicates, "
+                                                f"default_rng({BASE_SEED})"),
+           "seed_overlap": ov}
+    with open(os.path.join(RUNS, "EMU_extras.json"), "w") as fh:
+        json.dump(out, fh, indent=1, default=float)
+    return out
+
+
+# --------------------------------------------------------------------------- #
 # CLI (collect / figs / report live in emulator_E_report.py)
 # --------------------------------------------------------------------------- #
 
@@ -871,8 +1147,10 @@ def main(argv=None):
     m.add_argument("--variant", choices=list(VARIANT), default="house")
     sub.add_parser("random-pool")
     sub.add_parser("front")
+    sub.add_parser("extras")
     a = ap.parse_args(argv)
     os.makedirs(RUNS, exist_ok=True)
+    os.makedirs(RUNS_BIG, exist_ok=True)
     if a.cmd == "fit-emulator":
         fit_emulator()
     elif a.cmd == "single":
@@ -884,6 +1162,8 @@ def main(argv=None):
         random_pool()
     elif a.cmd == "front":
         emulator_front()
+    elif a.cmd == "extras":
+        extras()
     return 0
 
 

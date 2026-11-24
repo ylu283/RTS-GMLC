@@ -2,7 +2,7 @@
 
 Arm `qnehvi`, seed_id 3, round 3,
 acq qnehvi seed 20261309; bo-gp 60e6328236e745b3d34dc8cd704bb72888ae5d15; botorch
-0.16.1; guardrail_mode constrain. Created 2026-11-24T07:46:37+00:00.
+0.16.1; guardrail_mode constrain. Created 2026-11-24T08:06:40+00:00.
 
 Rows are `oat_site = __ALL__` multi-site designs (contract 5): `mw_<site>` /
 `u_<site>` at full precision, `pem_mw = sum mw`, `tier = bo`. The retrofit dict

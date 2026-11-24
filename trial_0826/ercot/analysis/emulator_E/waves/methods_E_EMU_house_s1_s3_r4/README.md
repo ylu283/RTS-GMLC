@@ -2,7 +2,7 @@
 
 Arm `qnehvi`, seed_id 3, round 4,
 acq qnehvi seed 20261310; bo-gp 60e6328236e745b3d34dc8cd704bb72888ae5d15; botorch
-0.16.1; guardrail_mode constrain. Created 2026-11-24T07:46:47+00:00.
+0.16.1; guardrail_mode constrain. Created 2026-11-24T08:06:50+00:00.
 
 Rows are `oat_site = __ALL__` multi-site designs (contract 5): `mw_<site>` /
 `u_<site>` at full precision, `pem_mw = sum mw`, `tier = bo`. The retrofit dict
@@ -18,7 +18,7 @@ is ABSENT). Bid 40.0 $/MWh, full year from 01-01-2019.
 | 5 | 0.000 | 0.000 | 0.000 | 185.400 | 179.381 | 746.400 | 1111.181 | 0.00000 | 0.00000 | 0.00000 | 1.00000 | 0.30981 | 1.00000 |
 | 6 | 0.000 | 0.000 | 0.000 | 185.400 | 579.000 | 404.618 | 1169.018 | 0.00000 | 0.00000 | 0.00000 | 1.00000 | 1.00000 | 0.54209 |
 | 7 | 0.000 | 0.000 | 0.000 | 185.400 | 579.000 | 605.450 | 1369.850 | 0.00000 | 0.00000 | 0.00000 | 1.00000 | 1.00000 | 0.81116 |
-| 8 | 0.000 | 150.371 | 0.000 | 185.400 | 579.000 | 746.400 | 1661.171 | 0.00000 | 0.60005 | 0.00000 | 1.00000 | 1.00000 | 1.00000 |
+| 8 | 0.000 | 150.364 | 0.000 | 185.400 | 579.000 | 746.400 | 1661.164 | 0.00000 | 0.60002 | 0.00000 | 1.00000 | 1.00000 | 1.00000 |
 
 Submission: Kay runs `bash analysis/methods_E/submit_ready_E.sh` on the CRC
 login node (generic `methods_E_array.sh` + `methods_E_collect.sh`, `-v WAVE=methods_E_EMU_house_s1_s3_r4`,

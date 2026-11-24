@@ -25,8 +25,8 @@
     746.3999877635443
   ],
   "bid": 40.0,
-  "git_head": "7b12427",
-  "created_at": "2026-11-24T07:45:55+00:00",
+  "git_head": "3d57f8c",
+  "created_at": "2026-11-24T08:05:57+00:00",
   "methods_arm": "qnehvi",
   "seed_id": 3,
   "methods_round": 1,
@@ -46,7 +46,13 @@
     "constraint": "none",
     "guardrail_mode": "monitor",
     "seed": 20261307,
-    "dtype": "float64"
+    "dtype": "float64",
+    "bound_snaps": {
+      "to_0": 0,
+      "to_1": 0,
+      "tol": 1e-12,
+      "note": "bound cleanup after x * sx + mx; not lattice snapping"
+    }
   },
   "objectives": [
     "V1",
