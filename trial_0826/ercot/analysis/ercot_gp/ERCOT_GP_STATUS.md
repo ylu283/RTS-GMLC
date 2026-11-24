@@ -1,6 +1,6 @@
 # ERCOT_GP_STATUS — prompt 54 Part B (v3.3 addendum; plan AMENDMENT 2026-11-24b)
 
-Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 4.7 min; fit-v2 run 4.6 min.
+Design space `design_space_E_2026-11-24.json` (contract_version 2026-11-24, objective_rule AMENDMENT 2026-11-24). Seated: **V1 · E1**. Co-reported (fitted and graded like the seated ids, never seated): N4 · N1. Data: n0_E grading tier, 48 rows (Sobol 0–47; loader refusals 0; max R1 0.0 MWh; max R2 170.2 MWh). random_E: 48 rows, read only by the holdout grader (refusals 0; max R1 0.0; max R2 199.9). Environment bogp-botorch. House-fit page build 3.7 min; fit-v2 run 4.1 min.
 
 ## 0. Answers for the PI
 
@@ -32,7 +32,9 @@ The % range denominator here is the 48-row grading-tier range of y for every cel
 
 **Q3 — How many starting runs (n\*, the navigation tier)?** **n\* = 48.** No tier below 48 meets the rule. The ratio LOO RMSE_n / RMSE_48 is above 1.1 at every n < 48 for the seated ids (n = 44: V1 1.120, E1 1.116; n = 40: V1 1.271, E1 1.259). Whether 48 itself suffices is untested: LOO RMSE still falls by ≈ 1.3× from n = 40 to 48. Under fit v2 (§13) n\* = 48.
 
-**Read this before the BO.** A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13). The committed fit definition per objective is in §13 and `committed_configs.json` (`fit_definition`).
+**Read this before the BO.** A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width. Plan AMENDMENT 2026-11-24b sets fit definition v2; an objective keeps the house fit only where its v2 config fails the holdout (§13). The committed fit definition per objective is in §13 and `committed_configs.json` (`fit_definition`).
+
+**Fit v2 outcome (AMENDMENT 2026-11-24b, one re-open round, 2 scorings, exposure 10 / 24).** V1: v2 rbf+std holdout 37 / 48 (rms z 1.64) FAIL → committed **house (fallback)**; E1: v2 m52+std holdout 48 / 48 (rms z 0.74) PASS → committed **v2 (AMENDMENT 2026-11-24b)**. 55 fits each acquisition GP with the definition committed for that objective. A v2 config that fails the bar keeps the house-fit commit (pre-registered fallback); we did not re-select and did not score again.
 
 **N1 (co-reported) FAILS the holdout at n = 48** (n = 32: 44 / 48, n = 48: 41 / 48; bar [43, 48]). It is not seated. We recorded the failure. We did not re-select and did not score again.
 
@@ -406,7 +408,7 @@ ARD lengthscales (u units) of the SELECTED arm vs n (descriptive; in u-space the
 
 ### Exploratory: the same arms and selection rule with a longer fit (Adam 10,000 steps; NEVER committed, never holdout-scored)
 
-A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13).
+A 10,000-step fit of the same arms gives 39–53 % lower LOO RMSE (V1, E1, N4; N1 16 %) and 1.7× (E1) to 2.7× (V1) narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width. Plan AMENDMENT 2026-11-24b sets fit definition v2; an objective keeps the house fit only where its v2 config fails the holdout (§13).
 
 Provenance: this diagnostic (65179e1) was coded 7 minutes after the holdout was scored.
 

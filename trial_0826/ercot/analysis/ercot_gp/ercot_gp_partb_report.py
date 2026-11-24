@@ -66,8 +66,9 @@ def long_fit_caveat(res):
     return (f"A {res.get('long_epochs', P.LONG_EPOCHS):,}-step fit of the same arms gives {100 * lo:.0f}–{100 * hi:.0f} % "
             f"lower LOO RMSE ({', '.join(ids)}" + (f"; N1 {100 * cut['N1']:.0f} %" if "N1" in cut else "") + ") and "
             + " to ".join(f"{band[o]:.1f}× ({o})" for o in sorted(seat, key=lambda o: band[o]))
-            + " narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width; "
-            "plan AMENDMENT 2026-11-24b replaces the fit definition for every fit from now on (§13).")
+            + " narrower LOO bands at n = 48. The house fit therefore over-states the noise and the band width. "
+            "Plan AMENDMENT 2026-11-24b sets fit definition v2; an objective keeps the house fit only where its v2 "
+            "config fails the holdout (§13).")
 
 
 def raw_ls_span(res, n=48):
@@ -185,6 +186,17 @@ def pi_block(res, res2, B):
           + (f" Under fit v2 (§13) n\\* = {res2['n_star']}." if res2 is not None else ""), ""]
     L += ["**Read this before the BO.** " + long_fit_caveat(res)
           + " The committed fit definition per objective is in §13 and `committed_configs.json` (`fit_definition`).", ""]
+    if res2 is not None:
+        com2 = res2["committed"]["objectives"]
+        parts = []
+        for o in res2["seated"]:
+            hv = com2[o]["holdout_v2"]
+            parts.append(f"{o}: v2 {res2['winners'][o][48]['arm'].name} holdout {hv['cov95']} / 48 (rms z {hv['rms_z']:.2f}) "
+                         f"{_pf(hv['pass'])} → committed **{com2[o]['fit_definition']}**")
+        L += ["**Fit v2 outcome (AMENDMENT 2026-11-24b, one re-open round, 2 scorings, exposure "
+              f"{res2['exposure']} / 24).** " + "; ".join(parts) + ". 55 fits each acquisition GP with the definition "
+              "committed for that objective. A v2 config that fails the bar keeps the house-fit commit (pre-registered "
+              "fallback); we did not re-select and did not score again.", ""]
     for o in bad:
         fails = [n for n in (32, 48) if not res["holdout"][o][n]["pass"]]
         L += [f"**{o} ({roles[o]}) FAILS the holdout at n = {', '.join(map(str, fails))}** ("

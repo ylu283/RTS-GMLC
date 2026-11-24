@@ -426,7 +426,7 @@ Read: the 18 noise_seed_E runs + ONLY the 4 n0_E anchors (n0_E:25 / 29 / 46 / 4,
   24, `committed_configs.json` LAST, cross-check, figures, mechanism flags, `ERCOT_GP_STATUS.md`,
   E-D7 draft row); then E-D7 to Kay; 55 Part B waits on `E-D7_decided`.
 
-### Part B — fit (v3.3 addendum, 2026-11-24 night; branch `ercot/54-partB`, worktree `RTS-GMLC-e54b`)
+### Part B — fit (v3.3 addendum, 2026-11-24 night; worktree `RTS-GMLC-e54b`; commits dc316ef · 65179e1 · b23021c are on `ercot/tx123`, fast-forwarded by the strategy session)
 
 - [x] **Code** (committed before the run): `analysis/ercot_gp/ercot_gp_partb.py` + `ercot_gp_partb_report.py` +
   `tests/test_ercot_gp_partb.py` (8 tests); `ercot_gp_status.score_holdout` takes an admitted-tier list (third
@@ -451,7 +451,27 @@ Read: the 18 noise_seed_E runs + ONLY the 4 n0_E anchors (n0_E:25 / 29 / 46 / 4,
   appended to the plan), `ercot_gp_status.csv`, `committed_configs.json`, `exposure_ledger.csv`, `figs/`,
   `ercot_gp_{exploratory,exploratory_longfit,nstar_checks,noise_crosscheck,lc_residuals}.csv`,
   `ercot_gp_mechanism.json`, `pi_agenda_E-D7_draft.md`.
-- [ ] **STOP** — E-D7 to Kay; 55 Part B waits on `E-D7_decided`.
+- [x] ~~STOP — E-D7 to Kay~~ → acceptance reviews (GP statistics ACCEPT WITH NOTES; PI-audience FIX THEN SHIP) and plan
+  AMENDMENT 2026-11-24b (93c81a4) → the round below.
+
+### Part B — AMENDMENT 2026-11-24b round (2026-11-24 night; worktree `RTS-GMLC-e54b`, rebased on `ercot/tx123`)
+
+- [x] **A — reporting fixes** (9a357ea): PI answer block (calibration, accuracy in rule-v2 B_j units and % range,
+  n\* with ratios, read-before-BO, N1 FAIL), E-D7 decision rows with options / cost / what-changes-it + a separate
+  fit-definition item, rule-v2 disclosure → §12, computed long-fit caveat and raw-lengthscale span, B_pert vs B_j,
+  COMPOSITION-OR-LOCATION label, provenance line (long-fit diagnostic coded 7 min after the holdout scoring), true
+  parity plot, linear lengthscale plot, config-independent null-curve figure. No number changed (house csv identical).
+- [x] **B — fit definition v2 code** (4375a10): `--fit v2` (FitV2: float64 MAP, LogNormal(√2 + ½ log 6, √3) lengthscale
+  prior on u, noise prior on σ_c² / s_y², noise LB 1e-6 / measured floor, L-BFGS-B maxiter 1000, 16 restarts
+  default_rng(5454), convergence flag + mode gap); `reopen_score` refuses anything but V1 / E1 at n = 48 once each;
+  49 ercot_gp tests green (bogp-botorch).
+- [x] **C — v2 round** (3885776): v2 study LOO-only, n\* = 48 (house n\* = 48); every v2 fit at n = 48 converged
+  (≥ 12 / 16 restarts within tolerance). Re-open scorings 9–10: **V1 v2 rbf+std 37 / 48 FAIL (rms z 1.64) → V1 keeps the house-fit commit
+  (rbf+std, fallback)**; **E1 v2 m52+std 48 / 48 PASS (rms z 0.74) → E1 commits v2**. Exposure 10 / 24;
+  `committed_configs.json` rewritten LAST with `fit_definition` (house round kept as `committed_configs_housefit.json`);
+  holdout retired again. N4 / N1 v2: LOO-only, commit stays house (co-reported).
+- [x] **D — pages** (this commit): ERCOT_GP_STATUS.md §0 / §13, E-D7 rows (`pi_agenda_E-D7_draft.md`), this section.
+- [ ] **STOP** — E-D7 (n0 = 48 recommended, both fits) and the fit item to Kay; 55 Part B waits on `E-D7_decided`.
 
 ## Prompt 53 — ERCOT design-space freeze + n0_E / random_E waves (v3.1, 2026-11-13; executor writes here only)
 
