@@ -2,60 +2,81 @@
  "label": "EMULATOR",
  "pass_fail": [
   {
-   "check": "no crash: every planned run finished (12 single house, 15 multi house lanes) and each lane ended where its scenario says (s0/s1: 4 graded rounds; s2: r1 then HALT)",
-   "result": "single 12/12, multi 15/15, lane ends as expected = True",
+   "n": 1,
+   "check": "No crash: 12 single-objective house runs and 15 multi-objective house lanes finish; each lane ends where its scenario says",
+   "result": "12/12, 15/15, ends as expected",
    "pass": true,
-   "note": "AS BUILT the multi-seed init CRASHED at seed 1 (55's r1 pairwise-disjointness assert; shared vertex designs); PASS is after the disclosed one-line 55 change"
+   "verdict": "PASS after a 55 fix. As built, the multi-seed init CRASHED at seed 1 (section 7, change 2c)"
   },
   {
-   "check": "C1 ingest passes on every emulated round (55 ingest_gate)",
-   "result": "49/49",
-   "pass": true
+   "n": 2,
+   "check": "C1 ingest passes on every emulated round (55 `ingest_gate`)",
+   "result": "49/49 rounds",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "C2 / C3 flag counts at or below nominal (per (round, objective): C2 3.7e-4, C3 1.1e-6; PASS iff count <= Poisson 95 % quantile of the expected count)",
-   "result": "C2 0 (single 0/24, multi 0/90; expected 0.042, limit 0); C3 0 (expected 1.3e-04, limit 0)",
-   "pass": true
+   "n": 3,
+   "check": "C2/C3 flag counts at or below nominal (Poisson 95 % limit of the expected count)",
+   "result": "C2 0, C3 0 in 114 (round, objective) cells; expected C2 0.042",
+   "pass": true,
+   "verdict": "PASS \u2014 NO POWER. The Poisson limit is 0 flags, and the house-fit bands are 2\u20136\u00d7 too wide (\u00a74.3). With a converged-fit proxy, C2 fires 3 times (\u00a75)."
   },
   {
-   "check": "single-objective BO within 2 B_j of the emulator optimum by round 4 on >= 2 of 3 seeds (regret of the best-observed design, true f)",
-   "result": "V1: 3/3; E1: 3/3",
-   "pass": true
+   "n": 4,
+   "check": "Single-objective BO within 2 B_j of the emulator optimum by round 4 on >= 2 of 3 seeds",
+   "result": "V1 3/3; E1 3/3",
+   "pass": true,
+   "verdict": "PASS (easy case: both optima are box vertices, and optimize_acqf goes to vertices)"
   },
   {
-   "check": "single-objective BO beats the random-8 baseline at matched budget (round 4, 80 evaluations) on every objective (mean regret over 3 seeds; per-seed shown)",
-   "result": "V1: BO 0.176 B vs random 18.687 B, per seed {0: True, 1: True, 2: True}; E1: BO 0.011 B vs random 12.292 B, per seed {0: True, 1: True, 2: True}",
-   "pass": true
+   "n": 5,
+   "check": "Single-objective BO beats random-8 at matched budget (round 4, 80 evaluations) on every objective",
+   "result": "On this emulator, where both optima are box vertices outside the data hull: V1 0.18 B vs 18.7 B; E1 0.011 B vs 12.3 B; every seed. Uniform draws in [0,1]^6 almost never reach a vertex, so this gap does not predict the gap on PCM.",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "multi s0 clean: 4 rounds, guardrail_mode monitor, no halt (5 lanes)",
-   "result": "True",
-   "pass": true
+   "n": 6,
+   "check": "Multi s0 (clean): 4 rounds, monitor mode, no halt, 5 lanes",
+   "result": "yes",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "multi s1 one injected shed violation in r1: mode flips at r1, constrained qNEHVI (shed GP) in r2-r4, violating run out of HV (n_hv 55/63/71/79), r1 unconstrained (5 lanes)",
-   "result": "True",
-   "pass": true
+   "n": 7,
+   "check": "Multi s1 (one shed violation in r1): mode flips at r1; r2\u2013r4 constrained qNEHVI with the shed GP; the violating run is out of HV (n_hv 55/63/71/79); 5 lanes",
+   "result": "yes",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "multi s2 two injected violations in r1: HALT_FOR_DECISION.md written, propose r2 REFUSED (5 lanes)",
-   "result": "True",
-   "pass": true
+   "n": 8,
+   "check": "Multi s2 (two violations in r1): `HALT_FOR_DECISION.md` written; `propose --round 2` refused; 5 lanes",
+   "result": "yes",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "tau_exact = 0 -> budget-cap-only: gain/tau_exact null, would_stop never fires, every lane to the cap",
-   "result": "True",
-   "pass": true
+   "n": 9,
+   "check": "tau_exact = 0 -> budget-cap-only: gain/tau_exact null, would_stop never fires, every lane runs to the cap",
+   "result": "yes",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "R2 / N1_off monitors at base + chatter: no flags (R2 > 312.16 MWh; dN1_off >= 462.7 line-h)",
-   "result": "R2 max 210.5 MWh; N1_off max 30954",
-   "pass": true
+   "n": 10,
+   "check": "R2 and N1_off monitors at base + chatter raise no flag",
+   "result": "R2 max 210.5 MWh (< 312.16); N1_off max 30,954 (dN1_off < 462.7)",
+   "pass": true,
+   "verdict": "PASS"
   },
   {
-   "check": "HV fraction of the emulator front reported (no threshold; a finding)",
-   "result": "s0 true-f HV / polished front: [0.9966, 0.9923, 0.9966, 0.9964, 0.9936]",
-   "pass": true
+   "n": 11,
+   "check": "HV fraction of the best-known emulator front reported (no threshold)",
+   "result": "s0 round 4, true f: 0.975\u20130.979 of the best-known front. The reference is a lower bound on the true front, so these fractions are upper bounds",
+   "pass": true,
+   "verdict": "reported"
   }
  ],
  "within_2B": {
@@ -73,7 +94,7 @@
    }
   },
   "E1": {
-   "bo_mean": 0.011431959098272326,
+   "bo_mean": 0.011416940076693471,
    "random_mean": 12.291838895735586,
    "per_seed": {
     "0": true,
@@ -90,10 +111,17 @@
   "n_single": 24,
   "n_multi": 90,
   "expected_C2": 0.04218,
-  "expected_C3": 0.0001254
+  "expected_C3": 0.0001254,
+  "long_single_C2": 3,
+  "long_single_C3": 0
  },
+ "s0_r4_frac_best": [
+  0.9750422253428059,
+  0.9793468935698709
+ ],
  "hv_front_sobol": 129360280237874.28,
  "hv_front_polished": 142385804210826.0,
+ "hv_best_known": 144892399224287.7,
  "hv_random48_obs": 103089197015716.27,
  "hv_random48_true": 103497320668402.56
 }
