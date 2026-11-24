@@ -1,5 +1,19 @@
 # ERCOT PROGRESS (prompts 26 → 36, 52, 53–55, 57, 58)
 
+## Prompt 65 — E-D1b rule v2: disclosed post-hoc amendment + re-walk + dated design space (v1.1, 2026-11-24; executor writes here only)
+
+### 2026-11-24 — executor (worktree `RTS-GMLC-e65`, branch `ercot/65-objective-rule-v2`)
+
+- (i) 212d60d: AMENDMENT 2026-11-24 committed alone. It is the v1.1 block with §8 folded in, sha256 `e3712a7f…`.
+- (ii) b8a3285: `analysis/pool/pool_n0E_v2.py` + `tests/test_pool_n0E_v2.py` (26 tests on synthetic Y at the real X).
+- (iii) real read. Seats **V1 · E1 (M = 2)**: X1 suppressed by E1, R EMPTY, N EMPTY.
+  - N4 is REDUNDANT given V1: raw ρ 0.966; residual ρ 0.421 [90 % 0.176, 0.617]; residual Mantel p 0.0253 > 0.01, so N4 is not COMPOSITION-RESOLVABLE; residual IDR/B 4.34 (joint lower-90 2.31).
+  - §4b was not reached.
+  - This differs from the §3 prediction V1 · E1 · N4. It was committed per Kay's override of §8.14: never tuned, never re-run.
+  - v1 and the Seed-bar re-grade (V1 · E1 · N1) are co-reported.
+- (iv) `waves/design_space_E_2026-11-24.json` with the actual seats, plus the `DESIGN_SPACE_E.md` addendum.
+- Not done: no push, no qsub. random_E unread; no GP (`committed_configs.json` absent).
+
 ## Prompt 64 — ERCOT objective-selection deck (v1.1, 2026-11-18; executor writes here only)
 
 ### 2026-11-18 — deck build (executor; worktree `RTS-GMLC-e64`, branch `ercot/64-objective-deck`)

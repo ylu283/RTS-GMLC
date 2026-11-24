@@ -123,3 +123,22 @@ None bind on this slate:
 - `__ALL__` naming: the multi-site rows reuse `oat_site = "__ALL__"`
   (contract §5). The label is per wave (pool key `wave:index`), so it
   cannot collide with `screening_ercot` row 10.
+
+
+## Addendum 2026-11-24 — dated design space under rule v2 (prompt 65; plan AMENDMENT 2026-11-24)
+
+- New file `waves/design_space_E_2026-11-24.json` (`contract_version` "2026-11-24"). The 2026-11-13 file stays unchanged.
+- `objectives` holds the actual rule-v2 seats only, V1 and E1 (M = 2), each `SEATED (rule v2, AMENDMENT 2026-11-24)`. The walk did not give the §3 prediction V1 · E1 · N4. Kay overrode the §8.14 uncommitted-on-mismatch clause and had the actual output committed, never tuned and never re-run (`analysis/pool/POOL_N0E_STANDINGS_v2.md`).
+- `co_reported` holds N1 (PRE-REGISTERED (v1), co-reported) and N4 (v2 candidate, not seated). N4 is REDUNDANT given the seated V1 (raw ρ 0.966). It has no escape because it is not COMPOSITION-RESOLVABLE (residual Mantel p 0.0253 > 0.01). It is not a BORDERLINE-PAIR, so §4b was not reached.
+- `guardrails`:
+  - R1: plan §1.3, unchanged.
+  - R2: flag at 2 × base_v3 = 312.2 MWh.
+  - R3: flag at > 1 MWh.
+  - N3: flag at base 90,951 MWh + 2·B_N3.
+  - N1_off (§8.8): (a) ΔN1_off ≥ 2·B_N1off = 462.7 line-h; (b) a new bottleneck (≥ 88 h on a non-pocket line that is at 0 h in base); (c) N3_off ≥ 61,477 MWh + 2·B_N3off.
+- `reporting`:
+  - E1 − 40·D1 as a column only. Δnet ≤ 0 by construction; capex excluded.
+  - −N5 and the L252 mean flow beside the co-reported N4, with the N4 == N4_L252 assert.
+  - ΔX1/D1, −ΔV1/D1 and ΔE1/(D1 + ΔV1).
+  - The three vectors: v1 V1 · E1 · N1; v2 V1 · E1; the v2 prediction V1 · E1 · N4 as a conditional reading.
+- 54 Part B passes `--design-space waves/design_space_E_2026-11-24.json` (no 54 code change). 55 updates `arms_E.json` in its own commit. Under M = 2, plan §6.4 gate numbers, the ref point and τ are re-derived by the strategy session (rule v2 item 8).
