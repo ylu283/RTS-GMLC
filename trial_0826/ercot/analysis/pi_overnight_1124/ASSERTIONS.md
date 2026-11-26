@@ -1,0 +1,241 @@
+# Build-time assertions (overnight_facts.py + make_overnight_deck.py; every one passed at build)
+
+Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analysis/pool/pool_n0E_v2.py `steiger` (imported): Z = -5.7372, p = 4.81e-09.
+
+- git rev-parse ercot/tx123 = de45242
+- pool_ed1b_v2.csv rows: 28 ≈ 28 (± 0)
+- V1 eta2_T: 0.978038 ≈ 0.978 (± 0.0005)
+- E1 eta2_T: 0.641254 ≈ 0.64 (± 0.005)
+- E1 residual IDR/B (composition residual ≈ 10 B): 10.1089 ≈ 10.1 (± 0.05)
+- N4 IDR/B: 14.237 ≈ 14.24 (± 0.005)
+- N4 residual Mantel p: 0.0253 ≈ 0.0253 (± 5e-05)
+- N1 residual IDR/B: 0.943324 ≈ 0.94 (± 0.005)
+- N4 COMP_RESOLVABLE False (pool_ed1b_v2.csv)
+- pool_ed1b_v2.csv status: V1, E1 SEATED (rule v2)
+- roles: N1 PROXY, R4 PROXY(E2 start-up cost) (pool_ed1b_v2.csv)
+- no OUTCOME role in family R (pool_ed1b_v2.csv)
+- X1|E1 raw ρ: 0.981654 ≈ 0.982 (± 0.0005)
+- X1|E1 residual ρ: 0.967651 ≈ 0.968 (± 0.0005)
+- N4|V1 raw ρ: 0.966131 ≈ 0.966 (± 0.0005)
+- N1|V1 raw ρ: 0.950499 ≈ 0.95 (± 0.001)
+- pool_pairs_v2.csv N4|V1: REDUNDANT_given_p True, BORDERLINE_PAIR False
+- floor V1 (MWh): 58287.3 ≈ 58287 (± 1)
+- floor E1 ($M): 8.06138 ≈ 8.06 (± 0.005)
+- floor X1 (t): 194521 ≈ 194521 (± 1)
+- floor N4 (h): 87.6 ≈ 87.6 (± 1e-09)
+- ν = 22 (D1/D2 ν 20) in pool_ed1b_v2.csv
+- B_j == max(3√2·s_j, max|δ|) for all 28 ids (pool_ed1b_v2.csv)
+- text in POOL_N0E_STANDINGS_v2.md: 'v1 pre-registered (d706199): V: V1 · E: E1 · X: EMPTY · R: EMPTY · N: N1'
+- text in POOL_N0E_STANDINGS_v2.md: 'v1 Seed-bar re-grade (baf77c3): V: V1 · E: E1 · X: EMPTY · R: EMPTY · N: N1'
+- text in POOL_N0E_STANDINGS_v2.md: 'v2 (this read): V: V1 · E: E1 · X: EMPTY · R: EMPTY · N: EMPTY'
+- text in POOL_N0E_STANDINGS_v2.md: 'block sha256 `e3712a7f4d8e0542d5421ed13453fd0a722a582fa7b087b6b34d831581ac28be`'
+- text in POOL_N0E_STANDINGS_v2.md: 'Kay overrode that clause for this read: commit the rule's actual output, never tuned'
+- text in ERCOT_BO_PLAN.md: 'Rule v2 is pre-registered unchanged for the next dataset, which is its real test.'
+- text in ERCOT_BO_PLAN.md: 's_j² = (6·s²_pert + 16·s²_seed)/22, ν = 22'
+- text in ERCOT_BO_PLAN.md: 'B_j = max(3·√2·s_j, max|δ| over the 6 perturbed and 16 Seed deltas)'
+- text in ERCOT_BO_PLAN.md: 'Steiger's Z for dependent correlations sharing s'
+- text in ERCOT_GP_STATUS.md: 'with the same PTDF — the six sites are one electrical location'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'N4's composition signal is the cost of diverting deliverable wind, which E1 already prices'
+- Steiger Z RECOMPUTED (pool_n0E_v2.steiger, n_eff 42) for c = N4, p = V1, s = E1 from pool_pairs_v2.csv rho_resid (N4|E1 -0.8050, E1|V1 -0.0543, N4|V1 0.4209): Z = -5.7372, one-sided p = 4.81e-09
+- counterfactual: N4|E1 residual ρ upper-90 -0.687 ≤ −0.50; Steiger p ≤ 0.05; N4|V1 residual 90 % interval [0.176, 0.617] contains 0.50 → §4b would resolve NOT REDUNDANT
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'Mantel p 0.023–0.027 across'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'counterfactual: with that clause'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'passed §4b would seat N4'
+- design_space_E_2026-11-24.json: objectives [V1, E1], M 2, identity v3
+- design-space sites (u ∈ [0,1]^6): 6 ≈ 6 (± 0)
+- n0_E grading tier: 48 ≈ 48 (± 0)
+- arms_E q: 8 ≈ 8 (± 0)
+- arms_E hard_cap: 4 ≈ 4 (± 0)
+- arms_E seed lanes: 5 ≈ 5 (± 0)
+- arms_E.json: qNEHVI, objectives [V1, E1]
+- arms_E.json: C2 / C3 action = record + REVIEW flag; never halts
+- landing_R V1 (MWh): 3.97749e+06 ≈ 3977491 (± 1)
+- landing_R E1 ($M): 8163.73 ≈ 8163.73 (± 0.005)
+- text in ERCOT_BO_PLAN.md: 'τ_exact = 0 (Σ_exact = 0, 5ca9650) → the stop rule is budget-cap-only'
+- text in EMULATOR_BO.md: 'eps ~ N(0, Sigma_c[V1, E1])'
+- house holdout cov95 at n = 48 (ercot_gp_status.csv): {'V1': 45, 'E1': 48, 'N4': 48, 'N1': 41}
+- v2 holdout cov95 (ercot_gp_status_v2.csv): {'V1': 37, 'E1': 48}
+- committed_configs.json fit_definition: V1 house (fallback), E1 v2 (AMENDMENT 2026-11-24b)
+- committed_configs.json: n_star 48, n_star_v2 48, E-D7_decided null
+- text in committed_configs.json: 'n = 44: V1 (rbf+std): RMSE ratio 1.120 > 1.1; E1 (m52+std): RMSE ratio 1.116 > 1.1'
+- house LOO RMSE V1 (k MWh): 30.6332 ≈ 30.6 (± 0.05)
+- house LOO RMSE E1 ($M): 3.30119 ≈ 3.3 (± 0.005)
+- house LOO RMSE V1 / B_j: 1.63472 ≈ 1.63 (± 0.01)
+- house LOO RMSE E1 / B_j: 1.77303 ≈ 1.77 (± 0.005)
+- house inferred noise / σ_c V1: 3.96881 ≈ 3.97 (± 0.005)
+- house inferred noise / σ_c E1: 2.64624 ≈ 2.65 (± 0.005)
+- title '2.7–4×' low end = E1 2.646 (printed 2.65; the verbatim title rounds 2.65 up): 2.64624 ≈ 2.7 (± 0.06)
+- title '2.7–4×' high end = V1 3.97 rounded: 4 ≈ 4 (± 1e-09)
+- v2 V1 LOO RMSE 44/48 rbf+std (same arm): 1.25461 ≈ 1.255 (± 0.0005)
+- v2 V1 LOO RMSE 44/48 m52+std (same arm): 1.28495 ≈ 1.285 (± 0.0005)
+- v2 V1 LOO RMSE 44 m52 / 48 rbf (cross-arm): 1.46232 ≈ 1.46 (± 0.005)
+- text in ERCOT_GP_STATUS.md: 'm52+std 17,372 MWh / 13,520 MWh = 1.285; rbf+std 14,904 MWh / 11,880 MWh = 1.255'
+- text in ERCOT_GP_STATUS.md: 'n\* = 48 means that no tier below 48 suffices. Whether 48 suffices is untested.'
+- v2 V1 noise / σ_c (scored config): 0.982385 ≈ 0.98 (± 0.005)
+- v2 E1 noise / σ_c: 0.610774 ≈ 0.61 (± 0.005)
+- v2 converged restarts within tol: V1 14/16, E1 12/16 (ercot_gp_status_v2.csv)
+- v2 V1 mode gap (nats): 119.096 ≈ 119 (± 0.5)
+- v2 E1 mode gap (nats): 52.8544 ≈ 52.9 (± 0.05)
+- LOO NLPD v2 V1: 10.7948 ≈ 10.8 (± 0.006)
+- LOO NLPD house V1: 11.7325 ≈ 11.73 (± 0.005)
+- LOO NLPD v2 E1: 15.8054 ≈ 15.81 (± 0.005)
+- LOO NLPD house E1: 16.2522 ≈ 16.25 (± 0.005)
+- v2 holdout rms z V1: 1.63797 ≈ 1.64 (± 0.005)
+- v2 holdout rms z E1: 0.744311 ≈ 0.74 (± 0.005)
+- v2 holdout NLPD V1: 11.3089 ≈ 11.31 (± 0.005)
+- house holdout NLPD V1: 11.733 ≈ 11.73 (± 0.005)
+- v2 holdout RMSE V1: 16101.4 ≈ 16101 (± 1)
+- house holdout RMSE V1: 37361.3 ≈ 37361 (± 1)
+- V1 house / v2 holdout RMSE (2.3× more accurate): 2.32037 ≈ 2.3 (± 0.05)
+- P(≤ 37 | 48, 0.95): 1.96702e-05 ≈ 2e-05 (± 5e-06)
+- text in ERCOT_GP_STATUS.md: 'P(≤ 37 | 48, 0.95) = 2e-05'
+- prompt-61 residuals under v2: V1 |z| > 1.96 count (of 9): 5 ≈ 5 (± 0)
+- prompt-61 residual designs: 9 ≈ 9 (± 0)
+- V1 v2 z at P2_500_270: 5.63687 ≈ 5.64 (± 0.005)
+- V1 v2 rbf lengthscale min (u): 1.85908 ≈ 1.9 (± 0.05)
+- V1 v2 rbf lengthscale max (u): 5.85477 ≈ 5.9 (± 0.05)
+- V1 rbf v2 noise/σ_c at n = 44: 1.14833 ≈ 1.15 (± 0.005)
+- noise-prior MAP mode e^(−½) (σ_c units): 0.606531 ≈ 0.61 (± 0.005)
+- text in ERCOT_GP_STATUS.md: 'Its mode is at e^(μ − 1), i.e. 0.61 σ_c in sd'
+- V1 v2 holdout RMSE / LOO RMSE: 1.35536 ≈ 1.36 (± 0.005)
+- text in ERCOT_GP_STATUS.md: 'holdout band sd (median 8,315 MWh) is narrower than the LOO band sd (median 12,106 MWh)'
+- text in ERCOT_GP_STATUS.md: 'the fit change was designed after the house holdout results were known (8 scorings; the diagnostic 65179e1 was coded 7 min later)'
+- exposure ledger scorings (of 24): 10 ≈ 10 (± 0)
+- text in ERCOT_GP_STATUS.md: '10 of 24 scorings in total; retired'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'V1 needs structure (linear mean / additive or site-interaction kernel), not wider bars'
+- text in EMULATOR_BO.md: '`bogp.train_gp` Adam 700 steps, lr 0.01'
+- text in pi_agenda_E-D7_draft.md: '**Recommendation (i): the mixed commit as committed.**'
+- text in pi_agenda_E-D7_draft.md: '(c) 44 only under a 1.12 ratio bar'
+- text in pi_agenda_E-D7_draft.md: 'a second re-open, forbidden by AMENDMENT 2026-11-24b §4'
+- text in pi_agenda_E-D7_draft.md: 'a re-selection after scoring'
+- text in pi_agenda_E-D7_draft.md: 'discards E1's verified gain'
+- emulator_E_summary_committed.json pass_fail 1, 2, 6, 7, 8: 12/12 single, 15/15 multi, C1 45/45, branches s0/s1/s2, cap-only + monitors quiet, fit v2 converged 45/45 + 15/15 (= 60/60)
+- committed s0 lanes at r4: 5 ≈ 5 (± 0)
+- s0 r4 HV frac min: 0.970915 ≈ 0.971 (± 0.0005)
+- s0 r4 HV frac max: 0.980189 ≈ 0.98 (± 0.0005)
+- multi committed s1 n_hv per round 55/63/71/79
+- multi committed C2 count: 0 ≈ 0 (± 0)
+- multi committed graded (lane, round) rows: 45 ≈ 45 (± 0)
+- uniform r4 p5: 0.667192 ≈ 0.667 (± 0.0005)
+- uniform r4 p50: 0.682875 ≈ 0.683 (± 0.0005)
+- uniform r4 p95: 0.71198 ≈ 0.712 (± 0.0005)
+- random vertices r4 p95 (committed): 0.918168 ≈ 0.918 (± 0.0005)
+- r0 plug-in spread r4 (committed): 0.966112 ≈ 0.966 (± 0.0005)
+- baseline replicates: 1000 ≈ 1000 (± 0)
+- r0 plug-in regret V1 (B): 0.0857168 ≈ 0.086 (± 0.0005)
+- r0 plug-in regret E1 = 5.1e-13 B (≈ 0)
+- mismatch B V1 r0 plug-in regret (B): 1.31399 ≈ 1.31 (± 0.005)
+- mismatch B V1 posterior-mean incumbent regret r4 (B): 0.0502897 ≈ 0.05 (± 0.0005)
+- mismatch B V1 best-observed regret r4 (B): 0.293007 ≈ 0.293 (± 0.0005)
+- text in EMULATOR_BO.md: 'BO's minimum true f among evaluated designs reaches 0.002 B by r2'
+- text in EMULATOR_BO.md: 'the best observation's noise is -0.76 and -1.40 chatter sd at r3 / r4'
+- text in EMULATOR_BO.md: 'u = 0 lies 0.34 lengthscales from the nearest start point'
+- text in EMULATOR_BO.md: 'report incumbents by posterior mean or by replicates, not by best observed'
+- E1 single seed 0 r2 cov95 (C2 + C3 batch): 3 ≈ 3 (± 0)
+- E1 single seed 0 r2: C2 True, C3 True, 8 designs at the origin
+- E1 seed 0 r1 designs at u = 0 (observed twice in r1): 2 ≈ 2 (± 0)
+- E1 r1 fit noise / σ_c (the fit used at r2): 0.676423 ≈ 0.676 (± 0.0005)
+- ρ = fit noise / emulator noise: 0.5308 ≈ 0.53 (± 0.005)
+- emulator noise / σ_c (= 0.676 / 0.531): 1.27435 ≈ 1.274 (± 0.001)
+- replicate coverage 2Φ(1.96ρ) − 1: 0.701831 ≈ 0.7 (± 0.005)
+- text in EMULATOR_BO.md: 'P(C2) 0.10, P(C3) 0.018'
+- text in EMULATOR_BO.md: '(the review's model gave 0.22 / 0.083 / 0.07)'
+- single E1 r2–r4 designs at u = 0: 71 ≈ 71 (± 0)
+- single E1 r2–r4 designs: 72 ≈ 72 (± 0)
+- E1 fit noise / emulator noise (min): 0.308643 ≈ 0.31 (± 0.005)
+- E1 fit noise / emulator noise (max): 0.994041 ≈ 0.99 (± 0.005)
+- V1 rms z median (committed): 0.169 ≈ 0.17 (± 0.005)
+- V1 C2 0, C3 0 in 57 cells (summary_committed)
+- text in EMULATOR_BO.md: 'rms z median 0.17, i.e. the V1 bands are ≈ 6× too wide'
+- EMU_extras_committed seed_overlap unique per round 24/38/35/38 of 40
+- Jaccard min: 0.103448 ≈ 0.1 (± 0.005)
+- Jaccard max: 0.163636 ≈ 0.16 (± 0.005)
+- closest re-proposal distance (u): 0.0668516 ≈ 0.067 (± 0.0005)
+- no proposal within 1e-6 of an evaluated design
+- r1 duplicate runs of 40: 16 ≈ 16 (± 0)
+- text in ERCOT_BO_PLAN.md: 'Per-run core-h range for planning: **21 (fast) – 44.6 (slow)**'
+- text in pi-agenda.md (external; frozen in external_snippets.json): '16 of 40 r1 runs would return identical outputs (≈ 340–720 core-h at 21–45 core-h/run)'
+- 16 × 21 core-h: 336 ≈ 340 (± 5)
+- 16 × 44.6 core-h (≈ 720): 713.6 ≈ 720 (± 7)
+- text in EMULATOR_BO.md: '< 1 % of a round (8 PCM runs × 5–11 h)'
+- text in EMULATOR_BO.md: '`b2b2142` **zero-site fix (HIGH).**'
+- text in EMULATOR_BO.md: 'came back as 5.55e-17'
+- text in EMULATOR_BO.md: '`c7576a6` `acquire_E.py` / `common_E.py`'
+- text in EMULATOR_BO.md: '`c470d7b` hardening'
+- text in EMULATOR_BO.md: '`0066a64` `HALT_FOR_DECISION.md` printed a literal'
+- text in EMULATOR_BO.md: '**Code paths NOT exercised here:** `submit_state_E.py`, `acquire_E_job.sh`, the array and collector scripts, the ercot-bot commit / push, a real `__ALL__` wave ingest through `pool_objectives`, SUSPECT, a true R2 flag, resume after HALT (rename + rerun), and the Part B asserts.'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'a site proposed at the lower bound comes back as 5.6e-17'
+- Appendix C committed r4 vertices p95: 0.918168 ≈ 0.918 (± 0.0005)
+- Appendix C committed r4 plug-in spread: 0.966112 ≈ 0.966 (± 0.0005)
+- Appendix C committed r4 BO s0 seed 0: 0.970915 ≈ 0.971 (± 0.0005)
+- Appendix C mismatch A r4 vertices p95: 0.91023 ≈ 0.91 (± 0.0005)
+- Appendix C mismatch A r4 plug-in spread: 0.966827 ≈ 0.967 (± 0.0005)
+- Appendix C mismatch A r4 BO s0 seed 0: 0.976691 ≈ 0.977 (± 0.0005)
+- Appendix C mismatch B r4 vertices p95: 0.939883 ≈ 0.94 (± 0.0005)
+- Appendix C mismatch B r4 plug-in spread: 0.974692 ≈ 0.975 (± 0.0005)
+- Appendix C mismatch B r4 BO s0 seed 0: 0.988212 ≈ 0.988 (± 0.0005)
+- HOUSE s0 r4 frac min: 0.975042 ≈ 0.975 (± 0.0005)
+- HOUSE s0 r4 frac max: 0.979347 ≈ 0.979 (± 0.0005)
+- HOUSE r0 plug-in V1: 0.0857168 ≈ 0.086 (± 0.0005)
+- HOUSE r0 plug-in E1: 0.00581563 ≈ 0.006 (± 0.0005)
+- HOUSE seed overlap unique 23/36/31/35 of 40 (EMU_extras.json)
+- HOUSE r1 duplicate runs: 17 ≈ 17 (± 0)
+- HOUSE C2 0, C3 0 in 114 cells (emulator_E_summary.json)
+- HOUSE path sensitivity: max true-f HV change (%): 0.325944 ≈ 0.3 (± 0.05)
+- HOUSE path sensitivity: max observed HV change (%): 0.337912 ≈ 0.3 (± 0.05)
+- text in EMU_rerun_check.json: 'lane trajectories are not reproducible across a 1e-16 input change, only their aggregates are'
+- RTS ledger.json read via git show d6 (8ed4c01)
+- RTS V1 hard cap: 4 ≈ 4 (± 0)
+- RTS V1 n at r4: 64 ≈ 64 (± 0)
+- RTS V1 r1 HV (e17): 7.35947 ≈ 7.359 (± 0.0005)
+- RTS V1 r2 HV (e17): 7.66376 ≈ 7.664 (± 0.0005)
+- RTS V1 r3 HV (e17): 7.80158 ≈ 7.802 (± 0.0005)
+- RTS V1 r4 HV (e17): 7.96218 ≈ 7.962 (± 0.0005)
+- RTS V1 r1 gain (e16): 7.53194 ≈ 7.53 (± 0.005)
+- RTS V1 r2 gain (e16): 3.0429 ≈ 3.04 (± 0.005)
+- RTS V1 r3 gain (e16): 1.3782 ≈ 1.38 (± 0.005)
+- RTS V1 r4 gain (e16): 1.606 ≈ 1.61 (± 0.005)
+- RTS V1 r1 gain/τ_old: 1.43111 ≈ 1.43 (± 0.005)
+- RTS V1 r1 gain/τ_285: 11.5722 ≈ 11.57 (± 0.005)
+- RTS V1 r1 gain/τ_het: 24.9289 ≈ 24.9 (± 0.05)
+- RTS V1 r2 gain/τ_old: 0.578169 ≈ 0.578 (± 0.005)
+- RTS V1 r2 gain/τ_285: 4.67515 ≈ 4.68 (± 0.005)
+- RTS V1 r2 gain/τ_het: 10.0712 ≈ 10.1 (± 0.05)
+- RTS V1 r3 gain/τ_old: 0.261866 ≈ 0.262 (± 0.005)
+- RTS V1 r3 gain/τ_285: 2.11748 ≈ 2.12 (± 0.005)
+- RTS V1 r3 gain/τ_het: 4.5615 ≈ 4.56 (± 0.05)
+- RTS V1 r4 gain/τ_old: 0.305149 ≈ 0.305 (± 0.005)
+- RTS V1 r4 gain/τ_285: 2.46748 ≈ 2.47 (± 0.005)
+- RTS V1 r4 gain/τ_het: 5.31546 ≈ 5.32 (± 0.05)
+- RTS V1 would_stop (τ_old) r3, r4 only; τ_285 / τ_het never
+- RTS r4 loo rms z shed: 0.8165 ≈ 0.82 (± 0.005)
+- RTS r4 loo rms z curt: 0.7555 ≈ 0.76 (± 0.005)
+- RTS r4 loo rms z cost: 0.5583 ≈ 0.56 (± 0.005)
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**65 ACCEPTED by both reviewers (stats ACCEPT WITH NOTES'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'Power systems ACCEPT WITH NOTES: M = 2 is physically right'
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**54 B accepted (GP stats ACCEPT WITH NOTES; PI/QA FIX THEN SHIP).**'
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**54 v2 round accepted (GP stats ACCEPT WITH NOTES'
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**66 three reviews in: BO stats ACCEPT WITH NOTES (machinery check only); machinery/exec ACCEPT WITH NOTES'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'audience FIX THEN SHIP.**'
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**66 committed rerun accepted (ACCEPT WITH NOTES'
+- text in PROGRESS.md (external; frozen in external_snippets.json): '**RTS 49 V1 arm DONE at hard cap (d6 = 8ed4c01'
+- text in ercot-station-map.md (external; frozen in external_snippets.json): '| 3. Model validation |'
+- text in ercot-station-map.md (external; frozen in external_snippets.json): '| 4. BO loop |'
+- text in ercot-station-map.md (external; frozen in external_snippets.json): '| 6. Baseline + launch |'
+- text in pi-agenda.md (external; frozen in external_snippets.json): '**UPDATE 11-24 (prompt 65, rule v2'
+- text in pi-agenda.md (external; frozen in external_snippets.json): '| 2026-11-24 | E-D7 | **ERCOT navigation tier n* (prompt 54 Part B'
+- text in pi-agenda.md (external; frozen in external_snippets.json): '| 2026-11-24 | E-D4 (part) | **Cross-lane duplicate designs under option C'
+- text in pi-agenda.md (external; frozen in external_snippets.json): 'Strategy recommends reuse, disclosed.'
+- text in PROGRESS.md: 'Accept or reject the r1 cross-seed assert change ("sets differ" instead of disjoint; c7576a6 + c470d7b)'
+- text in PROGRESS.md: 'Meaning of a C2 REVIEW flag on a replicated design'
+- text in PROGRESS.md (external; frozen in external_snippets.json): 'make N3 / N1_off flags (b)(c) claims filters like R1'
+- Appendix A: 19 commits are ancestors of ercot/tx123; times from git log --format=%ai
+- RTS 8ed4c01 time 2026-11-24 01:16:14 -0500 (git log, RTS-GMLC repo)
+- text in EMULATOR_BO.md: 'Both optima are still box vertices outside the data.'
+- text in pi-agenda.md (external; frozen in external_snippets.json): 'Options: (a) 48 recommended; (b) 32 (already scored, PASS, 1.5–1.9× RMSE); (c) 44 only under a 1.12 bar.'
+- text in ERCOT_BO_PLAN.md: 'this is the one override of this campaign; a second one HALTs'
+- text in ERCOT_GP_STATUS.md: 'The 55 % lengthscale change at n = 48 is an arm switch (m52+std → rbf+std), not instability.'
+- text in EMULATOR_BO.md: 'below the lowest observed V1 (1.409 TWh)'
+- text in EMULATOR_BO.md: 'Both front end points lie outside the R box'
+- arms_E.json gp.train contains 'Adam, 700 epochs, lr 0.01'
+- text in EMULATOR_BO.md: 'Adam 700 steps, lr 0.01, float32, `torch.manual_seed(0)`'
