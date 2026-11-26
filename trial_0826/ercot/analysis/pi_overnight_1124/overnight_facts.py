@@ -79,7 +79,8 @@ CHECKS: list[str] = []
 
 # ---------------------------------------------------------------- helpers (pattern of pi_objectives/objective_facts.py)
 def near(value, expected, tol, what):
-    assert abs(float(value) - float(expected)) <= tol, f"{what}: source {value!r} vs prompt {expected!r} (tol {tol})"
+    if not abs(float(value) - float(expected)) <= tol:
+        raise RuntimeError(f"{what}: source {value!r} vs prompt {expected!r} (tol {tol})")
     CHECKS.append(f"{what}: {float(value):.6g} ≈ {expected} (± {tol})")
     return value
 
@@ -105,12 +106,14 @@ def text_has(path: Path, *needles: str):
                 if live is None or nd not in live:
                     WARNINGS.append(f"external file changed since freeze: {path.name}: '{nd[:60]}'")
             else:
-                assert live is not None and nd in live, f"'{nd}' not found in {path} (and not frozen)"
+                if live is None or nd not in live:
+                    raise RuntimeError(f"'{nd}' not found in {path} (and not frozen)")
                 FROZEN.setdefault(key, []).append(nd)
                 _FROZEN_NEW = True
             CHECKS.append(f"text in {path.name} (external; frozen in external_snippets.json): '{nd}'")
         else:
-            assert live is not None and nd in live, f"'{nd}' not found in {path}"
+            if live is None or nd not in live:
+                raise RuntimeError(f"'{nd}' not found in {path}")
             CHECKS.append(f"text in {path.name}: '{nd}'")
     return needles[0] if len(needles) == 1 else needles
 
@@ -129,7 +132,9 @@ def jl(p):
 
 
 TX123 = git("rev-parse", "--short=7", "ercot/tx123")
-CHECKS.append(f"git rev-parse ercot/tx123 = {TX123}")
+if TX123 != "de45242":
+    raise RuntimeError(f"ercot/tx123 moved: {TX123} (deck built on de45242)")
+CHECKS.append(f"git rev-parse ercot/tx123 = {TX123} == de45242")
 
 # =============================================================================
 # rule v2 standings (slides 3, 4, 5, Appendix B)
@@ -189,6 +194,16 @@ text_has(APROG, "N4's composition signal is the cost of diverting deliverable wi
 sys.path.insert(0, str(POOL))
 import pool_n0E_v2 as PV2  # noqa: E402
 
+THR = {"RESOLVED_LO": PV2.RESOLVED_LO, "MANTEL_ALPHA": PV2.MANTEL_ALPHA, "FLOOR_BARS": PV2.FLOOR_BARS,
+       "FLAGGED": PV2.FLAGGED, "RHO_RED": PV2.RHO_RED, "RHO_RESID": PV2.RHO_RESID}
+for k_, v_ in zip(THR, (2.0, 0.01, 2.0, 3.0, 0.90, 0.50)):
+    near(THR[k_], v_, 0, f"rule-v2 threshold pool_n0E_v2.{k_} (slide-4 equation)")
+text_has(PLAN, "Seatable iff role OUTCOME AND RESOLVED AND IDR ≥ max(2·B_j, M_j) AND IDR/B (point) ≥ 3 AND not suppressed",
+         "RESOLVED iff lower-90 % joint bound of IDR/B ≥ 2 AND raw Mantel p ≤ 0.01",
+         "COMPOSITION-RESOLVABLE iff residual Mantel p ≤ 0.01 AND lower-90 % joint bound of IDR(r_j)/B_j ≥ 2 AND IDR(r_j) ≥ M_j",
+         "oriented raw ρ(c, p) ≥ 0.90 AND NOT ESCAPE",
+         "the 90 % interval of residual ρ(c, p) lies entirely below 0.50")
+
 rcs, rps, rcp = (float(RHO["N4|E1"]["rho_resid"]), float(RHO["E1|V1"]["rho_resid"]), float(RHO["N4|V1"]["rho_resid"]))
 STEIGER_Z, STEIGER_P = PV2.steiger(rcs, rps, rcp)
 CHECKS.append(f"Steiger Z RECOMPUTED (pool_n0E_v2.steiger, n_eff {PV2.STEIGER_N}) for c = N4, p = V1, s = E1 from "
@@ -213,6 +228,8 @@ N0 = near(ds["tiers"]["grading"], 48, 0, "n0_E grading tier")
 Q = near(arms["q"], 8, 0, "arms_E q")
 CAP = near(arms["hard_cap"], 4, 0, "arms_E hard_cap")
 LANES = near(len(arms["arms"]["qnehvi"]["seed_ids"]), 5, 0, "arms_E seed lanes")
+BUDGET = near(LANES * CAP * Q, 160, 0, "BO budget lanes × cap × q (PCM runs)")
+text_has(P["arms"], "1 arm x 5 seeds x cap 4 x q 8 = 160 BO runs")
 assert arms["qnehvi"]["acq"] == "qNoisyExpectedHypervolumeImprovement" and arms["objectives"] == ["V1", "E1"]
 CHECKS.append("arms_E.json: qNEHVI, objectives [V1, E1]")
 assert arms["calibration"]["C2"]["action"].startswith("record + REVIEW flag; never halts")
@@ -309,6 +326,9 @@ EXPO = near(len(EXPL), 10, 0, "exposure ledger scorings (of 24)")
 text_has(P["gpmd"], "10 of 24 scorings in total; retired")
 text_has(APROG, "V1 needs structure (linear mean / additive or site-interaction kernel), not wider bars")
 FIT_V2_SPEC = cc["fit_v2_spec"]
+text_has(P["arms"], "(Adam, 700 epochs, lr 0.01), float64 SingleTaskGP per objective")
+text_has(P["emumd"], "`bogp.train_gp` Adam 700 steps, lr 0.01, float32")
+text_has(P["emumd"], "the fit-v2 V1 truth puts f* at the all-PEM vertex")
 text_has(P["emumd"], "`bogp.train_gp` Adam 700 steps, lr 0.01")
 text_has(P["ed7"], "**Recommendation (i): the mixed commit as committed.**",
          "(c) 44 only under a 1.12 ratio bar", "a second re-open, forbidden by AMENDMENT 2026-11-24b §4",
@@ -476,7 +496,8 @@ STEPS = [
     ("65", "real read: V1 · E1 (M = 2)", "ae6d80a"),
     ("65", "dated design space", "1f00a2d"),
     ("65", "erratum (disclosure wording)", "aa98045"),
-    ("54 B", "code: training-size study, long-fit diagnostic", "dc316ef"),
+    ("54 B", "code: training-size study", "dc316ef"),
+    ("54 B", "code: exploratory long-fit diagnostic", "65179e1"),
     ("54 B", "outputs: n* = 48, holdout 8/24", "b23021c"),
     ("plan", "AMENDMENT 2026-11-24b (M = 2, fit v2, one re-open)", "93c81a4"),
     ("66", "arms_E.json as 55's proxy", "bc3168c"),
@@ -496,6 +517,17 @@ for step, what, sha in STEPS:
     ai = git("log", "-1", "--format=%ai", sha)
     git("merge-base", "--is-ancestor", sha, "ercot/tx123")
     APPA.append((step, what, sha, ai))
+APPA.sort(key=lambda r: r[3])
+EB_CI = git("log", "-1", "--format=%ci", "eb8c2da")
+if not EB_CI.startswith("2026-11-24 03:22"):
+    raise RuntimeError(EB_CI)
+CHECKS.append(f"eb8c2da committer time {EB_CI} (rebased; author time used in Appendix A)")
+near(dict((r[2], r) for r in APPA)["65179e1"][3] == "2026-11-24 01:58:15 -0500", 1, 0, "65179e1 author time 01:58:15")
 CHECKS.append(f"Appendix A: {len(STEPS)} commits are ancestors of ercot/tx123; times from git log --format=%ai")
 RTS_AI = git("log", "-1", "--format=%ai", "8ed4c01", repo=RTS_REPO)
 CHECKS.append(f"RTS 8ed4c01 time {RTS_AI} (git log, RTS-GMLC repo)")
+
+# B3 checklist counts (EMULATOR_BO.md §8: 13 items)
+B3_DONE, B3_BLOCK, B3_OPEN_NB = (1, 3, 4), (2, 5, 6, 7, 8, 10, 11, 12, 13), (9,)
+near(len(B3_DONE) + len(B3_BLOCK) + len(B3_OPEN_NB), 13, 0, "55 Part B checklist items (EMULATOR_BO.md §8)")
+text_has(P["emumd"], "13. CRC: `acquire_E_job.sh --check-env`")

@@ -2,7 +2,7 @@
 
 Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analysis/pool/pool_n0E_v2.py `steiger` (imported): Z = -5.7372, p = 4.81e-09.
 
-- git rev-parse ercot/tx123 = de45242
+- git rev-parse ercot/tx123 = de45242 == de45242
 - pool_ed1b_v2.csv rows: 28 ≈ 28 (± 0)
 - V1 eta2_T: 0.978038 ≈ 0.978 (± 0.0005)
 - E1 eta2_T: 0.641254 ≈ 0.64 (± 0.005)
@@ -36,6 +36,17 @@ Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analy
 - text in ERCOT_BO_PLAN.md: 'Steiger's Z for dependent correlations sharing s'
 - text in ERCOT_GP_STATUS.md: 'with the same PTDF — the six sites are one electrical location'
 - text in PROGRESS.md (external; frozen in external_snippets.json): 'N4's composition signal is the cost of diverting deliverable wind, which E1 already prices'
+- rule-v2 threshold pool_n0E_v2.RESOLVED_LO (slide-4 equation): 2 ≈ 2.0 (± 0)
+- rule-v2 threshold pool_n0E_v2.MANTEL_ALPHA (slide-4 equation): 0.01 ≈ 0.01 (± 0)
+- rule-v2 threshold pool_n0E_v2.FLOOR_BARS (slide-4 equation): 2 ≈ 2.0 (± 0)
+- rule-v2 threshold pool_n0E_v2.FLAGGED (slide-4 equation): 3 ≈ 3.0 (± 0)
+- rule-v2 threshold pool_n0E_v2.RHO_RED (slide-4 equation): 0.9 ≈ 0.9 (± 0)
+- rule-v2 threshold pool_n0E_v2.RHO_RESID (slide-4 equation): 0.5 ≈ 0.5 (± 0)
+- text in ERCOT_BO_PLAN.md: 'Seatable iff role OUTCOME AND RESOLVED AND IDR ≥ max(2·B_j, M_j) AND IDR/B (point) ≥ 3 AND not suppressed'
+- text in ERCOT_BO_PLAN.md: 'RESOLVED iff lower-90 % joint bound of IDR/B ≥ 2 AND raw Mantel p ≤ 0.01'
+- text in ERCOT_BO_PLAN.md: 'COMPOSITION-RESOLVABLE iff residual Mantel p ≤ 0.01 AND lower-90 % joint bound of IDR(r_j)/B_j ≥ 2 AND IDR(r_j) ≥ M_j'
+- text in ERCOT_BO_PLAN.md: 'oriented raw ρ(c, p) ≥ 0.90 AND NOT ESCAPE'
+- text in ERCOT_BO_PLAN.md: 'the 90 % interval of residual ρ(c, p) lies entirely below 0.50'
 - Steiger Z RECOMPUTED (pool_n0E_v2.steiger, n_eff 42) for c = N4, p = V1, s = E1 from pool_pairs_v2.csv rho_resid (N4|E1 -0.8050, E1|V1 -0.0543, N4|V1 0.4209): Z = -5.7372, one-sided p = 4.81e-09
 - counterfactual: N4|E1 residual ρ upper-90 -0.687 ≤ −0.50; Steiger p ≤ 0.05; N4|V1 residual 90 % interval [0.176, 0.617] contains 0.50 → §4b would resolve NOT REDUNDANT
 - text in PROGRESS.md (external; frozen in external_snippets.json): 'Mantel p 0.023–0.027 across'
@@ -47,6 +58,8 @@ Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analy
 - arms_E q: 8 ≈ 8 (± 0)
 - arms_E hard_cap: 4 ≈ 4 (± 0)
 - arms_E seed lanes: 5 ≈ 5 (± 0)
+- BO budget lanes × cap × q (PCM runs): 160 ≈ 160 (± 0)
+- text in arms_E.json: '1 arm x 5 seeds x cap 4 x q 8 = 160 BO runs'
 - arms_E.json: qNEHVI, objectives [V1, E1]
 - arms_E.json: C2 / C3 action = record + REVIEW flag; never halts
 - landing_R V1 (MWh): 3.97749e+06 ≈ 3977491 (± 1)
@@ -103,6 +116,9 @@ Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analy
 - exposure ledger scorings (of 24): 10 ≈ 10 (± 0)
 - text in ERCOT_GP_STATUS.md: '10 of 24 scorings in total; retired'
 - text in PROGRESS.md (external; frozen in external_snippets.json): 'V1 needs structure (linear mean / additive or site-interaction kernel), not wider bars'
+- text in arms_E.json: '(Adam, 700 epochs, lr 0.01), float64 SingleTaskGP per objective'
+- text in EMULATOR_BO.md: '`bogp.train_gp` Adam 700 steps, lr 0.01, float32'
+- text in EMULATOR_BO.md: 'the fit-v2 V1 truth puts f* at the all-PEM vertex'
 - text in EMULATOR_BO.md: '`bogp.train_gp` Adam 700 steps, lr 0.01'
 - text in pi_agenda_E-D7_draft.md: '**Recommendation (i): the mixed commit as committed.**'
 - text in pi_agenda_E-D7_draft.md: '(c) 44 only under a 1.12 ratio bar'
@@ -229,13 +245,18 @@ Data state: ercot/tx123 de45242; RTS d6 8ed4c01. Steiger Z recomputed with analy
 - text in PROGRESS.md: 'Accept or reject the r1 cross-seed assert change ("sets differ" instead of disjoint; c7576a6 + c470d7b)'
 - text in PROGRESS.md: 'Meaning of a C2 REVIEW flag on a replicated design'
 - text in PROGRESS.md (external; frozen in external_snippets.json): 'make N3 / N1_off flags (b)(c) claims filters like R1'
-- Appendix A: 19 commits are ancestors of ercot/tx123; times from git log --format=%ai
+- eb8c2da committer time 2026-11-24 03:22:40 -0500 (rebased; author time used in Appendix A)
+- 65179e1 author time 01:58:15: 1 ≈ 1 (± 0)
+- Appendix A: 20 commits are ancestors of ercot/tx123; times from git log --format=%ai
 - RTS 8ed4c01 time 2026-11-24 01:16:14 -0500 (git log, RTS-GMLC repo)
+- 55 Part B checklist items (EMULATOR_BO.md §8): 13 ≈ 13 (± 0)
+- text in EMULATOR_BO.md: '13. CRC: `acquire_E_job.sh --check-env`'
 - text in EMULATOR_BO.md: 'Both optima are still box vertices outside the data.'
+- text in ERCOT_BO_PLAN.md: 'IDR* = Q90 − Q10'
+- text in ERCOT_GP_STATUS.md: 'Pre-register in 55, report-only: log the V1 v2-m52 and v2-rbf posteriors beside the house fit every round, and report gate power per objective.'
 - text in pi-agenda.md (external; frozen in external_snippets.json): 'Options: (a) 48 recommended; (b) 32 (already scored, PASS, 1.5–1.9× RMSE); (c) 44 only under a 1.12 bar.'
 - text in ERCOT_BO_PLAN.md: 'this is the one override of this campaign; a second one HALTs'
 - text in ERCOT_GP_STATUS.md: 'The 55 % lengthscale change at n = 48 is an arm switch (m52+std → rbf+std), not instability.'
 - text in EMULATOR_BO.md: 'below the lowest observed V1 (1.409 TWh)'
 - text in EMULATOR_BO.md: 'Both front end points lie outside the R box'
-- arms_E.json gp.train contains 'Adam, 700 epochs, lr 0.01'
-- text in EMULATOR_BO.md: 'Adam 700 steps, lr 0.01, float32, `torch.manual_seed(0)`'
+- arms_E.json gp.train contains 'Adam, 700 epochs, lr 0.01' and 'float64 SingleTaskGP'
