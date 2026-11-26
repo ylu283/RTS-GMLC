@@ -163,6 +163,7 @@ Holdout parity, house fit, n = 32 (top) and 48 (bottom); red = outside the 95 % 
 •  LOO RMSE at n = 48: V1 30.6k MWh (1.63 Bj); E1 $3.30M (1.77 Bj).
 •  Co-reported: N4 48/48; N1 41/48 FAIL (recorded, not re-selected).
 •  Inferred noise / σc: V1 3.97, E1 2.65. Adam stops at 700 steps.
+
 •  LOO RMSE ratio n = 44 / 48: V1 1.120, E1 1.116 (> 1.1). No tier below 48 qualifies.
 •  Under the converged fit, LOO RMSE still falls 1.255–1.285× from 44 to 48 (same arm; 1.46 is the cross-arm figure). The first BO rounds are model-learning rounds.
 •  n* = 48 means that no smaller tier suffices. We did not test whether 48 suffices. The early front is not a claim.
@@ -347,10 +348,10 @@ RTS 49 V1 arm (cap 4, 64 designs): the old-floor τ stops at rounds 3–4, the m
 
 
 | round | HV | gain | gain / τold | gain / τ285 | gain / τhet |
-| r1 | 7.359e+17 | 7.53e+16 | 1.43 | 11.6 | 24.9 |
-| r2 | 7.664e+17 | 3.04e+16 | 0.578 | 4.68 | 10.1 |
-| r3 | 7.802e+17 | 1.38e+16 | 0.262 (would stop) | 2.12 | 4.56 |
-| r4 | 7.962e+17 | 1.61e+16 | 0.305 (would stop) | 2.47 | 5.32 |
+| r1 | 7.359 × 10¹⁷ | 7.53 × 10¹⁶ | 1.43 | 11.57 | 24.9 |
+| r2 | 7.664 × 10¹⁷ | 3.04 × 10¹⁶ | 0.578 | 4.68 | 10.1 |
+| r3 | 7.802 × 10¹⁷ | 1.38 × 10¹⁶ | 0.262 (would stop) | 2.12 | 4.56 |
+| r4 | 7.962 × 10¹⁷ | 1.61 × 10¹⁶ | 0.305 (would stop) | 2.47 | 5.32 |
 
 •  r4 LOO rms z: shed 0.82, curtailment 0.76, cost 0.56.
 •  The old-floor ruler would stop at r3 and r4. The measured rulers (τ285, τhet) never stop.
@@ -367,7 +368,7 @@ What blocks round 1: the 55 Part B checklist (13 items; blocking ones marked)
 
 DONE
 
-1. Zero-site fix (b2b2142); add a real-loader ingest test.
+1. Zero-site fix (b2b2142) and its two tests (the real-loader ingest test is item 11).
 
 BLOCKS
 
@@ -491,22 +492,22 @@ Appendix B (1/3): full rule-v2 standings, walk order (28 rows)
 
 
 | id | role | Bj | IDR/B [lo90] | resid IDR/B | η²T | Mantel p raw / resid | status |
-| V1 | OUTCOME | 1.87e+04 | 80.50 [58.78] | 8.83 | 0.978 | 0.0001 / 0.0016 | SEATED (rule v2) |
-| E1 | OUTCOME | 1.86e+06 | 17.99 [13.32] | 10.11 | 0.641 | 0.0003 / 0.0002 | SEATED (rule v2) |
-| X1 | OUTCOME | 4.03e+04 | 24.77 [16.99] | 11.29 | 0.741 | 0.0004 / 0.0002 | SUPPRESSED (REDUNDANT given E1 |
+| V1 | OUTCOME | 18.7k | 80.50 [58.78] | 8.83 | 0.978 | 0.0001 / 0.0016 | SEATED (rule v2) |
+| E1 | OUTCOME | 1.86M | 17.99 [13.32] | 10.11 | 0.641 | 0.0003 / 0.0002 | SEATED (rule v2) |
+| X1 | OUTCOME | 40.3k | 24.77 [16.99] | 11.29 | 0.741 | 0.0004 / 0.0002 | SUPPRESSED (REDUNDANT given E1) |
 | R4 | PROXY(E2 start-up cost) | 250 | 1.24 [0.82] | 0.80 | 0.514 | 0.0009 / 0.0290 | PROXY |
-| N1 | PROXY | 217 | 3.41 [2.34] | 0.94 | 0.891 | 0.0001 / 0.0042 | PROXY (REDUNDANT given V1, E6, |
-| E4 | TRANSFER | 9.68e+06 | 9.19 [6.52] | 2.88 | 0.873 | 0.0001 / 0.0050 | TRANSFER (REDUNDANT given V2,  |
+| N1 | PROXY | 217 | 3.41 [2.34] | 0.94 | 0.891 | 0.0001 / 0.0042 | PROXY (REDUNDANT given V1, E6, N4) |
+| E4 | TRANSFER | 9.68M | 9.19 [6.52] | 2.88 | 0.873 | 0.0001 / 0.0050 | TRANSFER (REDUNDANT given V2, E1) |
 | R2 | GUARD | 112 | 0.68 [0.46] | 0.66 | 0.067 | 0.1728 / 0.5489 | GUARDRAIL |
-| R7 | DIAGNOSTIC | 2.83e+05 | 4.18 [2.76] | 2.27 | 0.689 | 0.0001 / 0.0020 | DIAGNOSTIC |
-| N4 | OUTCOME | 45.1 | 14.24 [10.01] | 4.34 | 0.925 | 0.0001 / 0.0253 | SUPPRESSED (REDUNDANT given V1 |
-| N5 | DIAGNOSTIC | 0.2 | 15.66 [11.30] | 4.30 | 0.926 | 0.0001 / 0.0019 | DIAGNOSTIC (REDUNDANT given V2 |
-| E6 | TRANSFER | 2e+06 | 21.18 [14.94] | 4.70 | 0.697 | 0.0001 / 0.0133 | TRANSFER (REDUNDANT given V1) |
-| R5 | DIAGNOSTIC | 1.37e+04 | 1.08 [0.76] | 0.91 | -0.715 | 0.1093 / 0.2172 | DIAGNOSTIC |
+| R7 | DIAGNOSTIC | 283k | 4.18 [2.76] | 2.27 | 0.689 | 0.0001 / 0.0020 | DIAGNOSTIC |
+| N4 | OUTCOME | 45.1 | 14.24 [10.01] | 4.34 | 0.925 | 0.0001 / 0.0253 | SUPPRESSED (REDUNDANT given V1) |
+| N5 | DIAGNOSTIC | 0.2 | 15.66 [11.30] | 4.30 | 0.926 | 0.0001 / 0.0019 | DIAGNOSTIC (REDUNDANT given V2, E1, E3, X1) |
+| E6 | TRANSFER | 2M | 21.18 [14.94] | 4.70 | 0.697 | 0.0001 / 0.0133 | TRANSFER (REDUNDANT given V1) |
+| R5 | DIAGNOSTIC | 13.7k | 1.08 [0.76] | 0.91 | -0.715 | 0.1093 / 0.2172 | DIAGNOSTIC |
 | N3 | GUARD | 11.3 | 0.81 [0.55] | 0.83 | -1.720 | 0.1118 / 0.0513 | GUARDRAIL |
-| E2 | COMPONENT(E1) | 3.53e+06 | 2.70 [1.88] | 1.77 | 0.557 | 0.0006 / 0.0013 | COMPONENT (REDUNDANT given V2, |
+| E2 | COMPONENT(E1) | 3.53M | 2.70 [1.88] | 1.77 | 0.557 | 0.0006 / 0.0013 | COMPONENT (REDUNDANT given V2, E1, E4) |
 
-**Notes:** Source: analysis/pool/pool_ed1b_v2.csv · plan amendment 11-24. Columns: B_j, IDR_over_B, IDR_over_B_lo90, resid_IDR_over_B, eta2_T, mantel_p_raw, mantel_p_resid, status (role / status strings truncated to fit; full strings in the csv).
+**Notes:** Source: analysis/pool/pool_ed1b_v2.csv · plan amendment 11-24. Columns: B_j, IDR_over_B, IDR_over_B_lo90, resid_IDR_over_B, eta2_T, mantel_p_raw, mantel_p_resid, status (full strings).
 
 ## Slide 21
 
@@ -516,10 +517,10 @@ Appendix B (2/3): full rule-v2 standings, walk order (28 rows)
 
 
 | id | role | Bj | IDR/B [lo90] | resid IDR/B | η²T | Mantel p raw / resid | status |
-| R6 | DIAGNOSTIC | 9.74e+04 | 0.86 [0.63] | 1.09 | -2.974 | 0.6759 / 0.0109 | DIAGNOSTIC |
+| R6 | DIAGNOSTIC | 97.4k | 0.86 [0.63] | 1.09 | -2.974 | 0.6759 / 0.0109 | DIAGNOSTIC |
 | N2 | DIAGNOSTIC | 3.66 | 0.35 [0.23] | 0.45 | -0.040 | 0.5561 / 0.4135 | DIAGNOSTIC |
-| E3 | COMPONENT(E1) | 3.42e+06 | 7.10 [4.98] | 4.01 | 0.674 | 0.0004 / 0.0002 | COMPONENT (REDUNDANT given V2, |
-| R8 | DIAGNOSTIC | 1.5e+03 | 1.20 [0.80] | 0.85 | 0.523 | 0.0032 / 0.0661 | DIAGNOSTIC |
+| E3 | COMPONENT(E1) | 3.42M | 7.10 [4.98] | 4.01 | 0.674 | 0.0004 / 0.0002 | COMPONENT (REDUNDANT given V2, E1) |
+| R8 | DIAGNOSTIC | 1.5k | 1.20 [0.80] | 0.85 | 0.523 | 0.0032 / 0.0661 | DIAGNOSTIC |
 | E7 | PROXY(E4) | 0.0144 | 16.21 [11.73] | 5.11 | 0.891 | 0.0001 / 0.0094 | PROXY |
 | E8 | DIAGNOSTIC | 0.295 | 1.04 [0.69] | 0.77 | 0.355 | 0.0267 / 0.4307 | DIAGNOSTIC |
 | E9 | DIAGNOSTIC (dead) | 1.14 | 0.00 [0.00] | 0.00 | 0.000 | 0.8332 / 0.8332 | DIAGNOSTIC |
@@ -528,10 +529,10 @@ Appendix B (2/3): full rule-v2 standings, walk order (28 rows)
 | E5 | OUTCOME (dead) | 0 | — | — | — | — | DEAD / constant / not computed |
 | R1 | GUARD | 0 | — | — | — | — | GUARDRAIL |
 | R3 | GUARD | 0 | — | — | — | — | GUARDRAIL |
-| D1 | DIAGNOSTIC (investor out | 1.44e+04 | 196.80 [137.08] | 48.38 | 0.899 | 0.0001 / 0.0016 | DIAGNOSTIC |
+| D1 | DIAGNOSTIC (investor outcome) | 14.4k | 196.80 [137.08] | 48.38 | 0.899 | 0.0001 / 0.0016 | DIAGNOSTIC |
 | D2 | DIAGNOSTIC | 0.00164 | 81.33 [54.46] | 39.77 | 0.696 | 0.0001 / 0.0172 | DIAGNOSTIC |
 
-**Notes:** Source: analysis/pool/pool_ed1b_v2.csv · plan amendment 11-24. Columns: B_j, IDR_over_B, IDR_over_B_lo90, resid_IDR_over_B, eta2_T, mantel_p_raw, mantel_p_resid, status (role / status strings truncated to fit; full strings in the csv).
+**Notes:** Source: analysis/pool/pool_ed1b_v2.csv · plan amendment 11-24. Columns: B_j, IDR_over_B, IDR_over_B_lo90, resid_IDR_over_B, eta2_T, mantel_p_raw, mantel_p_resid, status (full strings).
 
 ## Slide 22
 
@@ -540,13 +541,13 @@ Appendix B (2/3): full rule-v2 standings, walk order (28 rows)
 Appendix B (3/3): the bar Bj, the materiality floors, and the N4 counterfactual
 
 
-•  Bar
-•  Bj = max(3√2·s_j, max|δ|);  s_j² = (6 s²_pert + 16 s²_seed)/22,  ν = 22 (D1, D2: ν 20).
-•  Materiality floors (set after the relative responses were seen; disclosed)
+Bar
+•  Bj = max(3√2·sj, max|δ|);  sj² = (6·s²(pert) + 16·s²(seed)) / 22;  ν = 22 (D1, D2: ν = 20).
+Materiality floors (set after the relative responses were seen; disclosed)
 •  V1 58,287 MWh · E1 $8.06M · X1 194,521 t · N4 87.6 h.
-•  N4 counterfactual (not a result; the rule allows no second override)
+N4 counterfactual (not a result; the rule allows no second override)
 •  If N4 had passed the composition gate (residual Mantel p ≤ 0.01; it read 0.0253), the N4–V1 pair would be a BORDERLINE-PAIR: residual ρ 0.421, 90 % interval [0.176, 0.617] contains 0.50.
-•  §4b via the seated E1: residual ρ(N4, E1) -0.805, upper-90 -0.687 ≤ −0.50; Steiger Z -5.74 (one-sided p 4.8e-09, n_eff 42; recomputed at build) → NOT REDUNDANT → N4 seated → M = 3.
+•  §4b via the seated E1: residual ρ(N4, E1) −0.805, upper-90 −0.687 ≤ −0.50; Steiger Z −5.74 (one-sided p 4.8e-09, n_eff 42; recomputed at build) → NOT REDUNDANT → N4 seated → M = 3.
 •  Reviewer items (acceptance review, 2026-11-24): the residual Mantel p reads 0.023–0.027 across permutation seeds; with that clause passed, §4b would seat N4.
 
 **Notes:** Source: plan AMENDMENT 2026-11-24 inst. 1, 5, 6; pool_ed1b_v2.csv; pool_pairs_v2.csv; pool_n0E_v2.steiger · plan amendment 11-24. Steiger: pool_n0E_v2.steiger(ρ_res(N4,E1), ρ_res(E1,V1), ρ_res(N4,V1)) on pool_pairs_v2.csv rho_resid (logged in ASSERTIONS.md). Floors: pool_ed1b_v2.csv floor_M. Bin sensitivity is not printed (no file).
@@ -575,10 +576,10 @@ Appendix C: emulator matched-budget baselines at r4 under three truths (committe
 Appendix D: the two GP fit definitions in use
 
 
-•  Fit v2 (E1; AMENDMENT 2026-11-24b) — fit_v2_spec, verbatim
-•  float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best
-•  House fit (V1, fallback)
-•  bogp.train_gp: Adam, 700 steps, lr 0.01, float32, torch.manual_seed(0); refit each round.
+Fit v2 (E1; AMENDMENT 2026-11-24b) — fit_v2_spec, verbatim
+float64; MAP; lengthscale prior LogNormal(sqrt(2) + 0.5 log d, sqrt(3)) on u in [0,1]^d (no input standardization); noise prior LogNormal(log(sigma_c^2 / s_y^2), 1) on the standardized noise variance; standardized noise lower bound 1e-6 (measured-floor arm: max(1e-6, (sigma_c / s_y)^2)); L-BFGS-B via botorch fit_gpytorch_mll_scipy (maxiter 1000, ftol = gtol = 1e-7); 16 restarts (gpytorch default init + 15 prior draws, numpy default_rng(5454)); best MAP kept; converged iff >= 2 restarts within 1e-3 n nats of the best
+House fit (V1, fallback)
+bogp.train_gp: Adam, 700 steps, lr 0.01, float32, torch.manual_seed(0); refit each round.
 
 **Notes:** Source: committed_configs.json (fit_v2_spec); EMULATOR_BO.md §1; arms_E.json gp.train. fit_v2_spec printed verbatim from committed_configs.json.
 

@@ -60,6 +60,19 @@ def bullets(s, x, y, w, h, items, size=13, space_after=5):
     return text_box(s, x, y, w, h, items, size=size, bullets=True, space_after=space_after)
 
 
+def headed(s, x, y, w, h, items, size=13, space_after=6):
+    """List with unbulleted bold headings: items = [("H", heading) | str]."""
+    out = []
+    for it in items:
+        if isinstance(it, tuple) and it[0] == "H":
+            out.append((it[1], {"bold": True, "color": ACCENT}))
+        elif isinstance(it, tuple):
+            out.append(("•  " + it[0], it[1]))
+        else:
+            out.append("•  " + it)
+    return text_box(s, x, y, w, h, out, size=size, space_after=space_after)
+
+
 def chip(s, x, y, w, h, text, fill, size=10):
     card(s, x, y, w, h, fill=fill)
     text_box(s, x, y, w, h, text, size=size, bold=True, color=L.WHITE, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
@@ -74,6 +87,10 @@ def eq(s, path, x, y, scale_in_per_px):
     return h * scale_in_per_px
 
 
+def MINUS(v, d):
+    return f"{v:.{d}f}".replace("-", "−")
+
+
 def f2(v):
     return f"{v:.2f}"
 
@@ -83,7 +100,7 @@ def f3(v):
 
 
 # --------------------------------------------------------------- real sub/superscripts (pi_objectives scripts_pass)
-_TOK = re.compile(r"(B|σ|τ|η²|M|ρ)(_(?:j|c|exact|old|285|het|T|raw|res))(?![A-Za-z0-9])")
+_TOK = re.compile(r"(?<![A-Za-z_])(B|σ|τ|η²|M|ρ|s)(_(?:j|c|exact|old|285|het|T|raw|res))(?![A-Za-z0-9])")
 
 
 def _split_run(r):
@@ -229,13 +246,13 @@ for i in range(5):
     if tags[i]:
         text_box(s, Inches(9.35), Inches(y + 0.08), Inches(3.6), Inches(0.35), tags[i], size=12, bold=True, color=ACCENT2)
     y += 0.5
-text_box(s, Inches(0.45), Inches(4.2), Inches(8), Inches(0.35), "Rule v2 (objective seats), three lines",
+text_box(s, Inches(0.45), Inches(4.12), Inches(8), Inches(0.35), "Rule v2 (objective seats), three lines",
          size=14, bold=True, color=ACCENT)
-y = 4.55
+y = 4.47
 for i in range(4):
     eq(s, FIGS / f"eq_rule_{i + 1}.png", Inches(0.45), Inches(y), SC)
-    y += 0.47
-text_box(s, Inches(0.45), Inches(6.45), Inches(12.4), Inches(0.55),
+    y += 0.45
+text_box(s, Inches(0.45), Inches(6.33), Inches(12.4), Inches(0.6),
          "In words: a measure takes a seat only if it is a physical outcome, it moves clearly above the noise bar, "
          "and no earlier seat already carries it. B_j formula and the full table: Appendix B.",
          size=12, bold=True, color=ACCENT)
@@ -282,9 +299,9 @@ notes(s, SRC_LINES[k] + ". Vectors: POOL_N0E_STANDINGS_v2.md §8 (v1 d706199, Se
 s, k = slide("The house GPs pass the holdout at n = 48 (V1 45/48, E1 48/48) and no smaller tier meets the n* rule, "
              "but the capped optimizer over-states the noise 2.7–4×",
              "ERCOT_GP_STATUS.md §0, §13.2; ercot_gp_status(_v2).csv; committed_configs.json; exposure_ledger.csv")
-figure(s, FIGS / "fig_parity_holdout.png", Inches(0.3), Inches(1.25), Inches(7.6), Inches(3.7), k, show_path=False,
+figure(s, FIGS / "fig_parity_holdout.png", Inches(0.3), Inches(1.15), Inches(12.7), Inches(4.3), k, show_path=False,
        caption="Holdout parity, house fit, n = 32 (top) and 48 (bottom); red = outside the 95 % band.")
-bullets(s, Inches(8.05), Inches(1.25), Inches(4.95), Inches(5.75), [
+_b6 = [
     f"LOO RMSE at n = {F.N0}: V1 {F.LOO_V1 / 1e3:.1f}k MWh ({F.LOO_V1_B:.2f} B_j); E1 ${F.LOO_E1 / 1e6:.2f}M ({F.LOO_E1_B:.2f} B_j).",
     f"Co-reported: N4 {F.HOLD['N4']}/48; N1 {F.HOLD['N1']}/48 FAIL (recorded, not re-selected).",
     f"Inferred noise / σ_c: V1 {F.NOISE_H['V1']:.2f}, E1 {F.NOISE_H['E1']:.2f}. Adam stops at 700 steps.",
@@ -293,7 +310,9 @@ bullets(s, Inches(8.05), Inches(1.25), Inches(4.95), Inches(5.75), [
     f"{F.CROSS:.2f} is the cross-arm figure). The first BO rounds are model-learning rounds.",
     ("n* = 48 means that no smaller tier suffices. We did not test whether 48 suffices. The early front is not a claim.",
      {"bold": True, "color": ACCENT}),
-], size=12, space_after=6)
+]
+bullets(s, Inches(0.45), Inches(5.45), Inches(6.2), Inches(1.6), _b6[:3], size=12, space_after=3)
+bullets(s, Inches(6.75), Inches(5.45), Inches(6.25), Inches(1.6), _b6[3:], size=12, space_after=3)
 notes(s, SRC_LINES[k] + ". Holdout: ercot_gp_status.csv holdout rows (exposure rows 2, 4, 6, 8 of exposure_ledger.csv). "
          "LOO RMSE: committed_configs_housefit.json loo_rmse / pool_ed1b_v2.csv B_j. Noise: ercot_gp_status.csv "
          "noise_over_sigma_c (selected arm, n = 48). Ratios at 44: committed_configs.json n_star_reason. Like-for-like "
@@ -361,8 +380,8 @@ bullets(s, Inches(0.45), Inches(4.38), Inches(7.6), Inches(2.6), [
     "c7576a6 + c470d7b: the r1 cross-seed assert checks \"sets differ\" (prompt 55 §2.1), hardened by a second assert.",
     "0066a64: the HALT file printed a literal name; fixed.",
 ], size=12, space_after=5)
-card(s, Inches(8.3), Inches(1.3), Inches(4.6), Inches(5.65))
-text_box(s, Inches(8.45), Inches(1.38), Inches(4.3), Inches(5.5), [
+card(s, Inches(8.3), Inches(1.3), Inches(4.6), Inches(3.55))
+text_box(s, Inches(8.45), Inches(1.38), Inches(4.3), Inches(3.4), [
     ("NOT exercised here", {"bold": True, "color": WARN, "size": 14}),
     "•  submit_state_E.py",
     "•  acquire_E_job.sh",
@@ -419,8 +438,8 @@ bullets(s, Inches(0.45), Inches(4.8), Inches(7.3), Inches(2.2), [
     f"Multi path: {F.MULTI_C2}/{F.MULTI_N}. Single-objective E1 replicates u = 0 in {F.ORIG} of 72 r2–r4 designs.",
     "C2 and C3 are REVIEW flags. They never halt.",
 ], size=12, space_after=4)
-card(s, Inches(7.95), Inches(4.85), Inches(4.95), Inches(2.1))
-text_box(s, Inches(8.05), Inches(4.9), Inches(4.75), Inches(2.0), [
+card(s, Inches(7.95), Inches(4.85), Inches(4.95), Inches(1.65))
+text_box(s, Inches(8.05), Inches(4.9), Inches(4.75), Inches(1.55), [
     ("What tells us a GP is wrong in round 1?", {"bold": True, "color": ACCENT}),
     "Today: the report-only V1 v2 posterior log and E1's REVIEW flags.",
     "Proposed trigger (for 55 B): a REVIEW flag on a non-replicated batch, or |posterior mean − PCM| > 2 B_j on any "
@@ -519,8 +538,8 @@ SRC_LINES[k] = ""
 # B1
 s, k = slide("Training-size study under fit v2: LOO RMSE, NLPD, coverage and inferred noise still move from 44 to 48",
              "ercot_gp_nstar_checks_v2.csv, ercot_gp_status_v2.csv, ERCOT_GP_STATUS.md §13")
-figure(s, FIGS / "fig_training_size_curves_v2.png", Inches(1.6), Inches(1.2), Inches(10.1), Inches(5.0), k, show_path=False)
-text_box(s, Inches(0.45), Inches(6.25), Inches(12.4), Inches(0.75),
+figure(s, FIGS / "fig_training_size_curves_v2.png", Inches(0.3), Inches(1.1), Inches(12.7), Inches(5.35), k, show_path=False)
+text_box(s, Inches(0.45), Inches(6.5), Inches(12.4), Inches(0.5),
          f"The inferred-noise plateau at {F.PRIOR_MODE:.2f} σ_c is the prior's MAP mode (e^(−½)·σ_c). V1 rbf leaves it "
          f"at 44–48 ({F.NOISE44:.2f}, {F.NOISE_V2['V1']:.2f} σ_c).", size=14, bold=True, color=ACCENT)
 notes(s, SRC_LINES[k] + ". Figure: analysis/ercot_gp/figs/fig_training_size_curves_v2.png (81ea382), copied.")
@@ -533,9 +552,9 @@ R = F.RTS
 rows = [["round", "HV", "gain", "gain / τ_old", "gain / τ_285", "gain / τ_het"]]
 for kk in (1, 2, 3, 4):
     e = R[kk]
-    rows.append([f"r{kk}", f"{e['hv']:.3e}", f"{e['gain']:.2e}",
+    rows.append([f"r{kk}", f"{e['hv'] / 1e17:.3f} × 10¹⁷", f"{e['gain'] / 1e16:.2f} × 10¹⁶",
                  f"{e['gain_tau']:.3g}" + (" (would stop)" if e["would_stop"] else ""),
-                 f"{e['gain_tau_285']:.3g}", f"{e['gain_tau_het']:.3g}"])
+                 f"{e['gain_tau_285']:.2f}", f"{e['gain_tau_het']:.3g}"])
 table(s, Inches(0.45), Inches(1.35), Inches(12.4), rows, col_widths=[1, 2, 2, 2.6, 2, 2], size=14, row_h=Inches(0.48))
 lz = F.LRZ
 bullets(s, Inches(0.45), Inches(4.0), Inches(12.4), Inches(2.9), [
@@ -550,7 +569,7 @@ notes(s, SRC_LINES[k] + ". entries[1..4]: hv, gain, gain_tau (τ_old), gain_tau_
 s, k = slide("What blocks round 1: the 55 Part B checklist (13 items; blocking ones marked)",
              "EMULATOR_BO.md §8, §A.6–A.7; committed_configs.json")
 chk = [
-    ("DONE", "1. Zero-site fix (b2b2142); add a real-loader ingest test."),
+    ("DONE", "1. Zero-site fix (b2b2142) and its two tests (the real-loader ingest test is item 11)."),
     ("BLOCKS", "2. Duplicate-proposal rule; idempotent grade_round; commit before propose."),
     ("DONE", "3. Fit v2 in qnehvi_E per fit_definition (36b74b7 hook); convergence flag recorded."),
     ("DONE", "4. New committed_configs.json (240bde1); dry run rerun on it."),
@@ -630,41 +649,44 @@ cols = ["id", "role", "B_j", "IDR/B [lo90]", "resid IDR/B", "η²_T", "Mantel p 
 order = ed1b.sort_values("global_order").index.tolist()
 
 
-def gnum(v, d=3):
-    return "—" if v != v else (f"{v:.{d}g}" if abs(v) < 1e4 else f"{v:.3g}")
+def gnum(v):
+    if v != v:
+        return "—"
+    a = abs(v)
+    return f"{v / 1e6:.3g}M" if a >= 1e6 else (f"{v / 1e3:.3g}k" if a >= 1e3 else f"{v:.3g}")
 
 
 rowsB = []
 for j in order:
     r = ed1b.loc[j]
-    rowsB.append([j, str(r["role"])[:24], gnum(r["B_j"]),
+    rowsB.append([j, str(r["role"]), gnum(r["B_j"]),
                   "—" if r["IDR_over_B"] != r["IDR_over_B"] else f"{r['IDR_over_B']:.2f} [{r['IDR_over_B_lo90']:.2f}]",
                   "—" if r["resid_IDR_over_B"] != r["resid_IDR_over_B"] else f"{r['resid_IDR_over_B']:.2f}",
                   "—" if r["eta2_T"] != r["eta2_T"] else f"{r['eta2_T']:.3f}",
                   "—" if r["mantel_p_raw"] != r["mantel_p_raw"] else f"{r['mantel_p_raw']:.4f} / {r['mantel_p_resid']:.4f}",
-                  str(r["status"])[:30]])
+                  str(r["status"])])
 assert len(rowsB) == 28
 for part, chunk in ((1, rowsB[:14]), (2, rowsB[14:])):
     s, k = slide(f"Appendix B ({part}/3): full rule-v2 standings, walk order ({len(rowsB)} rows)",
                  "analysis/pool/pool_ed1b_v2.csv", "11-24")
     table(s, Inches(0.35), Inches(1.2), Inches(12.65), [cols] + chunk,
-          col_widths=[0.6, 2.4, 1.2, 1.6, 1.1, 0.8, 1.9, 3.0], size=10, row_h=Inches(0.36))
+          col_widths=[0.5, 2.35, 0.85, 1.4, 0.95, 0.7, 1.6, 3.6], size=10, row_h=Inches(0.36))
     notes(s, SRC_LINES[k] + ". Columns: B_j, IDR_over_B, IDR_over_B_lo90, resid_IDR_over_B, eta2_T, mantel_p_raw, "
-             "mantel_p_resid, status (role / status strings truncated to fit; full strings in the csv).")
+             "mantel_p_resid, status (full strings).")
 
 s, k = slide("Appendix B (3/3): the bar B_j, the materiality floors, and the N4 counterfactual",
              "plan AMENDMENT 2026-11-24 inst. 1, 5, 6; pool_ed1b_v2.csv; pool_pairs_v2.csv; pool_n0E_v2.steiger", "11-24")
-bullets(s, Inches(0.45), Inches(1.3), Inches(12.4), Inches(5.7), [
-    ("Bar", {"bold": True, "color": ACCENT}),
-    "B_j = max(3√2·s_j, max|δ|);  s_j² = (6 s²_pert + 16 s²_seed)/22,  ν = 22 (D1, D2: ν 20).",
-    ("Materiality floors (set after the relative responses were seen; disclosed)", {"bold": True, "color": ACCENT}),
+headed(s, Inches(0.45), Inches(1.3), Inches(12.4), Inches(5.7), [
+    ("H", "Bar"),
+    "B_j = max(3√2·s_j, max|δ|);  s_j² = (6·s²(pert) + 16·s²(seed)) / 22;  ν = 22 (D1, D2: ν = 20).",
+    ("H", "Materiality floors (set after the relative responses were seen; disclosed)"),
     f"V1 {F.FLOORS['V1']:,.0f} MWh · E1 ${F.FLOORS['E1'] / 1e6:.2f}M · X1 {F.FLOORS['X1']:,.0f} t · N4 {F.FLOORS['N4']:.1f} h.",
-    ("N4 counterfactual (not a result; the rule allows no second override)", {"bold": True, "color": ACCENT}),
+    ("H", "N4 counterfactual (not a result; the rule allows no second override)"),
     f"If N4 had passed the composition gate (residual Mantel p ≤ 0.01; it read {F.N4_MANTEL:.4f}), the N4–V1 pair "
     f"would be a BORDERLINE-PAIR: residual ρ {F.RHO['N4|V1']['rho_resid']:.3f}, 90 % interval [{F.N4V1_RES_LO:.3f}, "
     f"{F.N4V1_RES_HI:.3f}] contains 0.50.",
-    f"§4b via the seated E1: residual ρ(N4, E1) {F.rcs:.3f}, upper-90 {F.N4E1_UP:.3f} ≤ −0.50; Steiger Z "
-    f"{F.STEIGER_Z:.2f} (one-sided p {F.STEIGER_P:.1e}, n_eff {F.PV2.STEIGER_N}; recomputed at build) → NOT REDUNDANT → "
+    f"§4b via the seated E1: residual ρ(N4, E1) {MINUS(F.rcs, 3)}, upper-90 {MINUS(F.N4E1_UP, 3)} ≤ −0.50; Steiger Z "
+    f"{MINUS(F.STEIGER_Z, 2)} (one-sided p {F.STEIGER_P:.1e}, n_eff {F.PV2.STEIGER_N}; recomputed at build) → NOT REDUNDANT → "
     "N4 seated → M = 3.",
     "Reviewer items (acceptance review, 2026-11-24): the residual Mantel p reads 0.023–0.027 across permutation seeds; "
     "with that clause passed, §4b would seat N4.",
@@ -693,12 +715,13 @@ notes(s, SRC_LINES[k] + ". baselines.vertices.p95[4], baselines.plugin_spread.p5
 # Appendix D — fit definitions
 # =============================================================================
 s, k = slide("Appendix D: the two GP fit definitions in use", "committed_configs.json (fit_v2_spec); EMULATOR_BO.md §1; arms_E.json gp.train")
-bullets(s, Inches(0.45), Inches(1.35), Inches(12.4), Inches(5.6), [
+text_box(s, Inches(0.45), Inches(1.35), Inches(12.4), Inches(5.6), [
     ("Fit v2 (E1; AMENDMENT 2026-11-24b) — fit_v2_spec, verbatim", {"bold": True, "color": ACCENT}),
-    (F.FIT_V2_SPEC, {"size": 12}),
+    (F.FIT_V2_SPEC, {"size": 13}),
+    ("", {}),
     ("House fit (V1, fallback)", {"bold": True, "color": ACCENT}),
-    ("bogp.train_gp: Adam, 700 steps, lr 0.01, float32, torch.manual_seed(0); refit each round.", {"size": 12}),
-], size=13, space_after=8)
+    ("bogp.train_gp: Adam, 700 steps, lr 0.01, float32, torch.manual_seed(0); refit each round.", {"size": 13}),
+], size=14, space_after=8)
 assert "Adam, 700 epochs, lr 0.01" in F.arms["gp"]["train"]
 F.CHECKS.append("arms_E.json gp.train contains 'Adam, 700 epochs, lr 0.01'")
 F.text_has(F.P["emumd"], "Adam 700 steps, lr 0.01, float32, `torch.manual_seed(0)`")

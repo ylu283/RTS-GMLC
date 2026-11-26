@@ -68,3 +68,11 @@ Nothing else was dropped. Every other prompt-67 number was found and asserted (s
 9. Slide 4: the equations are one PNG per line at one common scale; the decision tags are text boxes beside the lines.
    ε is written as "solver seed chatter Σ_c" (EMULATOR_BO.md §1).
 10. Appendix A lists 19 tx123 commits plus RTS 8ed4c01 (times from `git log --format=%ai`).
+
+## Render round (second commit)
+
+All 24 slides rendered with the Codex runtime and looked at once. Fixes: slide 6 figure full width with the bullets in
+two columns below; slide 4 rule block moved up (clear of the footer); slides 8 and 10 side cards shortened; B1
+figure enlarged; B2 HV / gain in × 10ⁿ form and gain/τ_285 with 2 decimals; B3 item 1 wording (its open test is item
+11); Appendix B full role / status strings (no truncation), B_j in k / M form, unbulleted headings, true minus signs;
+Appendix D unbulleted. No number changed.
